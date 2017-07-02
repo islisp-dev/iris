@@ -3,7 +3,7 @@ all: build
 parser.go: parser.go.y
 	goyacc -o $@ $<
 
-.PHONY: build clean format run vet test gommit
+.PHONY: build clean format run vet test commit
 
 build: parser.go
 	go build
