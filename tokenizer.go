@@ -6,35 +6,35 @@ import (
 )
 
 type TokenReader interface {
-	ReadToken() (rune, int, error)
+	ReadToken() (string, error)
 }
 
 func concatMatcher(src ...string) *regexp.Regexp {
 	return regexp.MustCompile("^(?:" + strings.Join(src, ")$|^(?:") + ")$")
 }
 
-var MacroToken = "#[[:digit:]]*[aA]?|,@|,|'|`"
-var IntegerToken = "[+-]?[[:digit:]]+|#[bB][01]+|#[oO][0-7]+|#[xX][[:xdigit:]]+"
-var FloatToken = "[+-]?[[:digit:]]+(?:.[[:digit:]]+|[eE][+-]?[[:digit:]]+|.[[:digit:]]+[eE][+-]?[[:digit:]]+)"
-var CharacterToken = "#\\\\?|#\\\\(?:[[:alpha:]]+|[[:graph:]])"
-var StringToken = "\"(?:\\\\\"|[^\"])*\"?"
-var SymbolToken = "[<>/*=?_!$%[\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*|\\|(?:\\\\\\||[^|])*\\|?"
-var ParenthesesToken = "\\.|\\(|\\)"
+var macro = strings.Join([]string{"#(?:[[:digit:]]+[aA]?)?", ",@?", "'", "`"}, "|")
+var integer = strings.Join([]string{"[[:digit:]]+", "[+-][[:digit:]]*", "#(?:[bB][01]*)?", "#(?:[oO][0-7]*)?", "#(?:[xX][[:xdigit:]]*)?"}, "|")
+var float = strings.Join([]string{"[[:digit:]]+(?:\\.?[[:digit:]]*(?:[eE](?:[-+]?[[:digit:]]*)?)?)?", "[+-](?:[[:digit:]]+(?:\\.?[[:digit:]]*(?:[eE](?:[-+]?[[:digit:]]*)?)?)?)?"}, "|")
+var character = strings.Join([]string{"#(?:\\\\[[:alpha:]]*)?", "#(?:\\\\[[:graph:]]?)?"}, "|")
+var str = strings.Join([]string{"\"(?:\\\\\"|[^\"])*\"?"}, "|")
+var symbol = strings.Join([]string{"[<>/*=?_!$%[\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*", "\\|(?:\\\\\\||[^|])*\\|?"}, "|")
+var parentheses = strings.Join([]string{"\\.", "\\(", "\\)"}, "|")
 
 var token = concatMatcher(
-	MacroToken,
-	IntegerToken,
-	FloatToken,
-	CharacterToken,
-	StringToken,
-	SymbolToken,
-	ParenthesesToken)
+	macro,
+	integer,
+	float,
+	character,
+	str,
+	symbol,
+	parentheses)
 
-func (tr *Reader) ReadToken() (string, error) {
+func (r *Reader) ReadToken() (string, error) {
 	buf := ""
 	for {
 		if buf == "" {
-			p, _, err := tr.PeekRune()
+			p, _, err := r.PeekRune()
 			if err != nil {
 				return "", err
 			}
@@ -42,7 +42,7 @@ func (tr *Reader) ReadToken() (string, error) {
 				buf = string(p)
 			}
 		} else {
-			p, _, err := tr.PeekRune()
+			p, _, err := r.PeekRune()
 			if err != nil {
 				return buf, nil
 			}
@@ -51,6 +51,6 @@ func (tr *Reader) ReadToken() (string, error) {
 			}
 			buf += string(p)
 		}
-		tr.ReadRune()
+		r.ReadRune()
 	}
 }
