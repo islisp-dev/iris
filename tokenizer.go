@@ -9,7 +9,7 @@ type TokenReader interface {
 	ReadToken() (rune, int, error)
 }
 
-func NewMatcher(src ...string) *regexp.Regexp {
+func concatMatcher(src ...string) *regexp.Regexp {
 	return regexp.MustCompile("^(?:" + strings.Join(src, ")$|^(?:") + ")$")
 }
 
@@ -21,7 +21,7 @@ var StringToken = "\"(?:\\\\\"|[^\"])*\"?"
 var SymbolToken = "[<>/*=?_!$%[\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*|\\|(?:\\\\\\||[^|])*\\|?"
 var ParenthesesToken = "\\(|\\)"
 
-var token = NewMatcher(
+var token = concatMatcher(
 	MacroToken,
 	IntegerToken,
 	FloatToken,
