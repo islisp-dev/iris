@@ -13,7 +13,7 @@ func concatMatcher(src ...string) *regexp.Regexp {
 	return regexp.MustCompile("^(?:" + strings.Join(src, ")$|^(?:") + ")$")
 }
 
-var MacroToken = ",@|,|'|`"
+var MacroToken = "#[[:digit:]]*[aA]?|,@|,|'|`"
 var IntegerToken = "[+-]?[[:digit:]]+|#[bB][01]+|#[oO][0-7]+|#[xX][[:xdigit:]]+"
 var FloatToken = "[+-]?[[:digit:]]+(?:.[[:digit:]]+|[eE][+-]?[[:digit:]]+|.[[:digit:]]+[eE][+-]?[[:digit:]]+)"
 var CharacterToken = "#\\\\?|#\\\\(?:[[:alpha:]]+|[[:graph:]])"
