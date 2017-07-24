@@ -9,6 +9,7 @@ import (
 )
 
 var errEOP = errors.New("End Of Parentheses")
+var errDOT = errors.New("Dot Cons")
 
 func ParseInteger(tok string) (*Object, error) {
 	start := 0
@@ -73,36 +74,69 @@ func ParseCharacter(tok string) (*Object, error) {
 	return &Object{"character", nil, nil, tok[2]}, nil
 }
 
-func ParseAtom(tok string, t *Reader) (*Object, error) {
-	if matched, _ := regexp.Match(MacroToken, []byte(tok)); matched {
-		cdr, err := Parse(t)
+func ParseArray(tok string) (*Object, error) {
+	a := &Object{"symbol", nil, nil, "array"}
+	d := &Object{"integer", nil, nil, 0}
+	i := strings.IndexRune(strings.ToLower(tok), 'a')
+	if i == 1 {
+		d.Val = 1
+	} else {
+		v, err := strconv.Atoi(tok[1:i])
 		if err != nil {
 			return nil, err
 		}
-		return NewCons(&Object{"symbol", nil, nil, tok}, NewCons(cdr, nil)), nil
+		d.Val = v
 	}
-	if matched, _ := regexp.Match(IntegerToken, []byte(tok)); matched {
+	return NewCons(a, NewCons(d, NewCons(nil, nil))), nil
+}
+
+func ParseMacro(tok string, t *Reader) (*Object, error) {
+	cdr, err := Parse(t)
+	if err != nil {
+		return nil, err
+	}
+	if matched, _ := regexp.MatchString("#[[:digit]]*[aA]", tok); matched {
+		a, err := ParseArray(tok)
+		if err != nil {
+			return nil, err
+		}
+		a.Cdr.Cdr.Car = cdr
+		return a, nil
+	}
+	m := &Object{"symbol", nil, nil, tok}
+	return NewCons(m, NewCons(cdr, nil)), nil
+}
+
+func ParseAtom(tok string, t *Reader) (*Object, error) {
+	if matched, _ := regexp.MatchString(MacroToken, tok); matched {
+		m, err := ParseMacro(tok, t)
+		if err != nil {
+			return nil, err
+		}
+		return m, nil
+	}
+	if matched, _ := regexp.MatchString(IntegerToken, tok); matched {
 		n, err := ParseInteger(tok)
 		if err != nil {
 			return nil, err
 		}
 		return n, nil
 	}
-	if matched, _ := regexp.Match(FloatToken, []byte(tok)); matched {
+	if matched, _ := regexp.MatchString(FloatToken, tok); matched {
 		f, err := ParseFloat(tok)
 		if err != nil {
 			return nil, err
 		}
 		return f, nil
 	}
-	if matched, _ := regexp.Match(CharacterToken, []byte(tok)); matched {
+	if matched, _ := regexp.MatchString(CharacterToken, tok); matched {
 		c, err := ParseCharacter(tok)
 		if err != nil {
 			return nil, err
 		}
 		return c, nil
 	}
-	if matched, _ := regexp.Match(StringToken, []byte(tok)); matched {
+	if matched, _ := regexp.MatchString(StringToken, tok); matched {
 		return &Object{"string", nil, nil, tok}, nil
 	}
 	return &Object{"symbol", nil, nil, tok}, nil
@@ -112,6 +146,16 @@ func ParseCons(t *Reader) (*Object, error) {
 	car, err := Parse(t)
 	if err == errEOP {
 		return nil, nil
+	}
+	if err == errDOT {
+		cdr, err := Parse(t)
+		if err != nil {
+			return nil, err
+		}
+		if _, err := Parse(t); err != errEOP {
+			return nil, errors.New("Invalid syntax")
+		}
+		return cdr, nil
 	}
 	if err != nil {
 		return nil, err
@@ -137,6 +181,9 @@ func Parse(t *Reader) (*Object, error) {
 	}
 	if tok == ")" {
 		return nil, errEOP
+	}
+	if tok == "." {
+		return nil, errDOT
 	}
 	atom, err := ParseAtom(tok, t)
 	if err != nil {
