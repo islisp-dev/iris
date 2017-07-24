@@ -74,36 +74,38 @@ func ParseCharacter(tok string) (*Object, error) {
 	return &Object{"character", nil, nil, tok[2]}, nil
 }
 
-func ParseArray(tok string) (*Object, error) {
-	a := &Object{"symbol", nil, nil, "array"}
-	d := &Object{"integer", nil, nil, 0}
-	i := strings.IndexRune(strings.ToLower(tok), 'a')
-	if i == 1 {
-		d.Val = 1
-	} else {
-		v, err := strconv.Atoi(tok[1:i])
-		if err != nil {
-			return nil, err
-		}
-		d.Val = v
-	}
-	return NewCons(a, NewCons(d, NewCons(nil, nil))), nil
-}
-
 func ParseMacro(tok string, t *Reader) (*Object, error) {
 	cdr, err := Parse(t)
 	if err != nil {
 		return nil, err
 	}
-	if matched, _ := regexp.MatchString("#[[:digit]]*[aA]", tok); matched {
-		a, err := ParseArray(tok)
-		if err != nil {
-			return nil, err
+	n := tok
+	if m, _ := regexp.MatchString("#[[:digit:]]*[aA]", tok); m {
+		s := &Object{"symbol", nil, nil, "array"}
+		d := &Object{"integer", nil, nil, 0}
+		i := strings.IndexRune(strings.ToLower(tok), 'a')
+		if i == 1 {
+			d.Val = 1
+		} else {
+			v, err := strconv.Atoi(tok[1:i])
+			if err != nil {
+				return nil, err
+			}
+			d.Val = v
 		}
-		a.Cdr.Cdr.Car = cdr
-		return a, nil
+		return NewCons(s, NewCons(d, NewCons(cdr, nil))), nil
 	}
-	m := &Object{"symbol", nil, nil, tok}
+	switch tok {
+	case ",@":
+		n = "commaat"
+	case ",":
+		n = "comma"
+	case "'":
+		n = "quote"
+	case "`":
+		n = "backquote"
+	}
+	m := &Object{"symbol", nil, nil, n}
 	return NewCons(m, NewCons(cdr, nil)), nil
 }
 
