@@ -2,14 +2,15 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
-var errEOP = errors.New("End Of Parentheses")
-var errDOT = errors.New("Dot Cons")
+var EOP = errors.New("End Of Parentheses")
+var BOD = errors.New("Begin Of Dot")
 
 func ParseInteger(tok string) (*Object, error) {
 	start := 0
@@ -74,7 +75,7 @@ func ParseCharacter(tok string) (*Object, error) {
 	return &Object{"character", nil, nil, tok[2]}, nil
 }
 
-func ParseMacro(tok string, t *Reader) (*Object, error) {
+func ParseMacro(tok string, t TokenReader) (*Object, error) {
 	cdr, err := Parse(t)
 	if err != nil {
 		return nil, err
@@ -109,52 +110,58 @@ func ParseMacro(tok string, t *Reader) (*Object, error) {
 	return NewCons(m, NewCons(cdr, nil)), nil
 }
 
-func ParseAtom(tok string, t *Reader) (*Object, error) {
-	if matched, _ := regexp.MatchString(MacroToken, tok); matched {
+func ParseAtom(tok string, t TokenReader) (*Object, error) {
+	if matched, _ := regexp.MatchString("^(?:,@?|'|`|#[[:digit:]]*[aA])$", tok); matched {
 		m, err := ParseMacro(tok, t)
 		if err != nil {
 			return nil, err
 		}
 		return m, nil
 	}
-	if matched, _ := regexp.MatchString(IntegerToken, tok); matched {
+	if matched, _ := regexp.MatchString("^(?:[+-]?(?:[[:digit:]]+|#[bB][01]+|#[oO][0-7]+|#[xX][[:xdigit:]]+))$", tok); matched {
 		n, err := ParseInteger(tok)
 		if err != nil {
 			return nil, err
 		}
 		return n, nil
 	}
-	if matched, _ := regexp.MatchString(FloatToken, tok); matched {
+	if matched, _ := regexp.MatchString("^(?:[+-][[:digit:]]+(?:\\.[[:digit:]])?(?:[eE][-+]?[[:digit:]]+))?$", tok); matched {
 		f, err := ParseFloat(tok)
 		if err != nil {
 			return nil, err
 		}
 		return f, nil
 	}
-	if matched, _ := regexp.MatchString(CharacterToken, tok); matched {
+	if matched, _ := regexp.MatchString("^(?:#\\\\[[:graph:]]|#\\\\(?:[nN][eE][wW][lL][iI][nN][eE]|[sS][pP][aA][cC][eE]))$", tok); matched {
 		c, err := ParseCharacter(tok)
 		if err != nil {
 			return nil, err
 		}
 		return c, nil
 	}
-	if matched, _ := regexp.MatchString(StringToken, tok); matched {
+	if matched, _ := regexp.MatchString("^\".*\"$", tok); matched {
 		return &Object{"string", nil, nil, tok}, nil
 	}
-	return &Object{"symbol", nil, nil, tok}, nil
+	if matched, _ := regexp.MatchString("^\\|.*\\|$", tok); matched {
+		return &Object{"symbol", nil, nil, tok}, nil
+	}
+	if matched, _ := regexp.MatchString("[<>/*=?_!$%[\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*", tok); matched {
+		return &Object{"symbol", nil, nil, strings.ToUpper(tok)}, nil
+	}
+	return nil, fmt.Errorf("Sorry, I could not parse %s", tok)
 }
 
-func ParseCons(t *Reader) (*Object, error) {
+func ParseCons(t TokenReader) (*Object, error) {
 	car, err := Parse(t)
-	if err == errEOP {
+	if err == EOP {
 		return nil, nil
 	}
-	if err == errDOT {
+	if err == BOD {
 		cdr, err := Parse(t)
 		if err != nil {
 			return nil, err
 		}
-		if _, err := Parse(t); err != errEOP {
+		if _, err := Parse(t); err != EOP {
 			return nil, errors.New("Invalid syntax")
 		}
 		return cdr, nil
@@ -169,7 +176,7 @@ func ParseCons(t *Reader) (*Object, error) {
 	return NewCons(car, cdr), nil
 }
 
-func Parse(t *Reader) (*Object, error) {
+func Parse(t TokenReader) (*Object, error) {
 	tok, err := t.ReadToken()
 	if err != nil {
 		return nil, err
@@ -182,10 +189,10 @@ func Parse(t *Reader) (*Object, error) {
 		return cons, err
 	}
 	if tok == ")" {
-		return nil, errEOP
+		return nil, EOP
 	}
 	if tok == "." {
-		return nil, errDOT
+		return nil, BOD
 	}
 	atom, err := ParseAtom(tok, t)
 	if err != nil {

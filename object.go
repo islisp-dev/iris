@@ -8,6 +8,9 @@ type Object struct {
 }
 
 func NewCons(car *Object, cdr *Object) *Object {
+	if cdr == nil || cdr.Type == "list" {
+		return &Object{"list", car, cdr, nil}
+	}
 	return &Object{"cons", car, cdr, nil}
 }
 
