@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	src := "(display #\\a) (println '10)"
+	src := "(display . print)"
 	r := NewReader(strings.NewReader(src))
 	for exp, err := r.ReadExp(); err != io.EOF; exp, err = r.ReadExp() {
 		pp.Print(exp)
