@@ -8,9 +8,9 @@ import (
 )
 
 func main() {
-	src := "(display #\\\\) (print 10)"
-	r := strings.NewReader(src)
-	for exp, err := Read(r); err != io.EOF; exp, err = Read(r) {
+	src := "(display #\\a) (println 10)"
+	r := NewReader(strings.NewReader(src))
+	for exp, err := r.ReadExp(); err != io.EOF; exp, err = r.ReadExp() {
 		pp.Print(exp)
 	}
 }
