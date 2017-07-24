@@ -19,7 +19,7 @@ var FloatToken = "[+-]?[[:digit:]]+(?:.[[:digit:]]+|[eE][+-]?[[:digit:]]+|.[[:di
 var CharacterToken = "#\\\\?|#\\\\(?:[[:alpha:]]+|[[:graph:]])"
 var StringToken = "\"(?:\\\\\"|[^\"])*\"?"
 var SymbolToken = "[<>/*=?_!$%[\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*|\\|(?:\\\\\\||[^|])*\\|?"
-var ParenthesesToken = "\\(|\\)"
+var ParenthesesToken = "\\.|\\(|\\)"
 
 var token = concatMatcher(
 	MacroToken,
