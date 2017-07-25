@@ -1,5 +1,6 @@
 package main
 
+// Object struct type is the struct for the internal representations
 type Object struct {
 	Type string
 	Car  *Object
@@ -7,6 +8,7 @@ type Object struct {
 	Val  interface{}
 }
 
+// NewCons creates cons pair from two objects
 func NewCons(car *Object, cdr *Object) *Object {
 	if cdr == nil || cdr.Type == "list" {
 		return &Object{"list", car, cdr, nil}
@@ -14,6 +16,7 @@ func NewCons(car *Object, cdr *Object) *Object {
 	return &Object{"cons", car, cdr, nil}
 }
 
+// Is is for testing
 func (o *Object) Is(val interface{}) bool {
 	return o.Val == val
 }

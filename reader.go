@@ -2,6 +2,8 @@ package main
 
 import "io"
 
+// Reader is like bufio.Reader but has PeekRune
+// which returns a rune without advancing pointer
 type Reader struct {
 	err error
 	ru  rune
@@ -9,6 +11,7 @@ type Reader struct {
 	rr  io.RuneReader
 }
 
+// NewReader creates interal reader from io.RuneReader
 func NewReader(r io.RuneReader) *Reader {
 	b := new(Reader)
 	b.rr = r
@@ -16,22 +19,26 @@ func NewReader(r io.RuneReader) *Reader {
 	return b
 }
 
-func (tr *Reader) PeekRune() (rune, int, error) {
-	return tr.ru, tr.sz, tr.err
+// PeekRune returns a rune without advancing pointer
+func (r *Reader) PeekRune() (rune, int, error) {
+	return r.ru, r.sz, r.err
 }
 
-func (tr *Reader) ReadRune() (rune, int, error) {
-	r := tr.ru
-	s := tr.sz
-	e := tr.err
-	tr.ru, tr.sz, tr.err = tr.rr.ReadRune()
-	return r, s, e
+// ReadRune returns a rune with advancing pointer
+func (r *Reader) ReadRune() (rune, int, error) {
+	ru := r.ru
+	sz := r.sz
+	err := r.err
+	r.ru, r.sz, r.err = r.rr.ReadRune()
+	return ru, sz, err
 }
 
+// ExpReader interface type is the interface for reading expressions.
 type ExpReader interface {
 	ReadExp() (*Object, error)
 }
 
+// ReadExp returns a expression that is a pointer to Object
 func (r *Reader) ReadExp() (*Object, error) {
 	exp, err := Parse(r)
 	return exp, err
