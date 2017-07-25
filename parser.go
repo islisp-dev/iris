@@ -57,17 +57,17 @@ func parseInteger(tok string) (*Object, error) {
 func parseFloat(tok string) (*Object, error) {
 	e := strings.IndexRune(strings.ToUpper(tok), 'E')
 	if e > 0 {
-		num, err := strconv.ParseFloat(tok[:e], 32)
+		num, err := strconv.ParseFloat(tok[:e], 64)
 		if err != nil {
 			return nil, err
 		}
-		exp, err := strconv.ParseFloat(tok[e+1:], 32)
+		exp, err := strconv.ParseFloat(tok[e+1:], 64)
 		if err != nil {
 			return nil, err
 		}
 		return &Object{"float", nil, nil, num * math.Pow(10.0, exp)}, nil
 	}
-	num, err := strconv.ParseFloat(tok, 32)
+	num, err := strconv.ParseFloat(tok, 64)
 	if err != nil {
 		return nil, err
 	}
@@ -122,42 +122,35 @@ func parseMacro(tok string, t TokenReader) (*Object, error) {
 	return NewCons(m, NewCons(cdr, nil)), nil
 }
 
-func parseAtom(tok string, t TokenReader) (*Object, error) {
-	if matched, _ := regexp.MatchString("^(?:,@?|'|`|#[[:digit:]]*[aA])$", tok); matched {
-		m, err := parseMacro(tok, t)
-		if err != nil {
-			return nil, err
-		}
-		return m, nil
-	}
-	if matched, _ := regexp.MatchString("^(?:[+-]?[[:digit:]]+|#[bB][+-]?[01]+|#[oO][0-7]+|#[xX][+-]?[[:xdigit:]]+)$", tok); matched {
+func parseAtom(tok string) (*Object, error) {
+	if mat, _ := regexp.MatchString("^(?:[+-]?[[:digit:]]+|#[bB][+-]?[01]+|#[oO][+-]?[0-7]+|#[xX][+-]?[[:xdigit:]]+)$", tok); mat {
 		n, err := parseInteger(tok)
 		if err != nil {
 			return nil, err
 		}
 		return n, nil
 	}
-	if matched, _ := regexp.MatchString("^(?:[+-][[:digit:]]+(?:\\.[[:digit:]])?(?:[eE][-+]?[[:digit:]]+))?$", tok); matched {
+	if mat, _ := regexp.MatchString("^(?:[+-]?[[:digit:]]+(?:\\.[[:digit:]]+)?(?:[eE][-+]?[[:digit:]]+)?)?$", tok); mat {
 		f, err := parseFloat(tok)
 		if err != nil {
 			return nil, err
 		}
 		return f, nil
 	}
-	if matched, _ := regexp.MatchString("^(?:#\\\\[[:graph:]]|#\\\\[[:alpha:]]+$", tok); matched {
+	if mat, _ := regexp.MatchString("^(?:#\\\\[[:graph:]]|#\\\\[[:alpha:]]+)$", tok); mat {
 		c, err := parseCharacter(tok)
 		if err != nil {
 			return nil, err
 		}
 		return c, nil
 	}
-	if matched, _ := regexp.MatchString("^\".*\"$", tok); matched {
+	if mat, _ := regexp.MatchString("^\".*\"$", tok); mat {
 		return &Object{"string", nil, nil, tok}, nil
 	}
-	if matched, _ := regexp.MatchString("^\\|.*\\|$", tok); matched {
+	if mat, _ := regexp.MatchString("^\\|.*\\|$", tok); mat {
 		return &Object{"symbol", nil, nil, tok}, nil
 	}
-	if matched, _ := regexp.MatchString("[<>/*=?_!$%[\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*", tok); matched {
+	if mat, _ := regexp.MatchString("[<>/*=?_!$%[\\\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*", tok); mat {
 		return &Object{"symbol", nil, nil, strings.ToUpper(tok)}, nil
 	}
 	return nil, fmt.Errorf("Sorry, I could not parse %s", tok)
@@ -207,7 +200,14 @@ func Parse(t TokenReader) (*Object, error) {
 	if tok == "." {
 		return nil, errBOD
 	}
-	atom, err := parseAtom(tok, t)
+	if mat, _ := regexp.MatchString("^(?:,@?|'|`|#[[:digit:]]*[aA])$", tok); mat {
+		m, err := parseMacro(tok, t)
+		if err != nil {
+			return nil, err
+		}
+		return m, nil
+	}
+	atom, err := parseAtom(tok)
 	if err != nil {
 		return nil, err
 	}
