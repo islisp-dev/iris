@@ -16,6 +16,12 @@ func Test_parseInteger(t *testing.T) {
 		wantErr bool
 	}{
 		{
+			name:    "default",
+			args:    args{"5"},
+			want:    &Object{"integer", nil, nil, 5},
+			wantErr: false,
+		},
+		{
 			name:    "signed",
 			args:    args{"-5"},
 			want:    &Object{"integer", nil, nil, -5},
@@ -67,6 +73,61 @@ func Test_parseInteger(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("parseInteger() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_parseFloat(t *testing.T) {
+	type args struct {
+		tok string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *Object
+		wantErr bool
+	}{
+		{
+			name:    "default",
+			args:    args{"5.0"},
+			want:    &Object{"float", nil, nil, 5.0},
+			wantErr: false,
+		},
+		{
+			name:    "signed",
+			args:    args{"-5.0"},
+			want:    &Object{"float", nil, nil, -5.0},
+			wantErr: false,
+		},
+		{
+			name:    "exponential",
+			args:    args{"-5.0E3"},
+			want:    &Object{"float", nil, nil, -5.0 * 1000},
+			wantErr: false,
+		},
+		{
+			name:    "signed exponential",
+			args:    args{"5.0E-3"},
+			want:    &Object{"float", nil, nil, 5.0 * 1.0 / 1000.0},
+			wantErr: false,
+		},
+		{
+			name:    "without point",
+			args:    args{"5E-3"},
+			want:    &Object{"float", nil, nil, 5.0 * 1.0 / 1000.0},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := parseFloat(tt.args.tok)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("parseFloat() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("parseFloat() = %v, want %v", got, tt.want)
 			}
 		})
 	}
