@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// TokenReader interface type is the interface for reading string with every token
 type TokenReader interface {
 	ReadToken() (string, error)
 }
@@ -30,6 +31,7 @@ var token = concatMatcher(
 	symbol,
 	parentheses)
 
+// ReadToken returns error or string as token
 func (r *Reader) ReadToken() (string, error) {
 	buf := ""
 	for {
