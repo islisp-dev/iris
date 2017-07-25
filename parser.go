@@ -14,6 +14,7 @@ var errBOD = errors.New("Begin Of Dot")
 
 func parseInteger(tok string) (*Object, error) {
 	// TODO: http://minejima.jp/ISLispHyperDraft/islisp-v23.html#integer_class
+
 	start := 0
 	if tok[0] == '+' || tok[0] == '-' {
 		start = 1
@@ -74,16 +75,16 @@ func parseFloat(tok string) (*Object, error) {
 }
 
 func parseCharacter(tok string) (*Object, error) {
-	if strings.ToLower(tok) == "newline" {
+	if strings.ToLower(tok[2:]) == "newline" {
 		return &Object{"character", nil, nil, '\n'}, nil
 	}
-	if strings.ToLower(tok) == "space" {
+	if strings.ToLower(tok[2:]) == "space" {
 		return &Object{"character", nil, nil, ' '}, nil
 	}
 	if len(tok) != 3 {
 		return nil, errors.New("Invalid character name")
 	}
-	return &Object{"character", nil, nil, tok[2]}, nil
+	return &Object{"character", nil, nil, rune(tok[2])}, nil
 }
 
 func parseMacro(tok string, t TokenReader) (*Object, error) {
@@ -129,7 +130,7 @@ func parseAtom(tok string, t TokenReader) (*Object, error) {
 		}
 		return m, nil
 	}
-	if matched, _ := regexp.MatchString("^(?:[+-]?(?:[[:digit:]]+|#[bB][01]+|#[oO][0-7]+|#[xX][[:xdigit:]]+))$", tok); matched {
+	if matched, _ := regexp.MatchString("^(?:[+-]?[[:digit:]]+|#[bB][+-]?[01]+|#[oO][0-7]+|#[xX][+-]?[[:xdigit:]]+)$", tok); matched {
 		n, err := parseInteger(tok)
 		if err != nil {
 			return nil, err
@@ -143,7 +144,7 @@ func parseAtom(tok string, t TokenReader) (*Object, error) {
 		}
 		return f, nil
 	}
-	if matched, _ := regexp.MatchString("^(?:#\\\\[[:graph:]]|#\\\\(?:[nN][eE][wW][lL][iI][nN][eE]|[sS][pP][aA][cC][eE]))$", tok); matched {
+	if matched, _ := regexp.MatchString("^(?:#\\\\[[:graph:]]|#\\\\[[:alpha:]]+$", tok); matched {
 		c, err := parseCharacter(tok)
 		if err != nil {
 			return nil, err

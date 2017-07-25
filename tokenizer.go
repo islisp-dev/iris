@@ -15,7 +15,7 @@ func concatMatcher(src ...string) *regexp.Regexp {
 }
 
 var macro = strings.Join([]string{"#(?:[[:digit:]]+[aA]?)?", ",@?", "'", "`"}, "|")
-var integer = strings.Join([]string{"[[:digit:]]+", "[+-][[:digit:]]*", "#(?:[bB][01]*)?", "#(?:[oO][0-7]*)?", "#(?:[xX][[:xdigit:]]*)?"}, "|")
+var integer = strings.Join([]string{"[[:digit:]]+", "[+-][[:digit:]]*", "#(?:[bB][+-]?[01]*)?", "#(?:[oO][+-]?[0-7]*)?", "#(?:[xX][+-]?[[:xdigit:]]*)?"}, "|")
 var float = strings.Join([]string{"[[:digit:]]+(?:\\.?[[:digit:]]*(?:[eE](?:[-+]?[[:digit:]]*)?)?)?", "[+-](?:[[:digit:]]+(?:\\.?[[:digit:]]*(?:[eE](?:[-+]?[[:digit:]]*)?)?)?)?"}, "|")
 var character = strings.Join([]string{"#(?:\\\\[[:alpha:]]*)?", "#(?:\\\\[[:graph:]]?)?"}, "|")
 var str = strings.Join([]string{"\"(?:\\\\\"|[^\"])*\"?"}, "|")
