@@ -132,3 +132,52 @@ func Test_parseFloat(t *testing.T) {
 		})
 	}
 }
+
+func Test_parseCharacter(t *testing.T) {
+	type args struct {
+		tok string
+	}
+	tests := []struct {
+		name    string
+		args    args
+		want    *Object
+		wantErr bool
+	}{
+		{
+			name:    "default",
+			args:    args{"#\\a"},
+			want:    &Object{"character", nil, nil, 'a'},
+			wantErr: false,
+		},
+		{
+			name:    "newline",
+			args:    args{"#\\newline"},
+			want:    &Object{"character", nil, nil, '\n'},
+			wantErr: false,
+		},
+		{
+			name:    "space",
+			args:    args{"#\\space"},
+			want:    &Object{"character", nil, nil, ' '},
+			wantErr: false,
+		},
+		{
+			name:    "invalid character name",
+			args:    args{"#\\foo"},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := parseCharacter(tt.args.tok)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("parseCharacter() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("parseCharacter() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
