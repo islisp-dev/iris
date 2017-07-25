@@ -13,6 +13,7 @@ var errEOP = errors.New("End Of Parentheses")
 var errBOD = errors.New("Begin Of Dot")
 
 func parseInteger(tok string) (*Object, error) {
+	// TODO: http://minejima.jp/ISLispHyperDraft/islisp-v23.html#integer_class
 	start := 0
 	if tok[0] == '+' || tok[0] == '-' {
 		start = 1
@@ -26,20 +27,30 @@ func parseInteger(tok string) (*Object, error) {
 		} else if tok[start+1] == 'x' || tok[start+1] == 'X' {
 			base = 16
 		}
+		if tok[start+2] == '+' || tok[start+2] == '-' {
+			num, err := strconv.ParseInt(tok[start+3:], base, 32)
+			if err != nil {
+				return nil, err
+			}
+			if tok[start+2] == '-' {
+				num = -num
+			}
+			return &Object{"integer", nil, nil, int(num)}, nil
+		}
 		num, err := strconv.ParseInt(tok[start+2:], base, 32)
 		if err != nil {
 			return nil, err
 		}
-		if tok[0] == '-' {
-			num = -num
-		}
-		return &Object{"integer", nil, nil, num}, nil
+		return &Object{"integer", nil, nil, int(num)}, nil
 	}
-	num, err := strconv.ParseInt(tok, 10, 32)
+	num, err := strconv.ParseInt(tok[start:], 10, 32)
 	if err != nil {
 		return nil, err
 	}
-	return &Object{"integer", nil, nil, num}, nil
+	if tok[0] == '-' {
+		num = -num
+	}
+	return &Object{"integer", nil, nil, int(num)}, nil
 }
 
 func parseFloat(tok string) (*Object, error) {
@@ -88,11 +99,11 @@ func parseMacro(tok string, t TokenReader) (*Object, error) {
 		if i == 1 {
 			d.Val = 1
 		} else {
-			v, err := strconv.Atoi(tok[1:i])
+			v, err := strconv.ParseInt(tok[1:i], 10, 32)
 			if err != nil {
 				return nil, err
 			}
-			d.Val = v
+			d.Val = int(v)
 		}
 		return NewCons(s, NewCons(d, NewCons(cdr, nil))), nil
 	}
