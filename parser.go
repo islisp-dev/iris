@@ -35,7 +35,7 @@ func parseAtom(tok string) (*Object, error) {
 	//
 	// float
 	//
-	if m, _ := regexp.MatchString("^[-+]?[[:digit:]]+\\.[[:digit:]]$", tok); m {
+	if m, _ := regexp.MatchString("^[-+]?[[:digit:]]+\\.[[:digit:]]+$", tok); m {
 		n, _ := strconv.ParseFloat(tok, 64)
 		return &Object{"float", nil, nil, n}, nil
 	}
@@ -68,7 +68,7 @@ func parseAtom(tok string) (*Object, error) {
 	if m, _ := regexp.MatchString("^\\|.*\\|$", tok); m {
 		return &Object{"symbol", nil, nil, tok}, nil
 	}
-	if m, _ := regexp.MatchString("[<>/*=?_!$%[\\\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*", tok); m {
+	if m, _ := regexp.MatchString("^[<>/*=?_!$%[\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*$", tok); m {
 		return &Object{"symbol", nil, nil, strings.ToUpper(tok)}, nil
 	}
 	return nil, fmt.Errorf("Sorry, I could not parse %s", tok)
@@ -118,7 +118,7 @@ func parseCons(t TokenReader) (*Object, error) {
 			return nil, err
 		}
 		if _, err := Parse(t); err != errEOP {
-			return nil, errors.New("Invalid syntax")
+			return nil, err
 		}
 		return cdr, nil
 	}

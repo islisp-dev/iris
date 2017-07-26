@@ -2,10 +2,20 @@ package main
 
 import (
 	"reflect"
+	"strings"
 	"testing"
 )
 
+func read(s string) *Object {
+	e, _ := Parse(NewReader(strings.NewReader(s)))
+	return e
+}
+
 func TestEval(t *testing.T) {
+	testEnv := NewEnv()
+	testEnv.Fun["INC"] = &NativeFunction{func(args *Object, global *Env) (*Object, error) {
+		return &Object{"integer", nil, nil, args.Car.Val.(int) + 1}, nil
+	}}
 	type args struct {
 		obj    *Object
 		local  *Env
@@ -19,8 +29,14 @@ func TestEval(t *testing.T) {
 	}{
 		{
 			name:    "local variable",
-			args:    args{&Object{"symbol", nil, nil, "PI"}, &Env{nil, map[string]*Object{"PI": &Object{"float", nil, nil, 3.14}}}, nil},
+			args:    args{read("PI"), &Env{nil, nil, map[string]*Object{"PI": read("3.14")}}, nil},
 			want:    &Object{"float", nil, nil, 3.14},
+			wantErr: false,
+		},
+		{
+			name:    "function call",
+			args:    args{read("(inc (inc 1))"), NewEnv(), testEnv},
+			want:    &Object{"integer", nil, nil, 3},
 			wantErr: false,
 		},
 	}
