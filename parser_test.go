@@ -20,7 +20,7 @@ func Test_parseAtom(t *testing.T) {
 		//
 		{
 			name:    "default",
-			args:    args{"5.0"},
+			args:    args{"3.14"},
 			want:    &Object{"float", nil, nil, 5.0},
 			wantErr: false,
 		},
