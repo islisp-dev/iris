@@ -12,81 +12,67 @@ import (
 var errEOP = errors.New("End Of Parentheses")
 var errBOD = errors.New("Begin Of Dot")
 
-func parseInteger(tok string) (*Object, error) {
-	// TODO: http://minejima.jp/ISLispHyperDraft/islisp-v23.html#integer_class
-
-	start := 0
-	if tok[0] == '+' || tok[0] == '-' {
-		start = 1
+func parseAtom(tok string) (*Object, error) {
+	//
+	// integer
+	//
+	if m, _ := regexp.MatchString("^[-+]?[[:digit:]]+$", tok); m {
+		n, _ := strconv.ParseInt(tok, 10, 64)
+		return &Object{"integer", nil, nil, int(n)}, nil
 	}
-	if tok[start] == '#' {
-		base := 10
-		if tok[start+1] == 'b' || tok[start+1] == 'B' {
-			base = 2
-		} else if tok[start+1] == 'o' || tok[start+1] == 'O' {
-			base = 8
-		} else if tok[start+1] == 'x' || tok[start+1] == 'X' {
-			base = 16
-		}
-		if tok[start+2] == '+' || tok[start+2] == '-' {
-			num, err := strconv.ParseInt(tok[start+3:], base, 32)
-			if err != nil {
-				return nil, err
-			}
-			if tok[start+2] == '-' {
-				num = -num
-			}
-			return &Object{"integer", nil, nil, int(num)}, nil
-		}
-		num, err := strconv.ParseInt(tok[start+2:], base, 32)
-		if err != nil {
-			return nil, err
-		}
-		return &Object{"integer", nil, nil, int(num)}, nil
+	if r := regexp.MustCompile("^#[bB]([-+]?[01]+)$").FindStringSubmatch(tok); len(r) >= 2 {
+		n, _ := strconv.ParseInt(r[1], 2, 64)
+		return &Object{"integer", nil, nil, int(n)}, nil
 	}
-	num, err := strconv.ParseInt(tok[start:], 10, 32)
-	if err != nil {
-		return nil, err
+	if r := regexp.MustCompile("^#[oO]([-+]?[0-7]+)$").FindStringSubmatch(tok); len(r) >= 2 {
+		n, _ := strconv.ParseInt(r[1], 8, 64)
+		return &Object{"integer", nil, nil, int(n)}, nil
 	}
-	if tok[0] == '-' {
-		num = -num
+	if r := regexp.MustCompile("^#[xX]([-+]?[[:xdigit:]]+)$").FindStringSubmatch(tok); len(r) >= 2 {
+		n, _ := strconv.ParseInt(r[1], 16, 64)
+		return &Object{"integer", nil, nil, int(n)}, nil
 	}
-	return &Object{"integer", nil, nil, int(num)}, nil
-}
-
-func parseFloat(tok string) (*Object, error) {
-	e := strings.IndexRune(strings.ToUpper(tok), 'E')
-	if e > 0 {
-		num, err := strconv.ParseFloat(tok[:e], 64)
-		if err != nil {
-			return nil, err
-		}
-		exp, err := strconv.ParseFloat(tok[e+1:], 64)
-		if err != nil {
-			return nil, err
-		}
-		return &Object{"float", nil, nil, num * math.Pow(10.0, exp)}, nil
+	//
+	// float
+	//
+	if m, _ := regexp.MatchString("^[-+]?[[:digit:]]+\\.[[:digit:]]$", tok); m {
+		n, _ := strconv.ParseFloat(tok, 64)
+		return &Object{"float", nil, nil, n}, nil
 	}
-	num, err := strconv.ParseFloat(tok, 64)
-	if err != nil {
-		return nil, err
+	if r := regexp.MustCompile("^([-+]?[[:digit:]]+(?:\\.[[:digit:]]+)?)[eE]([-+]?[[:digit:]]+)$").FindStringSubmatch(tok); len(r) >= 3 {
+		n, _ := strconv.ParseFloat(r[1], 64)
+		e, _ := strconv.ParseInt(r[2], 10, 64)
+		return &Object{"float", nil, nil, n * math.Pow10(int(e))}, nil
 	}
-	return &Object{"float", nil, nil, num}, nil
-}
-
-func parseCharacter(tok string) (*Object, error) {
-	if strings.ToLower(tok[2:]) == "newline" {
+	//
+	// character
+	//
+	if m, _ := regexp.MatchString("^#\\\\newline$", tok); m {
 		return &Object{"character", nil, nil, '\n'}, nil
 	}
-	if strings.ToLower(tok[2:]) == "space" {
+	if m, _ := regexp.MatchString("^#\\\\space$", tok); m {
 		return &Object{"character", nil, nil, ' '}, nil
 	}
-	if len(tok) != 3 {
-		return nil, errors.New("Invalid character name")
+	if r := regexp.MustCompile("^#\\\\([[:graph:]])$").FindStringSubmatch(tok); len(r) >= 2 {
+		return &Object{"character", nil, nil, rune(r[1][0])}, nil
 	}
-	return &Object{"character", nil, nil, rune(tok[2])}, nil
+	//
+	// string
+	//
+	if m, _ := regexp.MatchString("^\".*\"$", tok); m {
+		return &Object{"string", nil, nil, tok}, nil
+	}
+	//
+	// symbol
+	//
+	if m, _ := regexp.MatchString("^\\|.*\\|$", tok); m {
+		return &Object{"symbol", nil, nil, tok}, nil
+	}
+	if m, _ := regexp.MatchString("[<>/*=?_!$%[\\\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*", tok); m {
+		return &Object{"symbol", nil, nil, strings.ToUpper(tok)}, nil
+	}
+	return nil, fmt.Errorf("Sorry, I could not parse %s", tok)
 }
-
 func parseMacro(tok string, t TokenReader) (*Object, error) {
 	cdr, err := Parse(t)
 	if err != nil {
@@ -121,41 +107,6 @@ func parseMacro(tok string, t TokenReader) (*Object, error) {
 	m := &Object{"symbol", nil, nil, n}
 	return NewCons(m, NewCons(cdr, nil)), nil
 }
-
-func parseAtom(tok string) (*Object, error) {
-	if mat, _ := regexp.MatchString("^(?:[+-]?[[:digit:]]+|#[bB][+-]?[01]+|#[oO][+-]?[0-7]+|#[xX][+-]?[[:xdigit:]]+)$", tok); mat {
-		n, err := parseInteger(tok)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
-	}
-	if mat, _ := regexp.MatchString("^(?:[+-]?[[:digit:]]+(?:\\.[[:digit:]]+)?(?:[eE][-+]?[[:digit:]]+)?)?$", tok); mat {
-		f, err := parseFloat(tok)
-		if err != nil {
-			return nil, err
-		}
-		return f, nil
-	}
-	if mat, _ := regexp.MatchString("^(?:#\\\\[[:graph:]]|#\\\\[[:alpha:]]+)$", tok); mat {
-		c, err := parseCharacter(tok)
-		if err != nil {
-			return nil, err
-		}
-		return c, nil
-	}
-	if mat, _ := regexp.MatchString("^\".*\"$", tok); mat {
-		return &Object{"string", nil, nil, tok}, nil
-	}
-	if mat, _ := regexp.MatchString("^\\|.*\\|$", tok); mat {
-		return &Object{"symbol", nil, nil, tok}, nil
-	}
-	if mat, _ := regexp.MatchString("[<>/*=?_!$%[\\\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*", tok); mat {
-		return &Object{"symbol", nil, nil, strings.ToUpper(tok)}, nil
-	}
-	return nil, fmt.Errorf("Sorry, I could not parse %s", tok)
-}
-
 func parseCons(t TokenReader) (*Object, error) {
 	car, err := Parse(t)
 	if err == errEOP {
