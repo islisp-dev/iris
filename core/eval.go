@@ -1,10 +1,10 @@
-package runtime
+package core
 
 import (
 	"errors"
 	"fmt"
 
-	"github.com/ta2gch/gazelle/runtime/class"
+	"github.com/ta2gch/gazelle/core/class"
 )
 
 // Eval evaluates any classs

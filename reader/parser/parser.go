@@ -8,8 +8,8 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/ta2gch/gazelle/core/class"
 	"github.com/ta2gch/gazelle/reader/tokenizer"
-	"github.com/ta2gch/gazelle/runtime/class"
 )
 
 var errEOP = errors.New("End Of Parentheses")

@@ -1,7 +1,7 @@
-package runtime
+package core
 
 import (
-	"github.com/ta2gch/gazelle/runtime/class"
+	"github.com/ta2gch/gazelle/core/class"
 )
 
 // Env struct is the struct for keeping functions and variables
@@ -17,3 +17,6 @@ func NewEnv() *Env {
 	env.Var = map[string]*class.Instance{}
 	return env
 }
+
+// TopLevel is a global environment
+var TopLevel = NewEnv()
