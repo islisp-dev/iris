@@ -1,7 +1,5 @@
 package main
 
-import "errors"
-
 // Object struct type is the struct for the internal representations
 type Object struct {
 	Type string
@@ -23,17 +21,10 @@ func (o *Object) Is(val interface{}) bool {
 	return o.Val == val
 }
 
-// CopyList create a clone list
-func CopyList(list *Object) (*Object, error) {
-	if list == nil {
-		return nil, nil
+// Copy creates a clone of Object
+func (o *Object) Copy() *Object {
+	if o == nil {
+		return nil
 	}
-	if list.Type != "list" {
-		return nil, errors.New("not a list")
-	}
-	cdr, err := CopyList(list.Cdr)
-	if err != nil {
-		return nil, err
-	}
-	return NewCons(list.Car, cdr), nil
+	return &Object{o.Type, o.Car.Copy(), o.Cdr.Copy(), o.Val}
 }
