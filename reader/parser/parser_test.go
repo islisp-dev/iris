@@ -1,8 +1,11 @@
-package main
+package parser
 
 import (
 	"reflect"
 	"testing"
+
+	"github.com/ta2gch/gazelle/runtime/class"
+	"github.com/ta2gch/gazelle/runtime/object"
 )
 
 func Test_parseAtom(t *testing.T) {
@@ -12,7 +15,7 @@ func Test_parseAtom(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    *Object
+		want    *object.Object
 		wantErr bool
 	}{
 		//
@@ -21,31 +24,31 @@ func Test_parseAtom(t *testing.T) {
 		{
 			name:    "default",
 			args:    args{"3.14"},
-			want:    &Object{"float", nil, nil, 5.0},
+			want:    &object.Object{class.Float, nil, nil, 3.14},
 			wantErr: false,
 		},
 		{
 			name:    "signed",
 			args:    args{"-5.0"},
-			want:    &Object{"float", nil, nil, -5.0},
+			want:    &object.Object{class.Float, nil, nil, -5.0},
 			wantErr: false,
 		},
 		{
 			name:    "exponential",
 			args:    args{"-5.0E3"},
-			want:    &Object{"float", nil, nil, -5.0 * 1000},
+			want:    &object.Object{class.Float, nil, nil, -5.0 * 1000},
 			wantErr: false,
 		},
 		{
 			name:    "signed exponential",
 			args:    args{"5.0E-3"},
-			want:    &Object{"float", nil, nil, 5.0 * 1.0 / 1000.0},
+			want:    &object.Object{class.Float, nil, nil, 5.0 * 1.0 / 1000.0},
 			wantErr: false,
 		},
 		{
 			name:    "without point",
 			args:    args{"5E-3"},
-			want:    &Object{"float", nil, nil, 5.0 * 1.0 / 1000.0},
+			want:    &object.Object{class.Float, nil, nil, 5.0 * 1.0 / 1000.0},
 			wantErr: false,
 		},
 		{
@@ -66,49 +69,49 @@ func Test_parseAtom(t *testing.T) {
 		{
 			name:    "default",
 			args:    args{"5"},
-			want:    &Object{"integer", nil, nil, 5},
+			want:    &object.Object{class.Integer, nil, nil, 5},
 			wantErr: false,
 		},
 		{
 			name:    "signed",
 			args:    args{"-5"},
-			want:    &Object{"integer", nil, nil, -5},
+			want:    &object.Object{class.Integer, nil, nil, -5},
 			wantErr: false,
 		},
 		{
 			name:    "binary",
 			args:    args{"#B00101"},
-			want:    &Object{"integer", nil, nil, 5},
+			want:    &object.Object{class.Integer, nil, nil, 5},
 			wantErr: false,
 		},
 		{
 			name:    "signed binary",
 			args:    args{"#b+00101"},
-			want:    &Object{"integer", nil, nil, 5},
+			want:    &object.Object{class.Integer, nil, nil, 5},
 			wantErr: false,
 		},
 		{
 			name:    "octal",
 			args:    args{"#o00101"},
-			want:    &Object{"integer", nil, nil, 65},
+			want:    &object.Object{class.Integer, nil, nil, 65},
 			wantErr: false,
 		},
 		{
 			name:    "signed octal",
 			args:    args{"#O-00101"},
-			want:    &Object{"integer", nil, nil, -65},
+			want:    &object.Object{class.Integer, nil, nil, -65},
 			wantErr: false,
 		},
 		{
 			name:    "hexadecimal",
 			args:    args{"#X00101"},
-			want:    &Object{"integer", nil, nil, 257},
+			want:    &object.Object{class.Integer, nil, nil, 257},
 			wantErr: false,
 		},
 		{
 			name:    "signed hexadecimal",
 			args:    args{"#x-00101"},
-			want:    &Object{"integer", nil, nil, -257},
+			want:    &object.Object{class.Integer, nil, nil, -257},
 			wantErr: false,
 		},
 		{
@@ -123,19 +126,19 @@ func Test_parseAtom(t *testing.T) {
 		{
 			name:    "default",
 			args:    args{"#\\a"},
-			want:    &Object{"character", nil, nil, 'a'},
+			want:    &object.Object{class.Character, nil, nil, 'a'},
 			wantErr: false,
 		},
 		{
 			name:    "newline",
 			args:    args{"#\\newline"},
-			want:    &Object{"character", nil, nil, '\n'},
+			want:    &object.Object{class.Character, nil, nil, '\n'},
 			wantErr: false,
 		},
 		{
 			name:    "space",
 			args:    args{"#\\space"},
-			want:    &Object{"character", nil, nil, ' '},
+			want:    &object.Object{class.Character, nil, nil, ' '},
 			wantErr: false,
 		},
 		{

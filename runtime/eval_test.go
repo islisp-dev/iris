@@ -1,42 +1,37 @@
-package main
+package runtime
 
 import (
 	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/ta2gch/gazelle/reader/parser"
+	"github.com/ta2gch/gazelle/reader/tokenizer"
+	"github.com/ta2gch/gazelle/runtime/class"
+	"github.com/ta2gch/gazelle/runtime/object"
 )
 
-func read(s string) *Object {
-	e, _ := Parse(NewReader(strings.NewReader(s)))
+func read(s string) *object.Object {
+	e, _ := parser.Parse(tokenizer.NewTokenReader(strings.NewReader(s)))
 	return e
 }
 
 func TestEval(t *testing.T) {
-	testEnv := NewEnv()
-	testEnv.Fun["INC"] = &NativeFunction{func(args *Object, local *Env, global *Env) (*Object, error) {
-		return &Object{"integer", nil, nil, args.Car.Val.(int) + 1}, nil
-	}}
 	type args struct {
-		obj    *Object
+		obj    *object.Object
 		local  *Env
 		global *Env
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *Object
+		want    *object.Object
 		wantErr bool
 	}{
 		{
 			name:    "local variable",
-			args:    args{read("PI"), &Env{nil, nil, nil, map[string]*Object{"PI": read("3.14")}}, nil},
-			want:    &Object{"float", nil, nil, 3.14},
-			wantErr: false,
-		},
-		{
-			name:    "function call",
-			args:    args{read("(inc (inc 1))"), NewEnv(), testEnv},
-			want:    &Object{"integer", nil, nil, 3},
+			args:    args{read("PI"), &Env{nil, map[string]*object.Object{"PI": read("3.14")}}, nil},
+			want:    &object.Object{class.Float, nil, nil, 3.14},
 			wantErr: false,
 		},
 	}
