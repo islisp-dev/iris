@@ -31,7 +31,7 @@ func TestEval(t *testing.T) {
 		{
 			name:    "local variable",
 			args:    args{read("PI"), &Env{nil, map[string]*object.Object{"PI": read("3.14")}}, nil},
-			want:    &object.Object{class.Float, nil, nil, 3.14},
+			want:    &object.Object{class.Float, 3.14},
 			wantErr: false,
 		},
 	}
