@@ -8,30 +8,29 @@ import (
 	"github.com/ta2gch/gazelle/reader/parser"
 	"github.com/ta2gch/gazelle/reader/tokenizer"
 	"github.com/ta2gch/gazelle/runtime/class"
-	"github.com/ta2gch/gazelle/runtime/object"
 )
 
-func read(s string) *object.Object {
+func read(s string) *class.Instance {
 	e, _ := parser.Parse(tokenizer.NewTokenReader(strings.NewReader(s)))
 	return e
 }
 
 func TestEval(t *testing.T) {
 	type args struct {
-		obj    *object.Object
+		obj    *class.Instance
 		local  *Env
 		global *Env
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *object.Object
+		want    *class.Instance
 		wantErr bool
 	}{
 		{
 			name:    "local variable",
-			args:    args{read("PI"), &Env{nil, map[string]*object.Object{"PI": read("3.14")}}, nil},
-			want:    &object.Object{class.Float, 3.14},
+			args:    args{read("PI"), &Env{nil, map[string]*class.Instance{"PI": read("3.14")}}, nil},
+			want:    &class.Instance{class.Float, 3.14},
 			wantErr: false,
 		},
 	}
