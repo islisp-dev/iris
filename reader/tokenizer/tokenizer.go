@@ -1,13 +1,42 @@
-package main
+package tokenizer
 
 import (
+	"io"
 	"regexp"
 	"strings"
 )
 
-// TokenReader interface type is the interface for reading string with every token
-type TokenReader interface {
-	ReadToken() (string, error)
+// TokenReader interface type is the interface
+// for reading string with every token
+// Reader is like bufio.Reader but has PeekRune
+// which returns a rune without advancing pointer
+type TokenReader struct {
+	err error
+	ru  rune
+	sz  int
+	rr  io.RuneReader
+}
+
+// NewReader creates interal reader from io.RuneReader
+func NewTokenReader(r io.RuneReader) *TokenReader {
+	b := new(TokenReader)
+	b.rr = r
+	b.ru, b.sz, b.err = r.ReadRune()
+	return b
+}
+
+// PeekRune returns a rune without advancing pointer
+func (r *TokenReader) PeekRune() (rune, int, error) {
+	return r.ru, r.sz, r.err
+}
+
+// ReadRune returns a rune with advancing pointer
+func (r *TokenReader) ReadRune() (rune, int, error) {
+	ru := r.ru
+	sz := r.sz
+	err := r.err
+	r.ru, r.sz, r.err = r.rr.ReadRune()
+	return ru, sz, err
 }
 
 func concatMatcher(src ...string) *regexp.Regexp {
@@ -32,7 +61,7 @@ var token = concatMatcher(
 	parentheses)
 
 // ReadToken returns error or string as token
-func (r *Reader) ReadToken() (string, error) {
+func (r *TokenReader) ReadToken() (string, error) {
 	buf := ""
 	for {
 		if buf == "" {
