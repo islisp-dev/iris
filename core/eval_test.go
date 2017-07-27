@@ -1,4 +1,4 @@
-package runtime
+package core
 
 import (
 	"reflect"
@@ -7,7 +7,7 @@ import (
 
 	"github.com/ta2gch/gazelle/reader/parser"
 	"github.com/ta2gch/gazelle/reader/tokenizer"
-	"github.com/ta2gch/gazelle/runtime/class"
+	"github.com/ta2gch/gazelle/core/class"
 )
 
 func read(s string) *class.Instance {

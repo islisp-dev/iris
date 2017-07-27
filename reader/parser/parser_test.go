@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ta2gch/gazelle/runtime/class"
+	"github.com/ta2gch/gazelle/core/class"
 )
 
 func Test_parseAtom(t *testing.T) {

@@ -1,7 +1,7 @@
-package runtime
+package core
 
 import (
-	"github.com/ta2gch/gazelle/runtime/class"
+	"github.com/ta2gch/gazelle/core/class"
 )
 
 type Function interface {
