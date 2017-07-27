@@ -18,9 +18,9 @@ var errBOD = errors.New("Begin Of Dot")
 // cons creates cons pair from two objects
 func cons(car *class.Instance, cdr *class.Instance) *class.Instance {
 	if cdr == nil || cdr.Class == class.List {
-		return &class.Instance{class.List, &class.Cell{car, cdr}}
+		return class.List.New(&class.Cell{car, cdr})
 	}
-	return &class.Instance{class.Cons, &class.Cell{car, cdr}}
+	return class.Cons.New(&class.Cell{car, cdr})
 }
 
 func parseAtom(tok string) (*class.Instance, error) {
@@ -29,49 +29,49 @@ func parseAtom(tok string) (*class.Instance, error) {
 	//
 	if m, _ := regexp.MatchString("^[-+]?[[:digit:]]+$", tok); m {
 		n, _ := strconv.ParseInt(tok, 10, 64)
-		return &class.Instance{class.Integer, int(n)}, nil
+		return class.Integer.New(int(n)), nil
 	}
 	if r := regexp.MustCompile("^#[bB]([-+]?[01]+)$").FindStringSubmatch(tok); len(r) >= 2 {
 		n, _ := strconv.ParseInt(r[1], 2, 64)
-		return &class.Instance{class.Integer, int(n)}, nil
+		return class.Integer.New(int(n)), nil
 	}
 	if r := regexp.MustCompile("^#[oO]([-+]?[0-7]+)$").FindStringSubmatch(tok); len(r) >= 2 {
 		n, _ := strconv.ParseInt(r[1], 8, 64)
-		return &class.Instance{class.Integer, int(n)}, nil
+		return class.Integer.New(int(n)), nil
 	}
 	if r := regexp.MustCompile("^#[xX]([-+]?[[:xdigit:]]+)$").FindStringSubmatch(tok); len(r) >= 2 {
 		n, _ := strconv.ParseInt(r[1], 16, 64)
-		return &class.Instance{class.Integer, int(n)}, nil
+		return class.Integer.New(int(n)), nil
 	}
 	//
 	// float
 	//
 	if m, _ := regexp.MatchString("^[-+]?[[:digit:]]+\\.[[:digit:]]+$", tok); m {
 		n, _ := strconv.ParseFloat(tok, 64)
-		return &class.Instance{class.Float, n}, nil
+		return class.Float.New(n), nil
 	}
 	if r := regexp.MustCompile("^([-+]?[[:digit:]]+(?:\\.[[:digit:]]+)?)[eE]([-+]?[[:digit:]]+)$").FindStringSubmatch(tok); len(r) >= 3 {
 		n, _ := strconv.ParseFloat(r[1], 64)
 		e, _ := strconv.ParseInt(r[2], 10, 64)
-		return &class.Instance{class.Float, n * math.Pow10(int(e))}, nil
+		return class.Float.New(n * math.Pow10(int(e))), nil
 	}
 	//
 	// character
 	//
 	if m, _ := regexp.MatchString("^#\\\\newline$", tok); m {
-		return &class.Instance{class.Character, '\n'}, nil
+		return class.Character.New('\n'), nil
 	}
 	if m, _ := regexp.MatchString("^#\\\\space$", tok); m {
-		return &class.Instance{class.Character, ' '}, nil
+		return class.Character.New(' '), nil
 	}
 	if r := regexp.MustCompile("^#\\\\([[:graph:]])$").FindStringSubmatch(tok); len(r) >= 2 {
-		return &class.Instance{class.Character, rune(r[1][0])}, nil
+		return class.Character.New(rune(r[1][0])), nil
 	}
 	//
 	// string
 	//
 	if m, _ := regexp.MatchString("^\".*\"$", tok); m {
-		return &class.Instance{class.String, tok}, nil
+		return class.String.New(tok), nil
 	}
 	//
 	// symbol
@@ -80,13 +80,13 @@ func parseAtom(tok string) (*class.Instance, error) {
 		return nil, nil
 	}
 	if r := regexp.MustCompile("^:([<>/*=?_!$%[\\]^{}~0-9a-zA-Z]+)$").FindStringSubmatch(tok); len(r) >= 2 {
-		return &class.Instance{class.Symbol, r[1]}, nil
+		return class.Symbol.New(r[1]), nil
 	}
 	if m, _ := regexp.MatchString("^\\|.*\\|$", tok); m {
-		return &class.Instance{class.Symbol, tok}, nil
+		return class.Symbol.New(tok), nil
 	}
 	if m, _ := regexp.MatchString("^[<>/*=?_!$%[\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*$", tok); m {
-		return &class.Instance{class.Symbol, strings.ToUpper(tok)}, nil
+		return class.Symbol.New(strings.ToUpper(tok)), nil
 	}
 	return nil, fmt.Errorf("Sorry, I could not parse %s", tok)
 }
@@ -97,8 +97,8 @@ func parseMacro(tok string, t *tokenizer.TokenReader) (*class.Instance, error) {
 	}
 	n := tok
 	if m, _ := regexp.MatchString("#[[:digit:]]*[aA]", tok); m {
-		s := &class.Instance{class.Symbol, "array"}
-		d := &class.Instance{class.Integer, 0}
+		s := class.Symbol.New("array")
+		d := class.Integer.New(0)
 		i := strings.IndexRune(strings.ToLower(tok), 'a')
 		if i == 1 {
 			d.Val = 1
@@ -121,7 +121,7 @@ func parseMacro(tok string, t *tokenizer.TokenReader) (*class.Instance, error) {
 	case "`":
 		n = "backquote"
 	}
-	m := &class.Instance{class.Symbol, n}
+	m := class.Symbol.New(n)
 	return cons(m, cons(cdr, nil)), nil
 }
 func parseCons(t *tokenizer.TokenReader) (*class.Instance, error) {

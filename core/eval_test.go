@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/ta2gch/gazelle/core/class"
 	"github.com/ta2gch/gazelle/reader/parser"
 	"github.com/ta2gch/gazelle/reader/tokenizer"
-	"github.com/ta2gch/gazelle/core/class"
 )
 
 func read(s string) *class.Instance {
@@ -29,8 +29,8 @@ func TestEval(t *testing.T) {
 	}{
 		{
 			name:    "local variable",
-			args:    args{read("PI"), &Env{nil, map[string]*class.Instance{"PI": read("3.14")}}, nil},
-			want:    &class.Instance{class.Float, 3.14},
+			args:    args{read("PI"), &Env{nil, map[string]*class.Instance{"PI": class.Float.New(3.14)}}, nil},
+			want:    class.Float.New(3.14),
 			wantErr: false,
 		},
 	}
