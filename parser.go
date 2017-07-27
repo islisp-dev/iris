@@ -65,6 +65,12 @@ func parseAtom(tok string) (*Object, error) {
 	//
 	// symbol
 	//
+	if "nil" == strings.ToLower(tok) {
+		return nil, nil
+	}
+	if r := regexp.MustCompile("^:([<>/*=?_!$%[\\]^{}~0-9a-zA-Z]+)$").FindStringSubmatch(tok); len(r) >= 2 {
+		return &Object{"keyword", nil, nil, r[1]}, nil
+	}
 	if m, _ := regexp.MatchString("^\\|.*\\|$", tok); m {
 		return &Object{"symbol", nil, nil, tok}, nil
 	}
