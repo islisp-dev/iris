@@ -13,7 +13,7 @@ func read(s string) *Object {
 
 func TestEval(t *testing.T) {
 	testEnv := NewEnv()
-	testEnv.Fun["INC"] = &NativeFunction{func(args *Object, global *Env) (*Object, error) {
+	testEnv.Fun["INC"] = &NativeFunction{func(args *Object, local *Env, global *Env) (*Object, error) {
 		return &Object{"integer", nil, nil, args.Car.Val.(int) + 1}, nil
 	}}
 	type args struct {
@@ -29,7 +29,7 @@ func TestEval(t *testing.T) {
 	}{
 		{
 			name:    "local variable",
-			args:    args{read("PI"), &Env{nil, nil, map[string]*Object{"PI": read("3.14")}}, nil},
+			args:    args{read("PI"), &Env{nil, nil, nil, map[string]*Object{"PI": read("3.14")}}, nil},
 			want:    &Object{"float", nil, nil, 3.14},
 			wantErr: false,
 		},

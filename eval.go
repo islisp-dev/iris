@@ -7,6 +7,7 @@ import (
 
 // Env struct is the struct for keeping functions and variables
 type Env struct {
+	Frm map[string]Function
 	Mac map[string]Function
 	Fun map[string]Function
 	Var map[string]*Object
@@ -15,6 +16,8 @@ type Env struct {
 // NewEnv creates new environment
 func NewEnv() *Env {
 	env := new(Env)
+	env.Frm = map[string]Function{}
+	env.Mac = map[string]Function{}
 	env.Fun = map[string]Function{}
 	env.Var = map[string]*Object{}
 	return env
@@ -38,28 +41,52 @@ func Eval(obj *Object, local *Env, global *Env) (*Object, error) {
 		if obj.Car.Type != "symbol" {
 			return nil, fmt.Errorf("%v is not a function", obj.Car.Val)
 		}
-		args, err := CopyList(obj.Cdr)
-		if err != nil {
-			return nil, err
-		}
-		cdr := args
-		for cdr != nil {
-			car, err := Eval(cdr.Car, local, global)
+		args := obj.Cdr
+		/*
+			if frm, ok := global.Frm[obj.Car.Val.(string)]; ok {
+				ret, err := frm.Apply(args, local, global)
+				if err != nil {
+					return nil, err
+				}
+				ret, err = Eval(ret, local, global)
+				if err != nil {
+					return nil, err
+				}
+				return ret, nil
+			}
+			if mac, ok := global.Mac[obj.Car.Val.(string)]; ok {
+				ret, err := mac.Apply(args, NewEnv(), global)
+				if err != nil {
+					return nil, err
+				}
+				ret, err = Eval(ret, local, global)
+				if err != nil {
+					return nil, err
+				}
+				return ret, nil
+			}
+		*/
+		cdr := NewCons(nil, nil)
+		tmp := cdr
+		for args != nil {
+			car, err := Eval(args.Car, local, global)
 			if err != nil {
 				return nil, err
 			}
-			args.Car = car
+			cdr.Car = car
 			cdr = cdr.Cdr
+			args = args.Cdr
 		}
+		args = tmp
 		if fun, ok := local.Fun[obj.Car.Val.(string)]; ok {
-			ret, err := fun.Apply(args, global)
+			ret, err := fun.Apply(args, NewEnv(), global)
 			if err != nil {
 				return nil, err
 			}
 			return ret, nil
 		}
 		if fun, ok := global.Fun[obj.Car.Val.(string)]; ok {
-			ret, err := fun.Apply(args, global)
+			ret, err := fun.Apply(args, NewEnv(), global)
 			if err != nil {
 				return nil, err
 			}
