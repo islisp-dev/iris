@@ -2,17 +2,17 @@ package main
 
 // Function interaface type is the interface for calling function with arguments
 type Function interface {
-	Apply(*Object, *Env) (*Object, error)
+	Apply(*Object, *Env, *Env) (*Object, error)
 }
 
 // NativeFunction struct type is the strcut for calling function written in go
 type NativeFunction struct {
-	raw func(*Object, *Env) (*Object, error)
+	raw func(*Object, *Env, *Env) (*Object, error)
 }
 
 // Apply call function f with args in global
-func (f *NativeFunction) Apply(args *Object, global *Env) (*Object, error) {
-	a, err := f.raw(args, global)
+func (f *NativeFunction) Apply(args *Object, local *Env, global *Env) (*Object, error) {
+	a, err := f.raw(args, local, global)
 	return a, err
 }
 
@@ -23,7 +23,7 @@ type NormalFunction struct {
 }
 
 // Apply call function f with args in global
-func (f *NormalFunction) Apply(args *Object, global *Env) (*Object, error) {
+func (f *NormalFunction) Apply(args *Object, _ *Env, global *Env) (*Object, error) {
 	local := NewEnv()
 	v := f.Args
 	a := args
