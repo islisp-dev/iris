@@ -20,8 +20,8 @@ func read(s string) *class.Instance {
 
 func TestEval(t *testing.T) {
 	testEnv := environment.New()
-	testEnv.Variable["PI"] = class.Float.New(3.14)
-	testEnv.Function["INC"] = function.New(func(args *class.Instance, global *environment.Environment) (*class.Instance, error) {
+	testEnv.Variable["pi"] = class.Float.New(3.14)
+	testEnv.Function["inc"] = function.New(func(args *class.Instance, global *environment.Environment) (*class.Instance, error) {
 		car, _ := cons.Car(args)
 		return class.Integer.New(car.Value().(int) + 1), nil
 	})
@@ -38,7 +38,7 @@ func TestEval(t *testing.T) {
 	}{
 		{
 			name:    "local variable",
-			args:    args{class.Symbol.New("PI"), testEnv, nil},
+			args:    args{class.Symbol.New("pi"), testEnv, nil},
 			want:    class.Float.New(3.14),
 			wantErr: false,
 		},
