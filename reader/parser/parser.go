@@ -94,14 +94,14 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (*class.Instance, error) {
 		i := strings.IndexRune(strings.ToLower(tok), 'a')
 		if i == 1 {
 			d := class.Integer.New(1)
-			return cons.New(s, cons.New(d, cons.New(cdr, nil))), nil
+			return cons.New(s, cons.New(d, cons.New(cdr, class.Null.New(nil)))), nil
 		}
 		v, err := strconv.ParseInt(tok[1:i], 10, 32)
 		if err != nil {
 			return nil, err
 		}
 		d := class.Integer.New(int(v))
-		return cons.New(s, cons.New(d, cons.New(cdr, nil))), nil
+		return cons.New(s, cons.New(d, cons.New(cdr, class.Null.New(nil)))), nil
 	}
 	switch tok {
 	case ",@":
@@ -114,7 +114,7 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (*class.Instance, error) {
 		n = "backquote"
 	}
 	m := class.Symbol.New(n)
-	return cons.New(m, cons.New(cdr, nil)), nil
+	return cons.New(m, cons.New(cdr, class.Null.New(nil))), nil
 }
 func parseCons(t *tokenizer.Tokenizer) (*class.Instance, error) {
 	car, err := Parse(t)
