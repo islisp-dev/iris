@@ -10,7 +10,7 @@ import (
 	env "github.com/ta2gch/gazelle/core/environment"
 )
 
-func evalArguments(args *class.Instance, local *env.Environment, dynamic *env.Environment, global *env.Environment) (*class.Instance, error) {
+func evalArguments(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
 	if args.Class() == class.Null {
 		return class.Null.New(nil), nil
 	}
@@ -22,18 +22,18 @@ func evalArguments(args *class.Instance, local *env.Environment, dynamic *env.En
 	if err != nil {
 		return nil, err
 	}
-	a, err := Eval(car, local, dynamic, global)
+	a, err := Eval(car, local, global)
 	if err != nil {
 		return nil, err
 	}
-	b, err := evalArguments(cdr, local, dynamic, global)
+	b, err := evalArguments(cdr, local, global)
 	if err != nil {
 		return nil, err
 	}
 	return cons.New(a, b), nil
 }
 
-func evalFunction(obj *class.Instance, local *env.Environment, dynamic *env.Environment, global *env.Environment) (*class.Instance, error) {
+func evalFunction(obj *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
 	// get function symbol
 	car, err := cons.Car(obj)
 	if err != nil {
@@ -49,61 +49,46 @@ func evalFunction(obj *class.Instance, local *env.Environment, dynamic *env.Envi
 	}
 	// get function instance has value of Function interface
 	var fun *class.Instance
-	if f, ok := local.Function[car.Value().(string)]; ok {
+	if f, ok := local.Function[car.Value()]; ok {
 		fun = f
 	}
-	if f, ok := global.Function[car.Value().(string)]; ok {
+	if f, ok := global.Function[car.Value()]; ok {
 		fun = f
 	}
 	if fun == nil {
 		return nil, fmt.Errorf("%v is not defined", obj.Value())
 	}
 	// evaluate each arguments
-	a, err := evalArguments(cdr, local, dynamic, global)
+	a, err := evalArguments(cdr, local, global)
 	if err != nil {
 		return nil, err
-	}
-	// keep what dynamic envrionment has.
-	ks := []string{}
-	for k := range dynamic.Variable {
-		ks = append(ks, k)
 	}
 	// apply function to arguments
-	r, err := function.Apply(fun, a, env.New(), dynamic, global)
+	e := env.New()
+	e.DynamicVariable = local.DynamicVariable
+	r, err := function.Apply(fun, a, env.New(), global)
 	if err != nil {
 		return nil, err
-	}
-	// remove dynamic variables defined by function called in this time
-	for k := range dynamic.Variable {
-		v := true
-		for _, l := range ks {
-			if k == l {
-				v = false
-			}
-		}
-		if v {
-			delete(dynamic.Variable, k)
-		}
 	}
 	return r, nil
 }
 
 // Eval evaluates any classs
-func Eval(obj *class.Instance, local *env.Environment, dynamic *env.Environment, global *env.Environment) (*class.Instance, error) {
+func Eval(obj *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
 	if obj.Class() == class.Null {
 		return class.Null.New(nil), nil
 	}
 	switch obj.Class() {
 	case class.Symbol:
-		if val, ok := local.Variable[obj.Value().(string)]; ok {
+		if val, ok := local.Variable[obj.Value()]; ok {
 			return val, nil
 		}
-		if val, ok := global.Variable[obj.Value().(string)]; ok {
+		if val, ok := global.Variable[obj.Value()]; ok {
 			return val, nil
 		}
 		return nil, fmt.Errorf("%v is not defined", obj.Value())
-	case class.List:
-		ret, err := evalFunction(obj, local, dynamic, global)
+	case class.List: // obj is a form or a macro
+		ret, err := evalFunction(obj, local, global)
 		if err != nil {
 			return nil, err
 		}

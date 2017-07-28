@@ -8,14 +8,14 @@ import (
 )
 
 type Function interface {
-	apply(args *class.Instance, local *env.Environment, dynamic *env.Environment, global *env.Environment) (*class.Instance, error)
+	apply(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error)
 }
 
-func Apply(fun *class.Instance, args *class.Instance, local *env.Environment, dynamic *env.Environment, global *env.Environment) (*class.Instance, error) {
+func Apply(fun *class.Instance, args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
 	if fun.Class() != class.Function {
 		return nil, fmt.Errorf("%v is not <function>", fun.Class().ToString())
 	}
-	obj, err := fun.Value().(Function).apply(args, local, dynamic, global)
+	obj, err := fun.Value().(Function).apply(args, local, global)
 	if err != nil {
 		return nil, err
 	}
@@ -23,18 +23,18 @@ func Apply(fun *class.Instance, args *class.Instance, local *env.Environment, dy
 }
 
 type NativeFunction struct {
-	fun func(*class.Instance, *env.Environment, *env.Environment, *env.Environment) (*class.Instance, error)
+	fun func(*class.Instance, *env.Environment, *env.Environment) (*class.Instance, error)
 }
 
-func (f NativeFunction) apply(args *class.Instance, local *env.Environment, dynamic *env.Environment, global *env.Environment) (*class.Instance, error) {
-	obj, err := f.fun(args, local, global, global)
+func (f NativeFunction) apply(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
+	obj, err := f.fun(args, local, global)
 	if err != nil {
 		return nil, err
 	}
 	return obj, nil
 }
 
-func New(fun func(*class.Instance, *env.Environment, *env.Environment, *env.Environment) (*class.Instance, error)) *class.Instance {
+func New(fun func(*class.Instance, *env.Environment, *env.Environment) (*class.Instance, error)) *class.Instance {
 	return class.Function.New(&NativeFunction{fun})
 }
 
