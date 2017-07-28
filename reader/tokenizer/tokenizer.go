@@ -6,11 +6,11 @@ import (
 	"strings"
 )
 
-// TokenReader interface type is the interface
+// Tokenizer interface type is the interface
 // for reading string with every token
 // Reader is like bufio.Reader but has PeekRune
 // which returns a rune without advancing pointer
-type TokenReader struct {
+type Tokenizer struct {
 	err error
 	ru  rune
 	sz  int
@@ -18,20 +18,20 @@ type TokenReader struct {
 }
 
 // New creates interal reader from io.RuneReader
-func New(r io.RuneReader) *TokenReader {
-	b := new(TokenReader)
+func New(r io.RuneReader) *Tokenizer {
+	b := new(Tokenizer)
 	b.rr = r
 	b.ru, b.sz, b.err = r.ReadRune()
 	return b
 }
 
 // PeekRune returns a rune without advancing pointer
-func (r *TokenReader) PeekRune() (rune, int, error) {
+func (r *Tokenizer) PeekRune() (rune, int, error) {
 	return r.ru, r.sz, r.err
 }
 
 // ReadRune returns a rune with advancing pointer
-func (r *TokenReader) ReadRune() (rune, int, error) {
+func (r *Tokenizer) ReadRune() (rune, int, error) {
 	ru := r.ru
 	sz := r.sz
 	err := r.err
@@ -60,8 +60,8 @@ var token = concatMatcher(
 	symbol,
 	parentheses)
 
-// ReadToken returns error or string as token
-func (r *TokenReader) ReadToken() (string, error) {
+// Next returns error or string as token
+func (r *Tokenizer) Next() (string, error) {
 	buf := ""
 	for {
 		if buf == "" {
