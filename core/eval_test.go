@@ -6,20 +6,29 @@ import (
 	"testing"
 
 	"github.com/ta2gch/gazelle/core/class"
+	"github.com/ta2gch/gazelle/core/class/cons"
+	"github.com/ta2gch/gazelle/core/class/function"
+	"github.com/ta2gch/gazelle/core/environment"
 	"github.com/ta2gch/gazelle/reader/parser"
 	"github.com/ta2gch/gazelle/reader/tokenizer"
 )
 
 func read(s string) *class.Instance {
-	e, _ := parser.Parse(tokenizer.NewTokenReader(strings.NewReader(s)))
+	e, _ := parser.Parse(tokenizer.New(strings.NewReader(s)))
 	return e
 }
 
 func TestEval(t *testing.T) {
+	testEnv := environment.New()
+	testEnv.Var["PI"] = class.Float.New(3.14)
+	testEnv.Fun["INC"] = function.New(func(args *class.Instance, global *environment.Env) (*class.Instance, error) {
+		car, _ := cons.Car(args)
+		return class.Integer.New(car.Value().(int) + 1), nil
+	})
 	type args struct {
 		obj    *class.Instance
-		local  *Env
-		global *Env
+		local  *environment.Env
+		global *environment.Env
 	}
 	tests := []struct {
 		name    string
@@ -29,8 +38,14 @@ func TestEval(t *testing.T) {
 	}{
 		{
 			name:    "local variable",
-			args:    args{read("PI"), &Env{nil, map[string]*class.Instance{"PI": class.Float.New(3.14)}}, nil},
+			args:    args{class.Symbol.New("PI"), testEnv, nil},
 			want:    class.Float.New(3.14),
+			wantErr: false,
+		},
+		{
+			name:    "local function",
+			args:    args{read("(inc (inc 1))"), testEnv, nil},
+			want:    class.Integer.New(3),
 			wantErr: false,
 		},
 	}

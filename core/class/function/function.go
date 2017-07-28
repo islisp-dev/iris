@@ -34,7 +34,7 @@ func (f NativeFunction) apply(args *class.Instance, global *environment.Env) (*c
 	return obj, nil
 }
 
-func NewNativeFunction(fun func(*class.Instance, *environment.Env) (*class.Instance, error)) *class.Instance {
+func New(fun func(*class.Instance, *environment.Env) (*class.Instance, error)) *class.Instance {
 	return class.Function.New(&NativeFunction{fun})
 }
 
