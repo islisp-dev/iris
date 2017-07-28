@@ -70,7 +70,7 @@ func parseAtom(tok string) (*class.Instance, error) {
 	// symbol
 	//
 	if "nil" == strings.ToLower(tok) {
-		return nil, nil
+		return class.Null.New(nil), nil
 	}
 	if r := regexp.MustCompile("^:([<>/*=?_!$%[\\]^{}~0-9a-zA-Z]+)$").FindStringSubmatch(tok); len(r) >= 2 {
 		return class.Symbol.New(r[1]), nil
@@ -119,7 +119,7 @@ func parseMacro(tok string, t *tokenizer.TokenReader) (*class.Instance, error) {
 func parseCons(t *tokenizer.TokenReader) (*class.Instance, error) {
 	car, err := Parse(t)
 	if err == errEOP {
-		return nil, nil
+		return class.Null.New(nil), nil
 	}
 	if err == errBOD {
 		cdr, err := Parse(t)

@@ -7,15 +7,12 @@ type Instance struct {
 }
 
 func (i *Instance) Class() *Class {
-	if i == nil {
-		return Null
-	}
 	return i.class
 }
 
 func (i *Instance) Value() interface{} {
-	if i == nil {
-		return Null
+	if i.Class() == Null {
+		return nil
 	}
 	return i.value
 }
