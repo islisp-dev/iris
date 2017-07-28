@@ -4,18 +4,18 @@ import (
 	"fmt"
 
 	"github.com/ta2gch/gazelle/core/class"
-	"github.com/ta2gch/gazelle/core/environment"
+	env "github.com/ta2gch/gazelle/core/environment"
 )
 
 type Function interface {
-	apply(args *class.Instance, global *environment.Environment) (*class.Instance, error)
+	apply(args *class.Instance, local *env.Environment, dynamic *env.Environment, global *env.Environment) (*class.Instance, error)
 }
 
-func Apply(fun *class.Instance, args *class.Instance, global *environment.Environment) (*class.Instance, error) {
+func Apply(fun *class.Instance, args *class.Instance, local *env.Environment, dynamic *env.Environment, global *env.Environment) (*class.Instance, error) {
 	if fun.Class() != class.Function {
 		return nil, fmt.Errorf("%v is not <function>", fun.Class().ToString())
 	}
-	obj, err := fun.Value().(Function).apply(args, global)
+	obj, err := fun.Value().(Function).apply(args, local, dynamic, global)
 	if err != nil {
 		return nil, err
 	}
@@ -23,18 +23,18 @@ func Apply(fun *class.Instance, args *class.Instance, global *environment.Enviro
 }
 
 type NativeFunction struct {
-	fun func(*class.Instance, *environment.Environment) (*class.Instance, error)
+	fun func(*class.Instance, *env.Environment, *env.Environment, *env.Environment) (*class.Instance, error)
 }
 
-func (f NativeFunction) apply(args *class.Instance, global *environment.Environment) (*class.Instance, error) {
-	obj, err := f.fun(args, global)
+func (f NativeFunction) apply(args *class.Instance, local *env.Environment, dynamic *env.Environment, global *env.Environment) (*class.Instance, error) {
+	obj, err := f.fun(args, local, global, global)
 	if err != nil {
 		return nil, err
 	}
 	return obj, nil
 }
 
-func New(fun func(*class.Instance, *environment.Environment) (*class.Instance, error)) *class.Instance {
+func New(fun func(*class.Instance, *env.Environment, *env.Environment, *env.Environment) (*class.Instance, error)) *class.Instance {
 	return class.Function.New(&NativeFunction{fun})
 }
 
@@ -48,5 +48,10 @@ func (f *DefaultFunction) Apply(args *class.Instance, global *Env) (*class.Insta
 	// Assign args to local environment
 	// Eval each body
 	// return evaluate result
-}z
+}
 */
+
+type GenericFunction struct {
+	args *class.Instance
+	body *class.Instance
+}
