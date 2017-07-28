@@ -69,7 +69,7 @@ func parseAtom(tok string) (*class.Instance, error) {
 	//
 	// symbol
 	//
-	if "nil" == strings.ToLower(tok) {
+	if "nil" == tok {
 		return class.Null.New(nil), nil
 	}
 	if r := regexp.MustCompile("^:([<>/*=?_!$%[\\]^{}~0-9a-zA-Z]+)$").FindStringSubmatch(tok); len(r) >= 2 {
@@ -79,7 +79,7 @@ func parseAtom(tok string) (*class.Instance, error) {
 		return class.Symbol.New(tok), nil
 	}
 	if m, _ := regexp.MatchString("^[<>/*=?_!$%[\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*$", tok); m {
-		return class.Symbol.New(strings.ToUpper(tok)), nil
+		return class.Symbol.New(tok), nil
 	}
 	return nil, fmt.Errorf("Sorry, I could not parse %s", tok)
 }
