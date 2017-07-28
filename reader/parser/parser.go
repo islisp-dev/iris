@@ -9,19 +9,12 @@ import (
 	"strings"
 
 	"github.com/ta2gch/gazelle/core/class"
+	"github.com/ta2gch/gazelle/core/class/cons"
 	"github.com/ta2gch/gazelle/reader/tokenizer"
 )
 
 var errEOP = errors.New("End Of Parentheses")
 var errBOD = errors.New("Begin Of Dot")
-
-// cons creates cons pair from two objects
-func cons(car *class.Instance, cdr *class.Instance) *class.Instance {
-	if cdr == nil || cdr.Class == class.List {
-		return class.List.New(&class.Cell{car, cdr})
-	}
-	return class.Cons.New(&class.Cell{car, cdr})
-}
 
 func parseAtom(tok string) (*class.Instance, error) {
 	//
@@ -98,18 +91,17 @@ func parseMacro(tok string, t *tokenizer.TokenReader) (*class.Instance, error) {
 	n := tok
 	if m, _ := regexp.MatchString("#[[:digit:]]*[aA]", tok); m {
 		s := class.Symbol.New("array")
-		d := class.Integer.New(0)
 		i := strings.IndexRune(strings.ToLower(tok), 'a')
 		if i == 1 {
-			d.Val = 1
-		} else {
-			v, err := strconv.ParseInt(tok[1:i], 10, 32)
-			if err != nil {
-				return nil, err
-			}
-			d.Val = int(v)
+			d := class.Integer.New(1)
+			return cons.New(s, cons.New(d, cons.New(cdr, nil))), nil
 		}
-		return cons(s, cons(d, cons(cdr, nil))), nil
+		v, err := strconv.ParseInt(tok[1:i], 10, 32)
+		if err != nil {
+			return nil, err
+		}
+		d := class.Integer.New(int(v))
+		return cons.New(s, cons.New(d, cons.New(cdr, nil))), nil
 	}
 	switch tok {
 	case ",@":
@@ -122,7 +114,7 @@ func parseMacro(tok string, t *tokenizer.TokenReader) (*class.Instance, error) {
 		n = "backquote"
 	}
 	m := class.Symbol.New(n)
-	return cons(m, cons(cdr, nil)), nil
+	return cons.New(m, cons.New(cdr, nil)), nil
 }
 func parseCons(t *tokenizer.TokenReader) (*class.Instance, error) {
 	car, err := Parse(t)
@@ -146,7 +138,7 @@ func parseCons(t *tokenizer.TokenReader) (*class.Instance, error) {
 	if err != nil {
 		return nil, err
 	}
-	return cons(car, cdr), nil
+	return cons.New(car, cdr), nil
 }
 
 // Parse builds a internal expression from tokens
