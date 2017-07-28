@@ -17,8 +17,8 @@ type TokenReader struct {
 	rr  io.RuneReader
 }
 
-// NewReader creates interal reader from io.RuneReader
-func NewTokenReader(r io.RuneReader) *TokenReader {
+// New creates interal reader from io.RuneReader
+func New(r io.RuneReader) *TokenReader {
 	b := new(TokenReader)
 	b.rr = r
 	b.ru, b.sz, b.err = r.ReadRune()
