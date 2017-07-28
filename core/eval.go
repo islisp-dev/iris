@@ -75,7 +75,9 @@ func evalFunction(obj *class.Instance, local *env.Environment, global *env.Envir
 		if err != nil {
 			return nil, err
 		}
-		r, err := function.Apply(fun, a, local, global)
+		env := env.New()
+		env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
+		r, err := function.Apply(fun, a, env, global)
 		if err != nil {
 			return nil, err
 		}
