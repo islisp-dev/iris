@@ -1,4 +1,4 @@
-package core
+package environment
 
 import (
 	"github.com/ta2gch/gazelle/core/class"
@@ -10,8 +10,8 @@ type Env struct {
 	Var map[string]*class.Instance
 }
 
-// NewEnv creates new environment
-func NewEnv() *Env {
+// New creates new environment
+func New() *Env {
 	env := new(Env)
 	env.Fun = map[string]*class.Instance{}
 	env.Var = map[string]*class.Instance{}
@@ -19,4 +19,4 @@ func NewEnv() *Env {
 }
 
 // TopLevel is a global environment
-var TopLevel = NewEnv()
+var TopLevel = New()
