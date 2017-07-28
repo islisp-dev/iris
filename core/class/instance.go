@@ -2,12 +2,20 @@ package class
 
 // Instance struct type is the struct for the internal representations
 type Instance struct {
-	Class *Class
-	Val   interface{}
+	class *Class
+	value interface{}
 }
 
-// Cell is a pair of pointers to Object
-type Cell struct {
-	Car *Instance
-	Cdr *Instance
+func (i *Instance) Class() *Class {
+	if i == nil {
+		return Null
+	}
+	return i.class
+}
+
+func (i *Instance) Value() interface{} {
+	if i == nil {
+		return Null
+	}
+	return i.value
 }
