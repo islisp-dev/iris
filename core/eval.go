@@ -7,10 +7,10 @@ import (
 	"github.com/ta2gch/gazelle/core/class"
 	"github.com/ta2gch/gazelle/core/class/cons"
 	"github.com/ta2gch/gazelle/core/class/function"
-	"github.com/ta2gch/gazelle/core/environment"
+	env "github.com/ta2gch/gazelle/core/environment"
 )
 
-func evalArgs(args *class.Instance, local *environment.Environment, global *environment.Environment) (*class.Instance, error) {
+func evalArgs(args *class.Instance, local *env.Environment, dynamic *env.Environment, global *env.Environment) (*class.Instance, error) {
 	if args.Class() == class.Null {
 		return class.Null.New(nil), nil
 	}
@@ -22,11 +22,11 @@ func evalArgs(args *class.Instance, local *environment.Environment, global *envi
 	if err != nil {
 		return nil, err
 	}
-	a, err := Eval(car, local, global)
+	a, err := Eval(car, local, dynamic, global)
 	if err != nil {
 		return nil, err
 	}
-	b, err := evalArgs(cdr, local, global)
+	b, err := evalArgs(cdr, local, dynamic, global)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +34,7 @@ func evalArgs(args *class.Instance, local *environment.Environment, global *envi
 }
 
 // Eval evaluates any classs
-func Eval(obj *class.Instance, local *environment.Environment, global *environment.Environment) (*class.Instance, error) {
+func Eval(obj *class.Instance, local *env.Environment, dynamic *env.Environment, global *env.Environment) (*class.Instance, error) {
 	if obj.Class() == class.Null {
 		return class.Null.New(nil), nil
 	}
@@ -60,24 +60,54 @@ func Eval(obj *class.Instance, local *environment.Environment, global *environme
 			return nil, fmt.Errorf("%v is not a symbol", obj.Value())
 		}
 		if f, ok := local.Function[car.Value().(string)]; ok {
-			a, err := evalArgs(cdr, local, global)
+			a, err := evalArgs(cdr, local, dynamic, global)
 			if err != nil {
 				return nil, err
 			}
-			r, err := function.Apply(f, a, global)
+			ks := []string{}
+			for k := range dynamic.Variable {
+				ks = append(ks, k)
+			}
+			r, err := function.Apply(f, a, env.New(), dynamic, global)
 			if err != nil {
 				return nil, err
+			}
+			for k := range dynamic.Variable {
+				v := true
+				for _, l := range ks {
+					if k == l {
+						v = false
+					}
+				}
+				if v {
+					delete(dynamic.Variable, k)
+				}
 			}
 			return r, nil
 		}
 		if f, ok := global.Function[car.Value().(string)]; ok {
-			a, err := evalArgs(cdr, local, global)
+			a, err := evalArgs(cdr, local, dynamic, global)
 			if err != nil {
 				return nil, err
 			}
-			r, err := function.Apply(f, a, global)
+			ks := []string{}
+			for k := range dynamic.Variable {
+				ks = append(ks, k)
+			}
+			r, err := function.Apply(f, a, env.New(), dynamic, global)
 			if err != nil {
 				return nil, err
+			}
+			for k := range dynamic.Variable {
+				v := true
+				for _, l := range ks {
+					if k == l {
+						v = false
+					}
+				}
+				if v {
+					delete(dynamic.Variable, k)
+				}
 			}
 			return r, nil
 		}
