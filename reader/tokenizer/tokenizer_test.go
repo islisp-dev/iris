@@ -28,13 +28,13 @@ func TestReader_ReadToken(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &Reader{
+			r := &Tokenizer{
 				err: tt.fields.err,
 				ru:  tt.fields.ru,
 				sz:  tt.fields.sz,
 				rr:  tt.fields.rr,
 			}
-			got, err := r.ReadToken()
+			got, err := r.Next()
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Reader.ReadToken() error = %v, wantErr %v", err, tt.wantErr)
 				return

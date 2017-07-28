@@ -83,7 +83,7 @@ func parseAtom(tok string) (*class.Instance, error) {
 	}
 	return nil, fmt.Errorf("Sorry, I could not parse %s", tok)
 }
-func parseMacro(tok string, t *tokenizer.TokenReader) (*class.Instance, error) {
+func parseMacro(tok string, t *tokenizer.Tokenizer) (*class.Instance, error) {
 	cdr, err := Parse(t)
 	if err != nil {
 		return nil, err
@@ -116,7 +116,7 @@ func parseMacro(tok string, t *tokenizer.TokenReader) (*class.Instance, error) {
 	m := class.Symbol.New(n)
 	return cons.New(m, cons.New(cdr, nil)), nil
 }
-func parseCons(t *tokenizer.TokenReader) (*class.Instance, error) {
+func parseCons(t *tokenizer.Tokenizer) (*class.Instance, error) {
 	car, err := Parse(t)
 	if err == errEOP {
 		return class.Null.New(nil), nil
@@ -142,8 +142,8 @@ func parseCons(t *tokenizer.TokenReader) (*class.Instance, error) {
 }
 
 // Parse builds a internal expression from tokens
-func Parse(t *tokenizer.TokenReader) (*class.Instance, error) {
-	tok, err := t.ReadToken()
+func Parse(t *tokenizer.Tokenizer) (*class.Instance, error) {
+	tok, err := t.Next()
 	if err != nil {
 		return nil, err
 	}
