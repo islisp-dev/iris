@@ -5,38 +5,38 @@ type Class struct {
 	name    string
 }
 
-func (c *Class) ToString() string {
-	return c.name
+func (class *Class) ToString() string {
+	return class.name
 }
 
-func (c *Class) New(val interface{}, rest ...interface{}) *Instance {
-	return &Instance{c, val}
+func (class *Class) New(value interface{}) *Instance {
+	return &Instance{class, value}
 }
 
-func defclass(parent *Class, name string) *Class {
+func NewClass(parent *Class, name string) *Class {
 	return &Class{[]*Class{parent}, name}
 }
 
 var Object = &Class{[]*Class{}, "<object>"}
-var BuiltInClass = defclass(Object, "<built-in-class>")
-var StandardClass = defclass(Object, "<standard-class>")
-var ArithmeticError = defclass(Object, "<arithmetic-error>")
-var FloatingPointUnderflow = defclass(Object, "<floating-point-underflow>")
-var SimpleError = defclass(Object, "<simple-error>")
-var BasicArray = defclass(Object, "<basic-array>")
-var BasicArrayStar = defclass(BasicArray, "<basic-array*>")
-var GeneralArrayStar = defclass(BasicArrayStar, "<general-array*>")
-var BasicVector = defclass(BasicArray, "<basic-vector>")
-var GeneraVector = defclass(BasicVector, "<general-vector>")
-var String = defclass(BasicVector, "<string>")
-var Function = defclass(Object, "<function>")
-var GenericFunction = defclass(Function, "<generic-function>")
-var StandardGenericFunction = defclass(GenericFunction, "<standard-generic-function>")
-var Character = defclass(Object, "<character>")
-var Number = defclass(Object, "<number>")
-var Integer = defclass(Number, "<integer>")
-var Float = defclass(Number, "<float>")
-var Symbol = defclass(Object, "<symbol>")
-var List = defclass(Object, "<list>")
-var Cons = defclass(List, "<cons>")
-var Null = defclass(List, "<null>")
+var BuiltInClass = NewClass(Object, "<built-in-class>")
+var StandardClass = NewClass(Object, "<standard-class>")
+var ArithmeticError = NewClass(Object, "<arithmetic-error>")
+var FloatingPointUnderflow = NewClass(Object, "<floating-point-underflow>")
+var SimpleError = NewClass(Object, "<simple-error>")
+var BasicArray = NewClass(Object, "<basic-array>")
+var BasicArrayStar = NewClass(BasicArray, "<basic-array*>")
+var GeneralArrayStar = NewClass(BasicArrayStar, "<general-array*>")
+var BasicVector = NewClass(BasicArray, "<basic-vector>")
+var GeneraVector = NewClass(BasicVector, "<general-vector>")
+var String = NewClass(BasicVector, "<string>")
+var Function = NewClass(Object, "<function>")
+var GenericFunction = NewClass(Function, "<generic-function>")
+var StandardGenericFunction = NewClass(GenericFunction, "<standard-generic-function>")
+var Character = NewClass(Object, "<character>")
+var Number = NewClass(Object, "<number>")
+var Integer = NewClass(Number, "<integer>")
+var Float = NewClass(Number, "<float>")
+var Symbol = NewClass(Object, "<symbol>")
+var List = NewClass(Object, "<list>")
+var Cons = NewClass(List, "<cons>")
+var Null = NewClass(List, "<null>")
