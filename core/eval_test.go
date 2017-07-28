@@ -26,6 +26,9 @@ func TestEval(t *testing.T) {
 		car, _ := cons.Car(args)
 		return class.Integer.New(car.Value().(int) + 1), nil
 	})
+	local.Macro["minc"] = function.New(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
+		return cons.New(class.Symbol.New("inc"), args), nil
+	})
 	type args struct {
 		obj    *class.Instance
 		local  *env.Environment
@@ -46,6 +49,12 @@ func TestEval(t *testing.T) {
 		{
 			name:    "local function",
 			args:    args{read("(inc (inc 1))"), local, global},
+			want:    class.Integer.New(3),
+			wantErr: false,
+		},
+		{
+			name:    "local macro",
+			args:    args{read("(minc (minc 1))"), local, global},
 			want:    class.Integer.New(3),
 			wantErr: false,
 		},

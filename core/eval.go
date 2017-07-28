@@ -43,9 +43,28 @@ func evalFunction(obj *class.Instance, local *env.Environment, global *env.Envir
 		return nil, fmt.Errorf("%v is not a symbol", obj.Value())
 	}
 	// get function arguments
-	cdr, err := cons.Cdr(obj)
+	args, err := cons.Cdr(obj)
 	if err != nil {
 		return nil, err
+	}
+	// get macro instance has value of Function interface
+	var mac *class.Instance
+	if m, ok := local.Macro[car.Value()]; ok {
+		mac = m
+	}
+	if m, ok := global.Macro[car.Value()]; ok {
+		mac = m
+	}
+	if mac != nil {
+		ret, err := function.Apply(mac, args, local, global)
+		if err != nil {
+			return nil, err
+		}
+		ret, err = Eval(ret, local, global)
+		if err != nil {
+			return nil, err
+		}
+		return ret, nil
 	}
 	// get function instance has value of Function interface
 	var fun *class.Instance
@@ -55,22 +74,18 @@ func evalFunction(obj *class.Instance, local *env.Environment, global *env.Envir
 	if f, ok := global.Function[car.Value()]; ok {
 		fun = f
 	}
-	if fun == nil {
-		return nil, fmt.Errorf("%v is not defined", obj.Value())
+	if fun != nil {
+		a, err := evalArguments(args, local, global)
+		if err != nil {
+			return nil, err
+		}
+		r, err := function.Apply(fun, a, local, global)
+		if err != nil {
+			return nil, err
+		}
+		return r, nil
 	}
-	// evaluate each arguments
-	a, err := evalArguments(cdr, local, global)
-	if err != nil {
-		return nil, err
-	}
-	// apply function to arguments
-	e := env.New()
-	e.DynamicVariable = local.DynamicVariable
-	r, err := function.Apply(fun, a, env.New(), global)
-	if err != nil {
-		return nil, err
-	}
-	return r, nil
+	return nil, fmt.Errorf("%v is not defined", obj.Value())
 }
 
 // Eval evaluates any classs
