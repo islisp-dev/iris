@@ -10,7 +10,7 @@ import (
 	"github.com/ta2gch/gazelle/core/environment"
 )
 
-func evalArgs(args *class.Instance, local *environment.Env, global *environment.Env) (*class.Instance, error) {
+func evalArgs(args *class.Instance, local *environment.Environment, global *environment.Environment) (*class.Instance, error) {
 	if args.Class() == class.Null {
 		return class.Null.New(nil), nil
 	}
@@ -34,16 +34,16 @@ func evalArgs(args *class.Instance, local *environment.Env, global *environment.
 }
 
 // Eval evaluates any classs
-func Eval(obj *class.Instance, local *environment.Env, global *environment.Env) (*class.Instance, error) {
+func Eval(obj *class.Instance, local *environment.Environment, global *environment.Environment) (*class.Instance, error) {
 	if obj.Class() == class.Null {
 		return class.Null.New(nil), nil
 	}
 	switch obj.Class() {
 	case class.Symbol:
-		if val, ok := local.Var[obj.Value().(string)]; ok {
+		if val, ok := local.Variable[obj.Value().(string)]; ok {
 			return val, nil
 		}
-		if val, ok := global.Var[obj.Value().(string)]; ok {
+		if val, ok := global.Variable[obj.Value().(string)]; ok {
 			return val, nil
 		}
 		return nil, fmt.Errorf("%v is not defined", obj.Value())
@@ -59,7 +59,7 @@ func Eval(obj *class.Instance, local *environment.Env, global *environment.Env) 
 		if car.Class() != class.Symbol {
 			return nil, fmt.Errorf("%v is not a symbol", obj.Value())
 		}
-		if f, ok := local.Fun[car.Value().(string)]; ok {
+		if f, ok := local.Function[car.Value().(string)]; ok {
 			a, err := evalArgs(cdr, local, global)
 			if err != nil {
 				return nil, err
@@ -70,7 +70,7 @@ func Eval(obj *class.Instance, local *environment.Env, global *environment.Env) 
 			}
 			return r, nil
 		}
-		if f, ok := global.Fun[car.Value().(string)]; ok {
+		if f, ok := global.Function[car.Value().(string)]; ok {
 			a, err := evalArgs(cdr, local, global)
 			if err != nil {
 				return nil, err
