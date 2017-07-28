@@ -60,10 +60,6 @@ func evalFunction(obj *class.Instance, local *env.Environment, global *env.Envir
 		if err != nil {
 			return nil, err
 		}
-		ret, err = Eval(ret, local, global)
-		if err != nil {
-			return nil, err
-		}
 		return ret, nil
 	}
 	// get function instance has value of Function interface
