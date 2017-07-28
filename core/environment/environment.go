@@ -6,19 +6,19 @@ import (
 
 // Environment struct is the struct for keeping functions and variables
 type Environment struct {
-	Macro           map[interface{}]*class.Instance
-	Function        map[interface{}]*class.Instance
-	Variable        map[interface{}]*class.Instance
-	DynamicVariable map[interface{}]*class.Instance
+	Macro           map[class.Value]*class.Instance
+	Function        map[class.Value]*class.Instance
+	Variable        map[class.Value]*class.Instance
+	DynamicVariable map[class.Value]*class.Instance
 }
 
 // New creates new environment
 func New() *Environment {
 	env := new(Environment)
-	env.Macro = map[interface{}]*class.Instance{}
-	env.Function = map[interface{}]*class.Instance{}
-	env.Variable = map[interface{}]*class.Instance{}
-	env.DynamicVariable = map[interface{}]*class.Instance{}
+	env.Macro = map[class.Value]*class.Instance{}
+	env.Function = map[class.Value]*class.Instance{}
+	env.Variable = map[class.Value]*class.Instance{}
+	env.DynamicVariable = map[class.Value]*class.Instance{}
 	return env
 }
 
