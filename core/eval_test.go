@@ -20,15 +20,15 @@ func read(s string) *class.Instance {
 
 func TestEval(t *testing.T) {
 	testEnv := environment.New()
-	testEnv.Var["PI"] = class.Float.New(3.14)
-	testEnv.Fun["INC"] = function.New(func(args *class.Instance, global *environment.Env) (*class.Instance, error) {
+	testEnv.Variable["PI"] = class.Float.New(3.14)
+	testEnv.Function["INC"] = function.New(func(args *class.Instance, global *environment.Environment) (*class.Instance, error) {
 		car, _ := cons.Car(args)
 		return class.Integer.New(car.Value().(int) + 1), nil
 	})
 	type args struct {
 		obj    *class.Instance
-		local  *environment.Env
-		global *environment.Env
+		local  *environment.Environment
+		global *environment.Environment
 	}
 	tests := []struct {
 		name    string
