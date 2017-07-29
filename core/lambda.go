@@ -29,6 +29,18 @@ func (f LambdaFunction) Apply(args *class.Instance, local *env.Environment, glob
 		if err != nil {
 			return nil, err
 		}
+		if *key == *class.Symbol.New(":rest") || *key == *class.Symbol.New("&rest") {
+			cdr, err := cons.Cdr(fargs)
+			if err != nil {
+				return nil, err
+			}
+			caar, err := cons.Car(cdr)
+			if err != nil {
+				return nil, err
+			}
+			local.SetVariable(caar, aargs)
+			break
+		}
 		local.SetVariable(key, value)
 		fargs, err = cons.Cdr(fargs)
 		if err != nil {
