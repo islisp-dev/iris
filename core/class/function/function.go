@@ -21,21 +21,3 @@ func Apply(fun *class.Instance, args *class.Instance, local *env.Environment, gl
 	}
 	return obj, nil
 }
-
-type DefaultFunction struct {
-	args *class.Instance
-	body *class.Instance
-}
-
-/*
-func (f *DefaultFunction) Apply(args *class.Instance, global *Env) (*class.Instance, error) {
-	// Assign args to local environment
-	// Eval each body
-	// return evaluate result
-}
-*/
-
-type GenericFunction struct {
-	args *class.Instance
-	body *class.Instance
-}

@@ -12,7 +12,7 @@ type LambdaFunction struct {
 	local *env.Environment
 }
 
-func Lambda(args *class.Instance, body *class.Instance, local *env.Environment) *class.Instance {
+func NewLambdaFunction(args *class.Instance, body *class.Instance, local *env.Environment) *class.Instance {
 	return class.Function.New(&LambdaFunction{args, body, local})
 }
 
