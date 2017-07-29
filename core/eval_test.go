@@ -21,15 +21,20 @@ func read(s string) *class.Instance {
 func TestEval(t *testing.T) {
 	local := env.New()
 	global := env.New()
-	local.Variable["pi"] = class.Float.New(3.14)
-	local.Function["inc"] = function.New(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
+	local.SetVariable(class.Symbol.New("pi"), class.Float.New(3.14))
+	local.SetFunction(class.Symbol.New("inc"), function.New(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
 		car, _ := cons.Car(args)
 		return class.Integer.New(car.Value().(int) + 1), nil
-	})
-	local.Macro["minc"] = function.New(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
+	}))
+	local.SetMacro(class.Symbol.New("minc"), function.New(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
 		ret, _ := Eval(cons.New(class.Symbol.New("inc"), args), local, global)
 		return ret, nil
-	})
+	}))
+	local.SetMacro(class.Symbol.New("lambda"), function.New(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
+		lambdaList, _ := cons.Car(args)
+		lambdaBody, _ := cons.Cdr(args)
+		return Lambda(lambdaList, lambdaBody, local), nil
+	}))
 	type args struct {
 		obj    *class.Instance
 		local  *env.Environment
@@ -57,6 +62,12 @@ func TestEval(t *testing.T) {
 			name:    "local macro",
 			args:    args{read("(minc (minc 1))"), local, global},
 			want:    class.Integer.New(3),
+			wantErr: false,
+		},
+		{
+			name:    "lambda",
+			args:    args{read("((lambda (x) (minc x)) 1)"), local, global},
+			want:    class.Integer.New(2),
 			wantErr: false,
 		},
 	}

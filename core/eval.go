@@ -39,24 +39,42 @@ func evalFunction(obj *class.Instance, local *env.Environment, global *env.Envir
 	if err != nil {
 		return nil, err
 	}
-	if car.Class() != class.Symbol {
-		return nil, fmt.Errorf("%v is not a symbol", obj.Value())
-	}
 	// get function arguments
-	args, err := cons.Cdr(obj)
+	cdr, err := cons.Cdr(obj)
 	if err != nil {
 		return nil, err
 	}
+	// eval if lambda form
+	if car.Class() == class.Cons {
+		caar, err := cons.Car(car)
+		if err != nil {
+			return nil, err
+		}
+		if *caar == *class.Symbol.New("lambda") {
+			fun, err := Eval(car, local, global)
+			if err != nil {
+				return nil, err
+			}
+			ret, err := function.Apply(fun, cdr, local, global)
+			if err != nil {
+				return nil, err
+			}
+			return ret, nil
+		}
+	}
+	if car.Class() != class.Symbol {
+		return nil, fmt.Errorf("%v is not a symbol", obj.Value())
+	}
 	// get macro instance has value of Function interface
 	var mac *class.Instance
-	if m, ok := local.Macro[car.Value()]; ok {
+	if m, ok := local.GetMacro(car); ok {
 		mac = m
 	}
-	if m, ok := global.Macro[car.Value()]; ok {
+	if m, ok := global.GetMacro(car); ok {
 		mac = m
 	}
 	if mac != nil {
-		ret, err := function.Apply(mac, args, local, global)
+		ret, err := function.Apply(mac, cdr, local, global)
 		if err != nil {
 			return nil, err
 		}
@@ -64,19 +82,19 @@ func evalFunction(obj *class.Instance, local *env.Environment, global *env.Envir
 	}
 	// get function instance has value of Function interface
 	var fun *class.Instance
-	if f, ok := local.Function[car.Value()]; ok {
+	if f, ok := local.GetFunction(car); ok {
 		fun = f
 	}
-	if f, ok := global.Function[car.Value()]; ok {
+	if f, ok := global.GetFunction(car); ok {
 		fun = f
 	}
 	if fun != nil {
-		a, err := evalArguments(args, local, global)
+		a, err := evalArguments(cdr, local, global)
 		if err != nil {
 			return nil, err
 		}
 		env := env.New()
-		env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
+		env.MergeDynamicVariable(local)
 		r, err := function.Apply(fun, a, env, global)
 		if err != nil {
 			return nil, err
@@ -93,14 +111,14 @@ func Eval(obj *class.Instance, local *env.Environment, global *env.Environment) 
 	}
 	switch obj.Class() {
 	case class.Symbol:
-		if val, ok := local.Variable[obj.Value()]; ok {
+		if val, ok := local.GetVariable(obj); ok {
 			return val, nil
 		}
-		if val, ok := global.Variable[obj.Value()]; ok {
+		if val, ok := global.GetVariable(obj); ok {
 			return val, nil
 		}
 		return nil, fmt.Errorf("%v is not defined", obj.Value())
-	case class.List: // obj is a form or a macro
+	case class.Cons: // obj is a form or a macro
 		ret, err := evalFunction(obj, local, global)
 		if err != nil {
 			return nil, err
