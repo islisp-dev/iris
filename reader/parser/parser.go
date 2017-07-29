@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"errors"
-	"fmt"
 	"math"
 	"regexp"
 	"strconv"
@@ -13,10 +11,10 @@ import (
 	"github.com/ta2gch/gazelle/reader/tokenizer"
 )
 
-var errEOP = errors.New("End Of Parentheses")
-var errBOD = errors.New("Begin Of Dot")
+var eop = class.SimpleError.New("End Of Parentheses")
+var bod = class.SimpleError.New("Begin Of Dot")
 
-func parseAtom(tok string) (*class.Instance, error) {
+func parseAtom(tok string) (*class.Instance, *class.Instance) {
 	//
 	// integer
 	//
@@ -81,9 +79,10 @@ func parseAtom(tok string) (*class.Instance, error) {
 	if m, _ := regexp.MatchString("^[<>/*=?_!$%[\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*$", tok); m {
 		return class.Symbol.New(tok), nil
 	}
-	return nil, fmt.Errorf("Sorry, I could not parse %s", tok)
+	return nil, class.ParseError.New(nil)
 }
-func parseMacro(tok string, t *tokenizer.Tokenizer) (*class.Instance, error) {
+
+func parseMacro(tok string, t *tokenizer.Tokenizer) (*class.Instance, *class.Instance) {
 	cdr, err := Parse(t)
 	if err != nil {
 		return nil, err
@@ -98,7 +97,7 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (*class.Instance, error) {
 		}
 		v, err := strconv.ParseInt(tok[1:i], 10, 32)
 		if err != nil {
-			return nil, err
+			return nil, class.ParseError.New(nil)
 		}
 		d := class.Integer.New(int(v))
 		return cons.New(s, cons.New(d, cons.New(cdr, class.Null.New(nil)))), nil
@@ -116,17 +115,17 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (*class.Instance, error) {
 	m := class.Symbol.New(n)
 	return cons.New(m, cons.New(cdr, class.Null.New(nil))), nil
 }
-func parseCons(t *tokenizer.Tokenizer) (*class.Instance, error) {
+func parseCons(t *tokenizer.Tokenizer) (*class.Instance, *class.Instance) {
 	car, err := Parse(t)
-	if err == errEOP {
+	if err == eop {
 		return class.Null.New(nil), nil
 	}
-	if err == errBOD {
+	if err == bod {
 		cdr, err := Parse(t)
 		if err != nil {
 			return nil, err
 		}
-		if _, err := Parse(t); err != errEOP {
+		if _, err := Parse(t); err != eop {
 			return nil, err
 		}
 		return cdr, nil
@@ -142,7 +141,7 @@ func parseCons(t *tokenizer.Tokenizer) (*class.Instance, error) {
 }
 
 // Parse builds a internal expression from tokens
-func Parse(t *tokenizer.Tokenizer) (*class.Instance, error) {
+func Parse(t *tokenizer.Tokenizer) (*class.Instance, *class.Instance) {
 	tok, err := t.Next()
 	if err != nil {
 		return nil, err
@@ -155,10 +154,10 @@ func Parse(t *tokenizer.Tokenizer) (*class.Instance, error) {
 		return cons, err
 	}
 	if tok == ")" {
-		return nil, errEOP
+		return nil, eop
 	}
 	if tok == "." {
-		return nil, errBOD
+		return nil, bod
 	}
 	if mat, _ := regexp.MatchString("^(?:,@?|'|`|#[[:digit:]]*[aA])$", tok); mat {
 		m, err := parseMacro(tok, t)
