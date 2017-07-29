@@ -1,4 +1,4 @@
-package function
+package core
 
 import (
 	"github.com/ta2gch/gazelle/core/class"
@@ -17,6 +17,6 @@ func (f NativeFunction) Apply(args *class.Instance, local *env.Environment, glob
 	return obj, nil
 }
 
-func New(fun func(*class.Instance, *env.Environment, *env.Environment) (*class.Instance, error)) *class.Instance {
+func NewNativeFunction(fun func(*class.Instance, *env.Environment, *env.Environment) (*class.Instance, error)) *class.Instance {
 	return class.Function.New(&NativeFunction{fun})
 }

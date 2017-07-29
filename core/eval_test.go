@@ -7,7 +7,6 @@ import (
 
 	"github.com/ta2gch/gazelle/core/class"
 	"github.com/ta2gch/gazelle/core/class/cons"
-	"github.com/ta2gch/gazelle/core/class/function"
 	env "github.com/ta2gch/gazelle/core/environment"
 	"github.com/ta2gch/gazelle/reader/parser"
 	"github.com/ta2gch/gazelle/reader/tokenizer"
@@ -22,18 +21,18 @@ func TestEval(t *testing.T) {
 	local := env.New()
 	global := env.New()
 	local.SetVariable(class.Symbol.New("pi"), class.Float.New(3.14))
-	local.SetFunction(class.Symbol.New("inc"), function.New(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
+	local.SetFunction(class.Symbol.New("inc"), NewNativeFunction(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
 		car, _ := cons.Car(args)
 		return class.Integer.New(car.Value().(int) + 1), nil
 	}))
-	local.SetMacro(class.Symbol.New("minc"), function.New(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
+	local.SetMacro(class.Symbol.New("minc"), NewNativeFunction(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
 		ret, _ := Eval(cons.New(class.Symbol.New("inc"), args), local, global)
 		return ret, nil
 	}))
-	local.SetMacro(class.Symbol.New("lambda"), function.New(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
-		lambdaList, _ := cons.Car(args)
-		lambdaBody, _ := cons.Cdr(args)
-		return Lambda(lambdaList, lambdaBody, local), nil
+	global.SetMacro(class.Symbol.New("lambda"), NewNativeFunction(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
+		car, _ := cons.Car(args)
+		cdr, _ := cons.Cdr(args)
+		return NewLambdaFunction(car, cdr, local), nil
 	}))
 	type args struct {
 		obj    *class.Instance
