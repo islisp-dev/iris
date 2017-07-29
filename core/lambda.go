@@ -16,7 +16,7 @@ func NewLambdaFunction(args *class.Instance, body *class.Instance, local *env.En
 	return class.Function.New(&LambdaFunction{args, body, local})
 }
 
-func (f LambdaFunction) Apply(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
+func (f LambdaFunction) Apply(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, *class.Instance) {
 	local.MergeAll(f.local)
 	fargs := f.args
 	aargs := args

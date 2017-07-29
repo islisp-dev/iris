@@ -21,15 +21,15 @@ func TestEval(t *testing.T) {
 	local := env.New()
 	global := env.New()
 	local.SetVariable(class.Symbol.New("pi"), class.Float.New(3.14))
-	local.SetFunction(class.Symbol.New("inc"), NewNativeFunction(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
+	local.SetFunction(class.Symbol.New("inc"), NewNativeFunction(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, *class.Instance) {
 		car, _ := cons.Car(args)
 		return class.Integer.New(car.Value().(int) + 1), nil
 	}))
-	local.SetMacro(class.Symbol.New("minc"), NewNativeFunction(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
+	local.SetMacro(class.Symbol.New("minc"), NewNativeFunction(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, *class.Instance) {
 		ret, _ := Eval(cons.New(class.Symbol.New("inc"), args), local, global)
 		return ret, nil
 	}))
-	global.SetMacro(class.Symbol.New("lambda"), NewNativeFunction(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
+	global.SetMacro(class.Symbol.New("lambda"), NewNativeFunction(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, *class.Instance) {
 		car, _ := cons.Car(args)
 		cdr, _ := cons.Cdr(args)
 		return NewLambdaFunction(car, cdr, local), nil

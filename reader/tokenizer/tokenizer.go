@@ -4,6 +4,8 @@ import (
 	"io"
 	"regexp"
 	"strings"
+
+	"github.com/ta2gch/gazelle/core/class"
 )
 
 // Tokenizer interface type is the interface
@@ -61,13 +63,13 @@ var token = concatMatcher(
 	parentheses)
 
 // Next returns error or string as token
-func (r *Tokenizer) Next() (string, error) {
+func (r *Tokenizer) Next() (string, *class.Instance) {
 	buf := ""
 	for {
 		if buf == "" {
 			p, _, err := r.PeekRune()
 			if err != nil {
-				return "", err
+				return "", class.ParseError.New(nil)
 			}
 			if token.MatchString(string(p)) {
 				buf = string(p)

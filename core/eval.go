@@ -1,16 +1,13 @@
 package core
 
 import (
-	"errors"
-	"fmt"
-
 	"github.com/ta2gch/gazelle/core/class"
 	"github.com/ta2gch/gazelle/core/class/cons"
 	"github.com/ta2gch/gazelle/core/class/function"
 	env "github.com/ta2gch/gazelle/core/environment"
 )
 
-func evalArguments(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
+func evalArguments(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, *class.Instance) {
 	if args.Class() == class.Null {
 		return class.Null.New(nil), nil
 	}
@@ -33,7 +30,7 @@ func evalArguments(args *class.Instance, local *env.Environment, global *env.Env
 	return cons.New(a, b), nil
 }
 
-func evalFunction(obj *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
+func evalFunction(obj *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, *class.Instance) {
 	// get function symbol
 	car, err := cons.Car(obj)
 	if err != nil {
@@ -69,7 +66,7 @@ func evalFunction(obj *class.Instance, local *env.Environment, global *env.Envir
 		}
 	}
 	if car.Class() != class.Symbol {
-		return nil, fmt.Errorf("%v is not a symbol", obj.Value())
+		return nil, class.DomainError.New(nil)
 	}
 	// get macro instance has value of Function interface
 	var mac *class.Instance
@@ -107,11 +104,11 @@ func evalFunction(obj *class.Instance, local *env.Environment, global *env.Envir
 		}
 		return ret, nil
 	}
-	return nil, fmt.Errorf("%v is not defined", obj.Value())
+	return nil, class.UndefinedFunction.New(nil)
 }
 
 // Eval evaluates any classs
-func Eval(obj *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, error) {
+func Eval(obj *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, *class.Instance) {
 	if obj.Class() == class.Null {
 		return class.Null.New(nil), nil
 	}
@@ -123,7 +120,7 @@ func Eval(obj *class.Instance, local *env.Environment, global *env.Environment) 
 		if val, ok := global.GetVariable(obj); ok {
 			return val, nil
 		}
-		return nil, fmt.Errorf("%v is not defined", obj.Value())
+		return nil, class.UndefinedVariable.New(nil)
 	case class.Cons: // obj is a form or a macro
 		ret, err := evalFunction(obj, local, global)
 		if err != nil {
@@ -133,5 +130,5 @@ func Eval(obj *class.Instance, local *env.Environment, global *env.Environment) 
 	case class.Integer, class.Float, class.Character, class.String:
 		return obj, nil
 	}
-	return nil, errors.New("I have no ideas")
+	return nil, class.ParseError.New(nil)
 }

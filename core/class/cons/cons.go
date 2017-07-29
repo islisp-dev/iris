@@ -1,8 +1,6 @@
 package cons
 
 import (
-	"fmt"
-
 	"github.com/ta2gch/gazelle/core/class"
 )
 
@@ -16,16 +14,16 @@ func New(car *class.Instance, cdr *class.Instance) *class.Instance {
 	return class.Cons.New(&Cell{car, cdr})
 }
 
-func Car(i *class.Instance) (*class.Instance, error) {
+func Car(i *class.Instance) (*class.Instance, *class.Instance) {
 	if i.Class() == class.Null || (i.Class() != class.Cons && i.Class() != class.List) {
-		return nil, fmt.Errorf("%v is not a member of <cons>", i.Class().ToString())
+		return nil, class.DomainError.New(nil)
 	}
 	return i.Value().(*Cell).car, nil
 }
 
-func Cdr(i *class.Instance) (*class.Instance, error) {
+func Cdr(i *class.Instance) (*class.Instance, *class.Instance) {
 	if i.Class() == class.Null || (i.Class() != class.Cons && i.Class() != class.List) {
-		return nil, fmt.Errorf("%v is not a member of <cons>", i.Class().ToString())
+		return nil, class.DomainError.New(nil)
 	}
 	return i.Value().(*Cell).cdr, nil
 }
