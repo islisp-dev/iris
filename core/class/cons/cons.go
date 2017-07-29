@@ -13,9 +13,6 @@ type Cell struct {
 }
 
 func New(car *class.Instance, cdr *class.Instance) *class.Instance {
-	if cdr.Class() == class.Null || cdr.Class() == class.List {
-		return class.List.New(&Cell{car, cdr})
-	}
 	return class.Cons.New(&Cell{car, cdr})
 }
 
