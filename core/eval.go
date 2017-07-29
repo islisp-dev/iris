@@ -55,7 +55,13 @@ func evalFunction(obj *class.Instance, local *env.Environment, global *env.Envir
 			if err != nil {
 				return nil, err
 			}
-			ret, err := function.Apply(fun, cdr, local, global)
+			args, err := evalArguments(cdr, local, global)
+			if err != nil {
+				return nil, err
+			}
+			env := env.New()
+			env.MergeDynamicVariable(local)
+			ret, err := function.Apply(fun, args, env, global)
 			if err != nil {
 				return nil, err
 			}
@@ -89,17 +95,17 @@ func evalFunction(obj *class.Instance, local *env.Environment, global *env.Envir
 		fun = f
 	}
 	if fun != nil {
-		a, err := evalArguments(cdr, local, global)
+		args, err := evalArguments(cdr, local, global)
 		if err != nil {
 			return nil, err
 		}
 		env := env.New()
 		env.MergeDynamicVariable(local)
-		r, err := function.Apply(fun, a, env, global)
+		ret, err := function.Apply(fun, args, env, global)
 		if err != nil {
 			return nil, err
 		}
-		return r, nil
+		return ret, nil
 	}
 	return nil, fmt.Errorf("%v is not defined", obj.Value())
 }
