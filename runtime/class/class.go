@@ -5,7 +5,7 @@ type Class interface {
 	Class() Class
 	Value() Value
 	IsInstanceOf(Class) bool
-	ToString() string
+	String() string
 	// Class main interface
 	Parents() []Class
 	New(...Value) Instance
@@ -18,6 +18,18 @@ func test(child Class, parent Class) bool {
 	}
 	for _, p := range child.Parents() {
 		if test(p, parent) {
+			return true
+		}
+	}
+	return false
+}
+
+func isInstanceOf(i Instance, class Class) bool {
+	if i.Class() == class {
+		return true
+	}
+	for _, p := range i.Class().Parents() {
+		if test(p, class) {
 			return true
 		}
 	}

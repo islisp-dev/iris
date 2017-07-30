@@ -1,6 +1,8 @@
 package cons
 
 import (
+	"fmt"
+
 	"github.com/ta2gch/gazelle/runtime/class"
 )
 
@@ -41,4 +43,8 @@ func Length(list class.Instance) (int, class.Instance) {
 		return 0, err
 	}
 	return 1 + len, nil
+}
+
+func (c *Cell) String() string {
+	return fmt.Sprintf("(%v . %v)", c.car, c.cdr)
 }

@@ -1,5 +1,9 @@
 package class
 
+import (
+	"fmt"
+)
+
 type Value interface{}
 
 // Instance struct type is the struct for the internal representations
@@ -7,7 +11,7 @@ type Instance interface {
 	Class() Class
 	Value() Value
 	IsInstanceOf(Class) bool
-	ToString() string
+	String() string
 }
 
 type defaultInstance struct {
@@ -24,17 +28,9 @@ func (i *defaultInstance) Value() Value {
 }
 
 func (i *defaultInstance) IsInstanceOf(class Class) bool {
-	if i.Class() == class {
-		return true
-	}
-	for _, p := range i.Class().Parents() {
-		if test(p, class) {
-			return true
-		}
-	}
-	return false
+	return isInstanceOf(i, class)
 }
 
-func (i *defaultInstance) ToString() string {
-	return ""
+func (i *defaultInstance) String() string {
+	return fmt.Sprintf("%v", i.Value())
 }
