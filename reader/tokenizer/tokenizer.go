@@ -63,13 +63,13 @@ var token = concatMatcher(
 	parentheses)
 
 // Next returns error or string as token
-func (r *Tokenizer) Next() (string, *class.Instance) {
+func (r *Tokenizer) Next() (string, class.Instance) {
 	buf := ""
 	for {
 		if buf == "" {
 			p, _, err := r.PeekRune()
 			if err != nil {
-				return "", class.ParseError.New(nil)
+				return "", class.New(class.ParseError, nil)
 			}
 			if token.MatchString(string(p)) {
 				buf = string(p)

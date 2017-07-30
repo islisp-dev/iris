@@ -12,7 +12,7 @@ import (
 	"github.com/ta2gch/gazelle/reader/tokenizer"
 )
 
-func read(s string) *class.Instance {
+func read(s string) class.Instance {
 	e, _ := parser.Parse(tokenizer.New(strings.NewReader(s)))
 	return e
 }
@@ -20,53 +20,53 @@ func read(s string) *class.Instance {
 func TestEval(t *testing.T) {
 	local := env.New()
 	global := env.New()
-	local.SetVariable(class.Symbol.New("pi"), class.Float.New(3.14))
-	local.SetFunction(class.Symbol.New("inc"), NewNativeFunction(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, *class.Instance) {
+	local.SetVariable(class.New(class.Symbol, "pi"), class.New(class.Float, 3.14))
+	local.SetFunction(class.New(class.Symbol, "inc"), NewNativeFunction(func(args class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance) {
 		car, _ := cons.Car(args)
-		return class.Integer.New(car.Value().(int) + 1), nil
+		return class.New(class.Integer, car.Value().(int)+1), nil
 	}))
-	local.SetMacro(class.Symbol.New("minc"), NewNativeFunction(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, *class.Instance) {
-		ret, _ := Eval(cons.New(class.Symbol.New("inc"), args), local, global)
+	local.SetMacro(class.New(class.Symbol, "minc"), NewNativeFunction(func(args class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance) {
+		ret, _ := Eval(cons.New(class.New(class.Symbol, "inc"), args), local, global)
 		return ret, nil
 	}))
-	global.SetMacro(class.Symbol.New("lambda"), NewNativeFunction(func(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, *class.Instance) {
+	global.SetMacro(class.New(class.Symbol, "lambda"), NewNativeFunction(func(args class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance) {
 		car, _ := cons.Car(args)
 		cdr, _ := cons.Cdr(args)
 		return NewLambdaFunction(car, cdr, local), nil
 	}))
 	type args struct {
-		obj    *class.Instance
+		obj    class.Instance
 		local  *env.Environment
 		global *env.Environment
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *class.Instance
+		want    class.Instance
 		wantErr bool
 	}{
 		{
 			name:    "local variable",
-			args:    args{class.Symbol.New("pi"), local, global},
-			want:    class.Float.New(3.14),
+			args:    args{class.New(class.Symbol, "pi"), local, global},
+			want:    class.New(class.Float, 3.14),
 			wantErr: false,
 		},
 		{
 			name:    "local function",
 			args:    args{read("(inc (inc 1))"), local, global},
-			want:    class.Integer.New(3),
+			want:    class.New(class.Integer, 3),
 			wantErr: false,
 		},
 		{
 			name:    "local macro",
 			args:    args{read("(minc (minc 1))"), local, global},
-			want:    class.Integer.New(3),
+			want:    class.New(class.Integer, 3),
 			wantErr: false,
 		},
 		{
 			name:    "lambda",
 			args:    args{read("((lambda (x) (minc x)) 1)"), local, global},
-			want:    class.Integer.New(2),
+			want:    class.New(class.Integer, 2),
 			wantErr: false,
 		},
 	}

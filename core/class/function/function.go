@@ -6,12 +6,12 @@ import (
 )
 
 type Function interface {
-	Apply(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, *class.Instance)
+	Apply(args class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance)
 }
 
-func Apply(fun *class.Instance, args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, *class.Instance) {
+func Apply(fun class.Instance, args class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance) {
 	if fun.Class() != class.Function {
-		return nil, class.DomainError.New(nil)
+		return nil, class.New(class.DomainError, nil)
 	}
 	obj, err := fun.Value().(Function).Apply(args, local, global)
 	if err != nil {

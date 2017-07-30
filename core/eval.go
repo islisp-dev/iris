@@ -7,9 +7,9 @@ import (
 	env "github.com/ta2gch/gazelle/core/environment"
 )
 
-func evalArguments(args *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, *class.Instance) {
+func evalArguments(args class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance) {
 	if args.Class() == class.Null {
-		return class.Null.New(nil), nil
+		return class.New(class.Null, nil), nil
 	}
 	car, err := cons.Car(args)
 	if err != nil {
@@ -30,7 +30,7 @@ func evalArguments(args *class.Instance, local *env.Environment, global *env.Env
 	return cons.New(a, b), nil
 }
 
-func evalFunction(obj *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, *class.Instance) {
+func evalFunction(obj class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance) {
 	// get function symbol
 	car, err := cons.Car(obj)
 	if err != nil {
@@ -47,7 +47,7 @@ func evalFunction(obj *class.Instance, local *env.Environment, global *env.Envir
 		if err != nil {
 			return nil, err
 		}
-		if *caar == *class.Symbol.New("lambda") {
+		if caar.Value() == "lambda" {
 			fun, err := Eval(car, local, global)
 			if err != nil {
 				return nil, err
@@ -66,10 +66,10 @@ func evalFunction(obj *class.Instance, local *env.Environment, global *env.Envir
 		}
 	}
 	if car.Class() != class.Symbol {
-		return nil, class.DomainError.New(nil)
+		return nil, class.New(class.DomainError, nil)
 	}
 	// get macro instance has value of Function interface
-	var mac *class.Instance
+	var mac class.Instance
 	if m, ok := local.GetMacro(car); ok {
 		mac = m
 	}
@@ -84,7 +84,7 @@ func evalFunction(obj *class.Instance, local *env.Environment, global *env.Envir
 		return ret, nil
 	}
 	// get function instance has value of Function interface
-	var fun *class.Instance
+	var fun class.Instance
 	if f, ok := local.GetFunction(car); ok {
 		fun = f
 	}
@@ -104,13 +104,13 @@ func evalFunction(obj *class.Instance, local *env.Environment, global *env.Envir
 		}
 		return ret, nil
 	}
-	return nil, class.UndefinedFunction.New(nil)
+	return nil, class.New(class.UndefinedFunction, nil)
 }
 
 // Eval evaluates any classs
-func Eval(obj *class.Instance, local *env.Environment, global *env.Environment) (*class.Instance, *class.Instance) {
+func Eval(obj class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance) {
 	if obj.Class() == class.Null {
-		return class.Null.New(nil), nil
+		return class.New(class.Null, nil), nil
 	}
 	switch obj.Class() {
 	case class.Symbol:
@@ -120,7 +120,7 @@ func Eval(obj *class.Instance, local *env.Environment, global *env.Environment) 
 		if val, ok := global.GetVariable(obj); ok {
 			return val, nil
 		}
-		return nil, class.UndefinedVariable.New(nil)
+		return nil, class.New(class.UndefinedVariable, nil)
 	case class.Cons: // obj is a form or a macro
 		ret, err := evalFunction(obj, local, global)
 		if err != nil {
@@ -130,5 +130,5 @@ func Eval(obj *class.Instance, local *env.Environment, global *env.Environment) 
 	case class.Integer, class.Float, class.Character, class.String:
 		return obj, nil
 	}
-	return nil, class.ParseError.New(nil)
+	return nil, class.New(class.ParseError, nil)
 }
