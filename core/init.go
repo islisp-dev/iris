@@ -19,7 +19,7 @@ func init() {
 		if err != nil {
 			return nil, err
 		}
-		if car.Class() == class.Function {
+		if car.IsInstanceOf(class.Function) {
 			return class.New(class.Object, true), nil
 		}
 		return class.New(class.Null, nil), nil

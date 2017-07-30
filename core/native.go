@@ -18,5 +18,5 @@ func (f NativeFunction) Apply(args class.Instance, local *env.Environment, globa
 }
 
 func NewNativeFunction(fun func(class.Instance, *env.Environment, *env.Environment) (class.Instance, class.Instance)) class.Instance {
-	return class.New(class.Function, &NativeFunction{fun})
+	return class.New(class.Function, NativeFunction{fun})
 }

@@ -11,25 +11,25 @@ type Cell struct {
 }
 
 func New(car class.Instance, cdr class.Instance) class.Instance {
-	return class.New(class.Cons, &Cell{car, cdr})
+	return class.New(class.Cons, Cell{car, cdr})
 }
 
 func Car(i class.Instance) (class.Instance, class.Instance) {
-	if i.Class() == class.Null || (i.Class() != class.Cons && i.Class() != class.List) {
+	if !i.IsInstanceOf(class.List) {
 		return nil, class.New(class.DomainError, nil)
 	}
-	return i.Value().(*Cell).car, nil
+	return i.Value().(Cell).car, nil
 }
 
 func Cdr(i class.Instance) (class.Instance, class.Instance) {
-	if i.Class() == class.Null || (i.Class() != class.Cons && i.Class() != class.List) {
+	if i.IsInstanceOf(class.Null) || !i.IsInstanceOf(class.List) {
 		return nil, class.New(class.DomainError, nil)
 	}
-	return i.Value().(*Cell).cdr, nil
+	return i.Value().(Cell).cdr, nil
 }
 
 func Length(list class.Instance) (int, class.Instance) {
-	if list.Class() == class.Null {
+	if list.IsInstanceOf(class.Null) {
 		return 0, nil
 	}
 	cdr, err := Cdr(list)

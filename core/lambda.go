@@ -13,14 +13,14 @@ type LambdaFunction struct {
 }
 
 func NewLambdaFunction(lambdaList class.Instance, forms class.Instance, local *env.Environment) class.Instance {
-	return class.New(class.Function, &LambdaFunction{lambdaList, forms, local})
+	return class.New(class.Function, LambdaFunction{lambdaList, forms, local})
 }
 
 func (f LambdaFunction) Apply(args class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance) {
 	local.MergeAll(f.local)
 	fargs := f.lambdaList
 	aargs := args
-	for fargs.Class() != class.Null {
+	for !fargs.IsInstanceOf(class.Null) {
 		key, err := cons.Car(fargs)
 		if err != nil {
 			return nil, err
@@ -42,7 +42,7 @@ func (f LambdaFunction) Apply(args class.Instance, local *env.Environment, globa
 			if err != nil {
 				return nil, err
 			}
-			if cddr.Class() == class.Null {
+			if !cddr.IsInstanceOf(class.Null) {
 				return nil, class.New(class.ParseError, nil)
 			}
 			local.SetVariable(cadr, aargs)
@@ -60,7 +60,7 @@ func (f LambdaFunction) Apply(args class.Instance, local *env.Environment, globa
 	}
 	body := f.forms
 	var ret class.Instance
-	for body.Class() != class.Null {
+	for !body.IsInstanceOf(class.Null) {
 		exp, err := cons.Car(body)
 		if err != nil {
 			return nil, err

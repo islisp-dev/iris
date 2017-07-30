@@ -8,7 +8,7 @@ import (
 )
 
 func evalArguments(args class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance) {
-	if args.Class() == class.Null {
+	if args.IsInstanceOf(class.Null) {
 		return class.New(class.Null, nil), nil
 	}
 	car, err := cons.Car(args)
@@ -36,13 +36,15 @@ func evalFunction(obj class.Instance, local *env.Environment, global *env.Enviro
 	if err != nil {
 		return nil, err
 	}
+	println("called")
+
 	// get function arguments
 	cdr, err := cons.Cdr(obj)
 	if err != nil {
 		return nil, err
 	}
 	// eval if lambda form
-	if car.Class() == class.Cons {
+	if car.IsInstanceOf(class.Cons) {
 		caar, err := cons.Car(car)
 		if err != nil {
 			return nil, err
@@ -65,7 +67,8 @@ func evalFunction(obj class.Instance, local *env.Environment, global *env.Enviro
 			return ret, nil
 		}
 	}
-	if car.Class() != class.Symbol {
+
+	if !car.IsInstanceOf(class.Symbol) {
 		return nil, class.New(class.DomainError, nil)
 	}
 	// get macro instance has value of Function interface
@@ -109,11 +112,10 @@ func evalFunction(obj class.Instance, local *env.Environment, global *env.Enviro
 
 // Eval evaluates any classs
 func Eval(obj class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance) {
-	if obj.Class() == class.Null {
+	if obj.IsInstanceOf(class.Null) {
 		return class.New(class.Null, nil), nil
 	}
-	switch obj.Class() {
-	case class.Symbol:
+	if obj.IsInstanceOf(class.Symbol) {
 		if val, ok := local.GetVariable(obj); ok {
 			return val, nil
 		}
@@ -121,13 +123,15 @@ func Eval(obj class.Instance, local *env.Environment, global *env.Environment) (
 			return val, nil
 		}
 		return nil, class.New(class.UndefinedVariable, nil)
-	case class.Cons: // obj is a form or a macro
+	}
+	if obj.IsInstanceOf(class.Cons) {
 		ret, err := evalFunction(obj, local, global)
 		if err != nil {
 			return nil, err
 		}
 		return ret, nil
-	case class.Integer, class.Float, class.Character, class.String:
+	}
+	if obj.IsInstanceOf(class.Number) || obj.IsInstanceOf(class.Character) || obj.IsInstanceOf(class.String) {
 		return obj, nil
 	}
 	return nil, class.New(class.ParseError, nil)
