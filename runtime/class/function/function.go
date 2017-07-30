@@ -1,8 +1,8 @@
 package function
 
 import (
-	"github.com/ta2gch/gazelle/core/class"
-	env "github.com/ta2gch/gazelle/core/environment"
+	"github.com/ta2gch/gazelle/runtime/class"
+	env "github.com/ta2gch/gazelle/runtime/environment"
 )
 
 type Function interface {

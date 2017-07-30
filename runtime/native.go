@@ -1,8 +1,8 @@
-package core
+package runtime
 
 import (
-	"github.com/ta2gch/gazelle/core/class"
-	env "github.com/ta2gch/gazelle/core/environment"
+	"github.com/ta2gch/gazelle/runtime/class"
+	env "github.com/ta2gch/gazelle/runtime/environment"
 )
 
 type NativeFunction struct {

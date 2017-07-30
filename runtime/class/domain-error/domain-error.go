@@ -1,7 +1,7 @@
 package domainerror
 
 import (
-	"github.com/ta2gch/gazelle/core/class"
+	"github.com/ta2gch/gazelle/runtime/class"
 )
 
 type DomainError struct {

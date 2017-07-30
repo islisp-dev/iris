@@ -1,7 +1,7 @@
 package cons
 
 import (
-	"github.com/ta2gch/gazelle/core/class"
+	"github.com/ta2gch/gazelle/runtime/class"
 )
 
 // Cell is a pair of pointers to Object

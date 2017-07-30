@@ -1,13 +1,13 @@
-package core
+package runtime
 
 import (
 	"reflect"
 	"strings"
 	"testing"
 
-	"github.com/ta2gch/gazelle/core/class"
-	"github.com/ta2gch/gazelle/core/class/cons"
-	env "github.com/ta2gch/gazelle/core/environment"
+	"github.com/ta2gch/gazelle/runtime/class"
+	"github.com/ta2gch/gazelle/runtime/class/cons"
+	env "github.com/ta2gch/gazelle/runtime/environment"
 	"github.com/ta2gch/gazelle/reader/parser"
 	"github.com/ta2gch/gazelle/reader/tokenizer"
 )
