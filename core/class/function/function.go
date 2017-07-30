@@ -10,7 +10,7 @@ type Function interface {
 }
 
 func Apply(fun class.Instance, args class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance) {
-	if fun.Class() != class.Function {
+	if !fun.IsInstanceOf(class.Function) {
 		return nil, class.New(class.DomainError, nil)
 	}
 	obj, err := fun.Value().(Function).Apply(args, local, global)

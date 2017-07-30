@@ -4,22 +4,32 @@ type Value interface{}
 
 // Instance struct type is the struct for the internal representations
 type Instance interface {
-	Class() Instance
+	Class() Class
 	Value() Value
+	IsInstanceOf(Class) bool
 }
 
-type DefaultInstance struct {
-	class Instance
+type defaultInstance struct {
+	class Class
 	value Value
 }
 
-func (i *DefaultInstance) Class() Instance {
+func (i *defaultInstance) Class() Class {
 	return i.class
 }
 
-func (i *DefaultInstance) Value() Value {
-	if i.Class() == nil {
-		return nil
-	}
+func (i *defaultInstance) Value() Value {
 	return i.value
+}
+
+func (i *defaultInstance) IsInstanceOf(class Class) bool {
+	if i.Class() == class {
+		return true
+	}
+	for _, p := range i.Class().Parents() {
+		if test(p, class) {
+			return true
+		}
+	}
+	return false
 }
