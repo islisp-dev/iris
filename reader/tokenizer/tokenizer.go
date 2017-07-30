@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/ta2gch/gazelle/core/class"
+	"github.com/ta2gch/gazelle/runtime/class"
 )
 
 // Tokenizer interface type is the interface

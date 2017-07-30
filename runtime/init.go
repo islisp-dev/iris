@@ -1,9 +1,9 @@
-package core
+package runtime
 
 import (
-	"github.com/ta2gch/gazelle/core/class"
-	"github.com/ta2gch/gazelle/core/class/cons"
-	env "github.com/ta2gch/gazelle/core/environment"
+	"github.com/ta2gch/gazelle/runtime/class"
+	"github.com/ta2gch/gazelle/runtime/class/cons"
+	env "github.com/ta2gch/gazelle/runtime/environment"
 )
 
 func init() {

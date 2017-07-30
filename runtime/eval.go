@@ -1,10 +1,10 @@
-package core
+package runtime
 
 import (
-	"github.com/ta2gch/gazelle/core/class"
-	"github.com/ta2gch/gazelle/core/class/cons"
-	"github.com/ta2gch/gazelle/core/class/function"
-	env "github.com/ta2gch/gazelle/core/environment"
+	"github.com/ta2gch/gazelle/runtime/class"
+	"github.com/ta2gch/gazelle/runtime/class/cons"
+	"github.com/ta2gch/gazelle/runtime/class/function"
+	env "github.com/ta2gch/gazelle/runtime/environment"
 )
 
 func evalArguments(args class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance) {

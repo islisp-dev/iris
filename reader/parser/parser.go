@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ta2gch/gazelle/core/class"
-	"github.com/ta2gch/gazelle/core/class/cons"
 	"github.com/ta2gch/gazelle/reader/tokenizer"
+	"github.com/ta2gch/gazelle/runtime/class"
+	"github.com/ta2gch/gazelle/runtime/class/cons"
 )
 
 var eop = class.New(class.Object, "End Of Parentheses")
