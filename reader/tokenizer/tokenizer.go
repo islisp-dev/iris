@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/ta2gch/gazelle/runtime/class"
+	"github.com/ta2gch/gazelle/runtime/class/parseerror"
 )
 
 // Tokenizer interface type is the interface
@@ -69,7 +70,7 @@ func (r *Tokenizer) Next() (string, class.Instance) {
 		if buf == "" {
 			p, _, err := r.PeekRune()
 			if err != nil {
-				return "", class.New(class.ParseError, nil)
+				return "", parseerror.New(buf, class.Object)
 			}
 			if token.MatchString(string(p)) {
 				buf = string(p)

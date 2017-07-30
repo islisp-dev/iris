@@ -7,12 +7,12 @@ import (
 )
 
 type parseerror struct {
-	object        class.Instance
+	str           string
 	expectedClass class.Class
 }
 
-func New(obj class.Instance, cls class.Class) class.Instance {
-	return parseerror{obj, cls}
+func New(str string, cls class.Class) class.Instance {
+	return parseerror{str, cls}
 }
 
 func (e parseerror) Value() class.Value {
@@ -28,5 +28,5 @@ func (e parseerror) IsInstanceOf(cls class.Class) bool {
 }
 
 func (e parseerror) String() string {
-	return fmt.Sprintf("Parse Error: %v is not a instance of %v", e.object, e.expectedClass)
+	return fmt.Sprintf("Parse Error: %v is not a instance of %v", e.str, e.expectedClass)
 }

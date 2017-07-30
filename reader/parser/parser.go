@@ -9,6 +9,7 @@ import (
 	"github.com/ta2gch/gazelle/reader/tokenizer"
 	"github.com/ta2gch/gazelle/runtime/class"
 	"github.com/ta2gch/gazelle/runtime/class/cons"
+	"github.com/ta2gch/gazelle/runtime/class/parseerror"
 )
 
 var eop = class.Object.New("End Of Parentheses")
@@ -79,7 +80,7 @@ func parseAtom(tok string) (class.Instance, class.Instance) {
 	if m, _ := regexp.MatchString("^[<>/*=?_!$%[\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*$", tok); m {
 		return class.Symbol.New(tok), nil
 	}
-	return nil, class.New(class.ParseError, nil)
+	return nil, parseerror.New(tok, class.Object)
 }
 
 func parseMacro(tok string, t *tokenizer.Tokenizer) (class.Instance, class.Instance) {
@@ -97,7 +98,7 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (class.Instance, class.Insta
 		}
 		v, err := strconv.ParseInt(tok[1:i], 10, 32)
 		if err != nil {
-			return nil, class.New(class.ParseError, nil)
+			return nil, parseerror.New(tok, class.Integer)
 		}
 		d := class.Integer.New(int(v))
 		return cons.New(s, cons.New(d, cons.New(cdr, class.Null.New(nil)))), nil
