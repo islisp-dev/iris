@@ -74,7 +74,7 @@ func TestEval(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			got, err := Eval(tt.args.obj, tt.args.local, tt.args.global)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Eval() error = %v, wantErr %v", err.Class().(class.Class).ToString(), tt.wantErr)
+				t.Errorf("Eval() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
