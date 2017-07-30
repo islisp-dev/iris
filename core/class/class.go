@@ -31,7 +31,7 @@ func (m *MetaClass) Value() Value {
 }
 
 func (m *MetaClass) New(value ...Value) Instance {
-	return &builtInClass{[]Class{value[0].(Instance).Value().(Class)}, value[1].(string)}
+	return &builtInClass{[]Class{value[0].(Class)}, value[1].(string)}
 }
 
 type builtInClass struct {
