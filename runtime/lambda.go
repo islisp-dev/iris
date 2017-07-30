@@ -13,7 +13,7 @@ type LambdaFunction struct {
 }
 
 func NewLambdaFunction(lambdaList class.Instance, forms class.Instance, local *env.Environment) class.Instance {
-	return class.New(class.Function, LambdaFunction{lambdaList, forms, local})
+	return class.Function.New(LambdaFunction{lambdaList, forms, local})
 }
 
 func (f LambdaFunction) Apply(args class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance) {
@@ -29,7 +29,7 @@ func (f LambdaFunction) Apply(args class.Instance, local *env.Environment, globa
 		if err != nil {
 			return nil, err
 		}
-		if key == class.New(class.Symbol, ":rest") || key == class.New(class.Symbol, "&rest") {
+		if key == class.Symbol.New(":rest") || key == class.Symbol.New("&rest") {
 			cdr, err := cons.Cdr(fargs)
 			if err != nil {
 				return nil, err

@@ -25,7 +25,7 @@ func (m *meta) New(value ...Value) Instance {
 }
 
 func (m *meta) IsInstanceOf(class Class) bool {
-	return isInstanceOf(m, class)
+	return IsInstanceOf(m, class)
 }
 
 var BuiltInClass = &meta{"<built-in-class>"}

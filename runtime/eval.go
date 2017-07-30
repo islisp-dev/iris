@@ -9,7 +9,7 @@ import (
 
 func evalArguments(args class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance) {
 	if args.IsInstanceOf(class.Null) {
-		return class.New(class.Null, nil), nil
+		return class.Null.New(nil), nil
 	}
 	car, err := cons.Car(args)
 	if err != nil {
@@ -113,7 +113,7 @@ func evalFunction(obj class.Instance, local *env.Environment, global *env.Enviro
 // Eval evaluates any classs
 func Eval(obj class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance) {
 	if obj.IsInstanceOf(class.Null) {
-		return class.New(class.Null, nil), nil
+		return class.Null.New(nil), nil
 	}
 	if obj.IsInstanceOf(class.Symbol) {
 		if val, ok := local.GetVariable(obj); ok {
