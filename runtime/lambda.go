@@ -3,6 +3,7 @@ package runtime
 import (
 	"github.com/ta2gch/gazelle/runtime/class"
 	"github.com/ta2gch/gazelle/runtime/class/cons"
+	"github.com/ta2gch/gazelle/runtime/class/parseerror"
 	env "github.com/ta2gch/gazelle/runtime/environment"
 )
 
@@ -43,7 +44,7 @@ func (f LambdaFunction) Apply(args class.Instance, local *env.Environment, globa
 				return nil, err
 			}
 			if !cddr.IsInstanceOf(class.Null) {
-				return nil, class.New(class.ParseError, nil)
+				return nil, parseerror.New(fargs.String(), class.List)
 			}
 			local.SetVariable(cadr, aargs)
 			break

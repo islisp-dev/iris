@@ -131,8 +131,5 @@ func Eval(obj class.Instance, local *env.Environment, global *env.Environment) (
 		}
 		return ret, nil
 	}
-	if obj.IsInstanceOf(class.Number) || obj.IsInstanceOf(class.Character) || obj.IsInstanceOf(class.String) {
-		return obj, nil
-	}
-	return nil, class.New(class.ParseError, nil)
+	return obj, nil
 }
