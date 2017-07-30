@@ -7,6 +7,7 @@ type Instance interface {
 	Class() Class
 	Value() Value
 	IsInstanceOf(Class) bool
+	ToString() string
 }
 
 type defaultInstance struct {
@@ -32,4 +33,8 @@ func (i *defaultInstance) IsInstanceOf(class Class) bool {
 		}
 	}
 	return false
+}
+
+func (i *defaultInstance) ToString() string {
+	return ""
 }
