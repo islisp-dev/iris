@@ -5,7 +5,7 @@ type builtin struct {
 	name    string
 }
 
-func (c *builtin) ToString() string {
+func (c *builtin) String() string {
 	return c.name
 }
 
@@ -26,15 +26,7 @@ func (c *builtin) New(value ...Value) Instance {
 }
 
 func (c *builtin) IsInstanceOf(class Class) bool {
-	if c == class {
-		return true
-	}
-	for _, p := range c.Class().Parents() {
-		if test(p, class) {
-			return true
-		}
-	}
-	return false
+	return isInstanceOf(c, class)
 }
 
 var Object = &builtin{[]Class{}, "<object>"}

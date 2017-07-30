@@ -4,7 +4,7 @@ type meta struct {
 	name string
 }
 
-func (m *meta) ToString() string {
+func (m *meta) String() string {
 	return m.name
 }
 
@@ -25,15 +25,7 @@ func (m *meta) New(value ...Value) Instance {
 }
 
 func (m *meta) IsInstanceOf(class Class) bool {
-	if m.Class() == class {
-		return true
-	}
-	for _, p := range m.Class().Parents() {
-		if test(p, class) {
-			return true
-		}
-	}
-	return false
+	return isInstanceOf(m, class)
 }
 
 var BuiltInClass = &meta{"<built-in-class>"}
