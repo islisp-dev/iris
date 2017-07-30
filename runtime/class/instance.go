@@ -28,7 +28,7 @@ func (i *defaultInstance) Value() Value {
 }
 
 func (i *defaultInstance) IsInstanceOf(class Class) bool {
-	return isInstanceOf(i, class)
+	return IsInstanceOf(i, class)
 }
 
 func (i *defaultInstance) String() string {

@@ -4,33 +4,53 @@ import (
 	"fmt"
 
 	"github.com/ta2gch/gazelle/runtime/class"
+	"github.com/ta2gch/gazelle/runtime/class/domainerror"
 )
 
 // Cell is a pair of pointers to Object
-type Cell struct {
+type cons struct {
 	car class.Instance
 	cdr class.Instance
 }
 
 func New(car class.Instance, cdr class.Instance) class.Instance {
-	return class.New(class.Cons, Cell{car, cdr})
+	return cons{car, cdr}
+}
+
+func (c cons) Class() class.Class {
+	return class.Cons
+}
+
+func (c cons) Value() class.Value {
+	return c
+}
+
+func (c cons) IsInstanceOf(cls class.Class) bool {
+	return class.IsInstanceOf(c, cls)
+}
+
+func (c cons) String() string {
+	return fmt.Sprintf("(%v . %v)", c.car, c.cdr)
 }
 
 func Car(i class.Instance) (class.Instance, class.Instance) {
-	if !i.IsInstanceOf(class.List) {
-		return nil, class.New(class.DomainError, nil)
+	if i.IsInstanceOf(class.Null) || !i.IsInstanceOf(class.List) {
+		return nil, domainerror.New(i, class.Cons)
 	}
-	return i.Value().(Cell).car, nil
+	return i.(cons).car, nil
 }
 
 func Cdr(i class.Instance) (class.Instance, class.Instance) {
 	if i.IsInstanceOf(class.Null) || !i.IsInstanceOf(class.List) {
-		return nil, class.New(class.DomainError, nil)
+		return nil, domainerror.New(i, class.Cons)
 	}
-	return i.Value().(Cell).cdr, nil
+	return i.(cons).cdr, nil
 }
 
 func Length(list class.Instance) (int, class.Instance) {
+	if !list.IsInstanceOf(class.List) {
+		return 0, domainerror.New(list, class.Cons)
+	}
 	if list.IsInstanceOf(class.Null) {
 		return 0, nil
 	}
@@ -43,8 +63,4 @@ func Length(list class.Instance) (int, class.Instance) {
 		return 0, err
 	}
 	return 1 + len, nil
-}
-
-func (c *Cell) String() string {
-	return fmt.Sprintf("(%v . %v)", c.car, c.cdr)
 }

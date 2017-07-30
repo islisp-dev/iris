@@ -24,7 +24,7 @@ func test(child Class, parent Class) bool {
 	return false
 }
 
-func isInstanceOf(i Instance, class Class) bool {
+func IsInstanceOf(i Instance, class Class) bool {
 	if i.Class() == class {
 		return true
 	}
