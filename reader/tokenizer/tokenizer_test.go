@@ -1,46 +1,55 @@
 package tokenizer
 
 import (
-	"io"
+	"bufio"
+	"reflect"
 	"strings"
 	"testing"
+
+	"github.com/ta2gch/gazelle/runtime/class"
 )
 
-func TestReader_ReadToken(t *testing.T) {
+func TestTokenizer_Next(t *testing.T) {
+	tokenizer := New(strings.NewReader("(default)"))
 	type fields struct {
-		err error
-		ru  rune
-		sz  int
-		rr  io.RuneReader
+		sc *bufio.Scanner
 	}
 	tests := []struct {
-		name    string
-		fields  fields
-		want    string
-		wantErr bool
+		name   string
+		fields fields
+		want   string
+		want1  class.Instance
 	}{
 		{
-			name:    "symbol",
-			fields:  fields{nil, 'd', 8, strings.NewReader("efault")},
-			want:    "default",
-			wantErr: false,
+			name:   "start",
+			fields: fields{tokenizer.sc},
+			want:   "(",
+			want1:  nil,
+		},
+		{
+			name:   "default",
+			fields: fields{tokenizer.sc},
+			want:   "default",
+			want1:  nil,
+		},
+		{
+			name:   "end",
+			fields: fields{tokenizer.sc},
+			want:   ")",
+			want1:  nil,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			r := &Tokenizer{
-				err: tt.fields.err,
-				ru:  tt.fields.ru,
-				sz:  tt.fields.sz,
-				rr:  tt.fields.rr,
+			tok := &Tokenizer{
+				sc: tt.fields.sc,
 			}
-			got, err := r.Next()
-			if (err != nil) != tt.wantErr {
-				t.Errorf("Reader.ReadToken() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
+			got, got1 := tok.Next()
 			if got != tt.want {
-				t.Errorf("Reader.ReadToken() = %v, want %v", got, tt.want)
+				t.Errorf("Tokenizer.Next() got = %v, want %v", got, tt.want)
+			}
+			if !reflect.DeepEqual(got1, tt.want1) {
+				t.Errorf("Tokenizer.Next() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 	}
