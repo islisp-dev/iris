@@ -36,7 +36,6 @@ func evalFunction(obj class.Instance, local *env.Environment, global *env.Enviro
 	if err != nil {
 		return nil, err
 	}
-	println("called")
 
 	// get function arguments
 	cdr, err := cons.Cdr(obj)
