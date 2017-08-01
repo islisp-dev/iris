@@ -1,10 +1,10 @@
 package runtime
 
 import (
-	"github.com/ta2gch/gazelle/runtime/class"
-	"github.com/ta2gch/gazelle/runtime/class/cons"
-	"github.com/ta2gch/gazelle/runtime/class/function"
-	env "github.com/ta2gch/gazelle/runtime/environment"
+	"github.com/ta2gch/iris/runtime/class"
+	"github.com/ta2gch/iris/runtime/class/cons"
+	"github.com/ta2gch/iris/runtime/class/function"
+	env "github.com/ta2gch/iris/runtime/environment"
 )
 
 func evalArguments(args class.Instance, local *env.Environment, global *env.Environment) (class.Instance, class.Instance) {

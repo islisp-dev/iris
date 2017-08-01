@@ -1,9 +1,9 @@
 package function
 
 import (
-	"github.com/ta2gch/gazelle/runtime/class"
-	"github.com/ta2gch/gazelle/runtime/class/domainerror"
-	env "github.com/ta2gch/gazelle/runtime/environment"
+	"github.com/ta2gch/iris/runtime/class"
+	"github.com/ta2gch/iris/runtime/class/domainerror"
+	env "github.com/ta2gch/iris/runtime/environment"
 )
 
 type Function interface {

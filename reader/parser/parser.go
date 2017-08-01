@@ -6,10 +6,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ta2gch/gazelle/reader/tokenizer"
-	"github.com/ta2gch/gazelle/runtime/class"
-	"github.com/ta2gch/gazelle/runtime/class/cons"
-	"github.com/ta2gch/gazelle/runtime/class/parseerror"
+	"github.com/ta2gch/iris/reader/tokenizer"
+	"github.com/ta2gch/iris/runtime/class"
+	"github.com/ta2gch/iris/runtime/class/cons"
+	"github.com/ta2gch/iris/runtime/class/parseerror"
 )
 
 var eop = class.Object.New("End Of Parentheses")
