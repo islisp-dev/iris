@@ -5,11 +5,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ta2gch/gazelle/reader/parser"
-	"github.com/ta2gch/gazelle/reader/tokenizer"
-	"github.com/ta2gch/gazelle/runtime/class"
-	"github.com/ta2gch/gazelle/runtime/class/cons"
-	env "github.com/ta2gch/gazelle/runtime/environment"
+	"github.com/ta2gch/iris/reader/parser"
+	"github.com/ta2gch/iris/reader/tokenizer"
+	"github.com/ta2gch/iris/runtime/class"
+	"github.com/ta2gch/iris/runtime/class/cons"
+	env "github.com/ta2gch/iris/runtime/environment"
 )
 
 func read(s string) class.Instance {

@@ -1,9 +1,9 @@
 package runtime
 
 import (
-	"github.com/ta2gch/gazelle/runtime/class"
-	"github.com/ta2gch/gazelle/runtime/class/cons"
-	env "github.com/ta2gch/gazelle/runtime/environment"
+	"github.com/ta2gch/iris/runtime/class"
+	"github.com/ta2gch/iris/runtime/class/cons"
+	env "github.com/ta2gch/iris/runtime/environment"
 )
 
 func init() {

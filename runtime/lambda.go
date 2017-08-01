@@ -1,10 +1,10 @@
 package runtime
 
 import (
-	"github.com/ta2gch/gazelle/runtime/class"
-	"github.com/ta2gch/gazelle/runtime/class/cons"
-	"github.com/ta2gch/gazelle/runtime/class/parseerror"
-	env "github.com/ta2gch/gazelle/runtime/environment"
+	"github.com/ta2gch/iris/runtime/class"
+	"github.com/ta2gch/iris/runtime/class/cons"
+	"github.com/ta2gch/iris/runtime/class/parseerror"
+	env "github.com/ta2gch/iris/runtime/environment"
 )
 
 type LambdaFunction struct {

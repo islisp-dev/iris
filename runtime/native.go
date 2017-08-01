@@ -1,8 +1,8 @@
 package runtime
 
 import (
-	"github.com/ta2gch/gazelle/runtime/class"
-	env "github.com/ta2gch/gazelle/runtime/environment"
+	"github.com/ta2gch/iris/runtime/class"
+	env "github.com/ta2gch/iris/runtime/environment"
 )
 
 type NativeFunction struct {

@@ -1,7 +1,7 @@
 package environment
 
 import (
-	"github.com/ta2gch/gazelle/runtime/class"
+	"github.com/ta2gch/iris/runtime/class"
 )
 
 // Environment struct is the struct for keeping functions and variables

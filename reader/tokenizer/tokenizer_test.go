@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ta2gch/gazelle/runtime/class"
+	"github.com/ta2gch/iris/runtime/class"
 )
 
 func TestTokenizer_Next(t *testing.T) {

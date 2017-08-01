@@ -5,8 +5,8 @@ import (
 	"io"
 	"regexp"
 
-	"github.com/ta2gch/gazelle/runtime/class"
-	"github.com/ta2gch/gazelle/runtime/class/parseerror"
+	"github.com/ta2gch/iris/runtime/class"
+	"github.com/ta2gch/iris/runtime/class/parseerror"
 )
 
 // Tokenizer interface type is the interface

@@ -3,7 +3,7 @@ package domainerror
 import (
 	"fmt"
 
-	"github.com/ta2gch/gazelle/runtime/class"
+	"github.com/ta2gch/iris/runtime/class"
 )
 
 type domainerror struct {
