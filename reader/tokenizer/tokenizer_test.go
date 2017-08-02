@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ta2gch/iris/runtime/class"
+	"github.com/ta2gch/iris/runtime/ilos"
 )
 
 func TestTokenizer_Next(t *testing.T) {
@@ -18,7 +18,7 @@ func TestTokenizer_Next(t *testing.T) {
 		name   string
 		fields fields
 		want   string
-		want1  class.Instance
+		want1  ilos.Instance
 	}{
 		{
 			name:   "start",

@@ -4,7 +4,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ta2gch/iris/runtime/class"
+	"github.com/ta2gch/iris/runtime/ilos"
+	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
 func Test_parseAtom(t *testing.T) {
@@ -14,7 +15,7 @@ func Test_parseAtom(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		want    class.Instance
+		want    ilos.Instance
 		wantErr bool
 	}{
 		//
@@ -23,31 +24,31 @@ func Test_parseAtom(t *testing.T) {
 		{
 			name:    "default",
 			args:    args{"3.14"},
-			want:    class.Float.New(3.14),
+			want:    instance.NewFloat(3.14),
 			wantErr: false,
 		},
 		{
 			name:    "signed",
 			args:    args{"-5.0"},
-			want:    class.Float.New(-5.0),
+			want:    instance.NewFloat(-5.0),
 			wantErr: false,
 		},
 		{
 			name:    "exponential",
 			args:    args{"-5.0E3"},
-			want:    class.Float.New(-5.0 * 1000),
+			want:    instance.NewFloat(-5.0 * 1000),
 			wantErr: false,
 		},
 		{
 			name:    "signed exponential",
 			args:    args{"5.0E-3"},
-			want:    class.Float.New(5.0 * 1.0 / 1000.0),
+			want:    instance.NewFloat(5.0 * 1.0 / 1000.0),
 			wantErr: false,
 		},
 		{
 			name:    "without point",
 			args:    args{"5E-3"},
-			want:    class.Float.New(5.0 * 1.0 / 1000.0),
+			want:    instance.NewFloat(5.0 * 1.0 / 1000.0),
 			wantErr: false,
 		},
 		{
@@ -68,49 +69,49 @@ func Test_parseAtom(t *testing.T) {
 		{
 			name:    "default",
 			args:    args{"5"},
-			want:    class.Integer.New(5),
+			want:    instance.NewInteger(5),
 			wantErr: false,
 		},
 		{
 			name:    "signed",
 			args:    args{"-5"},
-			want:    class.Integer.New(-5),
+			want:    instance.NewInteger(-5),
 			wantErr: false,
 		},
 		{
 			name:    "binary",
 			args:    args{"#B00101"},
-			want:    class.Integer.New(5),
+			want:    instance.NewInteger(5),
 			wantErr: false,
 		},
 		{
 			name:    "signed binary",
 			args:    args{"#b+00101"},
-			want:    class.Integer.New(5),
+			want:    instance.NewInteger(5),
 			wantErr: false,
 		},
 		{
 			name:    "octal",
 			args:    args{"#o00101"},
-			want:    class.Integer.New(65),
+			want:    instance.NewInteger(65),
 			wantErr: false,
 		},
 		{
 			name:    "signed octal",
 			args:    args{"#O-00101"},
-			want:    class.Integer.New(-65),
+			want:    instance.NewInteger(-65),
 			wantErr: false,
 		},
 		{
 			name:    "hexadecimal",
 			args:    args{"#X00101"},
-			want:    class.Integer.New(257),
+			want:    instance.NewInteger(257),
 			wantErr: false,
 		},
 		{
 			name:    "signed hexadecimal",
 			args:    args{"#x-00101"},
-			want:    class.Integer.New(-257),
+			want:    instance.NewInteger(-257),
 			wantErr: false,
 		},
 		{
@@ -125,19 +126,19 @@ func Test_parseAtom(t *testing.T) {
 		{
 			name:    "default",
 			args:    args{"#\\a"},
-			want:    class.Character.New('a'),
+			want:    instance.NewCharacter('a'),
 			wantErr: false,
 		},
 		{
 			name:    "newline",
 			args:    args{"#\\newline"},
-			want:    class.Character.New('\n'),
+			want:    instance.NewCharacter('\n'),
 			wantErr: false,
 		},
 		{
 			name:    "space",
 			args:    args{"#\\space"},
-			want:    class.Character.New(' '),
+			want:    instance.NewCharacter(' '),
 			wantErr: false,
 		},
 		{

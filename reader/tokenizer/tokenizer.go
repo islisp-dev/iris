@@ -5,13 +5,13 @@ import (
 	"io"
 	"regexp"
 
-	"github.com/ta2gch/iris/runtime/class"
-	"github.com/ta2gch/iris/runtime/class/parseerror"
+	"github.com/ta2gch/iris/runtime/ilos"
+	"github.com/ta2gch/iris/runtime/ilos/class"
+	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
 // Tokenizer interface type is the interface
 // for reading string with every token
-
 type Tokenizer struct {
 	sc *bufio.Scanner
 }
@@ -41,11 +41,11 @@ func New(r io.Reader) *Tokenizer {
 	return &Tokenizer{sc}
 }
 
-func (t *Tokenizer) Next() (string, class.Instance) {
+func (t *Tokenizer) Next() (string, ilos.Instance) {
 	if t.sc.Scan() {
 		return t.sc.Text(), nil
 	}
-	return "", parseerror.New("", class.Object)
+	return "", instance.NewParseError(t.sc.Text(), class.Object)
 }
 
 func splitter(data []byte, atEOF bool) (advance int, token []byte, err error) {
