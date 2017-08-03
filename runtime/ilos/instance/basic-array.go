@@ -15,27 +15,23 @@ type GeneralArrayStar struct {
 	array     map[[128]int]ilos.Instance
 }
 
-func NewGeneralArrayStar(key []ilos.Instance) ilos.Instance {
-	dim := [128]int{}
-	for i, d := range key {
-		dim[i] = int(d.(Integer))
-	}
-	return &GeneralArrayStar{dim, map[[128]int]ilos.Instance{}}
+func NewGeneralArrayStar(key [128]int) ilos.Instance {
+	return &GeneralArrayStar{key, map[[128]int]ilos.Instance{}}
 }
 
 func (*GeneralArrayStar) Class() ilos.Class {
 	return class.GeneralArrayStar
 }
 
-func (a *GeneralArrayStar) GetSlotValue(key ilos.Instance) ilos.Instance {
-	if ilos.InstanceOf(key, class.Symbol) && key.(Symbol) == "LENGTH" {
+func (a *GeneralArrayStar) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
+	if symbol, ok := key.(Symbol); ok && symbol == "LENGTH" {
 		cons := NewNull()
 		for i := 128; i > 0; i-- {
 			if a.dimension[i-1] != 0 {
 				cons = NewCons(NewInteger(a.dimension[i-1]), cons)
 			}
 		}
-		return cons
+		return cons, true
 	}
 	if ilos.InstanceOf(key, class.List) {
 		dim := [128]int{}
@@ -46,12 +42,17 @@ func (a *GeneralArrayStar) GetSlotValue(key ilos.Instance) ilos.Instance {
 			cdr = UnsafeCdr(cdr)
 			idx++
 		}
-		return a.array[dim]
+		for i := 0; i < 128; i++ {
+			if a.dimension[i] != 0 && dim[i] >= a.dimension[i] {
+				return nil, false
+			}
+		}
+		return a.array[dim], true
 	}
-	return nil
+	return nil, false
 }
 
-func (a *GeneralArrayStar) SetSlotValue(key ilos.Instance, value ilos.Instance) {
+func (a *GeneralArrayStar) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
 	if ilos.InstanceOf(key, class.List) {
 		dim := [128]int{}
 		idx := 0
@@ -61,8 +62,15 @@ func (a *GeneralArrayStar) SetSlotValue(key ilos.Instance, value ilos.Instance) 
 			cdr = UnsafeCdr(cdr)
 			idx++
 		}
+		for i := 0; i < 128; i++ {
+			if a.dimension[i] != 0 && dim[i] >= a.dimension[i] {
+				return false
+			}
+		}
 		a.array[dim] = value
+		return true
 	}
+	return false
 }
 
 func (a *GeneralArrayStar) String() string {
@@ -83,20 +91,22 @@ func (GeneralVector) Class() ilos.Class {
 	return class.GeneraVector
 }
 
-func (i GeneralVector) GetSlotValue(key ilos.Instance) ilos.Instance {
-	if ilos.InstanceOf(key, class.Symbol) && key.(Symbol) == "LENGTH" {
-		return NewInteger(len(i))
+func (i GeneralVector) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
+	if symbol, ok := key.(Symbol); ok && symbol == "LENGTH" {
+		return NewInteger(len(i)), true
 	}
-	if ilos.InstanceOf(key, class.Integer) {
-		return i[int(key.(Integer))]
+	if index, ok := key.(Integer); ok && int(index) < len(i) {
+		return i[int(index)], true
 	}
-	return nil
+	return nil, false
 }
 
-func (i GeneralVector) SetSlotValue(key ilos.Instance, value ilos.Instance) {
-	if ilos.InstanceOf(key, class.Integer) {
-		i[int(key.(Integer))] = value
+func (i GeneralVector) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
+	if index, ok := key.(Integer); ok && int(index) < len(i) {
+		i[int(index)] = value
+		return true
 	}
+	return false
 }
 
 func (i GeneralVector) String() string {
@@ -117,20 +127,24 @@ func (String) Class() ilos.Class {
 	return class.String
 }
 
-func (i String) GetSlotValue(key ilos.Instance) ilos.Instance {
-	if ilos.InstanceOf(key, class.Symbol) && key.(Symbol) == "LENGTH" {
-		return NewInteger(len(i))
+func (i String) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
+	if symbol, ok := key.(Symbol); ok && symbol == "LENGTH" {
+		return NewInteger(len(i)), true
 	}
-	if ilos.InstanceOf(key, class.Integer) {
-		return NewCharacter(i[int(key.(Integer))])
+	if index, ok := key.(Integer); ok && int(index) < len(i) {
+		return NewCharacter(i[int(index)]), true
 	}
-	return nil
+	return nil, false
 }
 
-func (i String) SetSlotValue(key ilos.Instance, value ilos.Instance) {
-	if ilos.InstanceOf(key, class.Integer) {
-		i[int(key.(Integer))] = rune(value.(Character))
+func (i String) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
+	if index, ok := key.(Integer); ok && int(index) < len(i) {
+		if character, ok := value.(Character); ok {
+			i[index] = rune(character)
+			return true
+		}
 	}
+	return false
 }
 
 func (i String) String() string {

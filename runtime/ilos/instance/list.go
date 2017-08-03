@@ -24,11 +24,30 @@ func (*Cons) Class() ilos.Class {
 	return class.Cons
 }
 
-func (i *Cons) GetSlotValue(key ilos.Instance) ilos.Instance {
-	return nil
+func (i *Cons) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
+	if symbol, ok := key.(Symbol); ok {
+		switch symbol {
+		case "CAR":
+			return i.car, true
+		case "CDR":
+			return i.cdr, true
+		}
+	}
+	return nil, false
 }
 
-func (i *Cons) SetSlotValue(key ilos.Instance, value ilos.Instance) {
+func (i *Cons) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
+	if symbol, ok := key.(Symbol); ok {
+		switch symbol {
+		case "CAR":
+			i.car = value
+			return true
+		case "CDR":
+			i.cdr = value
+			return true
+		}
+	}
+	return false
 }
 
 func (i *Cons) String() string {
@@ -64,17 +83,18 @@ func NewNull() ilos.Instance {
 	return &Null{}
 }
 
-func (*Null) Class() ilos.Class {
+func (Null) Class() ilos.Class {
 	return class.Null
 }
 
-func (i *Null) GetSlotValue(key ilos.Instance) ilos.Instance {
-	return nil
+func (i Null) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
+	return nil, false
 }
 
-func (i *Null) SetSlotValue(key ilos.Instance, value ilos.Instance) {
+func (i Null) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
+	return false
 }
 
-func (*Null) String() string {
+func (Null) String() string {
 	return "nil"
 }
