@@ -7,9 +7,12 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func NewLambdaFunction(lambdaList ilos.Instance, forms ilos.Instance, lexical *env.Environment) ilos.Instance {
+func lambda(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
+	lambdaList := instance.UnsafeCar(args)
+	forms := instance.UnsafeCdr(args)
+	lexical := local
 	return instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
-		local.MergeAll(lexical)
+		env.AppendAll(local, lexical)
 		fargs := lambdaList
 		aargs := args
 		for !ilos.InstanceOf(fargs, class.Null) {
@@ -22,15 +25,16 @@ func NewLambdaFunction(lambdaList ilos.Instance, forms ilos.Instance, lexical *e
 				if !ilos.InstanceOf(cddr, class.Null) {
 					return nil, instance.NewParseError(instance.NewString(fargs.String()), class.List)
 				}
-				local.SetVariable(cadr, aargs)
+				local.DefineVariable(cadr, aargs)
 				break
 			}
-			local.SetVariable(key, value)
+			local.DefineVariable(key, value)
 			fargs = instance.UnsafeCdr(fargs)
 			aargs = instance.UnsafeCdr(aargs)
 		}
 		body := forms
-		var ret, err ilos.Instance
+		ret := instance.NewNull()
+		var err ilos.Instance
 		for !ilos.InstanceOf(body, class.Null) {
 			exp := instance.UnsafeCar(body)
 			ret, err = Eval(exp, local, global)
@@ -40,5 +44,5 @@ func NewLambdaFunction(lambdaList ilos.Instance, forms ilos.Instance, lexical *e
 			body = instance.UnsafeCdr(body)
 		}
 		return ret, nil
-	})
+	}), nil
 }

@@ -20,11 +20,11 @@ func New() *Environment {
 	return env
 }
 
-func (e *Environment) MergeDynamicVariable(f *Environment) {
+func AppendDynamicVariable(e *Environment, f *Environment) {
 	e.DynamicVariable = append(e.DynamicVariable, f.DynamicVariable...)
 }
 
-func (e *Environment) MergeAll(f *Environment) {
+func AppendAll(e *Environment, f *Environment) {
 	e.Variable = append(e.Variable, f.Variable...)
 	e.Function = append(e.Function, f.Function...)
 	e.Macro = append(e.Macro, f.Macro...)
@@ -34,76 +34,92 @@ func (e *Environment) MergeAll(f *Environment) {
 func (e *Environment) GetVariable(key ilos.Instance) (ilos.Instance, bool) {
 	for _, vars := range e.Variable {
 		if v, ok := vars[key]; ok {
-			return v, ok
+			return v, true
 		}
 	}
 	return nil, false
 }
 
-func (e *Environment) SetVariable(key ilos.Instance, value ilos.Instance) {
+func (e *Environment) SetVariable(key, value ilos.Instance) bool {
 	for _, vars := range e.Variable {
 		if _, ok := vars[key]; ok {
 			vars[key] = value
-			return
+			return true
 		}
 	}
+	return false
+}
+
+func (e *Environment) DefineVariable(key, value ilos.Instance) {
 	e.Variable[0][key] = value
 }
 
 func (e *Environment) GetFunction(key ilos.Instance) (ilos.Instance, bool) {
 	for _, vars := range e.Function {
 		if v, ok := vars[key]; ok {
-			return v, ok
+			return v, true
 		}
 	}
 	return nil, false
 }
 
-func (e *Environment) SetFunction(key ilos.Instance, value ilos.Instance) {
+func (e *Environment) SetFunction(key, value ilos.Instance) bool {
 	for _, vars := range e.Function {
 		if _, ok := vars[key]; ok {
 			vars[key] = value
-			return
+			return true
 		}
 	}
+	return false
+}
+
+func (e *Environment) DefineFunction(key, value ilos.Instance) {
 	e.Function[0][key] = value
 }
 
 func (e *Environment) GetMacro(key ilos.Instance) (ilos.Instance, bool) {
 	for _, vars := range e.Macro {
 		if v, ok := vars[key]; ok {
-			return v, ok
+			return v, true
 		}
 	}
 	return nil, false
 }
 
-func (e *Environment) SetMacro(key ilos.Instance, value ilos.Instance) {
+func (e *Environment) SetMacro(key, value ilos.Instance) bool {
 	for _, vars := range e.Macro {
 		if _, ok := vars[key]; ok {
 			vars[key] = value
-			return
+			return true
 		}
 	}
+	return false
+}
+
+func (e *Environment) DefineMacro(key, value ilos.Instance) {
 	e.Macro[0][key] = value
 }
 
 func (e *Environment) GetDynamicVariable(key ilos.Instance) (ilos.Instance, bool) {
 	for _, vars := range e.DynamicVariable {
 		if v, ok := vars[key]; ok {
-			return v, ok
+			return v, true
 		}
 	}
 	return nil, false
 }
 
-func (e *Environment) SetDynamicVariable(key ilos.Instance, value ilos.Instance) {
+func (e *Environment) SetDynamicVariable(key, value ilos.Instance) bool {
 	for _, vars := range e.DynamicVariable {
 		if _, ok := vars[key]; ok {
 			vars[key] = value
-			return
+			return true
 		}
 	}
+	return false
+}
+
+func (e *Environment) DefineDynamicVariable(key, value ilos.Instance) {
 	e.DynamicVariable[0][key] = value
 }
 

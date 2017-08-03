@@ -43,9 +43,9 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 			if err != nil {
 				return nil, err
 			}
-			env := env.New()
-			env.MergeDynamicVariable(local)
-			ret, err := fun.(instance.Function)(args, env, global)
+			e := env.New()
+			env.AppendDynamicVariable(e, local)
+			ret, err := fun.(instance.Function)(args, e, global)
 			if err != nil {
 				return nil, err
 			}
@@ -84,9 +84,9 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 		if err != nil {
 			return nil, err
 		}
-		env := env.New()
-		env.MergeDynamicVariable(local)
-		ret, err := fun.(instance.Function)(args, env, global)
+		e := env.New()
+		env.AppendDynamicVariable(e, local)
+		ret, err := fun.(instance.Function)(args, e, global)
 		if err != nil {
 			return nil, err
 		}
