@@ -3,15 +3,15 @@ package ilos
 type Class interface {
 	Class() Class
 	Parents() []Class
-	GetSlotValue(string) Instance
-	SetSlotValue(string, Instance)
+	GetSlotValue(Instance) Instance
+	SetSlotValue(Instance, Instance)
 	String() string
 }
 
 type Instance interface {
 	Class() Class
-	GetSlotValue(string) Instance
-	SetSlotValue(string, Instance)
+	GetSlotValue(Instance) Instance
+	SetSlotValue(Instance, Instance)
 	String() string
 }
 

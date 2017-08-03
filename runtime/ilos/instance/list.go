@@ -24,11 +24,11 @@ func (*Cons) Class() ilos.Class {
 	return class.Cons
 }
 
-func (i *Cons) GetSlotValue(key string) ilos.Instance {
+func (i *Cons) GetSlotValue(key ilos.Instance) ilos.Instance {
 	return nil
 }
 
-func (i *Cons) SetSlotValue(key string, value ilos.Instance) {
+func (i *Cons) SetSlotValue(key ilos.Instance, value ilos.Instance) {
 }
 
 func (i *Cons) String() string {
@@ -57,11 +57,11 @@ func (*Null) Class() ilos.Class {
 	return class.Null
 }
 
-func (i *Null) GetSlotValue(key string) ilos.Instance {
+func (i *Null) GetSlotValue(key ilos.Instance) ilos.Instance {
 	return nil
 }
 
-func (i *Null) SetSlotValue(key string, value ilos.Instance) {
+func (i *Null) SetSlotValue(key ilos.Instance, value ilos.Instance) {
 }
 
 func (*Null) String() string {

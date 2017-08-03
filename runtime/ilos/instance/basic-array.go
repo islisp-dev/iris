@@ -28,44 +28,46 @@ func (*GeneralArrayStar) Class() ilos.Class {
 	return class.GeneralArrayStar
 }
 
-func (a *GeneralArrayStar) GetSlotValue(key string) ilos.Instance {
-	if key == "LENGTH" {
-		var r []ilos.Instance
-		for d := range a.dimension {
-			if d != 0 {
-				r = append(r, NewInteger(d))
+func (a *GeneralArrayStar) GetSlotValue(key ilos.Instance) ilos.Instance {
+	if ilos.InstanceOf(key, class.Symbol) && key.(Symbol) == "LENGTH" {
+		cons := NewNull()
+		for i := 128; i > 0; i-- {
+			if a.dimension[i-1] != 0 {
+				cons = NewCons(NewInteger(a.dimension[i-1]), cons)
 			}
 		}
-		v := NewGeneralVector(len(r))
-		for i, d := range r {
-			v.(GeneralVector)[i] = d
+		return cons
+	}
+	if ilos.InstanceOf(key, class.List) {
+		dim := [128]int{}
+		idx := 0
+		cdr := key
+		for ilos.InstanceOf(cdr, class.Cons) {
+			dim[idx] = int(UnsafeCar(cdr).(Integer))
+			cdr = UnsafeCdr(cdr)
+			idx++
 		}
-		return v
+		return a.array[dim]
 	}
 	return nil
 }
 
-func (a *GeneralArrayStar) SetSlotValue(key string, value ilos.Instance) {
+func (a *GeneralArrayStar) SetSlotValue(key ilos.Instance, value ilos.Instance) {
+	if ilos.InstanceOf(key, class.List) {
+		dim := [128]int{}
+		idx := 0
+		cdr := key
+		for ilos.InstanceOf(cdr, class.Cons) {
+			dim[idx] = int(UnsafeCar(cdr).(Integer))
+			cdr = UnsafeCdr(cdr)
+			idx++
+		}
+		a.array[dim] = value
+	}
 }
 
 func (a *GeneralArrayStar) String() string {
 	return fmt.Sprint(a.array)
-}
-
-func UnsafeGeneralArrayStarAccess(a ilos.Instance, k ilos.Instance) ilos.Instance {
-	var dim [128]int
-	for i, d := range k.(GeneralVector) {
-		dim[i] = int(d.(Integer))
-	}
-	return a.(*GeneralArrayStar).array[dim]
-}
-
-func UnsafeGeneralArrayStarAsign(a ilos.Instance, k ilos.Instance, v ilos.Instance) {
-	var dim [128]int
-	for i, d := range k.(GeneralVector) {
-		dim[i] = int(d.(Integer))
-	}
-	a.(*GeneralArrayStar).array[dim] = v
 }
 
 //
@@ -82,23 +84,24 @@ func (GeneralVector) Class() ilos.Class {
 	return class.GeneraVector
 }
 
-func (i GeneralVector) GetSlotValue(key string) ilos.Instance {
+func (i GeneralVector) GetSlotValue(key ilos.Instance) ilos.Instance {
+	if ilos.InstanceOf(key, class.Symbol) && key.(Symbol) == "LENGTH" {
+		return NewInteger(len(i))
+	}
+	if ilos.InstanceOf(key, class.Integer) {
+		return i[int(key.(Integer))]
+	}
 	return nil
 }
 
-func (i GeneralVector) SetSlotValue(key string, value ilos.Instance) {
+func (i GeneralVector) SetSlotValue(key ilos.Instance, value ilos.Instance) {
+	if ilos.InstanceOf(key, class.Integer) {
+		i[int(key.(Integer))] = value
+	}
 }
 
 func (i GeneralVector) String() string {
 	return fmt.Sprint([]ilos.Instance(i))
-}
-
-func UnsafeGeneralVectorAccess(a ilos.Instance, k ilos.Instance) ilos.Instance {
-	return a.(GeneralVector)[k.(Integer)]
-}
-
-func UnsafeGeneralVectorAsign(a ilos.Instance, k ilos.Instance, v ilos.Instance) {
-	a.(GeneralVector)[k.(Integer)] = v
 }
 
 //
@@ -115,11 +118,20 @@ func (String) Class() ilos.Class {
 	return class.String
 }
 
-func (i String) GetSlotValue(key string) ilos.Instance {
+func (i String) GetSlotValue(key ilos.Instance) ilos.Instance {
+	if ilos.InstanceOf(key, class.Symbol) && key.(Symbol) == "LENGTH" {
+		return NewInteger(len(i))
+	}
+	if ilos.InstanceOf(key, class.Integer) {
+		return NewCharacter(i[int(key.(Integer))])
+	}
 	return nil
 }
 
-func (i String) SetSlotValue(key string, value ilos.Instance) {
+func (i String) SetSlotValue(key ilos.Instance, value ilos.Instance) {
+	if ilos.InstanceOf(key, class.Integer) {
+		i[int(key.(Integer))] = rune(value.(Character))
+	}
 }
 
 func (i String) String() string {
