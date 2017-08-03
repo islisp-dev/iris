@@ -148,5 +148,5 @@ func (i String) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
 }
 
 func (i String) String() string {
-	return string(i)
+	return "\"" + string(i) + "\""
 }
