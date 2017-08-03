@@ -8,11 +8,16 @@ import (
 )
 
 func evalArguments(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
+	// if args ends here
 	if ilos.InstanceOf(args, class.Null) {
 		return instance.NewNull(), nil
 	}
-	car := instance.UnsafeCar(args)
-	cdr := instance.UnsafeCdr(args)
+	// args must be a instance of list and ends with nil
+	if !ilos.InstanceOf(args, class.List) || !UnsafeEndOfListIsNil(args) {
+		return nil, instance.NewParseError(args, class.List)
+	}
+	car := instance.UnsafeCar(args) // Checked there
+	cdr := instance.UnsafeCdr(args) // Checked there
 	a, err := Eval(car, local, global)
 	if err != nil {
 		return nil, err
@@ -22,23 +27,29 @@ func evalArguments(args ilos.Instance, local *env.Environment, global *env.Envir
 		return nil, err
 	}
 	return instance.NewCons(a, b), nil
+
 }
 
 func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
+	// obj, function call form, must be a instance of Cons, NOT Null, and ends with nil
+	if !ilos.InstanceOf(obj, class.Cons) || !UnsafeEndOfListIsNil(obj) {
+		return nil, instance.NewParseError(obj, class.Cons)
+	}
 	// get function symbol
-	car := instance.UnsafeCar(obj)
+	car := instance.UnsafeCar(obj) // Checked at the top of this function
 
 	// get function arguments
-	cdr := instance.UnsafeCdr(obj)
+	cdr := instance.UnsafeCdr(obj) // Checked at the top of this function
 
 	// eval if lambda form
 	if ilos.InstanceOf(car, class.Cons) {
-		caar := instance.UnsafeCar(car)
+		caar := instance.UnsafeCar(car) // Checked at the top of this sentence
 		if caar == instance.NewSymbol("LAMBDA") {
 			fun, err := Eval(car, local, global)
 			if err != nil {
 				return nil, err
 			}
+
 			args, err := evalArguments(cdr, local, global)
 			if err != nil {
 				return nil, err
@@ -52,7 +63,7 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 			return ret, nil
 		}
 	}
-
+	// if function is not a lambda special form, first element must be a symbol
 	if !ilos.InstanceOf(car, class.Symbol) {
 		return nil, instance.NewDomainError(car, class.Symbol)
 	}
