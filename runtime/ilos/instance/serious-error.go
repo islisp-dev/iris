@@ -55,7 +55,7 @@ func NewStreamError(stream ilos.Instance) ilos.Instance {
 
 func NewUndefinedEntityError(name, namespace ilos.Instance) ilos.Instance {
 	i := new(instance)
-	i.class = class.StreamError
+	i.class = class.UndefinedEntity
 	i.slots = map[string]ilos.Instance{}
 	i.slots["NAME"] = name
 	i.slots["NAMESPACE"] = namespace

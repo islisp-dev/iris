@@ -1,8 +1,7 @@
 package instance
 
 import (
-	"fmt"
-
+	"github.com/k0kubun/pp"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 )
@@ -67,7 +66,7 @@ func (a *GeneralArrayStar) SetSlotValue(key ilos.Instance, value ilos.Instance) 
 }
 
 func (a *GeneralArrayStar) String() string {
-	return fmt.Sprint(a.array)
+	return pp.Sprint(a.array)
 }
 
 //
@@ -101,7 +100,7 @@ func (i GeneralVector) SetSlotValue(key ilos.Instance, value ilos.Instance) {
 }
 
 func (i GeneralVector) String() string {
-	return fmt.Sprint([]ilos.Instance(i))
+	return pp.Sprint([]ilos.Instance(i))
 }
 
 //

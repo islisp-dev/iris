@@ -8,9 +8,9 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/class"
 )
 
-type Function func(ilos.Instance, environment.Environment, environment.Environment) (ilos.Instance, ilos.Instance)
+type Function func(ilos.Instance, *environment.Environment, *environment.Environment) (ilos.Instance, ilos.Instance)
 
-func NewFunction(f func(ilos.Instance, environment.Environment, environment.Environment) (ilos.Instance, ilos.Instance)) ilos.Instance {
+func NewFunction(f func(ilos.Instance, *environment.Environment, *environment.Environment) (ilos.Instance, ilos.Instance)) ilos.Instance {
 	return Function(f)
 }
 
