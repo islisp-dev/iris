@@ -28,5 +28,5 @@ func (i Symbol) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
 }
 
 func (i Symbol) String() string {
-	return string("\"" + i + "\"")
+	return string(i)
 }
