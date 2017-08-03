@@ -19,14 +19,14 @@ func (Symbol) Class() ilos.Class {
 	return class.Symbol
 }
 
-func (i Symbol) GetSlotValue(key ilos.Instance) ilos.Instance {
-	return nil
+func (i Symbol) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
+	return nil, false
 }
 
-func (i Symbol) SetSlotValue(key ilos.Instance, value ilos.Instance) {
-	return
+func (i Symbol) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
+	return false
 }
 
 func (i Symbol) String() string {
-	return string(i)
+	return string("\"" + i + "\"")
 }

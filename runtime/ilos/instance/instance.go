@@ -19,17 +19,25 @@ func (i *instance) Class() ilos.Class {
 	return i.class
 }
 
-func (i *instance) GetSlotValue(key ilos.Instance) ilos.Instance {
-	v, _ := i.slots[string(key.(Symbol))]
-	return v
+func (i *instance) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
+	if symbol, ok := key.(Symbol); ok {
+		v, ok := i.slots[string(symbol)]
+		return v, ok
+	}
+	return nil, false
 }
 
-func (i *instance) SetSlotValue(key ilos.Instance, value ilos.Instance) {
-	i.slots[string(key.(Symbol))] = value
+func (i *instance) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
+	if symbol, ok := key.(Symbol); ok {
+		if _, ok := i.slots[string(symbol)]; ok {
+			i.slots[string(symbol)] = value
+			return true
+		}
+	}
+	return false
 }
 
 func (i *instance) String() string {
 	class := fmt.Sprint(i.class)
-
 	return fmt.Sprintf("#%v %v>", class[:len(class)-1], i.slots)
 }

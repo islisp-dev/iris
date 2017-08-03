@@ -18,15 +18,16 @@ func (Function) Class() ilos.Class {
 	return class.Function
 }
 
-func (f Function) GetSlotValue(key ilos.Instance) ilos.Instance {
-	return f
+func (f Function) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
+	return nil, false
 }
 
-func (Function) SetSlotValue(key ilos.Instance, value ilos.Instance) {
+func (Function) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
+	return false
 }
 
 func (f Function) String() string {
-	return fmt.Sprintf("#%v[]", f.Class())
+	return fmt.Sprintf("#%v", f.Class())
 }
 
 type GenericFunction map[[128]ilos.Class]Function
@@ -35,7 +36,7 @@ func (GenericFunction) Class() ilos.Class {
 	return class.GenericFunction
 }
 
-func (f GenericFunction) GetSlotValue(key ilos.Instance) ilos.Instance {
+func (f GenericFunction) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
 	types := [128]ilos.Class{}
 	cdr := key
 	idx := 0
@@ -43,10 +44,13 @@ func (f GenericFunction) GetSlotValue(key ilos.Instance) ilos.Instance {
 		types[idx] = cdr.Class()
 		idx++
 	}
-	return f[types]
+	if v, ok := f[types]; ok {
+		return v, true
+	}
+	return nil, false
 }
 
-func (f GenericFunction) SetSlotValue(key ilos.Instance, value ilos.Instance) {
+func (f GenericFunction) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
 	types := [128]ilos.Class{}
 	cdr := key
 	idx := 0
@@ -55,10 +59,11 @@ func (f GenericFunction) SetSlotValue(key ilos.Instance, value ilos.Instance) {
 		idx++
 	}
 	f[types] = value.(Function)
+	return true
 }
 
 func (f GenericFunction) String() string {
-	return fmt.Sprintf("#%v[]", f.Class())
+	return fmt.Sprintf("#%v", f.Class())
 }
 
 type StandardGenericFunction map[[128]ilos.Class]Function
@@ -67,7 +72,7 @@ func (StandardGenericFunction) Class() ilos.Class {
 	return class.StandardGenericFunction
 }
 
-func (f StandardGenericFunction) GetSlotValue(key ilos.Instance) ilos.Instance {
+func (f StandardGenericFunction) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
 	types := [128]ilos.Class{}
 	cdr := key
 	idx := 0
@@ -75,10 +80,13 @@ func (f StandardGenericFunction) GetSlotValue(key ilos.Instance) ilos.Instance {
 		types[idx] = cdr.Class()
 		idx++
 	}
-	return f[types]
+	if v, ok := f[types]; ok {
+		return v, true
+	}
+	return nil, false
 }
 
-func (f StandardGenericFunction) SetSlotValue(key ilos.Instance, value ilos.Instance) {
+func (f StandardGenericFunction) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
 	types := [128]ilos.Class{}
 	cdr := key
 	idx := 0
@@ -87,8 +95,9 @@ func (f StandardGenericFunction) SetSlotValue(key ilos.Instance, value ilos.Inst
 		idx++
 	}
 	f[types] = value.(Function)
+	return true
 }
 
 func (f StandardGenericFunction) String() string {
-	return fmt.Sprintf("#%v[]", f.Class())
+	return fmt.Sprintf("#%v", f.Class())
 }
