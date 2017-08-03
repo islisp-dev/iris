@@ -26,7 +26,7 @@ func (Function) SetSlotValue(key ilos.Instance, value ilos.Instance) {
 }
 
 func (f Function) String() string {
-	return fmt.Sprintf("#instance[%v]", f.Class())
+	return fmt.Sprintf("#%v[]", f.Class())
 }
 
 type GenericFunction map[[128]ilos.Class]Function
@@ -58,7 +58,7 @@ func (f GenericFunction) SetSlotValue(key ilos.Instance, value ilos.Instance) {
 }
 
 func (f GenericFunction) String() string {
-	return fmt.Sprintf("#instance[%v]", f.Class())
+	return fmt.Sprintf("#%v[]", f.Class())
 }
 
 type StandardGenericFunction map[[128]ilos.Class]Function
@@ -90,5 +90,5 @@ func (f StandardGenericFunction) SetSlotValue(key ilos.Instance, value ilos.Inst
 }
 
 func (f StandardGenericFunction) String() string {
-	return fmt.Sprintf("#instance[%v]", f.Class())
+	return fmt.Sprintf("#%v[]", f.Class())
 }

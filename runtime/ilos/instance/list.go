@@ -32,7 +32,18 @@ func (i *Cons) SetSlotValue(key ilos.Instance, value ilos.Instance) {
 }
 
 func (i *Cons) String() string {
-	return fmt.Sprintf("(%v . %v)", i.car, i.cdr)
+	str := "(" + fmt.Sprint(i.car)
+	cdr := i.cdr
+	for ilos.InstanceOf(cdr, class.Cons) {
+		str += fmt.Sprintf(" %v", UnsafeCar(cdr))
+		cdr = UnsafeCdr(cdr)
+	}
+	if ilos.InstanceOf(cdr, class.Null) {
+		str += ")"
+	} else {
+		str += fmt.Sprintf(" . %v)", cdr)
+	}
+	return str
 }
 
 func UnsafeCar(i ilos.Instance) ilos.Instance {
