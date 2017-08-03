@@ -80,7 +80,7 @@ func UnsafeCdr(i ilos.Instance) ilos.Instance {
 type Null struct{}
 
 func NewNull() ilos.Instance {
-	return &Null{}
+	return Null{}
 }
 
 func (Null) Class() ilos.Class {
