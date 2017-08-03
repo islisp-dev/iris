@@ -81,7 +81,7 @@ func parseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	if m, _ := regexp.MatchString("^[<>/*=?_!$%[\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*$", tok); m {
 		return instance.NewSymbol(strings.ToUpper(tok)), nil
 	}
-	return nil, instance.NewParseError(tok, class.Object)
+	return nil, instance.NewParseError(instance.NewString(tok), class.Object)
 }
 
 func parseMacro(tok string, t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instance) {
@@ -99,7 +99,7 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instanc
 		}
 		v, err := strconv.ParseInt(tok[1:i], 10, 32)
 		if err != nil {
-			return nil, instance.NewParseError(tok, class.Integer)
+			return nil, instance.NewParseError(instance.NewString(tok), class.Integer)
 		}
 		d := instance.NewInteger(int(v))
 		return instance.NewCons(s, instance.NewCons(d, instance.NewCons(cdr, instance.NewNull()))), nil
