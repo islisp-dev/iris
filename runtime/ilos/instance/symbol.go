@@ -19,11 +19,11 @@ func (Symbol) Class() ilos.Class {
 	return class.Symbol
 }
 
-func (i Symbol) GetSlotValue(key string) ilos.Instance {
+func (i Symbol) GetSlotValue(key ilos.Instance) ilos.Instance {
 	return nil
 }
 
-func (i Symbol) SetSlotValue(key string, value ilos.Instance) {
+func (i Symbol) SetSlotValue(key ilos.Instance, value ilos.Instance) {
 	return
 }
 

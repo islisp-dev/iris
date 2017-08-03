@@ -19,13 +19,13 @@ func (i *instance) Class() ilos.Class {
 	return i.class
 }
 
-func (i *instance) GetSlotValue(key string) ilos.Instance {
-	v, _ := i.slots[key]
+func (i *instance) GetSlotValue(key ilos.Instance) ilos.Instance {
+	v, _ := i.slots[string(key.(Symbol))]
 	return v
 }
 
-func (i *instance) SetSlotValue(key string, value ilos.Instance) {
-	i.slots[key] = value
+func (i *instance) SetSlotValue(key ilos.Instance, value ilos.Instance) {
+	i.slots[string(key.(Symbol))] = value
 }
 
 func (i *instance) String() string {
