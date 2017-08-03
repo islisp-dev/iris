@@ -34,7 +34,7 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 	// eval if lambda form
 	if ilos.InstanceOf(car, class.Cons) {
 		caar := instance.UnsafeCar(car)
-		if caar == instance.NewSymbol("lambda") {
+		if caar == instance.NewSymbol("LAMBDA") {
 			fun, err := Eval(car, local, global)
 			if err != nil {
 				return nil, err

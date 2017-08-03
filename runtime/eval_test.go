@@ -30,6 +30,9 @@ func TestEval(t *testing.T) {
 		ret, _ := Eval(instance.NewCons(instance.NewSymbol("INC"), args), local, global)
 		return ret, nil
 	}))
+	local.SetMacro(instance.NewSymbol("LAMBDA"), instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
+		return NewLambdaFunction(instance.UnsafeCar(args), instance.UnsafeCdr(args), local), nil
+	}))
 	type args struct {
 		obj    ilos.Instance
 		local  *env.Environment
@@ -57,6 +60,12 @@ func TestEval(t *testing.T) {
 			name:    "local macro",
 			args:    args{read("(minc (minc 1))"), local, global},
 			want:    instance.NewInteger(3),
+			wantErr: false,
+		},
+		{
+			name:    "lambda form",
+			args:    args{read("((lambda (x) (inc x)) 1)"), local, global},
+			want:    instance.NewInteger(2),
 			wantErr: false,
 		},
 	}
