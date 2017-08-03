@@ -27,8 +27,8 @@ func TestEval(t *testing.T) {
 		return instance.NewInteger(int(car.(instance.Integer)) + 1), nil
 	}))
 	local.SetMacro(instance.NewSymbol("MINC"), instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
-		ret, _ := Eval(instance.NewCons(instance.NewSymbol("INC"), args), local, global)
-		return ret, nil
+		ret, err := Eval(instance.NewCons(instance.NewSymbol("INC"), args), local, global)
+		return ret, err
 	}))
 	local.SetMacro(instance.NewSymbol("LAMBDA"), instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 		return NewLambdaFunction(instance.UnsafeCar(args), instance.UnsafeCdr(args), local), nil

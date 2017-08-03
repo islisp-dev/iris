@@ -29,5 +29,7 @@ func (i *instance) SetSlotValue(key ilos.Instance, value ilos.Instance) {
 }
 
 func (i *instance) String() string {
-	return fmt.Sprintf("#INSTANCE[%v %v]", i.class, i.slots)
+	class := fmt.Sprint(i.class)
+
+	return fmt.Sprintf("#%v %v>", class[:len(class)-1], i.slots)
 }
