@@ -21,18 +21,16 @@ func read(s string) ilos.Instance {
 func TestEval(t *testing.T) {
 	local := env.New()
 	global := env.New()
-	local.SetVariable(instance.NewSymbol("PI"), instance.NewFloat(3.14))
-	local.SetFunction(instance.NewSymbol("INC"), instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
+	local.DefineVariable(instance.NewSymbol("PI"), instance.NewFloat(3.14))
+	local.DefineFunction(instance.NewSymbol("INC"), instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 		car := instance.UnsafeCar(args)
 		return instance.NewInteger(int(car.(instance.Integer)) + 1), nil
 	}))
-	local.SetMacro(instance.NewSymbol("MINC"), instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
+	local.DefineMacro(instance.NewSymbol("MINC"), instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 		ret, err := Eval(instance.NewCons(instance.NewSymbol("INC"), args), local, global)
 		return ret, err
 	}))
-	local.SetMacro(instance.NewSymbol("LAMBDA"), instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
-		return NewLambdaFunction(instance.UnsafeCar(args), instance.UnsafeCdr(args), local), nil
-	}))
+	local.DefineMacro(instance.NewSymbol("LAMBDA"), instance.NewFunction(lambda))
 	type args struct {
 		obj    ilos.Instance
 		local  *env.Environment
@@ -64,8 +62,8 @@ func TestEval(t *testing.T) {
 		},
 		{
 			name:    "lambda form",
-			args:    args{read("((lambda (x) (inc x)) 1)"), local, global},
-			want:    instance.NewInteger(2),
+			args:    args{read("((lambda (x)) 1)"), local, global},
+			want:    instance.NewNull(),
 			wantErr: false,
 		},
 	}
