@@ -66,6 +66,12 @@ func TestEval(t *testing.T) {
 			want:    instance.NewNull(),
 			wantErr: false,
 		},
+		{
+			name:    "lambda form",
+			args:    args{read("((lambda (:rest xs) xs) 1 2)"), local, global},
+			want:    read("(1 2)"),
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
