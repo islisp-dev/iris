@@ -12,7 +12,7 @@ import (
 
 type instance struct {
 	class ilos.Class
-	slots map[string]ilos.Instance
+	slots map[ilos.Instance]ilos.Instance
 }
 
 func (i *instance) Class() ilos.Class {
@@ -20,19 +20,14 @@ func (i *instance) Class() ilos.Class {
 }
 
 func (i *instance) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
-	if symbol, ok := key.(Symbol); ok {
-		v, ok := i.slots[string(symbol)]
-		return v, ok
-	}
-	return nil, false
+	v, ok := i.slots[key]
+	return v, ok
 }
 
 func (i *instance) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
-	if symbol, ok := key.(Symbol); ok {
-		if _, ok := i.slots[string(symbol)]; ok {
-			i.slots[string(symbol)] = value
-			return true
-		}
+	if _, ok := i.slots[key]; ok {
+		i.slots[key] = value
+		return true
 	}
 	return false
 }
