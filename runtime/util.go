@@ -6,6 +6,9 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
+// UnsafeEndOfListIsNil test a given instance ends with nil
+// but doesn't work correctly if the given instance isn't a instance of list
+// So you have to check the instance.
 func UnsafeEndOfListIsNil(i ilos.Instance) bool {
 	cdr := i
 	for ilos.InstanceOf(cdr, class.Cons) {
@@ -17,6 +20,9 @@ func UnsafeEndOfListIsNil(i ilos.Instance) bool {
 	return false
 }
 
+// UnsafeListLength return a length of list
+// but doesn't work correctly if the given instance aren't a instance of list.
+// So you have to check the instance.
 func UnsafeListLength(i ilos.Instance) int {
 	cdr := i
 	cnt := 0
