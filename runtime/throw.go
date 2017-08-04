@@ -13,9 +13,17 @@ func throw(args ilos.Instance, local *env.Environment, global *env.Environment) 
 		return nil, instance.NewParseError(args, class.Cons)
 	}
 	car := instance.UnsafeCar(args) // Checked at the top of this function
-	if _, ok := local.ThrowTag.Get(car); !ok {
-		return nil, instance.NewSimpleError(instance.NewString("%v is not defined as the tag"), car)
+	tag, err := Eval(car, local, global)
+	if err != nil {
+		return nil, err
 	}
 	cadr := instance.UnsafeCar(instance.UnsafeCdr(args)) // Checked length is 2 at the top of this function
-	return nil, instance.NewThrow(car, cadr)
+	object, err := Eval(cadr, local, global)
+	if err != nil {
+		return nil, err
+	}
+	if _, ok := local.ThrowTag.Get(tag); !ok {
+		return nil, instance.NewSimpleError(instance.NewString("%v is not defined as the tag"), car)
+	}
+	return nil, instance.NewThrow(tag, object)
 }
