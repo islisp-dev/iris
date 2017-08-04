@@ -108,6 +108,8 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instanc
 		return instance.NewCons(s, instance.NewCons(d, instance.NewCons(cdr, instance.NewNull()))), nil
 	}
 	switch tok {
+	case "#'":
+		n = "FUNCTION"
 	case ",@":
 		n = "commaat"
 	case ",":
@@ -164,7 +166,7 @@ func Parse(t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instance) {
 	if tok == "." {
 		return nil, bod
 	}
-	if mat, _ := regexp.MatchString("^(?:,@?|'|`|#[[:digit:]]*[aA])$", tok); mat {
+	if mat, _ := regexp.MatchString("^(?:#'|,@?|'|`|#[[:digit:]]*[aA])$", tok); mat {
 		m, err := parseMacro(tok, t)
 		if err != nil {
 			return nil, err
