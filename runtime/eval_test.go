@@ -22,12 +22,12 @@ func TestEval(t *testing.T) {
 	Init()
 	local := env.New()
 	global := env.TopLevel
-	local.DefineVariable(instance.NewSymbol("PI"), instance.NewFloat(3.14))
-	local.DefineFunction(instance.NewSymbol("INC"), instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
+	local.Variable.Define(instance.NewSymbol("PI"), instance.NewFloat(3.14))
+	local.Function.Define(instance.NewSymbol("INC"), instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 		car := instance.UnsafeCar(args)
 		return instance.NewInteger(int(car.(instance.Integer)) + 1), nil
 	}))
-	local.DefineMacro(instance.NewSymbol("MINC"), instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
+	local.Macro.Define(instance.NewSymbol("MINC"), instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 		ret, err := Eval(instance.NewCons(instance.NewSymbol("INC"), args), local, global)
 		return ret, err
 	}))
