@@ -12,12 +12,14 @@ func tagbody(args ilos.Instance, local *env.Environment, global *env.Environment
 	if !ilos.InstanceOf(args, class.Cons) || !UnsafeEndOfListIsNil(args) || UnsafeListLength(args) < 2 { // Checked at the head of test
 		return nil, instance.NewWrongNumberOfArguments(instance.NewSymbol("TAGBODY"), args)
 	}
+	localTags := []ilos.Instance{}
 	cdr := args // Checked at the top of this function
 	for ilos.InstanceOf(cdr, class.Cons) {
 		cadr := instance.UnsafeCar(cdr) // Checked at the top of this loop
 		cddr := instance.UnsafeCdr(cdr) // Checked at the top of this loop
 		if !ilos.InstanceOf(cadr, class.Cons) {
 			local.TagBodyTag.Define(cadr, cddr)
+			localTags = append(localTags, cadr)
 		}
 		cdr = cddr
 	}
@@ -30,19 +32,31 @@ func tagbody(args ilos.Instance, local *env.Environment, global *env.Environment
 			if fail != nil {
 			tag:
 				if ilos.InstanceOf(fail, class.TagBodyTag) {
-					tag, _ := fail.GetSlotValue(instance.NewSymbol("TAG"))
-					forms, _ := local.TagBodyTag.Get(tag)
-					cdddr := forms
-					for ilos.InstanceOf(cdddr, class.Cons) {
-						cadddr := instance.UnsafeCar(cdddr) // Checked at the top of this loop
-						cddddr := instance.UnsafeCdr(cdddr) // Checked at the top of this loop
-						_, fail = Eval(cadddr, local, global)
-						if fail != nil {
-							goto tag
+					tag, _ := fail.GetSlotValue(instance.NewSymbol("TAG")) // Checked at the top of this loop
+					found := false
+					for _, localTag := range localTags {
+						if tag == localTag {
+							found = true
+							break
 						}
-						cdddr = cddddr
 					}
-					break
+					if found {
+						forms, _ := local.TagBodyTag.Get(tag) // Checked in the function, tagbodyGo
+						cdddr := forms
+						for ilos.InstanceOf(cdddr, class.Cons) {
+							cadddr := instance.UnsafeCar(cdddr) // Checked at the top of this loop
+							cddddr := instance.UnsafeCdr(cdddr) // Checked at the top of this loop
+							if ilos.InstanceOf(cadddr, class.Cons) {
+								_, fail = Eval(cadddr, local, global)
+								if fail != nil {
+									goto tag
+								}
+							}
+							cdddr = cddddr
+						}
+						break
+					}
+
 				}
 				return nil, fail
 			}
