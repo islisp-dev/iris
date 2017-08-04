@@ -34,7 +34,7 @@ func New(r io.Reader) *Tokenizer {
 	str += "\\|.*\\||"
 	str += "[<>/*=?_!$%[\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*|"
 	str += "[.()]|"
-	str += ",@?|'|`|#[[:digit:]]*[aA]"
+	str += "#'|,@?|'|`|#[[:digit:]]*[aA]"
 	re = regexp.MustCompile(str)
 	sc := bufio.NewScanner(r)
 	sc.Split(splitter)
