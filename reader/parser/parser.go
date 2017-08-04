@@ -81,7 +81,7 @@ func parseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	if m, _ := regexp.MatchString("^\\|.*\\|$", tok); m {
 		return instance.NewSymbol(tok), nil
 	}
-	if m, _ := regexp.MatchString("^[<>/*=?_!$%[\\]^{}~a-zA-Z][<>/*=?_!$%[\\]^{}~0-9a-zA-Z]*$", tok); m {
+	if m, _ := regexp.MatchString("^[<>/*=?_!$%[\\]^{}~a-zA-Z-][<>/*=?_!$%[\\]^{}~0-9a-zA-Z-]*$", tok); m {
 		return instance.NewSymbol(strings.ToUpper(tok)), nil
 	}
 	return nil, instance.NewParseError(instance.NewString(tok), class.Object)
