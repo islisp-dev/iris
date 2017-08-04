@@ -84,6 +84,12 @@ func TestEval(t *testing.T) {
 			want:    instance.NewNull(),
 			wantErr: false,
 		},
+		{
+			name:    "nested tagbody & go",
+			args:    args{read("(catch 'foo (tagbody (tagbody (go bar) (throw 'foo 1) bar (go foobar)) foobar))"), local, global},
+			want:    instance.NewNull(),
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
