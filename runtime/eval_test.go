@@ -73,9 +73,15 @@ func TestEval(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name:    "throw",
+			name:    "catch & throw",
 			args:    args{read("(catch 'foo 1 (throw 'foo 1))"), local, global},
 			want:    read("1"),
+			wantErr: false,
+		},
+		{
+			name:    "tagbody & go",
+			args:    args{read("(catch 'foo (tagbody (go bar) (throw 'foo 1) bar))"), local, global},
+			want:    instance.NewNull(),
 			wantErr: false,
 		},
 	}
