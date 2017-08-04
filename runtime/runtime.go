@@ -12,4 +12,5 @@ func Init() {
 	e.TopLevel.Macro.Define(i.NewSymbol("CATCH"), i.NewFunction(catch))
 	e.TopLevel.Macro.Define(i.NewSymbol("TAGBODY"), i.NewFunction(tagbody))
 	e.TopLevel.Macro.Define(i.NewSymbol("GO"), i.NewFunction(tagbodyGo))
+	e.TopLevel.Macro.Define(i.NewSymbol("FUNCTION"), i.NewFunction(function))
 }
