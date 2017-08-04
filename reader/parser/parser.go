@@ -113,9 +113,9 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instanc
 	case ",":
 		n = "comma"
 	case "'":
-		n = "quote"
+		n = "QUOTE"
 	case "`":
-		n = "backquote"
+		n = "BACKQUOTE"
 	}
 	m := instance.NewSymbol(n)
 	return instance.NewCons(m, instance.NewCons(cdr, instance.NewNull())), nil

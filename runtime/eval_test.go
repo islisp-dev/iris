@@ -19,8 +19,9 @@ func read(s string) ilos.Instance {
 }
 
 func TestEval(t *testing.T) {
+	Init()
 	local := env.New()
-	global := env.New()
+	global := env.TopLevel
 	local.DefineVariable(instance.NewSymbol("PI"), instance.NewFloat(3.14))
 	local.DefineFunction(instance.NewSymbol("INC"), instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 		car := instance.UnsafeCar(args)
@@ -30,7 +31,6 @@ func TestEval(t *testing.T) {
 		ret, err := Eval(instance.NewCons(instance.NewSymbol("INC"), args), local, global)
 		return ret, err
 	}))
-	local.DefineMacro(instance.NewSymbol("LAMBDA"), instance.NewFunction(lambda))
 	type args struct {
 		obj    ilos.Instance
 		local  *env.Environment
@@ -70,6 +70,12 @@ func TestEval(t *testing.T) {
 			name:    "lambda form",
 			args:    args{read("((lambda (:rest xs) xs) 1 2)"), local, global},
 			want:    read("(1 2)"),
+			wantErr: false,
+		},
+		{
+			name:    "throw",
+			args:    args{read("(catch 'foo 1 (throw 'foo 1))"), local, global},
+			want:    read("1"),
 			wantErr: false,
 		},
 	}
