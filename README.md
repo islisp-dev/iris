@@ -1,6 +1,6 @@
 # iris
 
-Iris is a interpreter of ISLisp implemented golang
+Iris is a interpreter of ISLisp implemented with golang
 
 [![Build Status](https://travis-ci.org/ta2gch/iris.svg?branch=master)](https://travis-ci.org/ta2gch/iris)
 
