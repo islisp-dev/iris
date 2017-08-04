@@ -23,5 +23,5 @@ func function(args ilos.Instance, local *env.Environment, global *env.Environmen
 	if f, ok := global.Function.Get(car); ok {
 		return f, nil
 	}
-	return nil, instance.NewUndefinedEntityError(nil, nil)
+	return nil, instance.NewUndefinedFunction(car)
 }
