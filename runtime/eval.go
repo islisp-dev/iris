@@ -56,6 +56,7 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 			}
 			e := env.New()
 			env.AppendDynamicVariable(e, local)
+			env.AppendThrowTag(e, local)
 			ret, err := fun.(instance.Function)(args, e, global)
 			if err != nil {
 				return nil, err
@@ -97,6 +98,7 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 		}
 		e := env.New()
 		env.AppendDynamicVariable(e, local)
+		env.AppendThrowTag(e, local)
 		ret, err := fun.(instance.Function)(args, e, global)
 		if err != nil {
 			return nil, err

@@ -66,3 +66,4 @@ var EndOfStream = &builtinclass{[]ilos.Class{StreamError}, "<END-OF-STREAM>"}
 var StorageExhausted = &builtinclass{[]ilos.Class{SeriousCondition}, "<STORAGE-EXHAUSTED>"}
 var StandardObject = &builtinclass{[]ilos.Class{Object}, "<STANDARD-OBJECT>"}
 var Stream = &builtinclass{[]ilos.Class{Object}, "<STREAM>"}
+var Throw = &builtinclass{[]ilos.Class{Object}, "<THROW>"}
