@@ -105,7 +105,7 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 		}
 		return ret, nil
 	}
-	return nil, instance.NewUndefinedEntityError(nil, nil)
+	return nil, instance.NewUndefinedFunction(car)
 }
 
 // Eval evaluates any classs
@@ -120,7 +120,7 @@ func Eval(obj ilos.Instance, local *env.Environment, global *env.Environment) (i
 		if val, ok := global.Variable.Get(obj); ok {
 			return val, nil
 		}
-		return nil, instance.NewUndefinedEntityError(nil, nil)
+		return nil, instance.NewUndefinedVariable(obj)
 	}
 	if ilos.InstanceOf(obj, class.Cons) {
 		ret, err := evalFunction(obj, local, global)
