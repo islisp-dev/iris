@@ -17,10 +17,10 @@ func function(args ilos.Instance, local *env.Environment, global *env.Environmen
 	if !ilos.InstanceOf(car, class.Symbol) {
 		return nil, instance.NewDomainError(car, class.Symbol)
 	}
-	if f, ok := local.GetFunction(car); ok {
+	if f, ok := local.Function.Get(car); ok {
 		return f, nil
 	}
-	if f, ok := global.GetFunction(car); ok {
+	if f, ok := global.Function.Get(car); ok {
 		return f, nil
 	}
 	return nil, instance.NewUndefinedEntityError(nil, nil)

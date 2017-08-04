@@ -20,8 +20,11 @@ func lambda(args ilos.Instance, local *env.Environment, global *env.Environment)
 	forms := instance.UnsafeCdr(args) // Checked at the top of this function. (EndOfListIsNil)
 	lexical := local
 	return instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
-		env.AppendAll(local, lexical)
-
+		local.ThrowTag = append(lexical.ThrowTag, local.ThrowTag...)
+		local.Variable = append(lexical.Variable, local.Variable...)
+		local.Function = append(lexical.Function, local.Function...)
+		local.Macro = append(lexical.Macro, local.Macro...)
+		local.DynamicVariable = append(lexical.DynamicVariable, local.DynamicVariable...)
 		// args must be a instance of list and end with nil
 		if !ilos.InstanceOf(args, class.List) || !UnsafeEndOfListIsNil(args) { // Checked at the head of test
 			return nil, instance.NewParseError(args, class.List)
@@ -61,10 +64,10 @@ func lambda(args ilos.Instance, local *env.Environment, global *env.Environment)
 			value := instance.UnsafeCar(aargs) // Checked at the top of this loop.
 			if key == instance.NewSymbol(":REST") || key == instance.NewSymbol("&REST") {
 				cadr := instance.UnsafeCar(instance.UnsafeCdr(fargs)) // Checked before type checking secion
-				local.DefineVariable(cadr, aargs)
+				local.Variable.Define(cadr, aargs)
 				break
 			}
-			local.DefineVariable(key, value)
+			local.Variable.Define(key, value)
 			fargs = instance.UnsafeCdr(fargs) // Checked at the top of this loop
 			aargs = instance.UnsafeCdr(aargs) // Checked at the top of this loop
 		}

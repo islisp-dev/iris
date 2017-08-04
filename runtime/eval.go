@@ -54,10 +54,10 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 			if err != nil {
 				return nil, err
 			}
-			e := env.New()
-			env.AppendDynamicVariable(e, local)
-			env.AppendThrowTag(e, local)
-			ret, err := fun.(instance.Function)(args, e, global)
+			env := env.New()
+			env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
+			env.ThrowTag = append(local.ThrowTag, env.ThrowTag...)
+			ret, err := fun.(instance.Function)(args, env, global)
 			if err != nil {
 				return nil, err
 			}
@@ -70,10 +70,10 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 	}
 	// get macro instance has value of Function interface
 	var mac ilos.Instance
-	if m, ok := local.GetMacro(car); ok {
+	if m, ok := local.Macro.Get(car); ok {
 		mac = m
 	}
-	if m, ok := global.GetMacro(car); ok {
+	if m, ok := global.Macro.Get(car); ok {
 		mac = m
 	}
 	if mac != nil {
@@ -85,10 +85,10 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 	}
 	// get function instance has value of Function interface
 	var fun ilos.Instance
-	if f, ok := local.GetFunction(car); ok {
+	if f, ok := local.Function.Get(car); ok {
 		fun = f
 	}
-	if f, ok := global.GetFunction(car); ok {
+	if f, ok := global.Function.Get(car); ok {
 		fun = f
 	}
 	if fun != nil {
@@ -96,10 +96,10 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 		if err != nil {
 			return nil, err
 		}
-		e := env.New()
-		env.AppendDynamicVariable(e, local)
-		env.AppendThrowTag(e, local)
-		ret, err := fun.(instance.Function)(args, e, global)
+		env := env.New()
+		env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
+		env.ThrowTag = append(local.ThrowTag, env.ThrowTag...)
+		ret, err := fun.(instance.Function)(args, env, global)
 		if err != nil {
 			return nil, err
 		}
@@ -114,10 +114,10 @@ func Eval(obj ilos.Instance, local *env.Environment, global *env.Environment) (i
 		return instance.NewNull(), nil
 	}
 	if ilos.InstanceOf(obj, class.Symbol) {
-		if val, ok := local.GetVariable(obj); ok {
+		if val, ok := local.Variable.Get(obj); ok {
 			return val, nil
 		}
-		if val, ok := global.GetVariable(obj); ok {
+		if val, ok := global.Variable.Get(obj); ok {
 			return val, nil
 		}
 		return nil, instance.NewUndefinedEntityError(nil, nil)
