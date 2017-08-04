@@ -17,6 +17,9 @@ func throw(args ilos.Instance, local *env.Environment, global *env.Environment) 
 	if err != nil {
 		return nil, err
 	}
+	if ilos.InstanceOf(tag, class.Number) || ilos.InstanceOf(tag, class.Character) {
+		return nil, instance.NewDomainError(tag, class.Object)
+	}
 	cadr := instance.UnsafeCar(instance.UnsafeCdr(args)) // Checked length is 2 at the top of this function
 	object, err := Eval(cadr, local, global)
 	if err != nil {

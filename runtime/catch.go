@@ -16,6 +16,9 @@ func catch(args ilos.Instance, local *env.Environment, global *env.Environment) 
 	if err != nil {
 		return nil, err
 	}
+	if ilos.InstanceOf(car, class.Number) || ilos.InstanceOf(car, class.Character) {
+		return nil, instance.NewDomainError(car, class.Object)
+	}
 	local.ThrowTag.Define(car, car)
 	cdr := instance.UnsafeCdr(args) // Checked at the top of this function
 	var sucess, fail ilos.Instance
