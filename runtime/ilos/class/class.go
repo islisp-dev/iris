@@ -72,3 +72,4 @@ var WrongNumberOfArguments = &builtinclass{[]ilos.Class{Error}, "<WRONG-NUMBER-O
 var Escape = &builtinclass{[]ilos.Class{Object}, "<ESCAPE>"}
 var Throw = &builtinclass{[]ilos.Class{Escape}, "<THROW>"}
 var TagBodyTag = &builtinclass{[]ilos.Class{Escape}, "<TAGBODY-TAG>"}
+var BlockTag = &builtinclass{[]ilos.Class{Escape}, "<BLOCK-TAG>"}

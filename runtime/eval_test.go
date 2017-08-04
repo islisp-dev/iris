@@ -80,6 +80,12 @@ func TestEval(t *testing.T) {
 			wantErr: false,
 		},
 		{
+			name:    "block & return-from",
+			args:    args{read("(block 'foo 1 (return-from'foo 1))"), local, global},
+			want:    read("1"),
+			wantErr: false,
+		},
+		{
 			name:    "tagbody & go",
 			args:    args{read("(catch 'foo (tagbody (go bar) (throw 'foo 1) bar))"), local, global},
 			want:    instance.NewNull(),

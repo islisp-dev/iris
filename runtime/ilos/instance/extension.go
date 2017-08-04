@@ -14,6 +14,15 @@ func NewThrow(tag, object ilos.Instance) ilos.Instance {
 	return i
 }
 
+func NewBlockTag(tag, object ilos.Instance) ilos.Instance {
+	i := new(instance)
+	i.class = class.BlockTag
+	i.slots = map[ilos.Instance]ilos.Instance{}
+	i.slots[NewSymbol("TAG")] = tag
+	i.slots[NewSymbol("OBJECT")] = object
+	return i
+}
+
 func NewTagBodyTag(tag ilos.Instance) ilos.Instance {
 	i := new(instance)
 	i.class = class.TagBodyTag

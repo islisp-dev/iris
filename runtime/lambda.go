@@ -20,6 +20,7 @@ func lambda(args ilos.Instance, local *env.Environment, global *env.Environment)
 	forms := instance.UnsafeCdr(args) // Checked at the top of this function. (EndOfListIsNil)
 	lexical := local
 	return instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
+		local.BlockTag = append(lexical.BlockTag, local.BlockTag...)
 		local.TagBodyTag = append(lexical.TagBodyTag, local.TagBodyTag...)
 		local.ThrowTag = append(lexical.ThrowTag, local.ThrowTag...)
 		local.Variable = append(lexical.Variable, local.Variable...)
