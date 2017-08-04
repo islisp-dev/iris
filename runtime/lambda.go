@@ -10,7 +10,7 @@ import (
 func lambda(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 	// args must be a instance of Cons, not Null, and ends with nil
 	if !ilos.InstanceOf(args, class.Cons) || !UnsafeEndOfListIsNil(args) { // Checked at the head of test
-		return nil, instance.NewParseError(args, class.Cons)
+		return nil, instance.NewWrongNumberOfArguments(instance.NewSymbol("LAMBDA"), args)
 	}
 	lambdaList := instance.UnsafeCar(args)
 	// lambda-list must be a instance of list and ends with nil
@@ -20,6 +20,7 @@ func lambda(args ilos.Instance, local *env.Environment, global *env.Environment)
 	forms := instance.UnsafeCdr(args) // Checked at the top of this function. (EndOfListIsNil)
 	lexical := local
 	return instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
+		local.TagBodyTag = append(lexical.TagBodyTag, local.TagBodyTag...)
 		local.ThrowTag = append(lexical.ThrowTag, local.ThrowTag...)
 		local.Variable = append(lexical.Variable, local.Variable...)
 		local.Function = append(lexical.Function, local.Function...)
@@ -44,10 +45,10 @@ func lambda(args ilos.Instance, local *env.Environment, global *env.Environment)
 						ok = true
 						break
 					} else {
-						return nil, instance.NewParseError(args, class.List)
+						return nil, instance.NewWrongNumberOfArguments(instance.NewSymbol("ANONYMOUS-FUNCTION"), args)
 					}
 				} else {
-					return nil, instance.NewParseError(lambdaList, class.List)
+					return nil, instance.NewWrongNumberOfArguments(instance.NewSymbol("LAMBDA"), lambdaList)
 				}
 			}
 		}
@@ -55,7 +56,7 @@ func lambda(args ilos.Instance, local *env.Environment, global *env.Environment)
 		// aargs is a instance of list and ends nil becauseof the checking at this function.
 		// lambda-list is a instance of list and ends nil becauseof the checking at the function, lambda.
 		if !ok && UnsafeListLength(lambdaList) != UnsafeListLength(args) {
-			return nil, instance.NewParseError(args, class.List)
+			return nil, instance.NewWrongNumberOfArguments(instance.NewSymbol("ANONYMOUS-FUNCTION"), args)
 		}
 		fargs := lambdaList
 		aargs := args

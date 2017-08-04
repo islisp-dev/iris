@@ -10,7 +10,7 @@ import (
 func catch(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 	// args must be a instance of Cons, not Null, and ends with nil
 	if !ilos.InstanceOf(args, class.Cons) || !UnsafeEndOfListIsNil(args) || UnsafeListLength(args) < 2 { // Checked at the head of test
-		return nil, instance.NewParseError(args, class.Cons)
+		return nil, instance.NewWrongNumberOfArguments(instance.NewSymbol("SYMBOL"), args)
 	}
 	car, err := Eval(instance.UnsafeCar(args), local, global) // Checked at the top of this function
 	if err != nil {

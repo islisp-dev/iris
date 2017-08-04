@@ -66,4 +66,9 @@ var EndOfStream = &builtinclass{[]ilos.Class{StreamError}, "<END-OF-STREAM>"}
 var StorageExhausted = &builtinclass{[]ilos.Class{SeriousCondition}, "<STORAGE-EXHAUSTED>"}
 var StandardObject = &builtinclass{[]ilos.Class{Object}, "<STANDARD-OBJECT>"}
 var Stream = &builtinclass{[]ilos.Class{Object}, "<STREAM>"}
-var Throw = &builtinclass{[]ilos.Class{Object}, "<THROW>"}
+
+// Implementation defined
+var WrongNumberOfArguments = &builtinclass{[]ilos.Class{Error}, "<WRONG-NUMBER-OF-ARGUMENTS>"}
+var Escape = &builtinclass{[]ilos.Class{Object}, "<ESCAPE>"}
+var Throw = &builtinclass{[]ilos.Class{Escape}, "<THROW>"}
+var TagBodyTag = &builtinclass{[]ilos.Class{Escape}, "<TAGBODY-TAG>"}

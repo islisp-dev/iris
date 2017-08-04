@@ -10,7 +10,7 @@ import (
 func function(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 	// args must be a instance of Cons, not Null, and ends with nil
 	if !ilos.InstanceOf(args, class.Cons) || !UnsafeEndOfListIsNil(args) || UnsafeListLength(args) != 1 { // Checked at the head of test
-		return nil, instance.NewParseError(args, class.Cons)
+		return nil, instance.NewWrongNumberOfArguments(instance.NewSymbol("FUNCTION"), args)
 	}
 	car := instance.UnsafeCar(args) // Checked at the top of this function
 	// car must be a symbol
