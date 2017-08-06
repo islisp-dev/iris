@@ -11,8 +11,9 @@ import (
 //
 
 type instance struct {
-	class ilos.Class
-	slots map[ilos.Instance]ilos.Instance
+	class  ilos.Class
+	supers []ilos.Instance
+	slots  map[ilos.Instance]ilos.Instance
 }
 
 func (i *instance) Class() ilos.Class {
@@ -20,14 +21,26 @@ func (i *instance) Class() ilos.Class {
 }
 
 func (i *instance) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
-	v, ok := i.slots[key]
-	return v, ok
+	if v, ok := i.slots[key]; ok {
+		return v, ok
+	}
+	for _, s := range i.supers {
+		if v, ok := s.GetSlotValue(key); ok {
+			return v, ok
+		}
+	}
+	return nil, false
 }
 
 func (i *instance) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
 	if _, ok := i.slots[key]; ok {
 		i.slots[key] = value
 		return true
+	}
+	for _, s := range i.supers {
+		if ok := s.SetSlotValue(key, value); ok {
+			return ok
+		}
 	}
 	return false
 }
