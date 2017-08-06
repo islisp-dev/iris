@@ -7,6 +7,14 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
+// DEFINISION:
+// The block special form executes each form sequentially from left to right.
+// If the last form exits normally, whatever it returns is returned by the block form.
+// The name in a block form is not evaluated; it must be an identifier. The scope of name
+// is the body form only a return-from textually contained in some form can exit the block.
+// The extend of name is dynamic. (islisp-v23.pdf, 43-44)
+// NOTE:
+// According to this, the scope of name is dynamic. I guess it should be a static.
 func block(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 	// args must be a instance of Cons, not Null, and ends with nil
 	if !ilos.InstanceOf(args, class.Cons) || !UnsafeEndOfListIsNil(args) || UnsafeListLength(args) < 2 { // Checked at the head of test
