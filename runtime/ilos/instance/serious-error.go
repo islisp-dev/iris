@@ -49,7 +49,7 @@ func NewStreamError(stream ilos.Instance) ilos.Instance {
 	i := new(instance)
 	i.class = class.StreamError
 	i.slots = map[ilos.Instance]ilos.Instance{}
-	i.slots[NewSymbol("stream")] = stream
+	i.slots[NewSymbol("STREAM")] = stream
 	return i
 }
 
