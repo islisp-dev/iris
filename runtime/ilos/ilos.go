@@ -3,6 +3,7 @@ package ilos
 type Class interface {
 	Class() Class
 	Parents() []Class
+	Slots() []string
 	GetSlotValue(Instance, Class) (Instance, bool)
 	SetSlotValue(Instance, Instance, Class) bool
 	String() string
