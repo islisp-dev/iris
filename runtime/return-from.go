@@ -9,7 +9,7 @@ import (
 
 func returnFrom(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 	// args must be a instance of Cons, not Null, and ends with nil
-	if !ilos.InstanceOf(args, class.Cons) || !UnsafeEndOfListIsNil(args) || UnsafeListLength(args) != 2 { // Checked at the head of test
+	if !instance.Of(class.Cons, args) || !UnsafeEndOfListIsNil(args) || UnsafeListLength(args) != 2 { // Checked at the head of test
 		return nil, instance.New(class.WrongNumberOfArguments, map[string]ilos.Instance{
 			"FORM":      instance.New(class.Symbol, "RETURN-FROM"),
 			"ARGUMENTS": args,
@@ -20,7 +20,7 @@ func returnFrom(args ilos.Instance, local *env.Environment, global *env.Environm
 	if err != nil {
 		return nil, err
 	}
-	if ilos.InstanceOf(tag, class.Number) || ilos.InstanceOf(tag, class.Character) {
+	if instance.Of(class.Number, tag) || instance.Of(class.Character, tag) {
 		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
 			"OBJECT":         tag,
 			"EXPECTED-CLASS": class.Object,

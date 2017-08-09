@@ -9,7 +9,7 @@ import (
 
 func lambda(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 	// args must be a instance of Cons, not Null, and ends with nil
-	if !ilos.InstanceOf(args, class.Cons) || !UnsafeEndOfListIsNil(args) { // Checked at the head of test
+	if !instance.Of(class.Cons, args) || !UnsafeEndOfListIsNil(args) { // Checked at the head of test
 		return nil, instance.New(class.WrongNumberOfArguments, map[string]ilos.Instance{
 			"FORM":      instance.New(class.Symbol, "LAMBDA"),
 			"ARGUMENTS": args,
@@ -17,7 +17,7 @@ func lambda(args ilos.Instance, local *env.Environment, global *env.Environment)
 	}
 	lambdaList := instance.UnsafeCar(args)
 	// lambda-list must be a instance of list and ends with nil
-	if !ilos.InstanceOf(lambdaList, class.List) || !UnsafeEndOfListIsNil(lambdaList) { // Checked at the head of test
+	if !instance.Of(class.List, lambdaList) || !UnsafeEndOfListIsNil(lambdaList) { // Checked at the head of test
 		return nil, instance.New(class.ParseError, lambdaList, class.List)
 	}
 	forms := instance.UnsafeCdr(args) // Checked at the top of this function. (EndOfListIsNil)
@@ -31,7 +31,7 @@ func lambda(args ilos.Instance, local *env.Environment, global *env.Environment)
 		local.Macro = append(lexical.Macro, local.Macro...)
 		local.DynamicVariable = append(lexical.DynamicVariable, local.DynamicVariable...)
 		// args must be a instance of list and end with nil
-		if !ilos.InstanceOf(args, class.List) || !UnsafeEndOfListIsNil(args) { // Checked at the head of test
+		if !instance.Of(class.List, args) || !UnsafeEndOfListIsNil(args) { // Checked at the head of test
 			return nil, instance.New(class.DomainError, map[string]ilos.Instance{
 				"OBJECT":         args,
 				"EXPECTED-CLASS": class.List,
@@ -39,12 +39,12 @@ func lambda(args ilos.Instance, local *env.Environment, global *env.Environment)
 		}
 		cdr := lambdaList
 		ok := false
-		for ilos.InstanceOf(cdr, class.Cons) {
+		for instance.Of(class.Cons, cdr) {
 			car := instance.UnsafeCar(cdr) // Checked at the top of this loop.
 			cdr = instance.UnsafeCdr(cdr)  // Checked at the top of this loop.
 			if car == instance.New(class.Symbol, ":REST") || car == instance.New(class.Symbol, "&REST") {
 				// fargs has only one symbol after &rest or :rest symbol.
-				if ilos.InstanceOf(cdr, class.List) && UnsafeListLength(cdr) == 1 { // Checked at the head of test
+				if instance.Of(class.List, cdr) && UnsafeListLength(cdr) == 1 { // Checked at the head of test
 					// If fargs has :rest or &rest symbol, The length of aargs must be greater than or equal to 'the length of fargs' - 2.
 					// aargs is a instance of list and ends with nil becauseof the checking at this function.
 					// lambda-list is a instance of list and ends with nil becauseof the checking at the function, lambda.
@@ -76,7 +76,7 @@ func lambda(args ilos.Instance, local *env.Environment, global *env.Environment)
 		}
 		fargs := lambdaList
 		aargs := args
-		for ilos.InstanceOf(fargs, class.Cons) && ilos.InstanceOf(aargs, class.Cons) {
+		for instance.Of(class.Cons, fargs) && instance.Of(class.Cons, aargs) {
 			key := instance.UnsafeCar(fargs)   // Checked at the top of this loop.
 			value := instance.UnsafeCar(aargs) // Checked at the top of this loop.
 			if key == instance.New(class.Symbol, ":REST") || key == instance.New(class.Symbol, "&REST") {
@@ -91,7 +91,7 @@ func lambda(args ilos.Instance, local *env.Environment, global *env.Environment)
 		body := forms
 		ret := instance.New(class.Null)
 		var err ilos.Instance
-		for ilos.InstanceOf(body, class.Cons) {
+		for instance.Of(class.Cons, body) {
 			exp := instance.UnsafeCar(body) // Checked at the top of this loop
 			ret, err = Eval(exp, local, global)
 			if err != nil {

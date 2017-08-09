@@ -30,24 +30,3 @@ func (i *primitiveclass) SetSlotValue(key ilos.Instance, value ilos.Instance, _ 
 func (p *primitiveclass) String() string {
 	return p.name
 }
-
-var Object = &primitiveclass{[]ilos.Class{}, "<OBJECT>"}
-var BuiltInClass = &primitiveclass{[]ilos.Class{Object}, "<BUILT-IN-CLASS>"}
-var StandardClass = &primitiveclass{[]ilos.Class{Object}, "<STANDARD-CLASS>"}
-var BasicArray = &primitiveclass{[]ilos.Class{Object}, "<BASIC-ARRAY>"}
-var BasicArrayStar = &primitiveclass{[]ilos.Class{BasicArray}, "<BASIC-ARRAY*>"}
-var GeneralArrayStar = &primitiveclass{[]ilos.Class{BasicArrayStar}, "<GENERAL-ARRAY*>"}
-var BasicVector = &primitiveclass{[]ilos.Class{BasicArray}, "<BASIC-VECTOR>"}
-var GeneraVector = &primitiveclass{[]ilos.Class{BasicVector}, "<GENERAL-VECTOR>"}
-var String = &primitiveclass{[]ilos.Class{BasicVector}, "<STRING>"}
-var Character = &primitiveclass{[]ilos.Class{Object}, "<CHARACTER>"}
-var Function = &primitiveclass{[]ilos.Class{Object}, "<FUNCTION>"}
-var GenericFunction = &primitiveclass{[]ilos.Class{Function}, "<GENERIC-FUNCTION>"}
-var StandardGenericFunction = &primitiveclass{[]ilos.Class{GenericFunction}, "<STANDARD-GENERIC-FUNCTION>"}
-var List = &primitiveclass{[]ilos.Class{Object}, "<LIST>"}
-var Cons = &primitiveclass{[]ilos.Class{List}, "<CONS>"}
-var Null = &primitiveclass{[]ilos.Class{List}, "<NULL>"}
-var Symbol = &primitiveclass{[]ilos.Class{Object}, "<SYMBOL>"}
-var Number = &primitiveclass{[]ilos.Class{Object}, "<NUMBER>"}
-var Integer = &primitiveclass{[]ilos.Class{Number}, "<INTEGER>"}
-var Float = &primitiveclass{[]ilos.Class{Number}, "<FLOAT>"}

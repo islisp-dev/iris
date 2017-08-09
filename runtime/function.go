@@ -9,7 +9,7 @@ import (
 
 func function(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 	// args must be a instance of Cons, not Null, and ends with nil
-	if !ilos.InstanceOf(args, class.Cons) || !UnsafeEndOfListIsNil(args) || UnsafeListLength(args) != 1 { // Checked at the head of test
+	if !instance.Of(class.Cons, args) || !UnsafeEndOfListIsNil(args) || UnsafeListLength(args) != 1 { // Checked at the head of test
 		return nil, instance.New(class.WrongNumberOfArguments, map[string]ilos.Instance{
 			"FORM":      instance.New(class.Symbol, "FUNCTION"),
 			"ARGUMENTS": args,
@@ -17,7 +17,7 @@ func function(args ilos.Instance, local *env.Environment, global *env.Environmen
 	}
 	car := instance.UnsafeCar(args) // Checked at the top of this function
 	// car must be a symbol
-	if !ilos.InstanceOf(car, class.Symbol) {
+	if !instance.Of(class.Symbol, car) {
 		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
 			"OBJECT":         car,
 			"EXPECTED-CLASS": class.Symbol,
