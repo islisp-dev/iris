@@ -38,10 +38,10 @@ func block(args ilos.Instance, local *env.Environment, global *env.Environment) 
 		cddr := instance.UnsafeCdr(cdr) // Checked at the top of this loop
 		sucess, fail = Eval(cadr, local, global)
 		if fail != nil {
-			if ilos.InstanceOf(fail, class.ReturnFrom) {
+			if ilos.InstanceOf(fail, class.BlockTag) {
 				tag, _ := fail.GetSlotValue(instance.New(class.Symbol, "TAG"), class.Escape) // Checked at the head of this condition
 				if car == tag {
-					obj, _ := fail.GetSlotValue(instance.New(class.Symbol, "OBJECT"), class.ReturnFrom) // Checked at the head of this condition
+					obj, _ := fail.GetSlotValue(instance.New(class.Symbol, "OBJECT"), class.BlockTag) // Checked at the head of this condition
 					return obj, nil
 				}
 			}

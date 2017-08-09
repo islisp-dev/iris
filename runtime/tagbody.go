@@ -34,7 +34,7 @@ func tagbody(args ilos.Instance, local *env.Environment, global *env.Environment
 			_, fail := Eval(cadr, local, global)
 			if fail != nil {
 			tag:
-				if ilos.InstanceOf(fail, class.Go) {
+				if ilos.InstanceOf(fail, class.TagbodyTag) {
 					tag, _ := fail.GetSlotValue(instance.New(class.Symbol, "TAG"), class.Escape) // Checked at the top of this loop
 					found := false
 					for _, localTag := range localTags {

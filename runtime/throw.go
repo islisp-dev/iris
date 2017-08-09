@@ -37,7 +37,7 @@ func throw(args ilos.Instance, local *env.Environment, global *env.Environment) 
 			"FORMAT-ARGUMENTS": car,
 		})
 	}
-	return nil, instance.New(class.Throw, map[string]ilos.Instance{
+	return nil, instance.New(class.CatchTag, map[string]ilos.Instance{
 		"TAG":    tag,
 		"OBJECT": object,
 	})
