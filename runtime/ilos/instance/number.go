@@ -21,11 +21,11 @@ func (Integer) Class() ilos.Class {
 	return class.Integer
 }
 
-func (i Integer) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
+func (i Integer) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
 	return nil, false
 }
 
-func (i Integer) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
+func (i Integer) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
 	return false
 }
 
@@ -47,11 +47,11 @@ func (Float) Class() ilos.Class {
 	return class.Float
 }
 
-func (i Float) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
+func (i Float) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
 	return nil, false
 }
 
-func (i Float) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
+func (i Float) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
 	return false
 }
 

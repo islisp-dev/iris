@@ -23,7 +23,7 @@ func (*GeneralArrayStar) Class() ilos.Class {
 	return class.GeneralArrayStar
 }
 
-func (a *GeneralArrayStar) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
+func (a *GeneralArrayStar) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
 	if symbol, ok := key.(Symbol); ok && symbol == "LENGTH" {
 		cons := NewNull()
 		for i := 128; i > 0; i-- {
@@ -52,7 +52,7 @@ func (a *GeneralArrayStar) GetSlotValue(key ilos.Instance) (ilos.Instance, bool)
 	return nil, false
 }
 
-func (a *GeneralArrayStar) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
+func (a *GeneralArrayStar) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
 	if ilos.InstanceOf(key, class.List) {
 		dim := [128]int{}
 		idx := 0
@@ -91,7 +91,7 @@ func (GeneralVector) Class() ilos.Class {
 	return class.GeneraVector
 }
 
-func (i GeneralVector) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
+func (i GeneralVector) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
 	if symbol, ok := key.(Symbol); ok && symbol == "LENGTH" {
 		return NewInteger(len(i)), true
 	}
@@ -101,7 +101,7 @@ func (i GeneralVector) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
 	return nil, false
 }
 
-func (i GeneralVector) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
+func (i GeneralVector) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
 	if index, ok := key.(Integer); ok && int(index) < len(i) {
 		i[int(index)] = value
 		return true
@@ -127,7 +127,7 @@ func (String) Class() ilos.Class {
 	return class.String
 }
 
-func (i String) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
+func (i String) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
 	if symbol, ok := key.(Symbol); ok && symbol == "LENGTH" {
 		return NewInteger(len(i)), true
 	}
@@ -137,7 +137,7 @@ func (i String) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
 	return nil, false
 }
 
-func (i String) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
+func (i String) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
 	if index, ok := key.(Integer); ok && int(index) < len(i) {
 		if character, ok := value.(Character); ok {
 			i[index] = rune(character)

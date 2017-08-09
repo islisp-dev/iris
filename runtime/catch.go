@@ -28,9 +28,9 @@ func catch(args ilos.Instance, local *env.Environment, global *env.Environment) 
 		sucess, fail = Eval(cadr, local, global)
 		if fail != nil {
 			if ilos.InstanceOf(fail, class.Throw) {
-				tag, _ := fail.GetSlotValue(instance.NewSymbol("TAG")) // Checked at the head of this condition
+				tag, _ := fail.GetSlotValue(instance.NewSymbol("TAG"), class.Throw) // Checked at the head of this condition
 				if car == tag {
-					obj, _ := fail.GetSlotValue(instance.NewSymbol("OBJECT")) // Checked at the head of this condition
+					obj, _ := fail.GetSlotValue(instance.NewSymbol("OBJECT"), class.Throw) // Checked at the head of this condition
 					return obj, nil
 				}
 			}

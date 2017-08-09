@@ -15,11 +15,11 @@ func (p *builtinclass) Parents() []ilos.Class {
 	return p.parents
 }
 
-func (i *builtinclass) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
+func (i *builtinclass) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
 	return nil, false
 }
 
-func (i *builtinclass) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
+func (i *builtinclass) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
 	return false
 }
 
