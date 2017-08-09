@@ -37,7 +37,7 @@ func returnFrom(args ilos.Instance, local *env.Environment, global *env.Environm
 			"FORMAT-ARGUMENTS": car,
 		})
 	}
-	return nil, instance.New(class.ReturnFrom, map[string]ilos.Instance{
+	return nil, instance.New(class.BlockTag, map[string]ilos.Instance{
 		"TAG":    tag,
 		"OBJECT": object,
 	})

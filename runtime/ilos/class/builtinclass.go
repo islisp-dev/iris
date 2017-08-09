@@ -55,6 +55,6 @@ var Stream = &builtinclass{[]ilos.Class{Object}, []string{"STREAM"}, "<STREAM>"}
 // Implementation defined
 var WrongNumberOfArguments = &builtinclass{[]ilos.Class{Error}, []string{"FORM", "ARGUMENTS"}, "<WRONG-NUMBER-OF-ARGUMENTS>"}
 var Escape = &builtinclass{[]ilos.Class{Object}, []string{"TAG"}, "<ESCAPE>"}
-var Throw = &builtinclass{[]ilos.Class{Escape}, []string{"OBJECT"}, "<THROW>"}
-var Go = &builtinclass{[]ilos.Class{Escape}, []string{}, "<TAGBODY-TAG>"}
-var ReturnFrom = &builtinclass{[]ilos.Class{Escape}, []string{"OBJECT"}, "<BLOCK-TAG>"}
+var CatchTag = &builtinclass{[]ilos.Class{Escape}, []string{"OBJECT"}, "<THROW>"}
+var TagbodyTag = &builtinclass{[]ilos.Class{Escape}, []string{}, "<TAGBODY-TAG>"}
+var BlockTag = &builtinclass{[]ilos.Class{Escape}, []string{"OBJECT"}, "<BLOCK-TAG>"}

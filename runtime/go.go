@@ -22,5 +22,5 @@ func tagbodyGo(args ilos.Instance, local *env.Environment, global *env.Environme
 			"FORMAT-ARGUMENTS": car,
 		})
 	}
-	return nil, instance.New(class.Go, map[string]ilos.Instance{"TAG": car})
+	return nil, instance.New(class.TagbodyTag, map[string]ilos.Instance{"TAG": car})
 }
