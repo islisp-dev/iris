@@ -20,25 +20,25 @@ func (i *instance) Class() ilos.Class {
 	return i.class
 }
 
-func (i *instance) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
-	if v, ok := i.slots[key]; ok {
+func (i *instance) GetSlotValue(key ilos.Instance, class ilos.Class) (ilos.Instance, bool) {
+	if v, ok := i.slots[key]; ok && i.class == class {
 		return v, ok
 	}
 	for _, s := range i.supers {
-		if v, ok := s.GetSlotValue(key); ok {
+		if v, ok := s.GetSlotValue(key, class); ok {
 			return v, ok
 		}
 	}
 	return nil, false
 }
 
-func (i *instance) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
-	if _, ok := i.slots[key]; ok {
+func (i *instance) SetSlotValue(key ilos.Instance, value ilos.Instance, class ilos.Class) bool {
+	if _, ok := i.slots[key]; ok && i.class == class {
 		i.slots[key] = value
 		return true
 	}
 	for _, s := range i.supers {
-		if ok := s.SetSlotValue(key, value); ok {
+		if ok := s.SetSlotValue(key, value, class); ok {
 			return ok
 		}
 	}

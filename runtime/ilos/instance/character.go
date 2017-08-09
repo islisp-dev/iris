@@ -19,11 +19,11 @@ func (Character) Class() ilos.Class {
 	return class.Character
 }
 
-func (i Character) GetSlotValue(key ilos.Instance) (ilos.Instance, bool) {
+func (i Character) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
 	return nil, false
 }
 
-func (i Character) SetSlotValue(key ilos.Instance, value ilos.Instance) bool {
+func (i Character) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
 	return false
 }
 
