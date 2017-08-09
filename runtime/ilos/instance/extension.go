@@ -14,18 +14,18 @@ func NewThrow(tag, object ilos.Instance) ilos.Instance {
 	return i
 }
 
-func NewBlockTag(tag, object ilos.Instance) ilos.Instance {
+func NewReturnFrom(tag, object ilos.Instance) ilos.Instance {
 	i := new(instance)
-	i.class = class.BlockTag
+	i.class = class.ReturnFrom
 	i.slots = map[ilos.Instance]ilos.Instance{}
 	i.slots[NewSymbol("TAG")] = tag
 	i.slots[NewSymbol("OBJECT")] = object
 	return i
 }
 
-func NewTagBodyTag(tag ilos.Instance) ilos.Instance {
+func NewGo(tag ilos.Instance) ilos.Instance {
 	i := new(instance)
-	i.class = class.TagBodyTag
+	i.class = class.Go
 	i.slots = map[ilos.Instance]ilos.Instance{}
 	i.slots[NewSymbol("TAG")] = tag
 	return i

@@ -16,5 +16,5 @@ func tagbodyGo(args ilos.Instance, local *env.Environment, global *env.Environme
 	if _, ok := local.TagBodyTag.Get(car); !ok {
 		return nil, instance.NewSimpleError(instance.NewString("%v is not defined as the tag"), car)
 	}
-	return nil, instance.NewTagBodyTag(car)
+	return nil, instance.NewGo(car)
 }

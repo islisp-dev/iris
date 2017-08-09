@@ -28,5 +28,5 @@ func returnFrom(args ilos.Instance, local *env.Environment, global *env.Environm
 	if _, ok := local.BlockTag.Get(tag); !ok {
 		return nil, instance.NewSimpleError(instance.NewString("%v is not defined as the tag"), car)
 	}
-	return nil, instance.NewBlockTag(tag, object)
+	return nil, instance.NewReturnFrom(tag, object)
 }
