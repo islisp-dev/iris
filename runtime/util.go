@@ -11,10 +11,10 @@ import (
 // So you have to check the instance.
 func UnsafeEndOfListIsNil(i ilos.Instance) bool {
 	cdr := i
-	for ilos.InstanceOf(cdr, class.Cons) {
+	for instance.Of(class.Cons, cdr) {
 		cdr = instance.UnsafeCdr(cdr) // Checked at the top of this loop
 	}
-	if ilos.InstanceOf(cdr, class.Null) {
+	if instance.Of(class.Null, cdr) {
 		return true
 	}
 	return false
@@ -26,7 +26,7 @@ func UnsafeEndOfListIsNil(i ilos.Instance) bool {
 func UnsafeListLength(i ilos.Instance) int {
 	cdr := i
 	cnt := 0
-	for ilos.InstanceOf(cdr, class.Cons) {
+	for instance.Of(class.Cons, cdr) {
 		cdr = instance.UnsafeCdr(cdr) // Checked at the top of this loop
 		cnt++
 	}

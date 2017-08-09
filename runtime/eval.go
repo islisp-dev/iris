@@ -9,11 +9,11 @@ import (
 
 func evalArguments(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 	// if args ends here
-	if ilos.InstanceOf(args, class.Null) {
+	if instance.Of(class.Null, args) {
 		return instance.New(class.Null), nil
 	}
 	// args must be a instance of list and ends with nil
-	if !ilos.InstanceOf(args, class.List) || !UnsafeEndOfListIsNil(args) {
+	if !instance.Of(class.List, args) || !UnsafeEndOfListIsNil(args) {
 		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
 			"STRING":         args,
 			"EXPECTED-CLASS": class.List,
@@ -35,7 +35,7 @@ func evalArguments(args ilos.Instance, local *env.Environment, global *env.Envir
 
 func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 	// obj, function call form, must be a instance of Cons, NOT Null, and ends with nil
-	if !ilos.InstanceOf(obj, class.Cons) || !UnsafeEndOfListIsNil(obj) {
+	if !instance.Of(class.Cons, obj) || !UnsafeEndOfListIsNil(obj) {
 		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
 			"STRING":         obj,
 			"EXPECTED-CLASS": class.Cons,
@@ -48,7 +48,7 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 	cdr := instance.UnsafeCdr(obj) // Checked at the top of this function
 
 	// eval if lambda form
-	if ilos.InstanceOf(car, class.Cons) {
+	if instance.Of(class.Cons, car) {
 		caar := instance.UnsafeCar(car) // Checked at the top of this sentence
 		if caar == instance.New(class.Symbol, "LAMBDA") {
 			fun, err := Eval(car, local, global)
@@ -71,7 +71,7 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 		}
 	}
 	// if function is not a lambda special form, first element must be a symbol
-	if !ilos.InstanceOf(car, class.Symbol) {
+	if !instance.Of(class.Symbol, car) {
 		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
 			"OBJECT":         car,
 			"EXPECTED-CLASS": class.Symbol,
@@ -122,10 +122,10 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 
 // Eval evaluates any classs
 func Eval(obj ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(obj, class.Null) {
+	if instance.Of(class.Null, obj) {
 		return instance.New(class.Null), nil
 	}
-	if ilos.InstanceOf(obj, class.Symbol) {
+	if instance.Of(class.Symbol, obj) {
 		if val, ok := local.Variable.Get(obj); ok {
 			return val, nil
 		}
@@ -137,7 +137,7 @@ func Eval(obj ilos.Instance, local *env.Environment, global *env.Environment) (i
 			"NAMESPACE": instance.New(class.Symbol, "VARIABLE"),
 		})
 	}
-	if ilos.InstanceOf(obj, class.Cons) {
+	if instance.Of(class.Cons, obj) {
 		ret, err := evalFunction(obj, local, global)
 		if err != nil {
 			return nil, err

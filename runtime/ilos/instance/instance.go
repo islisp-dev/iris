@@ -43,6 +43,13 @@ func New(c ilos.Class, s ...interface{}) ilos.Instance {
 	}
 }
 
+func Of(p ilos.Class, i ilos.Instance) bool {
+	if i.Class() == p {
+		return true
+	}
+	return class.Is(i.Class(), p)
+}
+
 type instance struct {
 	class  ilos.Class
 	supers []ilos.Instance

@@ -33,11 +33,11 @@ func (a *GeneralArrayStar) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.I
 		}
 		return cons, true
 	}
-	if ilos.InstanceOf(key, class.List) {
+	if Of(class.List, key) {
 		dim := [128]int{}
 		idx := 0
 		cdr := key
-		for ilos.InstanceOf(cdr, class.Cons) {
+		for Of(class.Cons, cdr) {
 			dim[idx] = int(UnsafeCar(cdr).(Integer))
 			cdr = UnsafeCdr(cdr)
 			idx++
@@ -53,11 +53,11 @@ func (a *GeneralArrayStar) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.I
 }
 
 func (a *GeneralArrayStar) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
-	if ilos.InstanceOf(key, class.List) {
+	if Of(class.List, key) {
 		dim := [128]int{}
 		idx := 0
 		cdr := key
-		for ilos.InstanceOf(cdr, class.Cons) {
+		for Of(class.Cons, cdr) {
 			dim[idx] = int(UnsafeCar(cdr).(Integer))
 			cdr = UnsafeCdr(cdr)
 			idx++

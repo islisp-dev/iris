@@ -9,7 +9,7 @@ import (
 
 func tagbody(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 	// args must be a instance of Cons, not Null, and ends with nil
-	if !ilos.InstanceOf(args, class.Cons) || !UnsafeEndOfListIsNil(args) || UnsafeListLength(args) < 2 { // Checked at the head of test
+	if !instance.Of(class.Cons, args) || !UnsafeEndOfListIsNil(args) || UnsafeListLength(args) < 2 { // Checked at the head of test
 		return nil, instance.New(class.WrongNumberOfArguments, map[string]ilos.Instance{
 			"FORM":      instance.New(class.Symbol, "TAGBODY"),
 			"ARGUMENTS": args,
@@ -17,24 +17,24 @@ func tagbody(args ilos.Instance, local *env.Environment, global *env.Environment
 	}
 	localTags := []ilos.Instance{}
 	cdr := args // Checked at the top of this function
-	for ilos.InstanceOf(cdr, class.Cons) {
+	for instance.Of(class.Cons, cdr) {
 		cadr := instance.UnsafeCar(cdr) // Checked at the top of this loop
 		cddr := instance.UnsafeCdr(cdr) // Checked at the top of this loop
-		if !ilos.InstanceOf(cadr, class.Cons) {
+		if !instance.Of(class.Cons, cadr) {
 			local.TagBodyTag.Define(cadr, cddr)
 			localTags = append(localTags, cadr)
 		}
 		cdr = cddr
 	}
 	cdr = args
-	for ilos.InstanceOf(cdr, class.Cons) {
+	for instance.Of(class.Cons, cdr) {
 		cadr := instance.UnsafeCar(cdr) // Checked at the top of this loop
 		cddr := instance.UnsafeCdr(cdr) // Checked at the top of this loop
-		if ilos.InstanceOf(cadr, class.Cons) {
+		if instance.Of(class.Cons, cadr) {
 			_, fail := Eval(cadr, local, global)
 			if fail != nil {
 			tag:
-				if ilos.InstanceOf(fail, class.TagbodyTag) {
+				if instance.Of(class.TagbodyTag, fail) {
 					tag, _ := fail.GetSlotValue(instance.New(class.Symbol, "TAG"), class.Escape) // Checked at the top of this loop
 					found := false
 					for _, localTag := range localTags {
@@ -46,10 +46,10 @@ func tagbody(args ilos.Instance, local *env.Environment, global *env.Environment
 					if found {
 						forms, _ := local.TagBodyTag.Get(tag) // Checked in the function, tagbodyGo
 						cdddr := forms
-						for ilos.InstanceOf(cdddr, class.Cons) {
+						for instance.Of(class.Cons, cdddr) {
 							cadddr := instance.UnsafeCar(cdddr) // Checked at the top of this loop
 							cddddr := instance.UnsafeCdr(cdddr) // Checked at the top of this loop
-							if ilos.InstanceOf(cadddr, class.Cons) {
+							if instance.Of(class.Cons, cadddr) {
 								_, fail = Eval(cadddr, local, global)
 								if fail != nil {
 									goto tag
