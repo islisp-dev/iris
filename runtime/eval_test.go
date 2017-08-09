@@ -10,6 +10,7 @@ import (
 
 	env "github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
+	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
@@ -24,12 +25,12 @@ func TestEval(t *testing.T) {
 	global := env.TopLevel
 	inc := func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 		car := instance.UnsafeCar(args)
-		return instance.NewInteger(int(car.(instance.Integer)) + 1), nil
+		return instance.New(class.Integer, int(car.(instance.Integer))+1), nil
 	}
-	local.Variable.Define(instance.NewSymbol("PI"), instance.NewFloat(3.14))
-	local.Function.Define(instance.NewSymbol("INC"), instance.NewFunction(inc))
-	local.Macro.Define(instance.NewSymbol("MINC"), instance.NewFunction(func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
-		ret, err := Eval(instance.NewCons(instance.NewSymbol("INC"), args), local, global)
+	local.Variable.Define(instance.New(class.Symbol, "PI"), instance.New(class.Float, 3.14))
+	local.Function.Define(instance.New(class.Symbol, "INC"), instance.New(class.Function, inc))
+	local.Macro.Define(instance.New(class.Symbol, "MINC"), instance.New(class.Function, func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
+		ret, err := Eval(instance.New(class.Cons, instance.New(class.Symbol, "INC"), args), local, global)
 		return ret, err
 	}))
 	type args struct {
@@ -45,26 +46,26 @@ func TestEval(t *testing.T) {
 	}{
 		{
 			name:    "local variable",
-			args:    args{instance.NewSymbol("PI"), local, global},
-			want:    instance.NewFloat(3.14),
+			args:    args{instance.New(class.Symbol, "PI"), local, global},
+			want:    instance.New(class.Float, 3.14),
 			wantErr: false,
 		},
 		{
 			name:    "local function",
 			args:    args{read("(inc (inc 1))"), local, global},
-			want:    instance.NewInteger(3),
+			want:    instance.New(class.Integer, 3),
 			wantErr: false,
 		},
 		{
 			name:    "local macro",
 			args:    args{read("(minc (minc 1))"), local, global},
-			want:    instance.NewInteger(3),
+			want:    instance.New(class.Integer, 3),
 			wantErr: false,
 		},
 		{
 			name:    "lambda form",
 			args:    args{read("((lambda (x)) 1)"), local, global},
-			want:    instance.NewNull(),
+			want:    instance.New(class.Null),
 			wantErr: false,
 		},
 		{
@@ -88,13 +89,13 @@ func TestEval(t *testing.T) {
 		{
 			name:    "tagbody & go",
 			args:    args{read("(catch 'foo (tagbody (go bar) (throw 'foo 1) bar))"), local, global},
-			want:    instance.NewNull(),
+			want:    instance.New(class.Null),
 			wantErr: false,
 		},
 		{
 			name:    "nested tagbody & go",
 			args:    args{read("(catch 'foo (tagbody (tagbody (go bar) (throw 'foo 1) bar (go foobar)) foobar))"), local, global},
-			want:    instance.NewNull(),
+			want:    instance.New(class.Null),
 			wantErr: false,
 		},
 	}

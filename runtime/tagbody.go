@@ -10,7 +10,10 @@ import (
 func tagbody(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 	// args must be a instance of Cons, not Null, and ends with nil
 	if !ilos.InstanceOf(args, class.Cons) || !UnsafeEndOfListIsNil(args) || UnsafeListLength(args) < 2 { // Checked at the head of test
-		return nil, instance.NewWrongNumberOfArguments(instance.NewSymbol("TAGBODY"), args)
+		return nil, instance.New(class.WrongNumberOfArguments, map[string]ilos.Instance{
+			"FORM":      instance.New(class.Symbol, "TAGBODY"),
+			"ARGUMENTS": args,
+		})
 	}
 	localTags := []ilos.Instance{}
 	cdr := args // Checked at the top of this function
@@ -32,7 +35,7 @@ func tagbody(args ilos.Instance, local *env.Environment, global *env.Environment
 			if fail != nil {
 			tag:
 				if ilos.InstanceOf(fail, class.Go) {
-					tag, _ := fail.GetSlotValue(instance.NewSymbol("TAG"), class.Go) // Checked at the top of this loop
+					tag, _ := fail.GetSlotValue(instance.New(class.Symbol, "TAG"), class.Escape) // Checked at the top of this loop
 					found := false
 					for _, localTag := range localTags {
 						if tag == localTag {
@@ -63,5 +66,5 @@ func tagbody(args ilos.Instance, local *env.Environment, global *env.Environment
 		}
 		cdr = cddr
 	}
-	return instance.NewNull(), nil
+	return instance.New(class.Null), nil
 }

@@ -10,11 +10,14 @@ import (
 func evalArguments(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 	// if args ends here
 	if ilos.InstanceOf(args, class.Null) {
-		return instance.NewNull(), nil
+		return instance.New(class.Null), nil
 	}
 	// args must be a instance of list and ends with nil
 	if !ilos.InstanceOf(args, class.List) || !UnsafeEndOfListIsNil(args) {
-		return nil, instance.NewParseError(args, class.List)
+		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
+			"STRING":         args,
+			"EXPECTED-CLASS": class.List,
+		})
 	}
 	car := instance.UnsafeCar(args) // Checked there
 	cdr := instance.UnsafeCdr(args) // Checked there
@@ -26,14 +29,17 @@ func evalArguments(args ilos.Instance, local *env.Environment, global *env.Envir
 	if err != nil {
 		return nil, err
 	}
-	return instance.NewCons(a, b), nil
+	return instance.New(class.Cons, a, b), nil
 
 }
 
 func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 	// obj, function call form, must be a instance of Cons, NOT Null, and ends with nil
 	if !ilos.InstanceOf(obj, class.Cons) || !UnsafeEndOfListIsNil(obj) {
-		return nil, instance.NewParseError(obj, class.Cons)
+		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
+			"STRING":         obj,
+			"EXPECTED-CLASS": class.Cons,
+		})
 	}
 	// get function symbol
 	car := instance.UnsafeCar(obj) // Checked at the top of this function
@@ -44,7 +50,7 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 	// eval if lambda form
 	if ilos.InstanceOf(car, class.Cons) {
 		caar := instance.UnsafeCar(car) // Checked at the top of this sentence
-		if caar == instance.NewSymbol("LAMBDA") {
+		if caar == instance.New(class.Symbol, "LAMBDA") {
 			fun, err := Eval(car, local, global)
 			if err != nil {
 				return nil, err
@@ -66,7 +72,10 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 	}
 	// if function is not a lambda special form, first element must be a symbol
 	if !ilos.InstanceOf(car, class.Symbol) {
-		return nil, instance.NewDomainError(car, class.Symbol)
+		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
+			"OBJECT":         car,
+			"EXPECTED-CLASS": class.Symbol,
+		})
 	}
 	// get macro instance has value of Function interface
 	var mac ilos.Instance
@@ -105,13 +114,16 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 		}
 		return ret, nil
 	}
-	return nil, instance.NewUndefinedFunction(car)
+	return nil, instance.New(class.UndefinedFunction, map[string]ilos.Instance{
+		"NAME":      car,
+		"NAMESPACE": instance.New(class.Symbol, "FUNCTION"),
+	})
 }
 
 // Eval evaluates any classs
 func Eval(obj ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(obj, class.Null) {
-		return instance.NewNull(), nil
+		return instance.New(class.Null), nil
 	}
 	if ilos.InstanceOf(obj, class.Symbol) {
 		if val, ok := local.Variable.Get(obj); ok {
@@ -120,7 +132,10 @@ func Eval(obj ilos.Instance, local *env.Environment, global *env.Environment) (i
 		if val, ok := global.Variable.Get(obj); ok {
 			return val, nil
 		}
-		return nil, instance.NewUndefinedVariable(obj)
+		return nil, instance.New(class.UndefinedVariable, map[string]ilos.Instance{
+			"NAME":      obj,
+			"NAMESPACE": instance.New(class.Symbol, "VARIABLE"),
+		})
 	}
 	if ilos.InstanceOf(obj, class.Cons) {
 		ret, err := evalFunction(obj, local, global)
