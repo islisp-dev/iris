@@ -21,7 +21,7 @@ func tagbody(args ilos.Instance, local *env.Environment, global *env.Environment
 		cadr := instance.UnsafeCar(cdr) // Checked at the top of this loop
 		cddr := instance.UnsafeCdr(cdr) // Checked at the top of this loop
 		if !instance.Of(class.Cons, cadr) {
-			local.TagBodyTag.Define(cadr, cddr)
+			local.TagbodyTag.Define(cadr, nil)
 			localTags = append(localTags, cadr)
 		}
 		cdr = cddr
@@ -44,7 +44,7 @@ func tagbody(args ilos.Instance, local *env.Environment, global *env.Environment
 						}
 					}
 					if found {
-						forms, _ := local.TagBodyTag.Get(tag) // Checked in the function, tagbodyGo
+						forms, _ := local.TagbodyTag.Get(tag) // Checked in the function, tagbodyGo
 						cdddr := forms
 						for instance.Of(class.Cons, cdddr) {
 							cadddr := instance.UnsafeCar(cdddr) // Checked at the top of this loop
@@ -78,7 +78,7 @@ func tagbodyGo(args ilos.Instance, local *env.Environment, global *env.Environme
 		})
 	}
 	car := instance.UnsafeCar(args) // Checked at the top of this function
-	if _, ok := local.TagBodyTag.Get(car); !ok {
+	if _, ok := local.TagbodyTag.Get(car); !ok {
 		return nil, instance.New(class.SimpleError, map[string]ilos.Instance{
 			"FORMAT-STRING":    instance.New(class.String, "%v is not defined as the tag"),
 			"FORMAT-ARGUMENTS": car,

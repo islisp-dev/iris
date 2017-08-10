@@ -30,7 +30,7 @@ func block(args ilos.Instance, local *env.Environment, global *env.Environment) 
 	if instance.Of(class.Number, car) || instance.Of(class.Character, car) {
 		return nil, instance.New(class.DomainError, car, class.Object)
 	}
-	local.BlockTag.Define(car, car)
+	local.BlockTag.Define(car, nil)
 	cdr := instance.UnsafeCdr(args) // Checked at the top of this function
 	var sucess, fail ilos.Instance
 	for instance.Of(class.Cons, cdr) {

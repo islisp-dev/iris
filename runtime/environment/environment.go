@@ -3,8 +3,8 @@ package environment
 // Environment struct is the struct for keeping functions and variables
 type Environment struct {
 	BlockTag        stack
-	TagBodyTag      stack
-	ThrowTag        stack
+	TagbodyTag      stack
+	CatchTag        stack
 	Macro           stack
 	Function        stack
 	Variable        stack
@@ -15,8 +15,8 @@ type Environment struct {
 func New() *Environment {
 	env := new(Environment)
 	env.BlockTag = newStack()
-	env.TagBodyTag = newStack()
-	env.ThrowTag = newStack()
+	env.TagbodyTag = newStack()
+	env.CatchTag = newStack()
 	env.Macro = newStack()
 	env.Function = newStack()
 	env.Variable = newStack()

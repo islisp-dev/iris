@@ -22,7 +22,7 @@ func catch(args ilos.Instance, local *env.Environment, global *env.Environment) 
 	if instance.Of(class.Number, car) || instance.Of(class.Character, car) {
 		return nil, instance.New(class.DomainError, car, class.Object)
 	}
-	local.ThrowTag.Define(car, car)
+	local.CatchTag.Define(car, nil)
 	cdr := instance.UnsafeCdr(args) // Checked at the top of this function
 	var sucess, fail ilos.Instance
 	for instance.Of(class.Cons, cdr) {
@@ -68,7 +68,7 @@ func throw(args ilos.Instance, local *env.Environment, global *env.Environment) 
 	if err != nil {
 		return nil, err
 	}
-	if _, ok := local.ThrowTag.Get(tag); !ok {
+	if _, ok := local.CatchTag.Get(tag); !ok {
 		return nil, instance.New(class.SimpleError, map[string]ilos.Instance{
 			"FORMAT-STRING":    instance.New(class.String, "%v is not defined as the tag"),
 			"FORMAT-ARGUMENTS": car,
