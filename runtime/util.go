@@ -1,6 +1,12 @@
 package runtime
 
 import (
+	"strings"
+
+	"github.com/ta2gch/iris/runtime/environment"
+
+	"github.com/ta2gch/iris/reader/parser"
+	"github.com/ta2gch/iris/reader/tokenizer"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
@@ -31,4 +37,22 @@ func UnsafeListLength(i ilos.Instance) int {
 		cnt++
 	}
 	return cnt
+}
+
+func readFromString(s string) ilos.Instance {
+	e, _ := parser.Parse(tokenizer.New(strings.NewReader(s)))
+	return e
+}
+
+func defmacro(name string, macro interface{}) {
+	symbol := instance.New(class.Symbol, name)
+	environment.TopLevel.Macro.Define(symbol, instance.New(class.Function, macro))
+}
+func defun(name string, function interface{}) {
+	symbol := instance.New(class.Symbol, name)
+	environment.TopLevel.Function.Define(symbol, instance.New(class.Function, function))
+}
+func defglobal(name string, value ilos.Instance) {
+	symbol := instance.New(class.Symbol, name)
+	environment.TopLevel.Variable.Define(symbol, value)
 }
