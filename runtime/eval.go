@@ -7,7 +7,7 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func evalArguments(local *env.Environment, global *env.Environment, args ilos.Instance) (ilos.Instance, ilos.Instance) {
+func evalArguments(local, global *env.Environment, args ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// if args ends here
 	if instance.Of(class.Null, args) {
 		return instance.New(class.Null), nil
@@ -33,7 +33,40 @@ func evalArguments(local *env.Environment, global *env.Environment, args ilos.In
 
 }
 
-func evalFunction(local *env.Environment, global *env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func evalLambda(local, global *env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+	// obj, function call form, must be a instance of Cons, NOT Null, and ends with nil
+	if !instance.Of(class.Cons, obj) || !UnsafeEndOfListIsNil(obj) {
+		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
+			"STRING":         obj,
+			"EXPECTED-CLASS": class.Cons,
+		})
+	}
+	// get function symbol
+	car := instance.UnsafeCar(obj) // Checked at the top of this function
+
+	// get function arguments
+	cdr := instance.UnsafeCdr(obj) // Checked at the top of this function
+
+	fun, err := Eval(local, global, car)
+	if err != nil {
+		return nil, err
+	}
+
+	args, err := evalArguments(local, global, cdr)
+	if err != nil {
+		return nil, err
+	}
+	env := env.New()
+	env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
+	env.CatchTag = append(local.CatchTag, env.CatchTag...)
+	ret, err := fun.(instance.Applicable).Apply(env, global, args)
+	if err != nil {
+		return nil, err
+	}
+	return ret, nil
+}
+
+func evalFunction(local, global *env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// obj, function call form, must be a instance of Cons, NOT Null, and ends with nil
 	if !instance.Of(class.Cons, obj) || !UnsafeEndOfListIsNil(obj) {
 		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
@@ -51,23 +84,8 @@ func evalFunction(local *env.Environment, global *env.Environment, obj ilos.Inst
 	if instance.Of(class.Cons, car) {
 		caar := instance.UnsafeCar(car) // Checked at the top of this sentence
 		if caar == instance.New(class.Symbol, "LAMBDA") {
-			fun, err := Eval(local, global, car)
-			if err != nil {
-				return nil, err
-			}
-
-			args, err := evalArguments(local, global, cdr)
-			if err != nil {
-				return nil, err
-			}
-			env := env.New()
-			env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
-			env.CatchTag = append(local.CatchTag, env.CatchTag...)
-			ret, err := fun.(instance.Applicable).Apply(args, env, global)
-			if err != nil {
-				return nil, err
-			}
-			return ret, nil
+			ret, err := evalLambda(local, global, obj)
+			return ret, err
 		}
 	}
 	// if function is not a lambda special form, first element must be a symbol
@@ -86,7 +104,15 @@ func evalFunction(local *env.Environment, global *env.Environment, obj ilos.Inst
 		mac = m
 	}
 	if mac != nil {
-		ret, err := mac.(instance.Applicable).Apply(cdr, local, global)
+		env := env.New()
+		env.BlockTag = append(local.BlockTag, env.BlockTag...)
+		env.TagbodyTag = append(local.TagbodyTag, env.TagbodyTag...)
+		env.CatchTag = append(local.CatchTag, env.CatchTag...)
+		env.Variable = append(local.Variable, env.Variable...)
+		env.Function = append(local.Function, env.Function...)
+		env.Macro = append(local.Macro, env.Macro...)
+		env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
+		ret, err := mac.(instance.Applicable).Apply(env, global, cdr)
 		if err != nil {
 			return nil, err
 		}
@@ -106,9 +132,9 @@ func evalFunction(local *env.Environment, global *env.Environment, obj ilos.Inst
 			return nil, err
 		}
 		env := env.New()
-		env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
 		env.CatchTag = append(local.CatchTag, env.CatchTag...)
-		ret, err := fun.(instance.Applicable).Apply(args, env, global)
+		env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
+		ret, err := fun.(instance.Applicable).Apply(env, global, args)
 		if err != nil {
 			return nil, err
 		}
@@ -120,22 +146,30 @@ func evalFunction(local *env.Environment, global *env.Environment, obj ilos.Inst
 	})
 }
 
+func evalVariable(local, global *env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+	if val, ok := local.Variable.Get(obj); ok {
+		return val, nil
+	}
+	if val, ok := global.Variable.Get(obj); ok {
+		return val, nil
+	}
+	return nil, instance.New(class.UndefinedVariable, map[string]ilos.Instance{
+		"NAME":      obj,
+		"NAMESPACE": instance.New(class.Symbol, "VARIABLE"),
+	})
+}
+
 // Eval evaluates any classs
-func Eval(local *env.Environment, global *env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Eval(local, global *env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if instance.Of(class.Null, obj) {
 		return instance.New(class.Null), nil
 	}
 	if instance.Of(class.Symbol, obj) {
-		if val, ok := local.Variable.Get(obj); ok {
-			return val, nil
+		ret, err := evalVariable(local, global, obj)
+		if err != nil {
+			return nil, err
 		}
-		if val, ok := global.Variable.Get(obj); ok {
-			return val, nil
-		}
-		return nil, instance.New(class.UndefinedVariable, map[string]ilos.Instance{
-			"NAME":      obj,
-			"NAMESPACE": instance.New(class.Symbol, "VARIABLE"),
-		})
+		return ret, nil
 	}
 	if instance.Of(class.Cons, obj) {
 		ret, err := evalFunction(local, global, obj)

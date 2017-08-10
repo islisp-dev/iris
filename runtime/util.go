@@ -46,11 +46,11 @@ func readFromString(s string) ilos.Instance {
 
 func defmacro(name string, macro interface{}) {
 	symbol := instance.New(class.Symbol, name)
-	environment.TopLevel.Macro.Define(symbol, instance.New(class.Function, macro))
+	environment.TopLevel.Macro.Define(symbol, instance.New(class.Function, symbol, macro))
 }
 func defun(name string, function interface{}) {
 	symbol := instance.New(class.Symbol, name)
-	environment.TopLevel.Function.Define(symbol, instance.New(class.Function, function))
+	environment.TopLevel.Function.Define(symbol, instance.New(class.Function, symbol, function))
 }
 func defglobal(name string, value ilos.Instance) {
 	symbol := instance.New(class.Symbol, name)

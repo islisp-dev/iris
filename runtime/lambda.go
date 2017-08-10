@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	"fmt"
+	"math"
 
 	env "github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
@@ -9,36 +9,30 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-type lambdaFunction func(*env.Environment, *env.Environment, ilos.Instance) (ilos.Instance, ilos.Instance)
-
-func (lambdaFunction) Class() ilos.Class {
-	return class.Function
-}
-
-func (lambdaFunction) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
-	return nil, false
-}
-
-func (lambdaFunction) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
-	return false
-}
-
-func (f lambdaFunction) String() string {
-	return fmt.Sprintf("#%v", f.Class())
-}
-
-func (f lambdaFunction) Apply(args ilos.Instance, local, global *env.Environment) (ilos.Instance, ilos.Instance) {
-	a, b := f(local, global, args)
-	return a, b
-}
-
 func lambda(local, global *env.Environment, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// lambdaFunction-list must be a instance of list and ends with nil
 	if !instance.Of(class.List, lambdaList) || !UnsafeEndOfListIsNil(lambdaList) { // Checked at the head of test
 		return nil, instance.New(class.ParseError, lambdaList, class.List)
 	}
 	lexical := local
-	return lambdaFunction(func(local, global *env.Environment, args ilos.Instance) (ilos.Instance, ilos.Instance) {
+	cdr := lambdaList
+	cnt := 0
+	min := 0
+	max := 0
+	for instance.Of(class.Cons, cdr) {
+		cadr := instance.UnsafeCar(cdr)
+		cddr := instance.UnsafeCdr(cdr)
+		cnt++
+		if cadr == instance.New(class.Symbol, ":REST") || cadr == instance.New(class.Symbol, "&REST") {
+			min = cnt
+			max = math.MaxInt64
+			break
+		}
+		min = cnt
+		max = cnt
+		cdr = cddr
+	}
+	return instance.New(class.Function, instance.New(class.Symbol, "ANONYMOUS-FUNCTION"), func(local, global *env.Environment, args ilos.Instance) (ilos.Instance, ilos.Instance) {
 		local.BlockTag = append(lexical.BlockTag, local.BlockTag...)
 		local.TagbodyTag = append(lexical.TagbodyTag, local.TagbodyTag...)
 		local.CatchTag = append(lexical.CatchTag, local.CatchTag...)
@@ -46,50 +40,6 @@ func lambda(local, global *env.Environment, lambdaList ilos.Instance, forms ...i
 		local.Function = append(lexical.Function, local.Function...)
 		local.Macro = append(lexical.Macro, local.Macro...)
 		local.DynamicVariable = append(lexical.DynamicVariable, local.DynamicVariable...)
-		// args must be a instance of list and end with nil
-		if !instance.Of(class.List, args) || !UnsafeEndOfListIsNil(args) { // Checked at the head of test
-			return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-				"OBJECT":         args,
-				"EXPECTED-CLASS": class.List,
-			})
-		}
-		cdr := lambdaList
-		ok := false
-		for instance.Of(class.Cons, cdr) {
-			car := instance.UnsafeCar(cdr) // Checked at the top of this loop.
-			cdr = instance.UnsafeCdr(cdr)  // Checked at the top of this loop.
-			if car == instance.New(class.Symbol, ":REST") || car == instance.New(class.Symbol, "&REST") {
-				// fargs has only one symbol after &rest or :rest symbol.
-				if instance.Of(class.List, cdr) && UnsafeListLength(cdr) == 1 { // Checked at the head of test
-					// If fargs has :rest or &rest symbol, The length of aargs must be greater than or equal to 'the length of fargs' - 2.
-					// aargs is a instance of list and ends with nil becauseof the checking at this function.
-					// lambdaFunction-list is a instance of list and ends with nil becauseof the checking at the function, lambdaFunction.
-					if UnsafeListLength(lambdaList)-2 <= UnsafeListLength(args) {
-						ok = true
-						break
-					} else {
-						return nil, instance.New(class.WrongNumberOfArguments, map[string]ilos.Instance{
-							"FORM":      instance.New(class.Symbol, "ANONYMOUS-FUNCTION"),
-							"ARGUMENTS": args,
-						})
-					}
-				} else {
-					return nil, instance.New(class.WrongNumberOfArguments, map[string]ilos.Instance{
-						"FORM":      instance.New(class.Symbol, "lambdaFunction"),
-						"ARGUMENTS": lambdaList,
-					})
-				}
-			}
-		}
-		// If fargs doesn't have them, The length of aargs must be equal to the length of fargs.
-		// aargs is a instance of list and ends nil becauseof the checking at this function.
-		// lambda-list is a instance of list and ends nil becauseof the checking at the function, lambdaFunction.
-		if !ok && UnsafeListLength(lambdaList) != UnsafeListLength(args) {
-			return nil, instance.New(class.WrongNumberOfArguments, map[string]ilos.Instance{
-				"FORM":      instance.New(class.Symbol, "ANONYMOUS-FUNCTION"),
-				"ARGUMENTS": args,
-			})
-		}
 		fargs := lambdaList
 		aargs := args
 		for instance.Of(class.Cons, fargs) && instance.Of(class.Cons, aargs) {
@@ -113,5 +63,5 @@ func lambda(local, global *env.Environment, lambdaList ilos.Instance, forms ...i
 			}
 		}
 		return ret, nil
-	}), nil
+	}, min, max), nil
 }
