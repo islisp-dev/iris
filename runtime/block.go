@@ -17,7 +17,7 @@ import (
 // According to this, the scope of name is dynamic. I guess it should be a static.
 func block(local, global *env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
-	tag, err = Eval(tag, local, global) // Checked at the top of this function
+	tag, err = Eval(local, global, tag) // Checked at the top of this function
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func block(local, global *env.Environment, tag ilos.Instance, body ...ilos.Insta
 	local.BlockTag.Define(tag, nil)
 	var sucess, fail ilos.Instance
 	for _, cadr := range body {
-		sucess, fail = Eval(cadr, local, global)
+		sucess, fail = Eval(local, global, cadr)
 		if fail != nil {
 			if instance.Of(class.BlockTag, fail) {
 				tag1, _ := fail.GetSlotValue(instance.New(class.Symbol, "TAG"), class.Escape) // Checked at the head of this condition
@@ -47,7 +47,7 @@ func block(local, global *env.Environment, tag ilos.Instance, body ...ilos.Insta
 
 func returnFrom(local, global *env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
-	tag, err = Eval(tag, local, global)
+	tag, err = Eval(local, global, tag)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +57,7 @@ func returnFrom(local, global *env.Environment, tag, object ilos.Instance) (ilos
 			"EXPECTED-CLASS": class.Object,
 		})
 	}
-	object, err = Eval(object, local, global)
+	object, err = Eval(local, global, object)
 	if err != nil {
 		return nil, err
 	}

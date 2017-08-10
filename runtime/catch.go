@@ -9,7 +9,7 @@ import (
 
 func catch(local, global *env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
-	tag, err = Eval(tag, local, global)
+	tag, err = Eval(local, global, tag)
 	if err != nil {
 		return nil, err
 	}
@@ -19,7 +19,7 @@ func catch(local, global *env.Environment, tag ilos.Instance, body ...ilos.Insta
 	local.CatchTag.Define(tag, nil)
 	var sucess, fail ilos.Instance
 	for _, cadr := range body {
-		sucess, fail = Eval(cadr, local, global)
+		sucess, fail = Eval(local, global, cadr)
 		if fail != nil {
 			if instance.Of(class.CatchTag, fail) {
 				tag1, _ := fail.GetSlotValue(instance.New(class.Symbol, "TAG"), class.Escape) // Checked at the head of this condition
@@ -36,7 +36,7 @@ func catch(local, global *env.Environment, tag ilos.Instance, body ...ilos.Insta
 
 func throw(local, global *env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
-	tag, err = Eval(tag, local, global)
+	tag, err = Eval(local, global, tag)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func throw(local, global *env.Environment, tag, object ilos.Instance) (ilos.Inst
 			"EXPECTED-CLASS": class.Object,
 		})
 	}
-	object, err = Eval(object, local, global)
+	object, err = Eval(local, global, object)
 	if err != nil {
 		return nil, err
 	}
