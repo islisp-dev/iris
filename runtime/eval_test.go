@@ -29,7 +29,7 @@ func TestEval(t *testing.T) {
 	local.Variable.Define(instance.New(class.Symbol, "PI"), instance.New(class.Float, 3.14))
 	local.Function.Define(instance.New(class.Symbol, "INC"), instance.New(class.Function, inc2))
 	local.Macro.Define(instance.New(class.Symbol, "MINC"), instance.New(class.Function, func(local *env.Environment, global *env.Environment, arg ilos.Instance) (ilos.Instance, ilos.Instance) {
-		ret, err := Eval(instance.New(class.Cons, instance.New(class.Symbol, "INC"), instance.New(class.Cons, arg, instance.New(class.Null))), local, global)
+		ret, err := Eval(local, global, instance.New(class.Cons, instance.New(class.Symbol, "INC"), instance.New(class.Cons, arg, instance.New(class.Null))))
 		return ret, err
 	}))
 	type args struct {
@@ -100,13 +100,13 @@ func TestEval(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Eval(tt.args.obj, tt.args.local, tt.args.global)
+			got, err := Eval(tt.args.local, tt.args.global, tt.args.obj)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("Eval() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("Eval(err, tt.wantErr, ) error = %v, wantErr %v")
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("Eval() = %v, want %v", got, tt.want)
+				t.Errorf("Eval(got, tt.want, ) = %v, want %v")
 			}
 		})
 	}

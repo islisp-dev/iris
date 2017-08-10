@@ -16,7 +16,7 @@ func tagbody(local, global *env.Environment, body ...ilos.Instance) (ilos.Instan
 	}
 	for _, cadr := range body {
 		if instance.Of(class.Cons, cadr) {
-			_, fail := Eval(cadr, local, global)
+			_, fail := Eval(local, global, cadr)
 			if fail != nil {
 			TAG:
 				if instance.Of(class.TagbodyTag, fail) {
@@ -32,7 +32,7 @@ func tagbody(local, global *env.Environment, body ...ilos.Instance) (ilos.Instan
 						forms, _ := local.TagbodyTag.Get(tag) // Checked in the function, tagbodyGo
 						for _, form := range forms.(instance.GeneralVector) {
 							if instance.Of(class.Cons, form) {
-								_, fail = Eval(form, local, global)
+								_, fail = Eval(local, global, form)
 								if fail != nil {
 									goto TAG
 								}

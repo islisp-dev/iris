@@ -82,7 +82,7 @@ func lambda(local, global *env.Environment, lambdaList ilos.Instance, forms ...i
 		ret := instance.New(class.Null)
 		var err ilos.Instance
 		for _, form := range forms {
-			ret, err = Eval(form, local, global)
+			ret, err = Eval(local, global, form)
 			if err != nil {
 				return nil, err
 			}
