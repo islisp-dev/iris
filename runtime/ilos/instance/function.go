@@ -3,7 +3,6 @@ package instance
 import (
 	"fmt"
 	"reflect"
-	"runtime"
 
 	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
@@ -48,7 +47,7 @@ func (f NativeFunction) Apply(local, global *environment.Environment, args ilos.
 	}
 	if ft.NumIn() != len(argv) && (!ft.IsVariadic() || ft.NumIn()-2 > len(argv)) {
 		return nil, New(class.WrongNumberOfArguments, map[string]ilos.Instance{
-			"FORM":      New(class.Symbol, runtime.FuncForPC(fv.Pointer()).Name()),
+			"FORM":      f.name,
 			"ARGUMENTS": args,
 		})
 	}
@@ -60,10 +59,9 @@ func (f NativeFunction) Apply(local, global *environment.Environment, args ilos.
 }
 
 type Function struct {
-	name     Symbol
-	function interface{}
-	min      int
-	max      int
+	name       Symbol
+	lambdaList ilos.Instance
+	function   interface{}
 }
 
 func (Function) Class() ilos.Class {
@@ -83,23 +81,27 @@ func (f Function) String() string {
 }
 
 func (f Function) Apply(local, global *environment.Environment, args ilos.Instance) (ilos.Instance, ilos.Instance) {
-	cnt := 0
-	cdr := args
-	for Of(class.Cons, cdr) {
-		cadr := UnsafeCar(cdr)
-		cddr := UnsafeCdr(cdr)
-		cnt++
-		if cadr == New(class.Symbol, ":REST") || cadr == New(class.Symbol, "&REST") {
-			break
+	a := args
+	b := f.lambdaList
+	for Of(class.Cons, a) && Of(class.Cons, b) {
+		car := UnsafeCar(b)
+		if car == New(class.Symbol, ":REST") || car == New(class.Symbol, "&REST") {
+			c, d := f.function.(func(*environment.Environment, *environment.Environment, ilos.Instance) (ilos.Instance, ilos.Instance))(local, global, args)
+			return c, d
 		}
-		cdr = cddr
+		a = UnsafeCdr(a)
+		b = UnsafeCdr(b)
 	}
-	if cnt < f.min || f.max < cnt {
-		return nil, New(class.WrongNumberOfArguments, map[string]ilos.Instance{
-			"FORM":      New(class.Symbol, f.name),
-			"ARGUMENTS": args,
-		})
+	if Of(class.Cons, a) && (UnsafeCar(a) == New(class.Symbol, ":REST") || UnsafeCar(a) == New(class.Symbol, "&REST")) {
+		c, d := f.function.(func(*environment.Environment, *environment.Environment, ilos.Instance) (ilos.Instance, ilos.Instance))(local, global, args)
+		return c, d
 	}
-	a, b := f.function.(func(*environment.Environment, *environment.Environment, ilos.Instance) (ilos.Instance, ilos.Instance))(local, global, args)
-	return a, b
+	if Of(class.Null, a) && Of(class.Null, b) {
+		c, d := f.function.(func(*environment.Environment, *environment.Environment, ilos.Instance) (ilos.Instance, ilos.Instance))(local, global, args)
+		return c, d
+	}
+	return nil, New(class.WrongNumberOfArguments, map[string]ilos.Instance{
+		"FORM":      New(class.Symbol, f.name),
+		"ARGUMENTS": args,
+	})
 }

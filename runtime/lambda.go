@@ -1,8 +1,6 @@
 package runtime
 
 import (
-	"math"
-
 	env "github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
@@ -12,27 +10,13 @@ import (
 func lambda(local, global *env.Environment, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// lambdaFunction-list must be a instance of list and ends with nil
 	if !instance.Of(class.List, lambdaList) || !UnsafeEndOfListIsNil(lambdaList) { // Checked at the head of test
-		return nil, instance.New(class.ParseError, lambdaList, class.List)
+		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
+			"OBJECT":         lambdaList,
+			"EXPECTED-CLASS": class.List,
+		})
 	}
 	lexical := local
-	cdr := lambdaList
-	cnt := 0
-	min := 0
-	max := 0
-	for instance.Of(class.Cons, cdr) {
-		cadr := instance.UnsafeCar(cdr)
-		cddr := instance.UnsafeCdr(cdr)
-		cnt++
-		if cadr == instance.New(class.Symbol, ":REST") || cadr == instance.New(class.Symbol, "&REST") {
-			min = cnt
-			max = math.MaxInt64
-			break
-		}
-		min = cnt
-		max = cnt
-		cdr = cddr
-	}
-	return instance.New(class.Function, instance.New(class.Symbol, "ANONYMOUS-FUNCTION"), func(local, global *env.Environment, args ilos.Instance) (ilos.Instance, ilos.Instance) {
+	return instance.New(class.Function, instance.New(class.Symbol, "ANONYMOUS-FUNCTION"), lambdaList, func(local, global *env.Environment, args ilos.Instance) (ilos.Instance, ilos.Instance) {
 		local.BlockTag = append(lexical.BlockTag, local.BlockTag...)
 		local.TagbodyTag = append(lexical.TagbodyTag, local.TagbodyTag...)
 		local.CatchTag = append(lexical.CatchTag, local.CatchTag...)
@@ -63,5 +47,5 @@ func lambda(local, global *env.Environment, lambdaList ilos.Instance, forms ...i
 			}
 		}
 		return ret, nil
-	}, min, max), nil
+	}), nil
 }
