@@ -1,8 +1,7 @@
 package instance
 
 import (
-	"fmt"
-
+	"github.com/k0kubun/pp"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 )
@@ -89,6 +88,5 @@ func (i *instance) SetSlotValue(key ilos.Instance, value ilos.Instance, class il
 }
 
 func (i *instance) String() string {
-	class := fmt.Sprint(i.class)
-	return fmt.Sprintf("#%v %v>", class[:len(class)-1], i.slots)
+	return pp.Sprint(i)
 }

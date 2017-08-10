@@ -45,7 +45,7 @@ func block(local, global *env.Environment, tag ilos.Instance, body ...ilos.Insta
 	return sucess, nil
 }
 
-func returnFrom(local, global *env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
+func return_from(local, global *env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	tag, err = Eval(local, global, tag)
 	if err != nil {
