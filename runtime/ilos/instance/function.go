@@ -11,30 +11,31 @@ import (
 )
 
 type Applicable interface {
-	Apply(args ilos.Instance, local, global *environment.Environment) (ilos.Instance, ilos.Instance)
+	Apply(*environment.Environment, *environment.Environment, ilos.Instance) (ilos.Instance, ilos.Instance)
 }
 
-type Function struct {
+type NativeFunction struct {
+	name     Symbol
 	function interface{}
 }
 
-func (Function) Class() ilos.Class {
+func (NativeFunction) Class() ilos.Class {
 	return class.Function
 }
 
-func (Function) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
+func (NativeFunction) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
 	return nil, false
 }
 
-func (Function) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
+func (NativeFunction) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
 	return false
 }
 
-func (f Function) String() string {
+func (f NativeFunction) String() string {
 	return fmt.Sprintf("#%v", f.Class())
 }
 
-func (f Function) Apply(args ilos.Instance, local, global *environment.Environment) (ilos.Instance, ilos.Instance) {
+func (f NativeFunction) Apply(local, global *environment.Environment, args ilos.Instance) (ilos.Instance, ilos.Instance) {
 	fv := reflect.ValueOf(f.function)
 	ft := reflect.TypeOf(f.function)
 	cdr := args
@@ -56,4 +57,49 @@ func (f Function) Apply(args ilos.Instance, local, global *environment.Environme
 	b, _ := rets[1].Interface().(ilos.Instance)
 	return a, b
 
+}
+
+type Function struct {
+	name     Symbol
+	function interface{}
+	min      int
+	max      int
+}
+
+func (Function) Class() ilos.Class {
+	return class.Function
+}
+
+func (Function) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
+	return nil, false
+}
+
+func (Function) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
+	return false
+}
+
+func (f Function) String() string {
+	return fmt.Sprintf("#%v", f.Class())
+}
+
+func (f Function) Apply(local, global *environment.Environment, args ilos.Instance) (ilos.Instance, ilos.Instance) {
+	cnt := 0
+	cdr := args
+	for Of(class.Cons, cdr) {
+		cadr := UnsafeCar(cdr)
+		cddr := UnsafeCdr(cdr)
+		cnt++
+		if cadr == New(class.Symbol, ":REST") || cadr == New(class.Symbol, "&REST") {
+			break
+		}
+		cdr = cddr
+	}
+	if cnt < f.min || f.max < cnt {
+		return nil, New(class.WrongNumberOfArguments, map[string]ilos.Instance{
+			"FORM":      New(class.Symbol, f.name),
+			"ARGUMENTS": args,
+		})
+	}
+	a, b := f.function.(func(*environment.Environment, *environment.Environment, ilos.Instance) (ilos.Instance, ilos.Instance))(local, global, args)
+	return a, b
 }

@@ -23,7 +23,10 @@ func New(c ilos.Class, s ...interface{}) ilos.Instance {
 	case class.Character:
 		return Character(s[0].(rune))
 	case class.Function:
-		return Function{s[0]}
+		if len(s) == 4 {
+			return Function{s[0].(Symbol), s[1], s[2].(int), s[3].(int)}
+		}
+		return NativeFunction{s[0].(Symbol), s[1]}
 	case class.Cons:
 		return &Cons{s[0].(ilos.Instance), s[1].(ilos.Instance)}
 	case class.Null:
