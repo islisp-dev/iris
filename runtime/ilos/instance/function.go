@@ -3,6 +3,7 @@ package instance
 import (
 	"fmt"
 	"reflect"
+	"runtime"
 
 	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
@@ -14,7 +15,7 @@ type Applicable interface {
 }
 
 type Function struct {
-	fn interface{}
+	function interface{}
 }
 
 func (Function) Class() ilos.Class {
@@ -34,7 +35,8 @@ func (f Function) String() string {
 }
 
 func (f Function) Apply(args ilos.Instance, local, global *environment.Environment) (ilos.Instance, ilos.Instance) {
-	fv := reflect.ValueOf(f.fn)
+	fv := reflect.ValueOf(f.function)
+	ft := reflect.TypeOf(f.function)
 	cdr := args
 	argv := []reflect.Value{reflect.ValueOf(local), reflect.ValueOf(global)}
 	for Of(class.Cons, cdr) {
@@ -43,8 +45,13 @@ func (f Function) Apply(args ilos.Instance, local, global *environment.Environme
 		argv = append(argv, reflect.ValueOf(cadr))
 		cdr = cddr
 	}
+	if ft.NumIn() != len(argv) && (!ft.IsVariadic() || ft.NumIn()-2 > len(argv)) {
+		return nil, New(class.WrongNumberOfArguments, map[string]ilos.Instance{
+			"FORM":      New(class.Symbol, runtime.FuncForPC(fv.Pointer()).Name()),
+			"ARGUMENTS": args,
+		})
+	}
 	rets := fv.Call(argv)
-
 	a, _ := rets[0].Interface().(ilos.Instance)
 	b, _ := rets[1].Interface().(ilos.Instance)
 	return a, b
