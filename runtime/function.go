@@ -7,30 +7,22 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func function(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
-	// args must be a instance of Cons, not Null, and ends with nil
-	if !instance.Of(class.Cons, args) || !UnsafeEndOfListIsNil(args) || UnsafeListLength(args) != 1 { // Checked at the head of test
-		return nil, instance.New(class.WrongNumberOfArguments, map[string]ilos.Instance{
-			"FORM":      instance.New(class.Symbol, "FUNCTION"),
-			"ARGUMENTS": args,
-		})
-	}
-	car := instance.UnsafeCar(args) // Checked at the top of this function
+func function(local, global *env.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// car must be a symbol
-	if !instance.Of(class.Symbol, car) {
+	if !instance.Of(class.Symbol, fun) {
 		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         car,
+			"OBJECT":         fun,
 			"EXPECTED-CLASS": class.Symbol,
 		})
 	}
-	if f, ok := local.Function.Get(car); ok {
+	if f, ok := local.Function.Get(fun); ok {
 		return f, nil
 	}
-	if f, ok := global.Function.Get(car); ok {
+	if f, ok := global.Function.Get(fun); ok {
 		return f, nil
 	}
 	return nil, instance.New(class.UndefinedFunction, map[string]ilos.Instance{
-		"NAME":      car,
+		"NAME":      fun,
 		"NAMESPACE": instance.New(class.Symbol, "FUNCTION"),
 	})
 }

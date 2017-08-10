@@ -11,10 +11,6 @@ import (
 
 type Symbol string
 
-func NewSymbol(n string) ilos.Instance {
-	return Symbol(n)
-}
-
 func (Symbol) Class() ilos.Class {
 	return class.Symbol
 }

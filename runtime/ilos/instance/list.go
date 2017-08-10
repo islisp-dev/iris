@@ -16,10 +16,6 @@ type Cons struct {
 	cdr ilos.Instance
 }
 
-func NewCons(car ilos.Instance, cdr ilos.Instance) ilos.Instance {
-	return &Cons{car, cdr}
-}
-
 func (*Cons) Class() ilos.Class {
 	return class.Cons
 }
@@ -78,10 +74,6 @@ func UnsafeCdr(i ilos.Instance) ilos.Instance {
 //
 
 type Null struct{}
-
-func NewNull() ilos.Instance {
-	return Null{}
-}
 
 func (Null) Class() ilos.Class {
 	return class.Null

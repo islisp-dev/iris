@@ -7,22 +7,13 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func lambda(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
-	// args must be a instance of Cons, not Null, and ends with nil
-	if !instance.Of(class.Cons, args) || !UnsafeEndOfListIsNil(args) { // Checked at the head of test
-		return nil, instance.New(class.WrongNumberOfArguments, map[string]ilos.Instance{
-			"FORM":      instance.New(class.Symbol, "LAMBDA"),
-			"ARGUMENTS": args,
-		})
-	}
-	lambdaList := instance.UnsafeCar(args)
+func lambda(local, global *env.Environment, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// lambda-list must be a instance of list and ends with nil
 	if !instance.Of(class.List, lambdaList) || !UnsafeEndOfListIsNil(lambdaList) { // Checked at the head of test
 		return nil, instance.New(class.ParseError, lambdaList, class.List)
 	}
-	forms := instance.UnsafeCdr(args) // Checked at the top of this function. (EndOfListIsNil)
 	lexical := local
-	return instance.New(class.Function, func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
+	return instance.Lambda(func(local, global *env.Environment, args ilos.Instance) (ilos.Instance, ilos.Instance) {
 		local.BlockTag = append(lexical.BlockTag, local.BlockTag...)
 		local.TagbodyTag = append(lexical.TagbodyTag, local.TagbodyTag...)
 		local.CatchTag = append(lexical.CatchTag, local.CatchTag...)
@@ -88,16 +79,13 @@ func lambda(args ilos.Instance, local *env.Environment, global *env.Environment)
 			fargs = instance.UnsafeCdr(fargs) // Checked at the top of this loop
 			aargs = instance.UnsafeCdr(aargs) // Checked at the top of this loop
 		}
-		body := forms
 		ret := instance.New(class.Null)
 		var err ilos.Instance
-		for instance.Of(class.Cons, body) {
-			exp := instance.UnsafeCar(body) // Checked at the top of this loop
-			ret, err = Eval(exp, local, global)
+		for _, form := range forms {
+			ret, err = Eval(form, local, global)
 			if err != nil {
 				return nil, err
 			}
-			body = instance.UnsafeCdr(body) // Checked at the top of this loop
 		}
 		return ret, nil
 	}), nil

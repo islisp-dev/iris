@@ -63,7 +63,7 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 			env := env.New()
 			env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
 			env.CatchTag = append(local.CatchTag, env.CatchTag...)
-			ret, err := fun.(instance.Function)(args, env, global)
+			ret, err := fun.(instance.Callable).Apply(args, env, global)
 			if err != nil {
 				return nil, err
 			}
@@ -86,7 +86,7 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 		mac = m
 	}
 	if mac != nil {
-		ret, err := mac.(instance.Function)(cdr, local, global)
+		ret, err := mac.(instance.Callable).Apply(cdr, local, global)
 		if err != nil {
 			return nil, err
 		}
@@ -108,7 +108,7 @@ func evalFunction(obj ilos.Instance, local *env.Environment, global *env.Environ
 		env := env.New()
 		env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
 		env.CatchTag = append(local.CatchTag, env.CatchTag...)
-		ret, err := fun.(instance.Function)(args, env, global)
+		ret, err := fun.(instance.Callable).Apply(args, env, global)
 		if err != nil {
 			return nil, err
 		}
