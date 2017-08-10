@@ -13,10 +13,6 @@ import (
 
 type Integer int
 
-func NewInteger(n int) ilos.Instance {
-	return Integer(n)
-}
-
 func (Integer) Class() ilos.Class {
 	return class.Integer
 }
@@ -38,10 +34,6 @@ func (i Integer) String() string {
 //
 
 type Float float64
-
-func NewFloat(n float64) ilos.Instance {
-	return Float(n)
-}
 
 func (Float) Class() ilos.Class {
 	return class.Float

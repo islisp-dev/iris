@@ -23,14 +23,13 @@ func TestEval(t *testing.T) {
 	Init()
 	local := env.New()
 	global := env.TopLevel
-	inc := func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
-		car := instance.UnsafeCar(args)
-		return instance.New(class.Integer, int(car.(instance.Integer))+1), nil
+	inc2 := func(local, global *env.Environment, arg ilos.Instance) (ilos.Instance, ilos.Instance) {
+		return instance.New(class.Integer, int(arg.(instance.Integer))+1), nil
 	}
 	local.Variable.Define(instance.New(class.Symbol, "PI"), instance.New(class.Float, 3.14))
-	local.Function.Define(instance.New(class.Symbol, "INC"), instance.New(class.Function, inc))
-	local.Macro.Define(instance.New(class.Symbol, "MINC"), instance.New(class.Function, func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
-		ret, err := Eval(instance.New(class.Cons, instance.New(class.Symbol, "INC"), args), local, global)
+	local.Function.Define(instance.New(class.Symbol, "INC"), instance.New(class.Function, inc2))
+	local.Macro.Define(instance.New(class.Symbol, "MINC"), instance.New(class.Function, func(local *env.Environment, global *env.Environment, arg ilos.Instance) (ilos.Instance, ilos.Instance) {
+		ret, err := Eval(instance.New(class.Cons, instance.New(class.Symbol, "INC"), instance.New(class.Cons, arg, instance.New(class.Null))), local, global)
 		return ret, err
 	}))
 	type args struct {

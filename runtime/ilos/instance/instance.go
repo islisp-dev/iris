@@ -3,7 +3,6 @@ package instance
 import (
 	"fmt"
 
-	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 )
@@ -15,21 +14,25 @@ import (
 func New(c ilos.Class, s ...interface{}) ilos.Instance {
 	switch c {
 	case class.Integer:
-		return NewInteger(s[0].(int))
+		return Integer(s[0].(int))
 	case class.Float:
-		return NewFloat(s[0].(float64))
+		return Float(s[0].(float64))
 	case class.String:
-		return NewString(s[0].(string))
+		return String(s[0].(string))
 	case class.Symbol:
-		return NewSymbol(s[0].(string))
+		return Symbol(s[0].(string))
 	case class.Character:
-		return NewCharacter(s[0].(rune))
+		return Character(s[0].(rune))
 	case class.Function:
-		return NewFunction(s[0].(func(ilos.Instance, *environment.Environment, *environment.Environment) (ilos.Instance, ilos.Instance)))
+		return Function{s[0]}
 	case class.Cons:
-		return NewCons(s[0].(ilos.Instance), s[1].(ilos.Instance))
+		return &Cons{s[0].(ilos.Instance), s[1].(ilos.Instance)}
 	case class.Null:
-		return NewNull()
+		return Null{}
+	case class.GeneralVector:
+		return GeneralVector(s[0].([]ilos.Instance))
+	case class.String:
+		return String(s[0].(string))
 	default:
 		p := []ilos.Instance{}
 		for _, q := range c.Parents() {
