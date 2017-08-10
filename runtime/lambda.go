@@ -24,8 +24,8 @@ func lambda(args ilos.Instance, local *env.Environment, global *env.Environment)
 	lexical := local
 	return instance.New(class.Function, func(args ilos.Instance, local *env.Environment, global *env.Environment) (ilos.Instance, ilos.Instance) {
 		local.BlockTag = append(lexical.BlockTag, local.BlockTag...)
-		local.TagBodyTag = append(lexical.TagBodyTag, local.TagBodyTag...)
-		local.ThrowTag = append(lexical.ThrowTag, local.ThrowTag...)
+		local.TagbodyTag = append(lexical.TagbodyTag, local.TagbodyTag...)
+		local.CatchTag = append(lexical.CatchTag, local.CatchTag...)
 		local.Variable = append(lexical.Variable, local.Variable...)
 		local.Function = append(lexical.Function, local.Function...)
 		local.Macro = append(lexical.Macro, local.Macro...)
