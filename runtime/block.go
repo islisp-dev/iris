@@ -32,7 +32,8 @@ func block(local, global *environment.Environment, tag ilos.Instance, body ...il
 		})
 	}
 	local.BlockTag.Define(tag, nil)
-	var sucess, fail ilos.Instance
+	var fail ilos.Instance
+	sucess := instance.New(class.Null)
 	for _, cadr := range body {
 		sucess, fail = Eval(local, global, cadr)
 		if fail != nil {
