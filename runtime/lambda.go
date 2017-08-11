@@ -34,6 +34,7 @@ func lambda(local, global *environment.Environment, lambdaList ilos.Instance, fo
 		local.CatchTag = append(lexical.CatchTag, local.CatchTag...)
 		local.Variable = append(lexical.Variable, local.Variable...)
 		local.Function = append(lexical.Function, local.Function...)
+		local.Special = append(lexical.Special, local.Special...)
 		local.Macro = append(lexical.Macro, local.Macro...)
 		local.DynamicVariable = append(lexical.DynamicVariable, local.DynamicVariable...)
 		if (variadic && len(parameters)-2 > len(arguments)) || (!variadic && len(parameters) != len(arguments)) {

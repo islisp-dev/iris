@@ -12,33 +12,33 @@ import (
 
 func TestTagbody(t *testing.T) {
 	local, global := environment.New(), environment.TopLevel
-	defmacro("TAGBODY", tagbody)
-	defmacro("GO", tagbodyGo)
-	defmacro("CATCH", catch)
-	defmacro("THROW", throw)
-	defmacro("QUOTE", quote)
+	defspecial("TAGBODY", tagbody)
+	defspecial("GO", tagbodyGo)
+	defspecial("CATCH", catch)
+	defspecial("THROW", throw)
+	defspecial("QUOTE", quote)
 	type arguments struct {
 		local  *environment.Environment
 		global *environment.Environment
 		obj    ilos.Instance
 	}
 	tests := []struct {
-		name    string
-		arguments    arguments
-		want    ilos.Instance
-		wantErr bool
+		name      string
+		arguments arguments
+		want      ilos.Instance
+		wantErr   bool
 	}{
 		{
-			name:    "tagbody & go",
-			arguments:    arguments{local, global, readFromString("(catch 'foo (tagbody (go bar) (throw 'foo 1) bar))")},
-			want:    instance.New(class.Null),
-			wantErr: false,
+			name:      "tagbody & go",
+			arguments: arguments{local, global, readFromString("(catch 'foo (tagbody (go bar) (throw 'foo 1) bar))")},
+			want:      instance.New(class.Null),
+			wantErr:   false,
 		},
 		{
-			name:    "nested tagbody & go",
-			arguments:    arguments{local, global, readFromString("(catch 'foo (tagbody (tagbody (go bar) (throw 'foo 1) bar (go foobar)) foobar))")},
-			want:    instance.New(class.Null),
-			wantErr: false,
+			name:      "nested tagbody & go",
+			arguments: arguments{local, global, readFromString("(catch 'foo (tagbody (tagbody (go bar) (throw 'foo 1) bar (go foobar)) foobar))")},
+			want:      instance.New(class.Null),
+			wantErr:   false,
 		},
 	}
 	for _, tt := range tests {

@@ -18,8 +18,7 @@ func TestEval(t *testing.T) {
 	})
 	defglobal("PI", instance.New(class.Float, 3.14))
 	defmacro("MINC", func(local *environment.Environment, global *environment.Environment, arg ilos.Instance) (ilos.Instance, ilos.Instance) {
-		ret, err := Eval(local, global, instance.New(class.Cons, instance.New(class.Symbol, "INC"), instance.New(class.Cons, arg, instance.New(class.Null))))
-		return ret, err
+		return instance.New(class.Cons, instance.New(class.Symbol, "INC"), instance.New(class.Cons, arg, instance.New(class.Null))), nil
 	})
 	type arguments struct {
 		obj    ilos.Instance
@@ -27,28 +26,28 @@ func TestEval(t *testing.T) {
 		global *environment.Environment
 	}
 	tests := []struct {
-		name    string
-		arguments    arguments
-		want    ilos.Instance
-		wantErr bool
+		name      string
+		arguments arguments
+		want      ilos.Instance
+		wantErr   bool
 	}{
 		{
-			name:    "local variable",
-			arguments:    arguments{instance.New(class.Symbol, "PI"), local, global},
-			want:    instance.New(class.Float, 3.14),
-			wantErr: false,
+			name:      "local variable",
+			arguments: arguments{instance.New(class.Symbol, "PI"), local, global},
+			want:      instance.New(class.Float, 3.14),
+			wantErr:   false,
 		},
 		{
-			name:    "local function",
-			arguments:    arguments{readFromString("(inc (inc 1))"), local, global},
-			want:    instance.New(class.Integer, 3),
-			wantErr: false,
+			name:      "local function",
+			arguments: arguments{readFromString("(inc (inc 1))"), local, global},
+			want:      instance.New(class.Integer, 3),
+			wantErr:   false,
 		},
 		{
-			name:    "local macro",
-			arguments:    arguments{readFromString("(minc (minc 1))"), local, global},
-			want:    instance.New(class.Integer, 3),
-			wantErr: false,
+			name:      "local macro",
+			arguments: arguments{readFromString("(minc (minc 1))"), local, global},
+			want:      instance.New(class.Integer, 3),
+			wantErr:   false,
 		},
 	}
 	for _, tt := range tests {

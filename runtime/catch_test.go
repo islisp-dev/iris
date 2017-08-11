@@ -10,9 +10,9 @@ import (
 
 func TestCatch(t *testing.T) {
 	local, global := environment.New(), environment.TopLevel
-	defmacro("CATCH", catch)
-	defmacro("THROW", throw)
-	defmacro("QUOTE", quote)
+	defspecial("CATCH", catch)
+	defspecial("THROW", throw)
+	defspecial("QUOTE", quote)
 	type arguments struct {
 		local  *environment.Environment
 		global *environment.Environment

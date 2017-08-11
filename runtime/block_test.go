@@ -10,25 +10,25 @@ import (
 
 func TestBlock(t *testing.T) {
 	local, global := environment.New(), environment.TopLevel
-	defmacro("BLOCK", block)
-	defmacro("RETURN-FROM", return_from)
-	defmacro("QUOTE", quote)
+	defspecial("BLOCK", block)
+	defspecial("RETURN-FROM", return_from)
+	defspecial("QUOTE", quote)
 	type arguments struct {
 		local  *environment.Environment
 		global *environment.Environment
 		obj    ilos.Instance
 	}
 	tests := []struct {
-		name    string
-		arguments    arguments
-		want    ilos.Instance
-		wantErr bool
+		name      string
+		arguments arguments
+		want      ilos.Instance
+		wantErr   bool
 	}{
 		{
-			name:    "block & return-from",
-			arguments:    arguments{local, global, readFromString("(block 'foo 1 (return-from 'foo 1))")},
-			want:    readFromString("1"),
-			wantErr: false,
+			name:      "block & return-from",
+			arguments: arguments{local, global, readFromString("(block 'foo 1 (return-from 'foo 1))")},
+			want:      readFromString("1"),
+			wantErr:   false,
 		},
 	}
 	for _, tt := range tests {

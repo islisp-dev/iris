@@ -33,69 +33,51 @@ func evalArguments(local, global *environment.Environment, arguments ilos.Instan
 
 }
 
-func evalLambda(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	// obj, function call form, must be a instance of Cons, NOT Null, and ends with nil
-	if !instance.Of(class.Cons, obj) || !UnsafeEndOfListIsNil(obj) {
-		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
-			"STRING":         obj,
-			"EXPECTED-CLASS": class.Cons,
-		})
-	}
-	// get function symbol
-	car := instance.UnsafeCar(obj) // Checked at the top of this function
-
-	// get function arguments
-	cdr := instance.UnsafeCdr(obj) // Checked at the top of this function
-
-	fun, err := Eval(local, global, car)
-	if err != nil {
-		return nil, err
-	}
-
-	arguments, err := evalArguments(local, global, cdr)
-	if err != nil {
-		return nil, err
-	}
-	env := environment.New()
-	env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
-	env.CatchTag = append(local.CatchTag, env.CatchTag...)
-	ret, err := fun.(instance.Applicable).Apply(env, global, arguments)
-	if err != nil {
-		return nil, err
-	}
-	return ret, nil
-}
-
-func evalFunction(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	// obj, function call form, must be a instance of Cons, NOT Null, and ends with nil
-	if !instance.Of(class.Cons, obj) || !UnsafeEndOfListIsNil(obj) {
-		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
-			"STRING":         obj,
-			"EXPECTED-CLASS": class.Cons,
-		})
-	}
-	// get function symbol
-	car := instance.UnsafeCar(obj) // Checked at the top of this function
-
-	// get function arguments
-	cdr := instance.UnsafeCdr(obj) // Checked at the top of this function
-
+func evalLambda(local, global *environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// eval if lambda form
 	if instance.Of(class.Cons, car) {
 		caar := instance.UnsafeCar(car) // Checked at the top of this sentence
 		if caar == instance.New(class.Symbol, "LAMBDA") {
-			ret, err := evalLambda(local, global, obj)
-			return ret, err
+			fun, err := Eval(local, global, car)
+			if err != nil {
+				return nil, err, true
+			}
+
+			arguments, err := evalArguments(local, global, cdr)
+			if err != nil {
+				return nil, err, true
+			}
+			env := environment.New()
+			env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
+			env.CatchTag = append(local.CatchTag, env.CatchTag...)
+			ret, err := fun.(instance.Applicable).Apply(env, global, arguments)
+			if err != nil {
+				return nil, err, true
+			}
+			return ret, nil, true
 		}
 	}
-	// if function is not a lambda special form, first element must be a symbol
-	if !instance.Of(class.Symbol, car) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         car,
-			"EXPECTED-CLASS": class.Symbol,
-		})
+	return nil, nil, false
+}
+
+func evalSpecial(local, global *environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
+	// get special instance has value of Function interface
+	var spl ilos.Instance
+	if s, ok := global.Special.Get(car); ok {
+		spl = s
 	}
-	// get macro instance has value of Function interface
+	if spl != nil {
+		ret, err := spl.(instance.Applicable).Apply(local, global, cdr)
+		if err != nil {
+			return nil, err, true
+		}
+		return ret, nil, true
+	}
+	return nil, nil, false
+}
+
+func evalMacro(local, global *environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
+	// get special instance has value of Function interface
 	var mac ilos.Instance
 	if m, ok := local.Macro.Get(car); ok {
 		mac = m
@@ -105,20 +87,23 @@ func evalFunction(local, global *environment.Environment, obj ilos.Instance) (il
 	}
 	if mac != nil {
 		env := environment.New()
-		env.BlockTag = append(local.BlockTag, env.BlockTag...)
-		env.TagbodyTag = append(local.TagbodyTag, env.TagbodyTag...)
-		env.CatchTag = append(local.CatchTag, env.CatchTag...)
-		env.Variable = append(local.Variable, env.Variable...)
-		env.Function = append(local.Function, env.Function...)
-		env.Macro = append(local.Macro, env.Macro...)
 		env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
+		env.CatchTag = append(local.DynamicVariable, env.CatchTag...)
 		ret, err := mac.(instance.Applicable).Apply(env, global, cdr)
 		if err != nil {
-			return nil, err
+			return nil, err, true
 		}
-		return ret, nil
+		ret, err = Eval(local, global, ret)
+		if err != nil {
+			return nil, err, true
+		}
+		return ret, nil, true
 	}
-	// get function instance has value of Function interface
+	return nil, nil, false
+}
+
+func evalFunction(local, global *environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
+	// get special instance has value of Function interface
 	var fun ilos.Instance
 	if f, ok := local.Function.Get(car); ok {
 		fun = f
@@ -127,19 +112,50 @@ func evalFunction(local, global *environment.Environment, obj ilos.Instance) (il
 		fun = f
 	}
 	if fun != nil {
+		env := environment.New()
+		env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
+		env.CatchTag = append(local.DynamicVariable, env.CatchTag...)
 		arguments, err := evalArguments(local, global, cdr)
 		if err != nil {
-			return nil, err
+			return nil, err, true
 		}
-		env := environment.New()
-		env.CatchTag = append(local.CatchTag, env.CatchTag...)
-		env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
 		ret, err := fun.(instance.Applicable).Apply(env, global, arguments)
 		if err != nil {
-			return nil, err
+			return nil, err, true
 		}
-		return ret, nil
+		return ret, nil, true
 	}
+	return nil, nil, false
+}
+
+func evalCons(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+	// obj, function call form, must be a instance of Cons, NOT Null, and ends with nil
+	if !instance.Of(class.Cons, obj) || !UnsafeEndOfListIsNil(obj) {
+		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
+			"STRING":         obj,
+			"EXPECTED-CLASS": class.Cons,
+		})
+	}
+	car := instance.UnsafeCar(obj) // Checked at the top of this function
+	cdr := instance.UnsafeCdr(obj) // Checked at the top of this function
+
+	// eval if lambda form
+	if a, b, c := evalLambda(local, global, car, cdr); c {
+		return a, b
+	}
+	// get special instance has value of Function interface
+	if a, b, c := evalSpecial(local, global, car, cdr); c {
+		return a, b
+	}
+	// get macro instance has value of Function interface
+	if a, b, c := evalMacro(local, global, car, cdr); c {
+		return a, b
+	}
+	// get function instance has value of Function interface
+	if a, b, c := evalFunction(local, global, car, cdr); c {
+		return a, b
+	}
+
 	return nil, instance.New(class.UndefinedFunction, map[string]ilos.Instance{
 		"NAME":      car,
 		"NAMESPACE": instance.New(class.Symbol, "FUNCTION"),
@@ -172,7 +188,7 @@ func Eval(local, global *environment.Environment, obj ilos.Instance) (ilos.Insta
 		return ret, nil
 	}
 	if instance.Of(class.Cons, obj) {
-		ret, err := evalFunction(local, global, obj)
+		ret, err := evalCons(local, global, obj)
 		if err != nil {
 			return nil, err
 		}
