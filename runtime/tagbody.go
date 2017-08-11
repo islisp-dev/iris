@@ -50,7 +50,7 @@ func tagbody(local, global *environment.Environment, body ...ilos.Instance) (ilo
 			}
 		}
 	}
-	return instance.New(class.Null), nil
+	return Nil, nil
 }
 
 func tagbodyGo(local, global *environment.Environment, tag ilos.Instance) (ilos.Instance, ilos.Instance) {

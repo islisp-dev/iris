@@ -22,7 +22,7 @@ func TestEval(t *testing.T) {
 	})
 	defglobal("PI", instance.New(class.Float, 3.14))
 	defmacro("MINC", func(local *environment.Environment, global *environment.Environment, arg ilos.Instance) (ilos.Instance, ilos.Instance) {
-		return instance.New(class.Cons, instance.New(class.Symbol, "INC"), instance.New(class.Cons, arg, instance.New(class.Null))), nil
+		return instance.New(class.Cons, instance.New(class.Symbol, "INC"), instance.New(class.Cons, arg, Nil)), nil
 	})
 	type arguments struct {
 		obj    ilos.Instance

@@ -22,7 +22,7 @@ func catch(local, global *environment.Environment, tag ilos.Instance, body ...il
 	}
 	local.CatchTag.Define(tag, nil)
 	var fail ilos.Instance
-	sucess := instance.New(class.Null)
+	sucess := Nil
 	for _, cadr := range body {
 		sucess, fail = Eval(local, global, cadr)
 		if fail != nil {

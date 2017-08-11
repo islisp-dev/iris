@@ -10,8 +10,6 @@ import (
 
 	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/class"
-	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
 func TestTagbody(t *testing.T) {
@@ -35,13 +33,13 @@ func TestTagbody(t *testing.T) {
 		{
 			name:      "tagbody & go",
 			arguments: arguments{local, global, readFromString("(catch 'foo (tagbody (go bar) (throw 'foo 1) bar))")},
-			want:      instance.New(class.Null),
+			want:      Nil,
 			wantErr:   false,
 		},
 		{
 			name:      "nested tagbody & go",
 			arguments: arguments{local, global, readFromString("(catch 'foo (tagbody (tagbody (go bar) (throw 'foo 1) bar (go foobar)) foobar))")},
-			want:      instance.New(class.Null),
+			want:      Nil,
 			wantErr:   false,
 		},
 	}
