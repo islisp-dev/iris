@@ -71,7 +71,16 @@ func evalSpecial(local, global *environment.Environment, car, cdr ilos.Instance)
 		spl = s
 	}
 	if spl != nil {
-		ret, err := spl.(instance.Applicable).Apply(local, global, cdr)
+		env := environment.New()
+		env.BlockTag = append(local.BlockTag, env.BlockTag...)
+		env.TagbodyTag = append(local.TagbodyTag, env.TagbodyTag...)
+		env.CatchTag = append(local.CatchTag, env.CatchTag...)
+		env.Variable = append(local.Variable, env.Variable...)
+		env.Function = append(local.Function, env.Function...)
+		env.Special = append(local.Special, env.Special...)
+		env.Macro = append(local.Macro, env.Macro...)
+		env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
+		ret, err := spl.(instance.Applicable).Apply(env, global, cdr)
 		if err != nil {
 			return nil, err, true
 		}
