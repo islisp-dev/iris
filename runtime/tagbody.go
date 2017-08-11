@@ -1,13 +1,13 @@
 package runtime
 
 import (
-	env "github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func tagbody(local, global *env.Environment, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func tagbody(local, global *environment.Environment, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	for idx, cadr := range body {
 		cddr := instance.New(class.GeneralVector, body[idx+1:])
 		if !instance.Of(class.Cons, cadr) {
@@ -49,7 +49,7 @@ func tagbody(local, global *env.Environment, body ...ilos.Instance) (ilos.Instan
 	return instance.New(class.Null), nil
 }
 
-func tagbodyGo(local, global *env.Environment, tag ilos.Instance) (ilos.Instance, ilos.Instance) {
+func tagbodyGo(local, global *environment.Environment, tag ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if _, ok := local.TagbodyTag.Get(tag); !ok {
 		return nil, instance.New(class.SimpleError, map[string]ilos.Instance{
 			"FORMAT-STRING":    instance.New(class.String, "%v is not defined as the tag"),

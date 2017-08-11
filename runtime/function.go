@@ -1,13 +1,13 @@
 package runtime
 
 import (
-	env "github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func function(local, global *env.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
+func function(local, global *environment.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// car must be a symbol
 	if !instance.Of(class.Symbol, fun) {
 		return nil, instance.New(class.DomainError, map[string]ilos.Instance{

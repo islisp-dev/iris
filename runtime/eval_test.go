@@ -4,56 +4,56 @@ import (
 	"reflect"
 	"testing"
 
-	env "github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
 func TestEval(t *testing.T) {
-	local := env.New()
-	global := env.TopLevel
-	defun("INC", func(local, global *env.Environment, arg ilos.Instance) (ilos.Instance, ilos.Instance) {
+	local := environment.New()
+	global := environment.TopLevel
+	defun("INC", func(local, global *environment.Environment, arg ilos.Instance) (ilos.Instance, ilos.Instance) {
 		return instance.New(class.Integer, int(arg.(instance.Integer))+1), nil
 	})
 	defglobal("PI", instance.New(class.Float, 3.14))
-	defmacro("MINC", func(local *env.Environment, global *env.Environment, arg ilos.Instance) (ilos.Instance, ilos.Instance) {
+	defmacro("MINC", func(local *environment.Environment, global *environment.Environment, arg ilos.Instance) (ilos.Instance, ilos.Instance) {
 		ret, err := Eval(local, global, instance.New(class.Cons, instance.New(class.Symbol, "INC"), instance.New(class.Cons, arg, instance.New(class.Null))))
 		return ret, err
 	})
-	type args struct {
+	type arguments struct {
 		obj    ilos.Instance
-		local  *env.Environment
-		global *env.Environment
+		local  *environment.Environment
+		global *environment.Environment
 	}
 	tests := []struct {
 		name    string
-		args    args
+		arguments    arguments
 		want    ilos.Instance
 		wantErr bool
 	}{
 		{
 			name:    "local variable",
-			args:    args{instance.New(class.Symbol, "PI"), local, global},
+			arguments:    arguments{instance.New(class.Symbol, "PI"), local, global},
 			want:    instance.New(class.Float, 3.14),
 			wantErr: false,
 		},
 		{
 			name:    "local function",
-			args:    args{readFromString("(inc (inc 1))"), local, global},
+			arguments:    arguments{readFromString("(inc (inc 1))"), local, global},
 			want:    instance.New(class.Integer, 3),
 			wantErr: false,
 		},
 		{
 			name:    "local macro",
-			args:    args{readFromString("(minc (minc 1))"), local, global},
+			arguments:    arguments{readFromString("(minc (minc 1))"), local, global},
 			want:    instance.New(class.Integer, 3),
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := Eval(tt.args.local, tt.args.global, tt.args.obj)
+			got, err := Eval(tt.arguments.local, tt.arguments.global, tt.arguments.obj)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Eval() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -1,7 +1,7 @@
 package runtime
 
 import (
-	env "github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
@@ -15,7 +15,7 @@ import (
 // The extend of name is dynamic. (islisp-v23.pdf, 43-44)
 // NOTE:
 // According to this, the scope of name is dynamic. I guess it should be a static.
-func block(local, global *env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func block(local, global *environment.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	tag, err = Eval(local, global, tag) // Checked at the top of this function
 	if err != nil {
@@ -45,7 +45,7 @@ func block(local, global *env.Environment, tag ilos.Instance, body ...ilos.Insta
 	return sucess, nil
 }
 
-func return_from(local, global *env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
+func return_from(local, global *environment.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	tag, err = Eval(local, global, tag)
 	if err != nil {
