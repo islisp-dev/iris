@@ -1,48 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Iris</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300italic,700,700italic">
-    <link rel="stylesheet" href="https://cdn.rawgit.com/necolas/normalize.css/master/normalize.css">
-    <link rel="stylesheet" href="https://cdn.rawgit.com/milligram/milligram/master/dist/milligram.min.css">
-    <style>
-    header {
-        background-color: darkorchid;
-        height: 300px;
-    }
-    header h1 {
-        font-size: 36px;
-    }
-    .navbar {
-        background-color: #eee;
-    }
-    .welcome {
-        text-align: center;
-        color: #eee;
-    }
-    </style>
-</head>
-<body>
-    <header>
-        <div class="navbar container">
-            <h1>Iris</h1>
-        </div>
-        <div class="container welcome">
-            <p>
-                Iris is a interpreter of ISLisp on Go/JavaScript.
-            </p>
-        </div>
-    </header>
-    <main>
-
-    </main>
-    <footer>
-        <div class="container">
-            <p>Copyright &copy; 2017 TANIGUCHI Masaya All Rights Reserved.</p>
-        </div>
-    </footer>
-</body>
-</html>
+---
+layout: default
+title: Welcome
+---
+<div id="home">
+  <h1>Blog Posts</h1>
+  <ul class="posts">
+    {% for post in site.posts %}
+      <li><span>{{ post.date | date_to_string }}</span> &raquo; <a href="{{ post.url }}">{{ post.title }}</a></li>
+    {% endfor %}
+  </ul>
+</div>

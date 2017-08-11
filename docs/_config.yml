@@ -1,0 +1,8 @@
+name: iris
+description: iris is a interpreter of ISLisp on golang
+gems:
+    - jemoji
+    - jekyll-mentions
+    - jekyll-redirect-from
+    - jekyll-sitemap
+    - jekyll-feed
