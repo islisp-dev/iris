@@ -155,7 +155,7 @@ func Test_parseAtom(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := parseAtom(tt.arguments.tok)
+			got, err := ParseAtom(tt.arguments.tok)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("parseAtom() error = %v, wantErr %v", err, tt.wantErr)
 				return
