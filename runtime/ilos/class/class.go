@@ -69,7 +69,6 @@ var StandardObject = &builtinclass{[]ilos.Class{Object}, []string{}, "<STANDARD-
 var Stream = &builtinclass{[]ilos.Class{Object}, []string{"STREAM"}, "<STREAM>"}
 
 // Implementation defined
-var WrongNumberOfArguments = &builtinclass{[]ilos.Class{Error}, []string{"FORM", "ARGUMENTS"}, "<WRONG-NUMBER-OF-ARGUMENTS>"}
 var Escape = &builtinclass{[]ilos.Class{Object}, []string{"TAG"}, "<ESCAPE>"}
 var CatchTag = &builtinclass{[]ilos.Class{Escape}, []string{"OBJECT"}, "<THROW>"}
 var TagbodyTag = &builtinclass{[]ilos.Class{Escape}, []string{}, "<TAGBODY-TAG>"}

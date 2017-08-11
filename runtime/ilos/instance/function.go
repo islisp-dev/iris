@@ -50,10 +50,7 @@ func (f Function) Apply(local, global *environment.Environment, arguments ilos.I
 		cdr = cddr
 	}
 	if ft.NumIn() != len(argv) && (!ft.IsVariadic() || ft.NumIn()-2 >= len(argv)) {
-		return nil, New(class.WrongNumberOfArguments, map[string]ilos.Instance{
-			"FORM":      f.name,
-			"ARGUMENTS": arguments,
-		})
+		return nil, New(class.ProgramError)
 	}
 	rets := fv.Call(argv)
 	a, _ := rets[0].Interface().(ilos.Instance)
