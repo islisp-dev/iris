@@ -19,7 +19,7 @@ import (
 var eop = instance.New(class.Symbol, "End Of Parentheses")
 var bod = instance.New(class.Symbol, "Begin Of Dot")
 
-func parseAtom(tok string) (ilos.Instance, ilos.Instance) {
+func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	//
 	// integer
 	//
@@ -179,7 +179,7 @@ func Parse(t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instance) {
 		}
 		return m, nil
 	}
-	atom, err := parseAtom(tok)
+	atom, err := ParseAtom(tok)
 	if err != nil {
 		return nil, err
 	}
