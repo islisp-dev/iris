@@ -16,11 +16,9 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-// IsProperList tests given argument is proper list
-// Proper list is the list terminated by nil.
-func IsProperList(i ilos.Instance) bool {
+func isProperList(i ilos.Instance) bool {
 	if instance.Of(class.Cons, i) {
-		return IsProperList(instance.UnsafeCdr(i))
+		return isProperList(instance.UnsafeCdr(i))
 	}
 	if instance.Of(class.Null, i) {
 		return true

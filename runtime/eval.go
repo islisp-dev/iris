@@ -14,10 +14,10 @@ import (
 func evalArguments(local, global *environment.Environment, arguments ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// if arguments ends here
 	if instance.Of(class.Null, arguments) {
-		return instance.New(class.Null), nil
+		return Nil, nil
 	}
 	// arguments must be a instance of list and ends with nil
-	if !IsProperList(arguments) {
+	if !isProperList(arguments) {
 		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
 			"STRING":         arguments,
 			"EXPECTED-CLASS": class.List,
@@ -143,7 +143,7 @@ func evalFunction(local, global *environment.Environment, car, cdr ilos.Instance
 
 func evalCons(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// obj, function call form, must be a instance of Cons, NOT Null, and ends with nil
-	if !IsProperList(obj) || instance.Of(class.Null, obj) {
+	if !isProperList(obj) || instance.Of(class.Null, obj) {
 		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
 			"STRING":         obj,
 			"EXPECTED-CLASS": class.Cons,
@@ -191,7 +191,7 @@ func evalVariable(local, global *environment.Environment, obj ilos.Instance) (il
 // Eval evaluates any classs
 func Eval(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if instance.Of(class.Null, obj) {
-		return instance.New(class.Null), nil
+		return Nil, nil
 	}
 	if instance.Of(class.Symbol, obj) {
 		ret, err := evalVariable(local, global, obj)
