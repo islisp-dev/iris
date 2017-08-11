@@ -54,8 +54,8 @@ func (i *Cons) String() string {
 	str := "(" + fmt.Sprint(i.car)
 	cdr := i.cdr
 	for Of(class.Cons, cdr) {
-		str += fmt.Sprintf(" %v", UnsafeCar(cdr))
-		cdr = UnsafeCdr(cdr)
+		str += fmt.Sprintf(" %v", UnsafeCar(cdr)) // Checked at the top of this loop
+		cdr = UnsafeCdr(cdr)                      // Checked at the top of this loop
 	}
 	if Of(class.Null, cdr) {
 		str += ")"
