@@ -38,10 +38,7 @@ func newNamedFunction(local, global *environment.Environment, functionName, lamb
 			for i := len(arguments) - 1; i >= 0; i-- {
 				v = instance.New(class.Cons, arguments[i], v)
 			}
-			return nil, instance.New(class.WrongNumberOfArguments, map[string]ilos.Instance{
-				"FORM":      functionName,
-				"ARGUMENTS": v,
-			})
+			return nil, instance.New(class.ProgramError)
 		}
 		for idx := range parameters {
 			key := parameters[idx]
