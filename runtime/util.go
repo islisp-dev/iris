@@ -18,7 +18,7 @@ import (
 
 func isProperList(i ilos.Instance) bool {
 	if instance.Of(class.Cons, i) {
-		return isProperList(instance.UnsafeCdr(i))
+		return isProperList(instance.UnsafeCdr(i)) // Checked at the top of this statements
 	}
 	if i == Nil {
 		return true

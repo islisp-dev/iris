@@ -134,22 +134,31 @@ func Lambda(local, global *environment.Environment, lambdaList ilos.Instance, fo
 func Labels(local, global *environment.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	cdr := functions
 	for instance.Of(class.Cons, cdr) {
-		cadr := instance.UnsafeCar(cdr)
-		functionName := instance.UnsafeCar(cadr)
-		lambdaList := instance.UnsafeCar(instance.UnsafeCdr(cadr))
+		cadr := instance.UnsafeCar(cdr)     // Checked at the top of this loop
+		if !instance.Of(class.Cons, cadr) { // #1
+			return nil, instance.New(class.ProgramError)
+		}
+		functionName := instance.UnsafeCar(cadr) // Checked at #1
+		cdadr := instance.UnsafeCdr(cadr)
+		if !instance.Of(class.Cons, cdadr) { // #2
+			return nil, instance.New(class.ProgramError)
+		}
+		lambdaList := instance.UnsafeCar(cdadr) // Checked at #2
 		if err := checkLambdaList(lambdaList); err != nil {
 			return nil, err
 		}
-
-		cddadr := instance.UnsafeCdr(instance.UnsafeCdr(cadr))
+		cddadr := instance.UnsafeCdr(cdadr) // Checked at #2
+		if !isProperList(cddadr) {
+			return nil, instance.New(class.ProgramError)
+		}
 		form := []ilos.Instance{}
 		for instance.Of(class.Cons, cddadr) {
-			caddadr := instance.UnsafeCar(cddadr)
+			caddadr := instance.UnsafeCar(cddadr) // Checked at the top of this loop
 			form = append(form, caddadr)
-			cddadr = instance.UnsafeCdr(cddadr)
+			cddadr = instance.UnsafeCdr(cddadr) // Checked at the top of this loop
 		}
 		local.Function.Define(functionName, newNamedFunction(local, global, functionName, lambdaList, form...))
-		cdr = instance.UnsafeCdr(cdr)
+		cdr = instance.UnsafeCdr(cdr) // Checked at #1
 	}
 	ret := Nil
 	var err ilos.Instance
@@ -176,22 +185,31 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 	env.Macro = append(local.Macro, env.Macro...)
 	env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
 	for instance.Of(class.Cons, cdr) {
-		cadr := instance.UnsafeCar(cdr)
-		functionName := instance.UnsafeCar(cadr)
-		lambdaList := instance.UnsafeCar(instance.UnsafeCdr(cadr))
+		cadr := instance.UnsafeCar(cdr)     // Checked at the top of this loop
+		if !instance.Of(class.Cons, cadr) { // #1
+			return nil, instance.New(class.ProgramError)
+		}
+		functionName := instance.UnsafeCar(cadr) // Checked at #1
+		cdadr := instance.UnsafeCdr(cadr)
+		if !instance.Of(class.Cons, cdadr) { // #2
+			return nil, instance.New(class.ProgramError)
+		}
+		lambdaList := instance.UnsafeCar(cdadr) // Checked at #2
 		if err := checkLambdaList(lambdaList); err != nil {
 			return nil, err
 		}
-
-		cddadr := instance.UnsafeCdr(instance.UnsafeCdr(cadr))
+		cddadr := instance.UnsafeCdr(cdadr) // Checked at #2
+		if !isProperList(cddadr) {
+			return nil, instance.New(class.ProgramError)
+		}
 		form := []ilos.Instance{}
 		for instance.Of(class.Cons, cddadr) {
-			caddadr := instance.UnsafeCar(cddadr)
+			caddadr := instance.UnsafeCar(cddadr) // Checked at the top of this loop
 			form = append(form, caddadr)
-			cddadr = instance.UnsafeCdr(cddadr)
+			cddadr = instance.UnsafeCdr(cddadr) // Checked at the top of this loop
 		}
 		env.Function.Define(functionName, newNamedFunction(local, global, functionName, lambdaList, form...))
-		cdr = instance.UnsafeCdr(cdr)
+		cdr = instance.UnsafeCdr(cdr) // Checked at #1
 	}
 	ret := Nil
 	var err ilos.Instance

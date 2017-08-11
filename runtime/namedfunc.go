@@ -17,12 +17,12 @@ func newNamedFunction(local, global *environment.Environment, functionName, lamb
 	parameters := []ilos.Instance{}
 	variadic := false
 	for instance.Of(class.Cons, cdr) {
-		cadr := instance.UnsafeCar(cdr)
+		cadr := instance.UnsafeCar(cdr) // Checked at the top of this loop
 		if cadr == instance.New(class.Symbol, ":REST") || cadr == instance.New(class.Symbol, "&REST") {
 			variadic = true
 		}
 		parameters = append(parameters, cadr)
-		cdr = instance.UnsafeCdr(cdr)
+		cdr = instance.UnsafeCdr(cdr) // Checked at the top of this loop
 	}
 	return instance.New(class.Function, functionName, func(local, global *environment.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 		local.BlockTag = append(lexical.BlockTag, local.BlockTag...)

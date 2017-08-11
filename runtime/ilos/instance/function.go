@@ -44,8 +44,8 @@ func (f Function) Apply(local, global *environment.Environment, arguments ilos.I
 	cdr := arguments
 	argv := []reflect.Value{reflect.ValueOf(local), reflect.ValueOf(global)}
 	for Of(class.Cons, cdr) {
-		cadr := UnsafeCar(cdr)
-		cddr := UnsafeCdr(cdr)
+		cadr := UnsafeCar(cdr) // Checked at the top of this loop
+		cddr := UnsafeCdr(cdr) // Checked at the top of this loop
 		argv = append(argv, reflect.ValueOf(cadr))
 		cdr = cddr
 	}
