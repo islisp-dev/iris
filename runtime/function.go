@@ -14,9 +14,6 @@ import (
 // Functionp returns t if obj is a (normal or generic) function;
 // otherwise, returns nil. obj may be any ISLISP object.
 //
-// Example:
-//   (functionp (function car)) => t
-//
 // Function bindings are entities established during execution of
 // a prepared labels or flet forms or by a function-defining form.
 // A function binding is an association between an identifier, function-name,
@@ -24,9 +21,9 @@ import (
 // position—or by (function function-name) elsewhere.
 func Functionp(local, global *environment.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if instance.Of(class.Function, fun) {
-		return instance.New(class.Symbol, "T"), nil
+		return T, nil
 	}
-	return instance.New(class.Null), nil
+	return Nil, nil
 }
 
 // Function returns the function object named by function-name.
@@ -34,10 +31,6 @@ func Functionp(local, global *environment.Environment, fun ilos.Instance) (ilos.
 // An error shall be signaled if no binding has been established for the identifier
 // in the function namespace of current lexical environment (error-id. undefined-function).
 // The consequences are undefined if the function-name names a macro or special form
-//
-// Example:
-//   (funcall (function -) 3) => -3
-//   (apply #'- '(4 3)) => 1
 func Function(local, global *environment.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// car must be a symbol
 	if !instance.Of(class.Symbol, fun) {
@@ -108,17 +101,11 @@ func checkLambdaList(lambdaList ilos.Instance) ilos.Instance {
 // was called with apply and R corresponds to the final argument, L2 , to that call
 // to apply (or some subtail of L2), in which case it is implementation defined whether
 // L1 shares structure with L2 .
-//
-// Example:
-//   ((lambda (x y) (+ (* x x) (* y y))) 3 4) => 25
-//   ((lambda (x y &rest z) z) 3 4 5 6) => (5 6)
-//   ((lambda (x y :rest z) z) 3 4 5 6) => (5 6)
-//   (funcall (lambda (x y) (- y (* x y))) 7 3) => -18
 func Lambda(local, global *environment.Environment, lambdaList ilos.Instance, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := checkLambdaList(lambdaList); err != nil {
 		return nil, err
 	}
-	return NewNamedFunction(local, global, instance.New(class.Symbol, "ANONYMOUS-FUNCTION"), lambdaList, form...), nil
+	return newNamedFunction(local, global, instance.New(class.Symbol, "ANONYMOUS-FUNCTION"), lambdaList, form...), nil
 }
 
 // Labels special form allow the definition of new identifiers in the function
@@ -144,17 +131,6 @@ func Lambda(local, global *environment.Environment, lambdaList ilos.Instance, fo
 // (or nil if there is none) is the value returned by the special form activation.
 //
 // No function-name may appear more than once in the function bindings.
-//
-// Example:
-//   (labels ((evenp (n)
-//              (if (= n 0)
-//                  t
-//                  (oddp (- n 1))))
-//            (oddp (n)
-//              (if (= n 0)
-//                  nil
-//                  (evenp (- n 1)))))
-//      (evenp 88)) => t
 func Labels(local, global *environment.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	cdr := functions
 	for instance.Of(class.Cons, cdr) {
@@ -172,10 +148,10 @@ func Labels(local, global *environment.Environment, functions ilos.Instance, bod
 			form = append(form, caddadr)
 			cddadr = instance.UnsafeCdr(cddadr)
 		}
-		local.Function.Define(functionName, NewNamedFunction(local, global, functionName, lambdaList, form...))
+		local.Function.Define(functionName, newNamedFunction(local, global, functionName, lambdaList, form...))
 		cdr = instance.UnsafeCdr(cdr)
 	}
-	ret := instance.New(class.Null)
+	ret := Nil
 	var err ilos.Instance
 	for _, form := range bodyForm {
 		ret, err = Eval(local, global, form)
@@ -188,11 +164,6 @@ func Labels(local, global *environment.Environment, functions ilos.Instance, bod
 
 // Flet special form allow the definition of new identifiers in the function
 // namespace for function objects (see Labels).
-//
-// Example:
-//  (flet ((f (x) (+ x 3)))
-//    (flet ((f (x) (+ x (f x))))
-//      (f 7))) => 17
 func Flet(local, global *environment.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	cdr := functions
 	env := environment.New()
@@ -219,10 +190,10 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 			form = append(form, caddadr)
 			cddadr = instance.UnsafeCdr(cddadr)
 		}
-		env.Function.Define(functionName, NewNamedFunction(local, global, functionName, lambdaList, form...))
+		env.Function.Define(functionName, newNamedFunction(local, global, functionName, lambdaList, form...))
 		cdr = instance.UnsafeCdr(cdr)
 	}
-	ret := instance.New(class.Null)
+	ret := Nil
 	var err ilos.Instance
 	for _, form := range bodyForm {
 		ret, err = Eval(env, global, form)
@@ -239,18 +210,11 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 // An error shall be signaled if function is not a function (error-id. domain-error).
 // Each obj may be any ISLISP object. An error shall be signaled
 // if list is not a proper list (error-id. improper-argument-list).
-//
-// Example:
-//   (apply (if (< 1 2) (function max) (function min)) 1 2 (list 3 4)) => 4
-//   (defun compose (f g)
-//     (lambda (:rest args)
-//     (funcall f (apply g args))))) => compose
-//   (funcall (compose (function sqrt) (function *)) 12 75) => 30
 func Apply(local, global *environment.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	list := instance.New(class.Null)
+	list := Nil
 	if instance.Of(class.List, obj[len(obj)-1]) {
 		list = obj[len(obj)-1]
-		if !IsProperList(list) {
+		if !isProperList(list) {
 			return nil, instance.New(class.ProgramError)
 		}
 		obj = obj[:len(obj)-1]
@@ -273,11 +237,6 @@ func Apply(local, global *environment.Environment, function ilos.Instance, obj .
 //
 // An error shall be signaled if function is not a function (error-id. domain-error).
 // Each obj may be any ISLISP object.
-//
-// Example:
-//   (let ((x '(1 2 3)))
-//     (funcall (cond ((listp x) (function car))
-//                    (t (lambda (x) (cons x 1)))) x)) => 1
 func Funcall(local, global *environment.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	ret, err := Apply(local, global, function, obj...)
 	return ret, err
