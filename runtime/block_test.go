@@ -43,7 +43,7 @@ func TestBlock(t *testing.T) {
 		{
 			name:      "case3",
 			arguments: arguments{local, global, readFromString("(block 'foo)")},
-			want:      readFromString("nil"),
+			want:      Nil,
 			wantErr:   false,
 		},
 	}

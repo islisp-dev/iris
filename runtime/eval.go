@@ -13,7 +13,7 @@ import (
 
 func evalArguments(local, global *environment.Environment, arguments ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// if arguments ends here
-	if instance.Of(class.Null, arguments) {
+	if arguments == Nil {
 		return Nil, nil
 	}
 	// arguments must be a instance of list and ends with nil
@@ -143,7 +143,7 @@ func evalFunction(local, global *environment.Environment, car, cdr ilos.Instance
 
 func evalCons(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// obj, function call form, must be a instance of Cons, NOT Null, and ends with nil
-	if !isProperList(obj) || instance.Of(class.Null, obj) {
+	if !isProperList(obj) || obj == Nil {
 		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
 			"STRING":         obj,
 			"EXPECTED-CLASS": class.Cons,
@@ -190,7 +190,7 @@ func evalVariable(local, global *environment.Environment, obj ilos.Instance) (il
 
 // Eval evaluates any classs
 func Eval(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if instance.Of(class.Null, obj) {
+	if obj == Nil {
 		return Nil, nil
 	}
 	if instance.Of(class.Symbol, obj) {

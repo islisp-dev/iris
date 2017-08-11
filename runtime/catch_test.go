@@ -43,7 +43,7 @@ func TestCatch(t *testing.T) {
 		{
 			name:      "case3",
 			arguments: arguments{local, global, readFromString("(catch 'foo)")},
-			want:      readFromString("nil"),
+			want:      Nil,
 			wantErr:   false,
 		},
 	}

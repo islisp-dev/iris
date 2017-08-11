@@ -68,7 +68,7 @@ func checkLambdaList(lambdaList ilos.Instance) ilos.Instance {
 		}
 		cdr = cddr
 	}
-	if !ok && instance.Of(class.Null, cdr) {
+	if !ok && cdr == Nil {
 		ok = true
 	}
 	if !ok {
