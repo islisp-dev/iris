@@ -49,7 +49,7 @@ func (f Function) Apply(local, global *environment.Environment, arguments ilos.I
 		argv = append(argv, reflect.ValueOf(cadr))
 		cdr = cddr
 	}
-	if ft.NumIn() != len(argv) && (!ft.IsVariadic() || ft.NumIn()-2 > len(argv)) {
+	if ft.NumIn() != len(argv) && (!ft.IsVariadic() || ft.NumIn()-2 >= len(argv)) {
 		return nil, New(class.WrongNumberOfArguments, map[string]ilos.Instance{
 			"FORM":      f.name,
 			"ARGUMENTS": arguments,

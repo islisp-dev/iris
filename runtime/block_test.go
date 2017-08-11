@@ -29,9 +29,21 @@ func TestBlock(t *testing.T) {
 		wantErr   bool
 	}{
 		{
-			name:      "block & return-from",
+			name:      "case1",
 			arguments: arguments{local, global, readFromString("(block 'foo 1 (return-from 'foo 1))")},
 			want:      readFromString("1"),
+			wantErr:   false,
+		},
+		{
+			name:      "case2",
+			arguments: arguments{local, global, readFromString("(block)")},
+			want:      nil,
+			wantErr:   true,
+		},
+		{
+			name:      "case3",
+			arguments: arguments{local, global, readFromString("(block 'foo)")},
+			want:      readFromString("nil"),
 			wantErr:   false,
 		},
 	}

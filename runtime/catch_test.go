@@ -29,9 +29,21 @@ func TestCatch(t *testing.T) {
 		wantErr   bool
 	}{
 		{
-			name:      "catch & throw",
+			name:      "case1",
 			arguments: arguments{local, global, readFromString("(catch 'foo 1 (throw 'foo 1))")},
 			want:      readFromString("1"),
+			wantErr:   false,
+		},
+		{
+			name:      "case2",
+			arguments: arguments{local, global, readFromString("(catch)")},
+			want:      nil,
+			wantErr:   true,
+		},
+		{
+			name:      "case3",
+			arguments: arguments{local, global, readFromString("(catch 'foo)")},
+			want:      readFromString("nil"),
 			wantErr:   false,
 		},
 	}
