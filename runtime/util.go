@@ -20,7 +20,7 @@ func isProperList(i ilos.Instance) bool {
 	if instance.Of(class.Cons, i) {
 		return isProperList(instance.UnsafeCdr(i))
 	}
-	if instance.Of(class.Null, i) {
+	if i == Nil {
 		return true
 	}
 	return false
