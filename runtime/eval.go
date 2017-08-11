@@ -1,3 +1,7 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 package runtime
 
 import (
@@ -36,7 +40,7 @@ func evalArguments(local, global *environment.Environment, arguments ilos.Instan
 func evalLambda(local, global *environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// eval if lambda form
 	if instance.Of(class.Cons, car) {
-		caar := instance.UnsafeCar(car) // Checked at the top of this sentence
+		caar := instance.UnsafeCar(car) // Checked at the top of// This sentence
 		if caar == instance.New(class.Symbol, "LAMBDA") {
 			fun, err := Eval(local, global, car)
 			if err != nil {
@@ -136,8 +140,8 @@ func evalCons(local, global *environment.Environment, obj ilos.Instance) (ilos.I
 			"EXPECTED-CLASS": class.Cons,
 		})
 	}
-	car := instance.UnsafeCar(obj) // Checked at the top of this function
-	cdr := instance.UnsafeCdr(obj) // Checked at the top of this function
+	car := instance.UnsafeCar(obj) // Checked at the top of// This function
+	cdr := instance.UnsafeCdr(obj) // Checked at the top of// This function
 
 	// eval if lambda form
 	if a, b, c := evalLambda(local, global, car, cdr); c {

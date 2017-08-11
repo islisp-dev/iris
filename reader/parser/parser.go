@@ -1,3 +1,7 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 package parser
 
 import (
@@ -6,11 +10,10 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/instance"
-
 	"github.com/ta2gch/iris/reader/tokenizer"
+	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
+	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
 var eop = instance.New(class.Symbol, "End Of Parentheses")
