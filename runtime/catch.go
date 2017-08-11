@@ -1,3 +1,7 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 package runtime
 
 import (
@@ -22,9 +26,9 @@ func catch(local, global *environment.Environment, tag ilos.Instance, body ...il
 		sucess, fail = Eval(local, global, cadr)
 		if fail != nil {
 			if instance.Of(class.CatchTag, fail) {
-				tag1, _ := fail.GetSlotValue(instance.New(class.Symbol, "TAG"), class.Escape) // Checked at the head of this condition
+				tag1, _ := fail.GetSlotValue(instance.New(class.Symbol, "TAG"), class.Escape) // Checked at the head of// This condition
 				if tag == tag1 {
-					obj, _ := fail.GetSlotValue(instance.New(class.Symbol, "OBJECT"), class.CatchTag) // Checked at the head of this condition
+					obj, _ := fail.GetSlotValue(instance.New(class.Symbol, "OBJECT"), class.CatchTag) // Checked at the head of// This condition
 					return obj, nil
 				}
 			}

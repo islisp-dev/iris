@@ -1,3 +1,7 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 package tokenizer
 
 import (
@@ -45,7 +49,7 @@ func (t *Tokenizer) Next() (string, ilos.Instance) {
 	if t.sc.Scan() {
 		return t.sc.Text(), nil
 	}
-	return "", instance.New(class.ParseError,instance.New(class.String,t.sc.Text()), class.Object)
+	return "", instance.New(class.ParseError, instance.New(class.String, t.sc.Text()), class.Object)
 }
 
 func splitter(data []byte, atEOF bool) (advance int, token []byte, err error) {

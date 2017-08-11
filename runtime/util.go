@@ -1,3 +1,7 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
 package runtime
 
 import (
@@ -18,7 +22,7 @@ import (
 func UnsafeEndOfListIsNil(i ilos.Instance) bool {
 	cdr := i
 	for instance.Of(class.Cons, cdr) {
-		cdr = instance.UnsafeCdr(cdr) // Checked at the top of this loop
+		cdr = instance.UnsafeCdr(cdr) // Checked at the top of// This loop
 	}
 	if instance.Of(class.Null, cdr) {
 		return true
@@ -33,7 +37,7 @@ func UnsafeListLength(i ilos.Instance) int {
 	cdr := i
 	cnt := 0
 	for instance.Of(class.Cons, cdr) {
-		cdr = instance.UnsafeCdr(cdr) // Checked at the top of this loop
+		cdr = instance.UnsafeCdr(cdr) // Checked at the top of// This loop
 		cnt++
 	}
 	return cnt
