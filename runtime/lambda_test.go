@@ -25,16 +25,34 @@ func TestLambda(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name:    "lambda form",
+			name:    "case1",
 			args:    args{local, global, readFromString("((lambda (x)) 1)")},
 			want:    instance.New(class.Null),
 			wantErr: false,
 		},
 		{
-			name:    "lambda form",
+			name:    "case2",
 			args:    args{local, global, readFromString("((lambda (:rest xs) xs) 1 2)")},
 			want:    readFromString("(1 2)"),
 			wantErr: false,
+		},
+		{
+			name:    "case3",
+			args:    args{local, global, readFromString("((lambda (:rest xs) xs))")},
+			want:    readFromString("nil"),
+			wantErr: false,
+		},
+		{
+			name:    "case4",
+			args:    args{local, global, readFromString("((lambda (x) x) 1 2)")},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:    "case5",
+			args:    args{local, global, readFromString("((lambda (x :rest xs) x))")},
+			want:    nil,
+			wantErr: true,
 		},
 	}
 	for _, tt := range tests {
