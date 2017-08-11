@@ -13,28 +13,28 @@ type Applicable interface {
 	Apply(*environment.Environment, *environment.Environment, ilos.Instance) (ilos.Instance, ilos.Instance)
 }
 
-type NativeFunction struct {
+type Function struct {
 	name     Symbol
 	function interface{}
 }
 
-func (NativeFunction) Class() ilos.Class {
+func (Function) Class() ilos.Class {
 	return class.Function
 }
 
-func (NativeFunction) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
+func (Function) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
 	return nil, false
 }
 
-func (NativeFunction) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
+func (Function) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
 	return false
 }
 
-func (f NativeFunction) String() string {
+func (f Function) String() string {
 	return fmt.Sprintf("#%v", f.Class())
 }
 
-func (f NativeFunction) Apply(local, global *environment.Environment, args ilos.Instance) (ilos.Instance, ilos.Instance) {
+func (f Function) Apply(local, global *environment.Environment, args ilos.Instance) (ilos.Instance, ilos.Instance) {
 	fv := reflect.ValueOf(f.function)
 	ft := reflect.TypeOf(f.function)
 	cdr := args
@@ -56,52 +56,4 @@ func (f NativeFunction) Apply(local, global *environment.Environment, args ilos.
 	b, _ := rets[1].Interface().(ilos.Instance)
 	return a, b
 
-}
-
-type Function struct {
-	name       Symbol
-	lambdaList ilos.Instance
-	function   interface{}
-}
-
-func (Function) Class() ilos.Class {
-	return class.Function
-}
-
-func (Function) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
-	return nil, false
-}
-
-func (Function) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
-	return false
-}
-
-func (f Function) String() string {
-	return fmt.Sprintf("#%v", f.Class())
-}
-
-func (f Function) Apply(local, global *environment.Environment, args ilos.Instance) (ilos.Instance, ilos.Instance) {
-	a := args
-	b := f.lambdaList
-	for Of(class.Cons, a) && Of(class.Cons, b) {
-		car := UnsafeCar(b)
-		if car == New(class.Symbol, ":REST") || car == New(class.Symbol, "&REST") {
-			c, d := f.function.(func(*environment.Environment, *environment.Environment, ilos.Instance) (ilos.Instance, ilos.Instance))(local, global, args)
-			return c, d
-		}
-		a = UnsafeCdr(a)
-		b = UnsafeCdr(b)
-	}
-	if Of(class.Cons, a) && (UnsafeCar(a) == New(class.Symbol, ":REST") || UnsafeCar(a) == New(class.Symbol, "&REST")) {
-		c, d := f.function.(func(*environment.Environment, *environment.Environment, ilos.Instance) (ilos.Instance, ilos.Instance))(local, global, args)
-		return c, d
-	}
-	if Of(class.Null, a) && Of(class.Null, b) {
-		c, d := f.function.(func(*environment.Environment, *environment.Environment, ilos.Instance) (ilos.Instance, ilos.Instance))(local, global, args)
-		return c, d
-	}
-	return nil, New(class.WrongNumberOfArguments, map[string]ilos.Instance{
-		"FORM":      New(class.Symbol, f.name),
-		"ARGUMENTS": args,
-	})
 }

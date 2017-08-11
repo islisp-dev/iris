@@ -16,7 +16,19 @@ func lambda(local, global *env.Environment, lambdaList ilos.Instance, forms ...i
 		})
 	}
 	lexical := local
-	return instance.New(class.Function, instance.New(class.Symbol, "ANONYMOUS-FUNCTION"), lambdaList, func(local, global *env.Environment, args ilos.Instance) (ilos.Instance, ilos.Instance) {
+	cdr := lambdaList
+	parameters := []ilos.Instance{}
+	variadic := false
+	for instance.Of(class.Cons, cdr) {
+		cadr := instance.UnsafeCar(cdr)
+		if cadr == instance.New(class.Symbol, ":REST") || cadr == instance.New(class.Symbol, "&REST") {
+			variadic = true
+		}
+		parameters = append(parameters, cadr)
+		cdr = instance.UnsafeCdr(cdr)
+	}
+	name := instance.New(class.Symbol, "ANONYMOUS-FUNCTION")
+	return instance.New(class.Function, name, func(local, global *env.Environment, args ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 		local.BlockTag = append(lexical.BlockTag, local.BlockTag...)
 		local.TagbodyTag = append(lexical.TagbodyTag, local.TagbodyTag...)
 		local.CatchTag = append(lexical.CatchTag, local.CatchTag...)
@@ -24,19 +36,29 @@ func lambda(local, global *env.Environment, lambdaList ilos.Instance, forms ...i
 		local.Function = append(lexical.Function, local.Function...)
 		local.Macro = append(lexical.Macro, local.Macro...)
 		local.DynamicVariable = append(lexical.DynamicVariable, local.DynamicVariable...)
-		fargs := lambdaList
-		aargs := args
-		for instance.Of(class.Cons, fargs) && instance.Of(class.Cons, aargs) {
-			key := instance.UnsafeCar(fargs)   // Checked at the top of this loop.
-			value := instance.UnsafeCar(aargs) // Checked at the top of this loop.
+		if (variadic && len(parameters)-2 > len(args)) || (!variadic && len(parameters) != len(args)) {
+			v := instance.New(class.Null)
+			for i := len(args) - 1; i >= 0; i-- {
+				v = instance.New(class.Cons, args[i], v)
+			}
+			return nil, instance.New(class.WrongNumberOfArguments, map[string]ilos.Instance{
+				"FORM":      name,
+				"ARGUMENTS": v,
+			})
+		}
+		for idx := range parameters {
+			key := parameters[idx]
 			if key == instance.New(class.Symbol, ":REST") || key == instance.New(class.Symbol, "&REST") {
-				cadr := instance.UnsafeCar(instance.UnsafeCdr(fargs)) // Checked before type checking secion
-				local.Variable.Define(cadr, aargs)
+				key := parameters[idx+1]
+				value := instance.New(class.Null)
+				for i := len(args) - 1; i >= idx; i-- {
+					value = instance.New(class.Cons, args[i], value)
+				}
+				local.Variable.Define(key, value)
 				break
 			}
+			value := args[idx]
 			local.Variable.Define(key, value)
-			fargs = instance.UnsafeCdr(fargs) // Checked at the top of this loop
-			aargs = instance.UnsafeCdr(aargs) // Checked at the top of this loop
 		}
 		ret := instance.New(class.Null)
 		var err ilos.Instance
