@@ -16,7 +16,7 @@ import (
 
 func TestLambda(t *testing.T) {
 	local, global := environment.New(), environment.TopLevel
-	defspecial("LAMBDA", lambda)
+	defspecial("LAMBDA", Lambda)
 	type arguments struct {
 		local  *environment.Environment
 		global *environment.Environment
