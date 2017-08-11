@@ -7,6 +7,7 @@ type Environment struct {
 	CatchTag        stack
 	Macro           stack
 	Function        stack
+	Special         stack
 	Variable        stack
 	DynamicVariable stack // deep biding
 }
@@ -19,6 +20,7 @@ func New() *Environment {
 	env.CatchTag = newStack()
 	env.Macro = newStack()
 	env.Function = newStack()
+	env.Special = newStack()
 	env.Variable = newStack()
 	env.DynamicVariable = newStack()
 	return env

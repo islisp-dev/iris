@@ -44,10 +44,16 @@ func readFromString(s string) ilos.Instance {
 	return e
 }
 
+func defspecial(name string, macro interface{}) {
+	symbol := instance.New(class.Symbol, name)
+	environment.TopLevel.Special.Define(symbol, instance.New(class.Function, symbol, macro))
+}
+
 func defmacro(name string, macro interface{}) {
 	symbol := instance.New(class.Symbol, name)
 	environment.TopLevel.Macro.Define(symbol, instance.New(class.Function, symbol, macro))
 }
+
 func defun(name string, function interface{}) {
 	symbol := instance.New(class.Symbol, name)
 	environment.TopLevel.Function.Define(symbol, instance.New(class.Function, symbol, function))
