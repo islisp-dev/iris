@@ -34,10 +34,10 @@ func (f Function) String() string {
 	return fmt.Sprintf("#%v", f.Class())
 }
 
-func (f Function) Apply(local, global *environment.Environment, args ilos.Instance) (ilos.Instance, ilos.Instance) {
+func (f Function) Apply(local, global *environment.Environment, arguments ilos.Instance) (ilos.Instance, ilos.Instance) {
 	fv := reflect.ValueOf(f.function)
 	ft := reflect.TypeOf(f.function)
-	cdr := args
+	cdr := arguments
 	argv := []reflect.Value{reflect.ValueOf(local), reflect.ValueOf(global)}
 	for Of(class.Cons, cdr) {
 		cadr := UnsafeCar(cdr)
@@ -48,7 +48,7 @@ func (f Function) Apply(local, global *environment.Environment, args ilos.Instan
 	if ft.NumIn() != len(argv) && (!ft.IsVariadic() || ft.NumIn()-2 > len(argv)) {
 		return nil, New(class.WrongNumberOfArguments, map[string]ilos.Instance{
 			"FORM":      f.name,
-			"ARGUMENTS": args,
+			"ARGUMENTS": arguments,
 		})
 	}
 	rets := fv.Call(argv)

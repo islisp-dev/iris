@@ -1,26 +1,26 @@
 package runtime
 
 import (
-	env "github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func evalArguments(local, global *env.Environment, args ilos.Instance) (ilos.Instance, ilos.Instance) {
-	// if args ends here
-	if instance.Of(class.Null, args) {
+func evalArguments(local, global *environment.Environment, arguments ilos.Instance) (ilos.Instance, ilos.Instance) {
+	// if arguments ends here
+	if instance.Of(class.Null, arguments) {
 		return instance.New(class.Null), nil
 	}
-	// args must be a instance of list and ends with nil
-	if !instance.Of(class.List, args) || !UnsafeEndOfListIsNil(args) {
+	// arguments must be a instance of list and ends with nil
+	if !instance.Of(class.List, arguments) || !UnsafeEndOfListIsNil(arguments) {
 		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
-			"STRING":         args,
+			"STRING":         arguments,
 			"EXPECTED-CLASS": class.List,
 		})
 	}
-	car := instance.UnsafeCar(args) // Checked there
-	cdr := instance.UnsafeCdr(args) // Checked there
+	car := instance.UnsafeCar(arguments) // Checked there
+	cdr := instance.UnsafeCdr(arguments) // Checked there
 	a, err := Eval(local, global, car)
 	if err != nil {
 		return nil, err
@@ -33,7 +33,7 @@ func evalArguments(local, global *env.Environment, args ilos.Instance) (ilos.Ins
 
 }
 
-func evalLambda(local, global *env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func evalLambda(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// obj, function call form, must be a instance of Cons, NOT Null, and ends with nil
 	if !instance.Of(class.Cons, obj) || !UnsafeEndOfListIsNil(obj) {
 		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
@@ -52,21 +52,21 @@ func evalLambda(local, global *env.Environment, obj ilos.Instance) (ilos.Instanc
 		return nil, err
 	}
 
-	args, err := evalArguments(local, global, cdr)
+	arguments, err := evalArguments(local, global, cdr)
 	if err != nil {
 		return nil, err
 	}
-	env := env.New()
+	env := environment.New()
 	env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
 	env.CatchTag = append(local.CatchTag, env.CatchTag...)
-	ret, err := fun.(instance.Applicable).Apply(env, global, args)
+	ret, err := fun.(instance.Applicable).Apply(env, global, arguments)
 	if err != nil {
 		return nil, err
 	}
 	return ret, nil
 }
 
-func evalFunction(local, global *env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func evalFunction(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// obj, function call form, must be a instance of Cons, NOT Null, and ends with nil
 	if !instance.Of(class.Cons, obj) || !UnsafeEndOfListIsNil(obj) {
 		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
@@ -104,7 +104,7 @@ func evalFunction(local, global *env.Environment, obj ilos.Instance) (ilos.Insta
 		mac = m
 	}
 	if mac != nil {
-		env := env.New()
+		env := environment.New()
 		env.BlockTag = append(local.BlockTag, env.BlockTag...)
 		env.TagbodyTag = append(local.TagbodyTag, env.TagbodyTag...)
 		env.CatchTag = append(local.CatchTag, env.CatchTag...)
@@ -127,14 +127,14 @@ func evalFunction(local, global *env.Environment, obj ilos.Instance) (ilos.Insta
 		fun = f
 	}
 	if fun != nil {
-		args, err := evalArguments(local, global, cdr)
+		arguments, err := evalArguments(local, global, cdr)
 		if err != nil {
 			return nil, err
 		}
-		env := env.New()
+		env := environment.New()
 		env.CatchTag = append(local.CatchTag, env.CatchTag...)
 		env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
-		ret, err := fun.(instance.Applicable).Apply(env, global, args)
+		ret, err := fun.(instance.Applicable).Apply(env, global, arguments)
 		if err != nil {
 			return nil, err
 		}
@@ -146,7 +146,7 @@ func evalFunction(local, global *env.Environment, obj ilos.Instance) (ilos.Insta
 	})
 }
 
-func evalVariable(local, global *env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func evalVariable(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if val, ok := local.Variable.Get(obj); ok {
 		return val, nil
 	}
@@ -160,7 +160,7 @@ func evalVariable(local, global *env.Environment, obj ilos.Instance) (ilos.Insta
 }
 
 // Eval evaluates any classs
-func Eval(local, global *env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Eval(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if instance.Of(class.Null, obj) {
 		return instance.New(class.Null), nil
 	}

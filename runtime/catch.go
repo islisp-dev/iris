@@ -1,13 +1,13 @@
 package runtime
 
 import (
-	env "github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func catch(local, global *env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func catch(local, global *environment.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	tag, err = Eval(local, global, tag)
 	if err != nil {
@@ -34,7 +34,7 @@ func catch(local, global *env.Environment, tag ilos.Instance, body ...ilos.Insta
 	return sucess, nil
 }
 
-func throw(local, global *env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
+func throw(local, global *environment.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	tag, err = Eval(local, global, tag)
 	if err != nil {
