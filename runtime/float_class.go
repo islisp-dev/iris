@@ -73,7 +73,7 @@ func Truncate(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, il
 }
 
 // Round returns the integer nearest to x.
-//  If x is exactly halfway between two integers, the even one is chosen.
+// If x is exactly halfway between two integers, the even one is chosen.
 // An error shall be signaled if x is not a number (error-id. domain-error).
 func Round(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	f, _, err := convFloat64(x)
