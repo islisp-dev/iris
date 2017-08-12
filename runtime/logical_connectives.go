@@ -17,3 +17,32 @@ func Not(_, _ *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.
 	}
 	return Nil, nil
 }
+
+// And is the sequential logical “and” (or “∧”). forms are evaluated
+// from left to right until either one of them evaluates to nil or else
+// none are left. If one of them evaluates to nil, then nil is returned
+// from the and; otherwise, the value of the last evaluated form is returned.
+func And(_, _ *environment.Environment, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	for _, f := range form {
+		if f == Nil {
+			return Nil, nil
+		}
+	}
+	if len(form) == 0 {
+		return T, nil
+	}
+	return form[len(form)-1], nil
+}
+
+// Or is the sequential logical "or" (or "∨"). forms are evaluated
+// from left to right until either one of them evaluates to a non-nil value
+// or else none are left. If one of them evaluates to a non-nil value,
+// then this non-nil value is returned, otherwise nil is returned.
+func Or(_, _ *environment.Environment, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	for _, f := range form {
+		if f != Nil {
+			return f, nil
+		}
+	}
+	return Nil, nil
+}
