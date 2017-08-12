@@ -244,7 +244,14 @@ func Quotient(_, _ *environment.Environment, dividend, divisor1 ilos.Instance, d
 			return nil, err
 		}
 		if f == 0.0 {
-			return nil, instance.New(class.DivisionByZero)
+			arguments := Nil
+			for i := len(divisor) - 1; i >= 0; i-- {
+				arguments = instance.New(class.Cons, divisor[i], arguments)
+			}
+			return nil, instance.New(class.DivisionByZero, map[string]ilos.Instance{
+				"OPERATION": instance.New(class.Symbol, "QUOTIENT"),
+				"OPERANDS":  arguments,
+			})
 		}
 		if !flt && !b && int(quotient)%int(f) != 0 {
 			flt = true
