@@ -48,11 +48,15 @@ func newNamedFunction(local, global *environment.Environment, functionName, lamb
 				for i := len(arguments) - 1; i >= idx; i-- {
 					value = instance.New(class.Cons, arguments[i], value)
 				}
-				local.Variable.Define(key, value)
+				if local.Variable.Define(key, value) {
+					return nil, instance.New(class.ProgramError)
+				}
 				break
 			}
 			value := arguments[idx]
-			local.Variable.Define(key, value)
+			if local.Variable.Define(key, value) {
+				return nil, instance.New(class.ProgramError)
+			}
 		}
 		ret := Nil
 		var err ilos.Instance

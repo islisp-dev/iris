@@ -33,6 +33,9 @@ func (s stack) Set(key, value ilos.Instance) bool {
 	return false
 }
 
-func (s stack) Define(key, value ilos.Instance) {
-	s[0][key] = value
+func (s stack) Define(key, value ilos.Instance) bool {
+	if _, ok := s[0][key]; ok {
+		s[0][key] = value
+	}
+	return false
 }

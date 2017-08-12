@@ -157,7 +157,9 @@ func Labels(local, global *environment.Environment, functions ilos.Instance, bod
 			form = append(form, caddadr)
 			cddadr = instance.UnsafeCdr(cddadr) // Checked at the top of this loop
 		}
-		local.Function.Define(functionName, newNamedFunction(local, global, functionName, lambdaList, form...))
+		if local.Function.Define(functionName, newNamedFunction(local, global, functionName, lambdaList, form...)) {
+			return nil, instance.New(class.ProgramError)
+		}
 		cdr = instance.UnsafeCdr(cdr) // Checked at #1
 	}
 	ret := Nil
@@ -208,7 +210,9 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 			form = append(form, caddadr)
 			cddadr = instance.UnsafeCdr(cddadr) // Checked at the top of this loop
 		}
-		env.Function.Define(functionName, newNamedFunction(local, global, functionName, lambdaList, form...))
+		if env.Function.Define(functionName, newNamedFunction(local, global, functionName, lambdaList, form...)) {
+			return nil, instance.New(class.ProgramError)
+		}
 		cdr = instance.UnsafeCdr(cdr) // Checked at #1
 	}
 	ret := Nil

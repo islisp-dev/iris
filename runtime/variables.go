@@ -68,7 +68,9 @@ func Let(local, global *environment.Environment, varForm ilos.Instance, bodyForm
 		cdr = cddr
 	}
 	for v, f := range vfs {
-		local.Variable.Define(v, f)
+		if local.Variable.Define(v, f) {
+			return nil, instance.New(class.ProgramError)
+		}
 	}
 	var err ilos.Instance
 	ret := Nil
@@ -108,7 +110,9 @@ func LetStar(local, global *environment.Environment, varForm ilos.Instance, body
 		if err != nil {
 			return nil, err
 		}
-		local.Variable.Define(v, f)
+		if local.Variable.Define(v, f) {
+			return nil, instance.New(class.ProgramError)
+		}
 		cdr = cddr
 	}
 	var err ilos.Instance
