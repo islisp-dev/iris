@@ -14,20 +14,6 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func convFloat64(x ilos.Instance) (float64, bool, ilos.Instance) {
-	switch {
-	case instance.Of(class.Integer, x):
-		return float64(x.(instance.Integer)), false, nil
-	case instance.Of(class.Float, x):
-		return float64(x.(instance.Float)), true, nil
-	default:
-		return 0.0, false, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         x,
-			"EXPECTED-CLASS": class.Number,
-		})
-	}
-}
-
 // Numberp returns t if obj is a number (instance of class number); otherwise,
 // returns nil. The obj may be any ISLISP object.
 func Numberp(_, _ *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {

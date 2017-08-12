@@ -26,6 +26,20 @@ func isProperList(i ilos.Instance) bool {
 	return false
 }
 
+func convFloat64(x ilos.Instance) (float64, bool, ilos.Instance) {
+	switch {
+	case instance.Of(class.Integer, x):
+		return float64(x.(instance.Integer)), false, nil
+	case instance.Of(class.Float, x):
+		return float64(x.(instance.Float)), true, nil
+	default:
+		return 0.0, false, instance.New(class.DomainError, map[string]ilos.Instance{
+			"OBJECT":         x,
+			"EXPECTED-CLASS": class.Number,
+		})
+	}
+}
+
 func readFromString(s string) ilos.Instance {
 	e, _ := parser.Parse(tokenizer.New(strings.NewReader(s)))
 	return e
