@@ -1,5 +1,14 @@
 name: iris
-description: iris is a interpreter of ISLisp on golang
+email: ta2gch@moffice.space
+description: iris is a interpreter of ISLisp.
+baseurl: "iris"
+url: "https://ta2gch.github.io"
+twitter_username: ta2gch
+github_username: ta2gch
+# Build Settings
+sass:
+  sass_dir: _sass
+include: ['_pages']
 gems:
     - jemoji
     - jekyll-mentions
