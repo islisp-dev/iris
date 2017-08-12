@@ -73,6 +73,16 @@ func UnsafeCdr(i ilos.Instance) ilos.Instance {
 	return i.(*Cons).cdr
 }
 
+func UnsafeSetCar(o, i ilos.Instance) ilos.Instance {
+	i.(*Cons).car = o
+	return o
+}
+
+func UnsafeSetCdr(o, i ilos.Instance) ilos.Instance {
+	i.(*Cons).cdr = o
+	return o
+}
+
 //
 // Null
 //
