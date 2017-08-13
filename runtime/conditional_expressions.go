@@ -55,15 +55,7 @@ func Cond(local, global *environment.Environment, testFrom ...ilos.Instance) (il
 			return nil, err
 		}
 		if ret == T {
-			var err ilos.Instance
-			ret := Nil
-			for _, e := range s[1:] {
-				ret, err = Eval(local, global, e)
-				if err != nil {
-					return nil, err
-				}
-			}
-			return ret, nil
+			return Progn(local, global, s[1:]...)
 		}
 	}
 	return Nil, nil
@@ -96,15 +88,7 @@ func Case(local, global *environment.Environment, key ilos.Instance, pattern ...
 			return nil, instance.New(class.ProgramError)
 		}
 		if idx == len(pattern)-1 && form[0] == T {
-			var err ilos.Instance
-			ret := Nil
-			for _, e := range form[1:] {
-				ret, err = Eval(local, global, e)
-				if err != nil {
-					return nil, err
-				}
-			}
-			return ret, nil
+			return Progn(local, global, form[1:]...)
 		}
 		keys, _, err := convSlice(form[0])
 		if err != nil {
@@ -112,15 +96,7 @@ func Case(local, global *environment.Environment, key ilos.Instance, pattern ...
 		}
 		for _, k := range keys {
 			if k == key {
-				var err ilos.Instance
-				ret := Nil
-				for _, e := range form[1:] {
-					ret, err = Eval(local, global, e)
-					if err != nil {
-						return nil, err
-					}
-				}
-				return ret, nil
+				return Progn(local, global, form[1:]...)
 			}
 		}
 	}
@@ -162,15 +138,7 @@ func CaseUsing(local, global *environment.Environment, key, pred ilos.Instance, 
 			return nil, instance.New(class.ProgramError)
 		}
 		if idx == len(pattern)-1 && form[0] == T {
-			var err ilos.Instance
-			ret := Nil
-			for _, e := range form[1:] {
-				ret, err = Eval(local, global, e)
-				if err != nil {
-					return nil, err
-				}
-			}
-			return ret, nil
+			return Progn(local, global, form[1:]...)
 		}
 		keys, _, err := convSlice(form[0])
 		if err != nil {
@@ -182,15 +150,7 @@ func CaseUsing(local, global *environment.Environment, key, pred ilos.Instance, 
 				return nil, err
 			}
 			if ret != Nil {
-				var err ilos.Instance
-				ret := Nil
-				for _, e := range form[1:] {
-					ret, err = Eval(local, global, e)
-					if err != nil {
-						return nil, err
-					}
-				}
-				return ret, nil
+				return Progn(local, global, form[1:]...)
 			}
 		}
 	}

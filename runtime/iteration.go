@@ -22,12 +22,13 @@ import (
 // 4. Upon successful completion of the body-forms*, the while form begins again with step 1.
 func While(local, global *environment.Environment, testForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	test, err := Eval(local, global, testForm)
+	if err != nil {
+		return nil, err
+	}
 	for test == T {
-		for _, form := range bodyForm {
-			_, err = Eval(local, global, form)
-			if err != nil {
-				return nil, err
-			}
+		_, err := Progn(local, global, bodyForm...)
+		if err != nil {
+			return nil, err
 		}
 		test, err = Eval(local, global, testForm)
 		if err != nil {
@@ -89,11 +90,9 @@ func For(local, global *environment.Environment, iterationSpecs, endTestAndResul
 		return nil, err
 	}
 	for test == Nil {
-		for _, form := range forms {
-			_, err = Eval(local, global, form)
-			if err != nil {
-				return nil, err
-			}
+		_, err := Progn(local, global, forms...)
+		if err != nil {
+			return nil, err
 		}
 		for _, is := range iss {
 			i, ln, err := convSlice(is)

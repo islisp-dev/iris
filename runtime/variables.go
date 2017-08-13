@@ -75,15 +75,7 @@ func Let(local, global *environment.Environment, varForm ilos.Instance, bodyForm
 			return nil, instance.New(class.ProgramError)
 		}
 	}
-	var err ilos.Instance
-	ret := Nil
-	for _, form := range bodyForm {
-		ret, err = Eval(local, global, form)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return ret, nil
+	return Progn(local, global, bodyForm...)
 }
 
 // LetStar form is used to define a scope for a group of identifiers for a sequence
@@ -121,13 +113,5 @@ func LetStar(local, global *environment.Environment, varForm ilos.Instance, body
 		}
 		cdr = cddr
 	}
-	var err ilos.Instance
-	ret := Nil
-	for _, form := range bodyForm {
-		ret, err = Eval(local, global, form)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return ret, nil
+	return Progn(local, global, bodyForm...)
 }
