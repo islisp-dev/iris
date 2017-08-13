@@ -71,15 +71,7 @@ func evalSpecial(local, global *environment.Environment, car, cdr ilos.Instance)
 		spl = s
 	}
 	if spl != nil {
-		env := environment.New()
-		env.BlockTag = append(local.BlockTag, env.BlockTag...)
-		env.TagbodyTag = append(local.TagbodyTag, env.TagbodyTag...)
-		env.CatchTag = append(local.CatchTag, env.CatchTag...)
-		env.Variable = append(local.Variable, env.Variable...)
-		env.Function = append(local.Function, env.Function...)
-		env.Special = append(local.Special, env.Special...)
-		env.Macro = append(local.Macro, env.Macro...)
-		env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
+		env := environment.New().Merge(local)
 		ret, err := spl.(instance.Applicable).Apply(env, global, cdr)
 		if err != nil {
 			return nil, err, true
@@ -180,6 +172,9 @@ func evalVariable(local, global *environment.Environment, obj ilos.Instance) (il
 		return val, nil
 	}
 	if val, ok := global.Variable.Get(obj); ok {
+		return val, nil
+	}
+	if val, ok := global.Constant.Get(obj); ok {
 		return val, nil
 	}
 	return nil, instance.New(class.UndefinedVariable, map[string]ilos.Instance{

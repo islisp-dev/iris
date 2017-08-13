@@ -44,14 +44,7 @@ func newNamedFunction(local, global *environment.Environment, functionName, lamb
 		parameters = append(parameters, cadr)
 	}
 	return instance.New(class.Function, functionName, func(local, global *environment.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-		local.BlockTag = append(lexical.BlockTag, local.BlockTag...)
-		local.TagbodyTag = append(lexical.TagbodyTag, local.TagbodyTag...)
-		local.CatchTag = append(lexical.CatchTag, local.CatchTag...)
-		local.Variable = append(lexical.Variable, local.Variable...)
-		local.Function = append(lexical.Function, local.Function...)
-		local.Special = append(lexical.Special, local.Special...)
-		local.Macro = append(lexical.Macro, local.Macro...)
-		local.DynamicVariable = append(lexical.DynamicVariable, local.DynamicVariable...)
+		local.Merge(lexical)
 		if (variadic && len(parameters)-2 > len(arguments)) || (!variadic && len(parameters) != len(arguments)) {
 			v := Nil
 			for i := len(arguments) - 1; i >= 0; i-- {
