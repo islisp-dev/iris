@@ -46,13 +46,13 @@ func ParseNumber(_, _ *environment.Environment, str ilos.Instance) (ilos.Instanc
 	return ret, err
 }
 
-// EqualNumber returns t if x1 has the same mathematical value as x2 ;
+// NumberEqual returns t if x1 has the same mathematical value as x2 ;
 // otherwise, returns nil. An error shall be signaled if either x1 or x2 is not a number
 // (error-id. domain-error).
 //
 // Note: = differs from eql because = compares only the mathematical values of its arguments,
 // whereas eql also compares the representations
-func EqualNumber(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func NumberEqual(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if !instance.Of(class.Number, x1) {
 		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
 			"OBJECT":         x1,
@@ -82,19 +82,19 @@ func EqualNumber(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Inst
 	return Nil, nil
 }
 
-// NotEqualNumber returns t if x1 and x2 have mathematically distinct values;
+// NumberNotEqual returns t if x1 and x2 have mathematically distinct values;
 // otherwise, returns nil. An error shall be signaled if either x1 or x2 is not
 // a number (error-id. domain-error).
-func NotEqualNumber(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	ret, err := EqualNumber(nil, nil, x1, x2)
+func NumberNotEqual(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	ret, err := NumberEqual(nil, nil, x1, x2)
 	if err != nil {
 		return ret, err
 	}
 	return Not(nil, nil, ret)
 }
 
-// GreaterThan returns t if x1 is greater than x2
-func GreaterThan(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+// NumberGreaterThan returns t if x1 is greater than x2
+func NumberGreaterThan(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if !instance.Of(class.Number, x1) {
 		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
 			"OBJECT":         x1,
@@ -124,13 +124,13 @@ func GreaterThan(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Inst
 	return Nil, nil
 }
 
-// GreaterThanOrEqual returns t if x1 is greater than or = x2
-func GreaterThanOrEqual(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := GreaterThan(nil, nil, x1, x2)
+// NumberGreaterThanOrEqual returns t if x1 is greater than or = x2
+func NumberGreaterThanOrEqual(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	gt, err := NumberGreaterThan(nil, nil, x1, x2)
 	if err != nil {
 		return nil, err
 	}
-	eq, err := EqualNumber(nil, nil, x1, x2)
+	eq, err := NumberEqual(nil, nil, x1, x2)
 	if err != nil {
 		return nil, err
 	}
@@ -140,18 +140,18 @@ func GreaterThanOrEqual(_, _ *environment.Environment, x1, x2 ilos.Instance) (il
 	return T, nil
 }
 
-// LessThan returns t if x1 is less than x2
-func LessThan(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	ge, err := GreaterThanOrEqual(nil, nil, x1, x2)
+// NumberLessThan returns t if x1 is less than x2
+func NumberLessThan(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	ge, err := NumberGreaterThanOrEqual(nil, nil, x1, x2)
 	if err != nil {
 		return nil, err
 	}
 	return Not(nil, nil, ge)
 }
 
-// LessThanOrEqulal returns t if x1 is less than or = x2
-func LessThanOrEqulal(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := GreaterThan(nil, nil, x1, x2)
+// NumberLessThanOrEqulal returns t if x1 is less than or = x2
+func NumberLessThanOrEqulal(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	gt, err := NumberGreaterThan(nil, nil, x1, x2)
 	if err != nil {
 		return nil, err
 	}
@@ -275,7 +275,7 @@ func Reciprocal(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, 
 func Max(_, _ *environment.Environment, x ilos.Instance, xs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	max := x
 	for _, y := range xs {
-		ret, err := GreaterThan(nil, nil, y, max)
+		ret, err := NumberGreaterThan(nil, nil, y, max)
 		if err != nil {
 			return nil, err
 		}
@@ -291,7 +291,7 @@ func Max(_, _ *environment.Environment, x ilos.Instance, xs ...ilos.Instance) (i
 func Min(_, _ *environment.Environment, x ilos.Instance, xs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	min := x
 	for _, y := range xs {
-		ret, err := LessThan(nil, nil, y, min)
+		ret, err := NumberLessThan(nil, nil, y, min)
 		if err != nil {
 			return nil, err
 		}
@@ -305,7 +305,7 @@ func Min(_, _ *environment.Environment, x ilos.Instance, xs ...ilos.Instance) (i
 // Abs returns the absolute value of its argument.
 // An error shall be signaled if x is not a number (error-id. domain-error).
 func Abs(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
-	ret, err := LessThan(nil, nil, x, instance.New(class.Integer, 0))
+	ret, err := NumberLessThan(nil, nil, x, instance.New(class.Integer, 0))
 	if err != nil {
 		return nil, err
 	}
