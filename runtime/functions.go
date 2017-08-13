@@ -33,11 +33,8 @@ func Functionp(local, global *environment.Environment, fun ilos.Instance) (ilos.
 // The consequences are undefined if the function-name names a macro or special form
 func Function(local, global *environment.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// car must be a symbol
-	if !instance.Of(class.Symbol, fun) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         fun,
-			"EXPECTED-CLASS": class.Symbol,
-		})
+	if err := ensure(class.Symbol, fun); err != nil {
+		return nil, err
 	}
 	if f, ok := local.Function.Get(fun); ok {
 		return f, nil
@@ -200,11 +197,8 @@ func Apply(local, global *environment.Environment, function ilos.Instance, obj .
 	for i := len(obj) - 1; i >= 0; i-- {
 		list = instance.New(class.Cons, obj[i], list)
 	}
-	if !instance.Of(class.Function, function) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         function,
-			"EXPECTED-CLASS": class.Function,
-		})
+	if err := ensure(class.Function, function); err != nil {
+		return nil, err
 	}
 	ret, err := function.(instance.Applicable).Apply(local, global, list)
 	return ret, err

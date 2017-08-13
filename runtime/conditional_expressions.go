@@ -123,11 +123,8 @@ func CaseUsing(local, global *environment.Environment, key, pred ilos.Instance, 
 	if err != nil {
 		return nil, err
 	}
-	if !instance.Of(class.Function, pred) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         pred,
-			"EXPECTED-CLASS": instance.New(class.Symbol, "FUNCTION"),
-		})
+	if err := ensure(class.Function, pred); err != nil {
+		return nil, err
 	}
 	for idx, pat := range pattern {
 		form, ln, err := convSlice(pat)

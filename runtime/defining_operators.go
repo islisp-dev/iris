@@ -21,11 +21,8 @@ import (
 // the object created as the result of evaluating the second argument are immutable. The symbol named
 // name is returned.
 func Defconstant(local, global *environment.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if !instance.Of(class.Symbol, name) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         name,
-			"EXPECTED-CLASS": class.Symbol,
-		})
+	if err := ensure(class.Symbol, name); err != nil {
+		return nil, err
 	}
 	ret, err := Eval(local, global, form)
 	if err != nil {
@@ -47,11 +44,8 @@ func Defconstant(local, global *environment.Environment, name, form ilos.Instanc
 // A lexical variable binding for name can still be locally established by a binding form; in that
 // case, the local binding lexically shadows the outer binding of name defined by defglobal.
 func Defglobal(local, global *environment.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if !instance.Of(class.Symbol, name) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         name,
-			"EXPECTED-CLASS": class.Symbol,
-		})
+	if err := ensure(class.Symbol, name); err != nil {
+		return nil, err
 	}
 	ret, err := Eval(local, global, form)
 	if err != nil {
@@ -71,11 +65,8 @@ func Defglobal(local, global *environment.Environment, name, form ilos.Instance)
 //
 //The symbol named name is returned.
 func Defdynamic(local, global *environment.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if !instance.Of(class.Symbol, name) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         name,
-			"EXPECTED-CLASS": class.Symbol,
-		})
+	if err := ensure(class.Symbol, name); err != nil {
+		return nil, err
 	}
 	ret, err := Eval(local, global, form)
 	if err != nil {
@@ -98,8 +89,7 @@ func Defdynamic(local, global *environment.Environment, name, form ilos.Instance
 // the body form* (i.e., those which are not contained in the lambda list) follow the rules of lexical
 // scoping.
 func Defun(local, global *environment.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	ret, err := newNamedFunction(local, global, functionName, lambdaList, forms...)
-	if err != nil {
+	if err := ensure(class.Symbol, functionName); err != nil {
 		return nil, err
 	}
 	if !global.Function.Define(functionName, ret) {

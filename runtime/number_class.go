@@ -30,11 +30,8 @@ func Numberp(_, _ *environment.Environment, obj ilos.Instance) (ilos.Instance, i
 // An error shall be signaled if string is not the textual representation
 // of a number (error-id. cannot-parse-number).
 func ParseNumber(_, _ *environment.Environment, str ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if !instance.Of(class.String, str) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         str,
-			"EXPECTED-CLASS": class.String,
-		})
+	if err := ensure(class.String, str); err != nil {
+		return nil, err
 	}
 	ret, err := parser.ParseAtom(string(str.(instance.String)))
 	if err != nil || !instance.Of(class.Number, ret) {
@@ -53,17 +50,8 @@ func ParseNumber(_, _ *environment.Environment, str ilos.Instance) (ilos.Instanc
 // Note: = differs from eql because = compares only the mathematical values of its arguments,
 // whereas eql also compares the representations
 func NumberEqual(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if !instance.Of(class.Number, x1) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         x1,
-			"EXPECTED-CLASS": class.Number,
-		})
-	}
-	if !instance.Of(class.Number, x2) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         x2,
-			"EXPECTED-CLASS": class.Number,
-		})
+	if err := ensure(class.Number, x1, x2); err != nil {
+		return nil, err
 	}
 	ret := false
 	switch {
@@ -95,17 +83,8 @@ func NumberNotEqual(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.I
 
 // NumberGreaterThan returns t if x1 is greater than x2
 func NumberGreaterThan(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if !instance.Of(class.Number, x1) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         x1,
-			"EXPECTED-CLASS": class.Number,
-		})
-	}
-	if !instance.Of(class.Number, x2) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         x2,
-			"EXPECTED-CLASS": class.Number,
-		})
+	if err := ensure(class.Number, x1, x2); err != nil {
+		return nil, err
 	}
 	ret := false
 	switch {

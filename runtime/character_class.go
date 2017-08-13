@@ -22,17 +22,8 @@ func Characterp(_, _ *environment.Environment, obj ilos.Instance) (ilos.Instance
 
 // CharEqual tests whether char1 is the same character as char2.
 func CharEqual(_, _ *environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if !instance.Of(class.Character, char1) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         char1,
-			"EXPECTED-CLASS": class.Character,
-		})
-	}
-	if !instance.Of(class.Character, char2) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         char2,
-			"EXPECTED-CLASS": class.Character,
-		})
+	if err := ensure(class.Character, char1, char2); err != nil {
+		return nil, err
 	}
 	if char1 == char2 {
 		return T, nil
@@ -52,17 +43,8 @@ func CharNotEqual(_, _ *environment.Environment, char1, char2 ilos.Instance) (il
 // CharGreaterThan tests whether char1 is greater than char2.
 // An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
 func CharGreaterThan(_, _ *environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if !instance.Of(class.Character, char1) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         char1,
-			"EXPECTED-CLASS": class.Character,
-		})
-	}
-	if !instance.Of(class.Character, char2) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         char2,
-			"EXPECTED-CLASS": class.Character,
-		})
+	if err := ensure(class.Character, char1, char2); err != nil {
+		return nil, err
 	}
 	if char1.(instance.Character) > char2.(instance.Character) {
 		return T, nil

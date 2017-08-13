@@ -14,11 +14,8 @@ import (
 )
 
 func convInt(z ilos.Instance) (int, ilos.Instance) {
-	if instance.Of(class.Integer, z) {
-		return 0, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         z,
-			"EXPECTED-CLASS": class.Integer,
-		})
+	if err := ensure(class.Integer, z); err != nil {
+		return 0, err
 	}
 	return int(z.(instance.Integer)), nil
 }

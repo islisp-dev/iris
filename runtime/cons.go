@@ -32,11 +32,8 @@ func Cons(_, _ *environment.Environment, obj1, obj2 ilos.Instance) (ilos.Instanc
 // Car returns the left component of the cons.
 // An error shall be signaled if cons is not a cons (error-id. domain-error).
 func Car(_, _ *environment.Environment, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if !instance.Of(class.Cons, cons) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         cons,
-			"EXPECTED-CLASS": class.Cons,
-		})
+	if err := ensure(class.Cons, cons); err != nil {
+		return nil, err
 	}
 	return instance.UnsafeCar(cons), nil // Checked at the top of this function
 }
@@ -44,11 +41,8 @@ func Car(_, _ *environment.Environment, cons ilos.Instance) (ilos.Instance, ilos
 // Cdr returns the right component of the cons.
 // An error shall be signaled if cons is not a cons (error-id. domain-error).
 func Cdr(_, _ *environment.Environment, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if !instance.Of(class.Cons, cons) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         cons,
-			"EXPECTED-CLASS": class.Cons,
-		})
+	if err := ensure(class.Cons, cons); err != nil {
+		return nil, err
 	}
 	return instance.UnsafeCdr(cons), nil // Checked at the top of this function
 }
@@ -59,11 +53,8 @@ func Cdr(_, _ *environment.Environment, cons ilos.Instance) (ilos.Instance, ilos
 // An error shall be signaled if cons is not a cons (error-id. domain-error).
 // obj may be any ISLISP object.
 func SetCar(_, _ *environment.Environment, obj, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if !instance.Of(class.Cons, cons) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         cons,
-			"EXPECTED-CLASS": class.Cons,
-		})
+	if err := ensure(class.Cons, cons); err != nil {
+		return nil, err
 	}
 	instance.UnsafeSetCar(obj, cons)
 	return obj, nil
@@ -75,11 +66,8 @@ func SetCar(_, _ *environment.Environment, obj, cons ilos.Instance) (ilos.Instan
 // An error shall be signaled if cons is not a cons (error-id. domain-error).
 // obj may be any ISLISP object.
 func SetCdr(_, _ *environment.Environment, obj, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if !instance.Of(class.Cons, cons) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         cons,
-			"EXPECTED-CLASS": class.Cons,
-		})
+	if err := ensure(class.Cons, cons); err != nil {
+		return nil, err
 	}
 	instance.UnsafeSetCdr(obj, cons)
 	return obj, nil
