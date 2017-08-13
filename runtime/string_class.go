@@ -13,8 +13,6 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-// TODO: stringp, create-string, string=, string/=, string<, string>, string>=, string <=, char-index, string-append
-
 // Stringp returns t if obj is a string (instance of class string);
 // otherwise, returns nil. obj may be any ISLISP object.
 func Stringp(_, _ *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
