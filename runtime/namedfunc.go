@@ -70,14 +70,6 @@ func newNamedFunction(local, global *environment.Environment, functionName, lamb
 				return nil, instance.New(class.ProgramError)
 			}
 		}
-		ret := Nil
-		var err ilos.Instance
-		for _, form := range forms {
-			ret, err = Eval(local, global, form)
-			if err != nil {
-				return nil, err
-			}
-		}
-		return ret, nil
+		return Progn(local, global, forms...)
 	}), nil
 }

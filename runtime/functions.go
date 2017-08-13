@@ -139,14 +139,7 @@ func Labels(local, global *environment.Environment, functions ilos.Instance, bod
 			return nil, instance.New(class.ProgramError)
 		}
 	}
-	ret := Nil
-	for _, form := range bodyForm {
-		ret, err = Eval(local, global, form)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return ret, nil
+	return Progn(local, global, bodyForm...)
 }
 
 // Flet special form allow the definition of new identifiers in the function
@@ -186,14 +179,7 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 			return nil, instance.New(class.ProgramError)
 		}
 	}
-	ret := Nil
-	for _, form := range bodyForm {
-		ret, err = Eval(env, global, form)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return ret, nil
+	return Progn(local, global, bodyForm...)
 }
 
 // Apply applies function to the arguments, obj*, followed by the elements of list,
