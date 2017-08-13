@@ -11,8 +11,6 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-// TODO: if, cond, case, case-using
-
 // If is conditional expression.
 // The test-form is evaluated. If its result is anything non-nil,
 // the then-form is evaluated and its value is returned;
@@ -37,6 +35,12 @@ func If(local, global *environment.Environment, testForm, thenForm ilos.Instance
 	return Eval(local, global, elseForm[0])
 }
 
+// Cond the clauses (test form*) are scanned sequentially
+// and in each case the test is evaluated; when a test delivers a non-nil value
+// the scanning process stops and all forms associated with the corresponding clause
+//are sequentially evaluated and the value of the last one is returned.
+// If no test is true, then nil is returned.
+// If no form exists for the successful test then the value of this test is returned.
 func Cond(local, global *environment.Environment, testFrom ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	for _, tf := range testFrom {
 		s, ln, err := convSlice(tf)
@@ -60,6 +64,134 @@ func Cond(local, global *environment.Environment, testFrom ...ilos.Instance) (il
 				}
 			}
 			return ret, nil
+		}
+	}
+	return Nil, nil
+}
+
+// Case special form, called case form, provide a mechanism
+// to execute a matching clause from a series of clauses based on the value of a dispatching form keyform.
+//
+// The clause to be executed is identified by a set of keys. A key can be any object.
+// If the keylist of the last clause is t the associated clause is executed if no key matches the keyform.
+//
+// keyform is a form to be computed at the beginning of execution of the case form.
+// If the result of evaluating keyform is equivalent to a key, then the forms, if any,
+// in the corresponding clause are evaluated sequentially and the value of the last one
+// is returned as value of the whole case form. case determines match equivalence by using eql;
+// the value returned by keyform and key. If no form exists for a matching key, the case form evaluates to nil.
+// If the value of keyform is different from every key, and there is a default clause, its forms, if any,
+// are evaluated sequentially, and the value of the last one is the result of the case form.
+func Case(local, global *environment.Environment, key ilos.Instance, pattern ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	key, err := Eval(local, global, key)
+	if err != nil {
+		return nil, err
+	}
+	for idx, pat := range pattern {
+		form, ln, err := convSlice(pat)
+		if err != nil {
+			return nil, err
+		}
+		if ln < 1 {
+			return nil, instance.New(class.ProgramError)
+		}
+		if idx == len(pattern)-1 && form[0] == T {
+			var err ilos.Instance
+			ret := Nil
+			for _, e := range form[1:] {
+				ret, err = Eval(local, global, e)
+				if err != nil {
+					return nil, err
+				}
+			}
+			return ret, nil
+		}
+		keys, _, err := convSlice(form[0])
+		if err != nil {
+			return nil, err
+		}
+		for _, k := range keys {
+			if k == key {
+				var err ilos.Instance
+				ret := Nil
+				for _, e := range form[1:] {
+					ret, err = Eval(local, global, e)
+					if err != nil {
+						return nil, err
+					}
+				}
+				return ret, nil
+			}
+		}
+	}
+	return Nil, nil
+}
+
+// CaseUsing special form, called case forms, provide a mechanism
+// to execute a matching clause from a series of clauses based on the value of a dispatching form keyform.
+//
+// The clause to be executed is identified by a set of keys. A key can be any object.
+// If the keylist of the last clause is t the associated clause is executed if no key matches the keyform.
+//
+// keyform is a form to be computed at the beginning of execution of the case form.
+// If the result of evaluating keyform is equivalent to a key, then the forms, if any,
+// in the corresponding clause are evaluated sequentially and the value of the last one
+// is returned as value of the whole case form.
+// case-using match determines equivalence by using the result of evaluating predform.
+// predform must be a boolean or quasi-boolean function that accepts two arguments,
+// the value returned by keyform and key. If no form exists for a matching key, the case form evaluates to nil.
+// If the value of keyform is different from every key, and there is a default clause, its forms, if any,
+// are evaluated sequentially, and the value of the last one is the result of the case form.
+func CaseUsing(local, global *environment.Environment, key, pred ilos.Instance, pattern ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	key, err := Eval(local, global, key)
+	if err != nil {
+		return nil, err
+	}
+	if !instance.Of(class.Function, pred) {
+		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
+			"OBJECT":         pred,
+			"EXPECTED-CLASS": instance.New(class.Symbol, "FUNCTION"),
+		})
+	}
+	for idx, pat := range pattern {
+		form, ln, err := convSlice(pat)
+		if err != nil {
+			return nil, err
+		}
+		if ln < 1 {
+			return nil, instance.New(class.ProgramError)
+		}
+		if idx == len(pattern)-1 && form[0] == T {
+			var err ilos.Instance
+			ret := Nil
+			for _, e := range form[1:] {
+				ret, err = Eval(local, global, e)
+				if err != nil {
+					return nil, err
+				}
+			}
+			return ret, nil
+		}
+		keys, _, err := convSlice(form[0])
+		if err != nil {
+			return nil, err
+		}
+		for _, k := range keys {
+			ret, err := pred.(instance.Function).Apply(local, global, instance.New(class.Cons, k, instance.New(class.Cons, key, Nil)))
+			if err != nil {
+				return nil, err
+			}
+			if ret != Nil {
+				var err ilos.Instance
+				ret := Nil
+				for _, e := range form[1:] {
+					ret, err = Eval(local, global, e)
+					if err != nil {
+						return nil, err
+					}
+				}
+				return ret, nil
+			}
 		}
 	}
 	return Nil, nil
