@@ -92,6 +92,10 @@ func Defun(local, global *environment.Environment, functionName, lambdaList ilos
 	if err := ensure(class.Symbol, functionName); err != nil {
 		return nil, err
 	}
+	ret, err := newNamedFunction(local, global, functionName, lambdaList, forms...)
+	if err != nil {
+		return nil, err
+	}
 	if !global.Function.Define(functionName, ret) {
 		return nil, instance.New(class.ProgramError)
 	}

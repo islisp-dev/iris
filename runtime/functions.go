@@ -172,11 +172,11 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 		if err != nil {
 			return nil, err
 		}
-		if !local.Function.Define(functionName, fun) {
+		if !env.Function.Define(functionName, fun) {
 			return nil, instance.New(class.ProgramError)
 		}
 	}
-	return Progn(local, global, bodyForm...)
+	return Progn(env, global, bodyForm...)
 }
 
 // Apply applies function to the arguments, obj*, followed by the elements of list,
