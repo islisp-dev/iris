@@ -4,4 +4,118 @@
 
 package runtime
 
-// TODO: while, for
+import (
+	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/ilos"
+	"github.com/ta2gch/iris/runtime/ilos/class"
+	"github.com/ta2gch/iris/runtime/ilos/instance"
+)
+
+// While the test-form returns a true value. Specifically:
+//
+// 1. test-form is evaluated, producing a value Vt.
+//
+// 2. If Vt is nil, then the while form immediately returns nil.
+//
+// 3. Otherwise, if Vt is non-nil, the forms body-form* are evaluated sequentially (from left to right).
+//
+// 4. Upon successful completion of the body-forms*, the while form begins again with step 1.
+func While(local, global *environment.Environment, testForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	test, err := Eval(local, global, testForm)
+	for test == T {
+		for _, form := range bodyForm {
+			_, err = Eval(local, global, form)
+			if err != nil {
+				return nil, err
+			}
+		}
+		test, err = Eval(local, global, testForm)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return Nil, nil
+}
+
+// For repeatedly executes a sequence of forms form*, called its body. It specifies a set of identifiers naming
+// variables that will be local to the for form, their initialization, and their update for each iteration.
+// When a termination condition is met, the iteration exits with a specified result value.
+//
+// The scope of an identifier var is the body, the steps, the end-test , and the result *. A step might be omitted,
+// in which case the effect is the same as if (var init var) had been written instead of (var init).
+// It is a violation if more than one iteration-spec names the same var in the same for form.
+//
+// The for special form is executed as follows: The init forms are evaluated sequentially from left to right.
+// Then each value is used as the initial value of the variable denoted by the corresponding identifier var ,
+// and the iteration phase begins.
+//
+//Each iteration begins by evaluating end-test . If the result is nil, the forms in the body are
+// evaluated sequentially (for side-effects). Afterwards, the step-forms are evaluated sequentially
+// order from left to right. Then their values are assigned to the corresponding variables and the next iteration begins.
+// If end-test returns a non-nil value, then the result * are evaluated sequentially and the value of the
+// last one is returned as value of the whole for macro. If no result is present, then the value of the for macro is nil.
+func For(local, global *environment.Environment, iterationSpecs, endTestAndResults ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	iss, _, err := convSlice(iterationSpecs)
+	if err != nil {
+		return nil, err
+	}
+	for _, is := range iss {
+		i, ln, err := convSlice(is)
+		if err != nil {
+			return nil, err
+		}
+		switch ln {
+		case 2, 3:
+			var1 := i[0]
+			init := i[1]
+			if local.Variable.Define(var1, init) {
+				return nil, instance.New(class.ProgramError)
+			}
+		default:
+			return nil, instance.New(class.ProgramError)
+		}
+	}
+	ends, ln, err := convSlice(endTestAndResults)
+	if err != nil {
+		return nil, err
+	}
+	if ln == 0 {
+		return nil, instance.New(class.ParseError)
+	}
+	endTest := ends[0]
+	results := ends[1:]
+	test, err := Eval(local, global, endTest)
+	if err != nil {
+		return nil, err
+	}
+	for test == Nil {
+		for _, form := range forms {
+			_, err = Eval(local, global, form)
+			if err != nil {
+				return nil, err
+			}
+		}
+		for _, is := range iss {
+			i, ln, err := convSlice(is)
+			if err != nil {
+				return nil, err
+			}
+			switch ln {
+			case 2:
+			case 3:
+				var1 := i[0]
+				step := i[2]
+				if local.Variable.Set(var1, step) {
+					return nil, instance.New(class.ProgramError)
+				}
+			default:
+				return nil, instance.New(class.ProgramError)
+			}
+		}
+		test, err = Eval(local, global, endTest)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return Progn(local, global, results...)
+}
