@@ -135,7 +135,7 @@ func Labels(local, global *environment.Environment, functions ilos.Instance, bod
 		if err != nil {
 			return nil, err
 		}
-		if local.Function.Define(functionName, fun) {
+		if !local.Function.Define(functionName, fun) {
 			return nil, instance.New(class.ProgramError)
 		}
 	}
@@ -190,7 +190,7 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 		if err != nil {
 			return nil, err
 		}
-		if local.Function.Define(functionName, fun) {
+		if !local.Function.Define(functionName, fun) {
 			return nil, instance.New(class.ProgramError)
 		}
 	}

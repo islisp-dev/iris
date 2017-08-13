@@ -50,7 +50,7 @@ func Block(local, global *environment.Environment, tag ilos.Instance, body ...il
 			"EXPECTED-CLASS": class.Object,
 		})
 	}
-	if local.BlockTag.Define(tag, nil) {
+	if !local.BlockTag.Define(tag, nil) {
 		return nil, instance.New(class.ProgramError)
 	}
 	var fail ilos.Instance
@@ -108,7 +108,7 @@ func Catch(local, global *environment.Environment, tag ilos.Instance, body ...il
 	if instance.Of(class.Number, tag) || instance.Of(class.Character, tag) {
 		return nil, instance.New(class.DomainError, tag, class.Object)
 	}
-	if local.CatchTag.Define(tag, nil) {
+	if !local.CatchTag.Define(tag, nil) {
 		return nil, instance.New(class.ProgramError)
 	}
 	var fail ilos.Instance
@@ -161,7 +161,7 @@ func Tagbody(local, global *environment.Environment, body ...ilos.Instance) (ilo
 	for idx, cadr := range body {
 		cddr := instance.New(class.GeneralVector, body[idx+1:])
 		if !instance.Of(class.Cons, cadr) {
-			if local.TagbodyTag.Define(cadr, cddr) {
+			if !local.TagbodyTag.Define(cadr, cddr) {
 				return nil, instance.New(class.ProgramError)
 			}
 		}
