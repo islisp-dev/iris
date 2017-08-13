@@ -11,18 +11,38 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func newNamedFunction(local, global *environment.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) ilos.Instance {
+func checkLambdaList(lambdaList ilos.Instance) ilos.Instance {
+	cdr, _, err := convSlice(lambdaList)
+	if err != nil {
+		return err
+	}
+	for i, cadr := range cdr {
+		if !instance.Of(class.Symbol, cadr) {
+			return instance.New(class.ProgramError)
+		}
+		if cadr == instance.New(class.Symbol, ":REST") || cadr == instance.New(class.Symbol, "&REST") {
+			if len(cdr) != i+2 {
+				return instance.New(class.ProgramError)
+			}
+		}
+	}
+	return nil
+}
+
+func newNamedFunction(local, global *environment.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lexical := local
-	cdr := lambdaList
+	// TODO: Check lambdalist
+	if err := checkLambdaList(lambdaList); err != nil {
+		return nil, err
+	}
+	cdr, _, _ := convSlice(lambdaList)
 	parameters := []ilos.Instance{}
 	variadic := false
-	for instance.Of(class.Cons, cdr) {
-		cadr := instance.UnsafeCar(cdr) // Checked at the top of this loop
+	for _, cadr := range cdr {
 		if cadr == instance.New(class.Symbol, ":REST") || cadr == instance.New(class.Symbol, "&REST") {
 			variadic = true
 		}
 		parameters = append(parameters, cadr)
-		cdr = instance.UnsafeCdr(cdr) // Checked at the top of this loop
 	}
 	return instance.New(class.Function, functionName, func(local, global *environment.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 		local.BlockTag = append(lexical.BlockTag, local.BlockTag...)
@@ -67,5 +87,5 @@ func newNamedFunction(local, global *environment.Environment, functionName, lamb
 			}
 		}
 		return ret, nil
-	})
+	}), nil
 }

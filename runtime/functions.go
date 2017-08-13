@@ -51,32 +51,6 @@ func Function(local, global *environment.Environment, fun ilos.Instance) (ilos.I
 	})
 }
 
-func checkLambdaList(lambdaList ilos.Instance) ilos.Instance {
-	cdr := lambdaList
-	ok := false
-	for instance.Of(class.Cons, cdr) {
-		cadr := instance.UnsafeCar(cdr)
-		cddr := instance.UnsafeCdr(cdr)
-		if !instance.Of(class.Symbol, cadr) {
-			break
-		}
-		if cadr == instance.New(class.Symbol, ":REST") || cadr == instance.New(class.Symbol, "&REST") {
-			if instance.Of(class.Cons, cddr) && instance.Of(class.Symbol, instance.UnsafeCar(cddr)) && instance.Of(class.Null, instance.UnsafeCdr(cddr)) {
-				ok = true
-			}
-			break
-		}
-		cdr = cddr
-	}
-	if !ok && cdr == Nil {
-		ok = true
-	}
-	if !ok {
-		return instance.New(class.ProgramError)
-	}
-	return nil
-}
-
 // Lambda special form creates a function object.
 //
 // The scope of the identifiers of the lambda-list is the sequence of forms form*,
@@ -105,7 +79,7 @@ func Lambda(local, global *environment.Environment, lambdaList ilos.Instance, fo
 	if err := checkLambdaList(lambdaList); err != nil {
 		return nil, err
 	}
-	return newNamedFunction(local, global, instance.New(class.Symbol, "ANONYMOUS-FUNCTION"), lambdaList, form...), nil
+	return newNamedFunction(local, global, instance.New(class.Symbol, "ANONYMOUS-FUNCTION"), lambdaList, form...)
 }
 
 // Labels special form allow the definition of new identifiers in the function
@@ -132,9 +106,11 @@ func Lambda(local, global *environment.Environment, lambdaList ilos.Instance, fo
 //
 // No function-name may appear more than once in the function bindings.
 func Labels(local, global *environment.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	cdr := functions
-	for instance.Of(class.Cons, cdr) {
-		cadr := instance.UnsafeCar(cdr)     // Checked at the top of this loop
+	cdr, _, err := convSlice(functions)
+	if err != nil {
+		return nil, err
+	}
+	for _, cadr := range cdr {
 		if !instance.Of(class.Cons, cadr) { // #1
 			return nil, instance.New(class.ProgramError)
 		}
@@ -151,19 +127,19 @@ func Labels(local, global *environment.Environment, functions ilos.Instance, bod
 		if !isProperList(cddadr) {
 			return nil, instance.New(class.ProgramError)
 		}
-		form := []ilos.Instance{}
-		for instance.Of(class.Cons, cddadr) {
-			caddadr := instance.UnsafeCar(cddadr) // Checked at the top of this loop
-			form = append(form, caddadr)
-			cddadr = instance.UnsafeCdr(cddadr) // Checked at the top of this loop
+		form, _, err := convSlice(cddadr)
+		if err != nil {
+			return nil, err
 		}
-		if local.Function.Define(functionName, newNamedFunction(local, global, functionName, lambdaList, form...)) {
+		fun, err := newNamedFunction(local, global, functionName, lambdaList, form...)
+		if err != nil {
+			return nil, err
+		}
+		if local.Function.Define(functionName, fun) {
 			return nil, instance.New(class.ProgramError)
 		}
-		cdr = instance.UnsafeCdr(cdr) // Checked at #1
 	}
 	ret := Nil
-	var err ilos.Instance
 	for _, form := range bodyForm {
 		ret, err = Eval(local, global, form)
 		if err != nil {
@@ -176,7 +152,10 @@ func Labels(local, global *environment.Environment, functions ilos.Instance, bod
 // Flet special form allow the definition of new identifiers in the function
 // namespace for function objects (see Labels).
 func Flet(local, global *environment.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	cdr := functions
+	cdr, _, err := convSlice(functions)
+	if err != nil {
+		return nil, err
+	}
 	env := environment.New()
 	env.BlockTag = append(local.BlockTag, env.BlockTag...)
 	env.TagbodyTag = append(local.TagbodyTag, env.TagbodyTag...)
@@ -186,8 +165,7 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 	env.Special = append(local.Special, env.Special...)
 	env.Macro = append(local.Macro, env.Macro...)
 	env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
-	for instance.Of(class.Cons, cdr) {
-		cadr := instance.UnsafeCar(cdr)     // Checked at the top of this loop
+	for _, cadr := range cdr {
 		if !instance.Of(class.Cons, cadr) { // #1
 			return nil, instance.New(class.ProgramError)
 		}
@@ -204,19 +182,19 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 		if !isProperList(cddadr) {
 			return nil, instance.New(class.ProgramError)
 		}
-		form := []ilos.Instance{}
-		for instance.Of(class.Cons, cddadr) {
-			caddadr := instance.UnsafeCar(cddadr) // Checked at the top of this loop
-			form = append(form, caddadr)
-			cddadr = instance.UnsafeCdr(cddadr) // Checked at the top of this loop
+		form, _, err := convSlice(cddadr)
+		if err != nil {
+			return nil, err
 		}
-		if env.Function.Define(functionName, newNamedFunction(local, global, functionName, lambdaList, form...)) {
+		fun, err := newNamedFunction(local, global, functionName, lambdaList, form...)
+		if err != nil {
+			return nil, err
+		}
+		if local.Function.Define(functionName, fun) {
 			return nil, instance.New(class.ProgramError)
 		}
-		cdr = instance.UnsafeCdr(cdr) // Checked at #1
 	}
 	ret := Nil
-	var err ilos.Instance
 	for _, form := range bodyForm {
 		ret, err = Eval(env, global, form)
 		if err != nil {

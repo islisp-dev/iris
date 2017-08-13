@@ -16,6 +16,18 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
+func convSlice(cons ilos.Instance) ([]ilos.Instance, int, ilos.Instance) {
+	is := []ilos.Instance{}
+	if isProperList(cons) {
+		return nil, 0, instance.New(class.ProgramError)
+	}
+	for instance.Of(class.Cons, cons) {
+		is = append(is, instance.UnsafeCar(cons))
+		cons = instance.UnsafeCdr(cons)
+	}
+	return is, len(is), nil
+}
+
 func isProperList(i ilos.Instance) bool {
 	if instance.Of(class.Cons, i) {
 		return isProperList(instance.UnsafeCdr(i)) // Checked at the top of this statements
