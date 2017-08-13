@@ -11,8 +11,6 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-//TODO: char<, char>, char<=, char>=
-
 // Characterp returns t if obj is a character (instance of class character);
 // otherwise, returns nil. obj may be any ISLISP object.
 func Characterp(_, _ *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
