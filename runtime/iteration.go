@@ -68,7 +68,7 @@ func For(local, global *environment.Environment, iterationSpecs, endTestAndResul
 		case 2, 3:
 			var1 := i[0]
 			init := i[1]
-			if local.Variable.Define(var1, init) {
+			if !local.Variable.Define(var1, init) {
 				return nil, instance.New(class.ProgramError)
 			}
 		default:
