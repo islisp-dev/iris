@@ -5,7 +5,8 @@
 package instance
 
 import (
-	"github.com/k0kubun/pp"
+	"fmt"
+
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 )
@@ -91,6 +92,22 @@ func (i *instance) SetSlotValue(key ilos.Instance, value ilos.Instance, class il
 	return false
 }
 
+func (i *instance) Slots() map[string]ilos.Instance {
+	m := map[string]ilos.Instance{}
+	for k, v := range i.slots {
+		m[k] = v
+	}
+	for _, c := range i.supers {
+		if _, ok := c.(*instance); ok {
+			for k, v := range c.(*instance).Slots() {
+				m[k] = v
+			}
+		}
+	}
+	return m
+}
+
 func (i *instance) String() string {
-	return pp.Sprint(i)
+	c := i.Class().String()
+	return fmt.Sprintf("#%v %v>", c[:len(c)-1], i.Slots())
 }
