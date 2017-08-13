@@ -31,7 +31,6 @@ func checkLambdaList(lambdaList ilos.Instance) ilos.Instance {
 
 func newNamedFunction(local, global *environment.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lexical := local
-	// TODO: Check lambdalist
 	if err := checkLambdaList(lambdaList); err != nil {
 		return nil, err
 	}

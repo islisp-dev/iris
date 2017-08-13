@@ -4,4 +4,24 @@
 
 package runtime
 
-// TODO: progn
+import (
+	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/ilos"
+)
+
+// Progn allows a series of forms to be evaluated, where normally only one could be used.
+//
+// The result of evaluation of the last form of form* is returned. All the forms are
+// evaluated from left to right. The values of all the forms but the last are discarded,
+// so they are executed only for their side-effects. progn without forms returns nil.
+func Progn(local, global *environment.Environment, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	var err ilos.Instance
+	ret := Nil
+	for _, e := range form {
+		ret, err = Eval(local, global, e)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return ret, nil
+}
