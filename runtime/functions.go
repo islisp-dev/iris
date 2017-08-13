@@ -156,15 +156,7 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 	if err != nil {
 		return nil, err
 	}
-	env := environment.New()
-	env.BlockTag = append(local.BlockTag, env.BlockTag...)
-	env.TagbodyTag = append(local.TagbodyTag, env.TagbodyTag...)
-	env.CatchTag = append(local.CatchTag, env.CatchTag...)
-	env.Variable = append(local.Variable, env.Variable...)
-	env.Function = append(local.Function, env.Function...)
-	env.Special = append(local.Special, env.Special...)
-	env.Macro = append(local.Macro, env.Macro...)
-	env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
+	env := environment.New().Merge(local)
 	for _, cadr := range cdr {
 		if !instance.Of(class.Cons, cadr) { // #1
 			return nil, instance.New(class.ProgramError)

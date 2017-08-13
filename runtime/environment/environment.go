@@ -14,6 +14,7 @@ type Environment struct {
 	Special         stack
 	Variable        stack
 	DynamicVariable stack // deep biding
+	Constant        stack
 }
 
 // New creates new environment
@@ -27,6 +28,20 @@ func New() *Environment {
 	env.Special = newStack()
 	env.Variable = newStack()
 	env.DynamicVariable = newStack()
+	env.Constant = newStack()
+	return env
+}
+
+func (env *Environment) Merge(before *Environment) *Environment {
+	env.BlockTag = append(before.BlockTag, env.BlockTag...)
+	env.TagbodyTag = append(before.TagbodyTag, env.TagbodyTag...)
+	env.CatchTag = append(before.CatchTag, env.CatchTag...)
+	env.Variable = append(before.Variable, env.Variable...)
+	env.Function = append(before.Function, env.Function...)
+	env.Special = append(before.Special, env.Special...)
+	env.Macro = append(before.Macro, env.Macro...)
+	env.DynamicVariable = append(before.DynamicVariable, env.DynamicVariable...)
+	env.Constant = append(before.Constant, env.Constant...)
 	return env
 }
 
