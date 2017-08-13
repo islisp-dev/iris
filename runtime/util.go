@@ -75,3 +75,14 @@ func defglobal(name string, value ilos.Instance) {
 	symbol := instance.New(class.Symbol, name)
 	environment.TopLevel.Variable.Define(symbol, value)
 }
+func ensure(c ilos.Class, i ...ilos.Instance) ilos.Instance {
+	for _, o := range i {
+		if !instance.Of(c, o) {
+			return instance.New(class.DomainError, map[string]ilos.Instance{
+				"OBJECT":         o,
+				"EXPECTED-CLASS": c,
+			})
+		}
+	}
+	return nil
+}
