@@ -34,8 +34,9 @@ func (s stack) Set(key, value ilos.Instance) bool {
 }
 
 func (s stack) Define(key, value ilos.Instance) bool {
-	if _, ok := s[0][key]; ok {
-		s[0][key] = value
+	if _, ok := s[len(s)-1][key]; !ok {
+		s[len(s)-1][key] = value
+		return true
 	}
 	return false
 }
