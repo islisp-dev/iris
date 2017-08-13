@@ -23,28 +23,28 @@ func Characterp(_, _ *environment.Environment, obj ilos.Instance) (ilos.Instance
 }
 
 // CharEqual tests whether char1 is the same character as char2.
-func CharEqual(_, _ *environment.Environment, c1, c2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if !instance.Of(class.Character, c1) {
+func CharEqual(_, _ *environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	if !instance.Of(class.Character, char1) {
 		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         c1,
+			"OBJECT":         char1,
 			"EXPECTED-CLASS": class.Character,
 		})
 	}
-	if !instance.Of(class.Character, c2) {
+	if !instance.Of(class.Character, char2) {
 		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         c2,
+			"OBJECT":         char2,
 			"EXPECTED-CLASS": class.Character,
 		})
 	}
-	if c1 == c2 {
+	if char1 == char2 {
 		return T, nil
 	}
 	return Nil, nil
 }
 
 // CharNotEqual if and only if they are not char=.
-func CharNotEqual(_, _ *environment.Environment, c1, c2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	ret, err := CharEqual(nil, nil, c1, c2)
+func CharNotEqual(_, _ *environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	ret, err := CharEqual(nil, nil, char1, char2)
 	if err != nil {
 		return nil, err
 	}
@@ -53,20 +53,20 @@ func CharNotEqual(_, _ *environment.Environment, c1, c2 ilos.Instance) (ilos.Ins
 
 // CharGreaterThan tests whether char1 is greater than char2.
 // An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
-func CharGreaterThan(_, _ *environment.Environment, c1, c2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if !instance.Of(class.Character, c1) {
+func CharGreaterThan(_, _ *environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	if !instance.Of(class.Character, char1) {
 		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         c1,
+			"OBJECT":         char1,
 			"EXPECTED-CLASS": class.Character,
 		})
 	}
-	if !instance.Of(class.Character, c2) {
+	if !instance.Of(class.Character, char2) {
 		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         c2,
+			"OBJECT":         char2,
 			"EXPECTED-CLASS": class.Character,
 		})
 	}
-	if c1.(instance.Character) > c2.(instance.Character) {
+	if char1.(instance.Character) > char2.(instance.Character) {
 		return T, nil
 	}
 	return Nil, nil
@@ -74,12 +74,12 @@ func CharGreaterThan(_, _ *environment.Environment, c1, c2 ilos.Instance) (ilos.
 
 // CharGreaterThanOrEqual tests whether char1 is greater than or equal to char2.
 // An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
-func CharGreaterThanOrEqual(_, _ *environment.Environment, c1, c2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := CharGreaterThan(nil, nil, c1, c2)
+func CharGreaterThanOrEqual(_, _ *environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	gt, err := CharGreaterThan(nil, nil, char1, char2)
 	if err != nil {
 		return nil, err
 	}
-	eq, err := CharEqual(nil, nil, c1, c2)
+	eq, err := CharEqual(nil, nil, char1, char2)
 	if err != nil {
 		return nil, err
 	}
@@ -91,8 +91,8 @@ func CharGreaterThanOrEqual(_, _ *environment.Environment, c1, c2 ilos.Instance)
 
 // CharLessThan tests whether char1 is less than char2.
 // An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
-func CharLessThan(_, _ *environment.Environment, c1, c2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := CharGreaterThanOrEqual(nil, nil, c1, c2)
+func CharLessThan(_, _ *environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	gt, err := CharGreaterThanOrEqual(nil, nil, char1, char2)
 	if err != nil {
 		return nil, err
 	}
@@ -101,8 +101,8 @@ func CharLessThan(_, _ *environment.Environment, c1, c2 ilos.Instance) (ilos.Ins
 
 // CharLessThanOrEqual tests whether char1 is less than or equal to char2.
 // An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
-func CharLessThanOrEqual(_, _ *environment.Environment, c1, c2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := CharGreaterThan(nil, nil, c1, c2)
+func CharLessThanOrEqual(_, _ *environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	gt, err := CharGreaterThan(nil, nil, char1, char2)
 	if err != nil {
 		return nil, err
 	}
