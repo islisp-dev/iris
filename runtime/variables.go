@@ -56,15 +56,18 @@ func Let(local, global *environment.Environment, varForm ilos.Instance, bodyForm
 	for instance.Of(class.Cons, cdr) {
 		uCar, uCdr := instance.UnsafeCar, instance.UnsafeCdr
 		cadr, cddr := uCar(cdr), uCdr(cdr) // Checked at the top of this loop
-		if !(instance.Of(class.Cons, cadr) && instance.Of(class.Cons, uCdr(cadr)) && uCdr(uCdr(cadr)) == Nil) {
-			return nil, instance.New(class.ProgramError)
-		}
-		v := uCar(cadr) // Checked before statement
-		f, err := Eval(local, global, uCar(uCdr(cadr)))
+		s, ln, err := convSlice(cadr)
 		if err != nil {
 			return nil, err
 		}
-		vfs[v] = f
+		if ln != 2 {
+			return nil, instance.New(class.ProgramError)
+		}
+		f, err := Eval(local, global, s[1])
+		if err != nil {
+			return nil, err
+		}
+		vfs[s[0]] = f
 		cdr = cddr
 	}
 	for v, f := range vfs {
@@ -102,15 +105,18 @@ func LetStar(local, global *environment.Environment, varForm ilos.Instance, body
 	for instance.Of(class.Cons, cdr) {
 		uCar, uCdr := instance.UnsafeCar, instance.UnsafeCdr
 		cadr, cddr := uCar(cdr), uCdr(cdr) // Checked at the top of this loop
-		if !(instance.Of(class.Cons, cadr) && instance.Of(class.Cons, uCdr(cadr)) && uCdr(uCdr(cadr)) == Nil) {
-			return nil, instance.New(class.ProgramError)
-		}
-		v := uCar(cadr) // Checked before statement
-		f, err := Eval(local, global, uCar(uCdr(cadr)))
+		s, ln, err := convSlice(cadr)
 		if err != nil {
 			return nil, err
 		}
-		if local.Variable.Define(v, f) {
+		if ln != 2 {
+			return nil, instance.New(class.ProgramError)
+		}
+		f, err := Eval(local, global, s[1])
+		if err != nil {
+			return nil, err
+		}
+		if local.Variable.Define(s[0], f) {
 			return nil, instance.New(class.ProgramError)
 		}
 		cdr = cddr
