@@ -383,8 +383,8 @@ func Sqrt(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.I
 	return instance.New(class.Float, math.Sqrt(a)), nil
 }
 
-// PI is an approximation of π.
-var PI = instance.New(class.Float, 3.141592653589793)
+// Pi is an approximation of π.
+var Pi = instance.New(class.Float, 3.141592653589793)
 
 // Sin returns the sine of x . x must be given in radians.
 // An error shall be signaled if x is not a number (error-id. domain-error).

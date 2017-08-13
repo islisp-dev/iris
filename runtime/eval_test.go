@@ -20,8 +20,8 @@ func TestEval(t *testing.T) {
 	defun("INC", func(local, global *environment.Environment, arg ilos.Instance) (ilos.Instance, ilos.Instance) {
 		return instance.New(class.Integer, int(arg.(instance.Integer))+1), nil
 	})
-	defglobal("PI", instance.New(class.Float, 3.14))
-	defmacro("MINC", func(local *environment.Environment, global *environment.Environment, arg ilos.Instance) (ilos.Instance, ilos.Instance) {
+	defglobal("*PI*", Pi)
+	defmacro("MINC", func(local, global *environment.Environment, arg ilos.Instance) (ilos.Instance, ilos.Instance) {
 		return instance.New(class.Cons, instance.New(class.Symbol, "INC"), instance.New(class.Cons, arg, Nil)), nil
 	})
 	type arguments struct {
@@ -37,8 +37,8 @@ func TestEval(t *testing.T) {
 	}{
 		{
 			name:      "local variable",
-			arguments: arguments{instance.New(class.Symbol, "PI"), local, global},
-			want:      instance.New(class.Float, 3.14),
+			arguments: arguments{readFromString("*pi*"), local, global},
+			want:      Pi,
 			wantErr:   false,
 		},
 		{
