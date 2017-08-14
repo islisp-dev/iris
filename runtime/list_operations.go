@@ -70,6 +70,8 @@ func Nreverse(_, _ *environment.Environment, list ilos.Instance) (ilos.Instance,
 }
 
 func Append(_, _ *environment.Environment, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	// Ref: https://github.com/sbcl/sbcl/blob/fe4faef65315c6ad52b3b89b62b6c6497cb78d09/src/code/list.lisp#L364
+
 	result, err := List(nil, nil, Nil)
 	if err != nil {
 		return nil, err
