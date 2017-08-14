@@ -106,21 +106,18 @@ func Labels(local, global *environment.Environment, functions ilos.Instance, bod
 	if err := ensure(class.List, functions); err != nil {
 		return nil, err
 	}
-	for _, cadr := range functions.(instance.List).Slice() {
-		if err := ensure(class.Cons, cadr); err != nil { // #1
+	for _, function := range functions.(instance.List).Slice() {
+		if err := ensure(class.List, function); err != nil {
 			return nil, err
 		}
-		functionName := cadr.(*instance.Cons).Car         // Checked at #1
-		cdadr := cadr.(*instance.Cons).Cdr                // Checked at #1
-		if err := ensure(class.Cons, cdadr); err != nil { // #2
-			return nil, err
+		definition := function.(instance.List).Slice()
+		if len(definition) < 2 {
+			return nil, instance.New(class.ProgramError)
 		}
-		lambdaList := cdadr.(*instance.Cons).Car // Checked at #2
-		forms := cdadr.(*instance.Cons).Cdr      // Checked at #2
-		if err := ensure(class.List, forms); err != nil {
-			return nil, err
-		}
-		fun, err := newNamedFunction(local, global, functionName, lambdaList, forms.(instance.List).Slice()...)
+		functionName := definition[0]
+		lambdaList := definition[1]
+		forms := definition[2:]
+		fun, err := newNamedFunction(local, global, functionName, lambdaList, forms...)
 		if err != nil {
 			return nil, err
 		}
@@ -138,21 +135,18 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 		return nil, err
 	}
 	env := environment.New().Merge(local)
-	for _, cadr := range functions.(instance.List).Slice() {
-		if err := ensure(class.Cons, cadr); err != nil { // #1
+	for _, function := range functions.(instance.List).Slice() {
+		if err := ensure(class.List, function); err != nil {
 			return nil, err
 		}
-		functionName := cadr.(*instance.Cons).Car         // Checked at #1
-		cdadr := cadr.(*instance.Cons).Cdr                // Checked at #1
-		if err := ensure(class.Cons, cdadr); err != nil { // #2
-			return nil, err
+		definition := function.(instance.List).Slice()
+		if len(definition) < 2 {
+			return nil, instance.New(class.ProgramError)
 		}
-		lambdaList := cdadr.(*instance.Cons).Car // Checked at #2
-		forms := cdadr.(*instance.Cons).Cdr      // Checked at #2
-		if err := ensure(class.List, forms); err != nil {
-			return nil, err
-		}
-		fun, err := newNamedFunction(local, global, functionName, lambdaList, forms.(instance.List).Slice()...)
+		functionName := definition[0]
+		lambdaList := definition[1]
+		forms := definition[2:]
+		fun, err := newNamedFunction(local, global, functionName, lambdaList, forms...)
 		if err != nil {
 			return nil, err
 		}
