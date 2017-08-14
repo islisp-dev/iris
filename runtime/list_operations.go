@@ -51,11 +51,8 @@ func Reverse(_, _ *environment.Environment, list ilos.Instance) (ilos.Instance, 
 		return nil, err
 	}
 	cons := Nil
-	cdr := list
-	for instance.Of(class.Cons, cdr) {
-		car := cdr.(*instance.Cons).Car
+	for _, car := range list.(instance.List).Slice() {
 		cons = instance.New(class.Cons, car, cons)
-		cdr = cdr.(*instance.Cons).Cdr
 	}
 	return cons, nil
 }
@@ -66,11 +63,8 @@ func Nreverse(_, _ *environment.Environment, list ilos.Instance) (ilos.Instance,
 		return nil, err
 	}
 	cons := Nil
-	cdr := list
-	for instance.Of(class.Cons, cdr) {
-		car := cdr.(*instance.Cons).Car
+	for _, car := range list.(instance.List).Slice() {
 		cons = instance.New(class.Cons, car, cons)
-		cdr = cdr.(*instance.Cons).Cdr
 	}
 	return cons, nil
 }
