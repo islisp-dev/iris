@@ -11,6 +11,31 @@ import (
 )
 
 //
+// General Array *
+//
+
+type GeneralArrayStar struct {
+	Vector []*GeneralArrayStar
+	Scalar ilos.Instance
+}
+
+func (GeneralArrayStar) Class() ilos.Class {
+	return class.GeneralArrayStar
+}
+
+func (i GeneralArrayStar) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
+	return nil, false
+}
+
+func (i GeneralArrayStar) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
+	return false
+}
+
+func (i GeneralArrayStar) String() string {
+	return ""
+}
+
+//
 // General Vector
 //
 
@@ -21,20 +46,10 @@ func (GeneralVector) Class() ilos.Class {
 }
 
 func (i GeneralVector) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
-	if symbol, ok := key.(Symbol); ok && symbol == "LENGTH" {
-		return New(class.Integer, len(i)), true
-	}
-	if index, ok := key.(Integer); ok && int(index) < len(i) {
-		return i[int(index)], true
-	}
 	return nil, false
 }
 
 func (i GeneralVector) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
-	if index, ok := key.(Integer); ok && int(index) < len(i) {
-		i[int(index)] = value
-		return true
-	}
 	return false
 }
 
@@ -53,22 +68,10 @@ func (String) Class() ilos.Class {
 }
 
 func (i String) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
-	if symbol, ok := key.(Symbol); ok && symbol == "LENGTH" {
-		return New(class.Integer, len(i)), true
-	}
-	if index, ok := key.(Integer); ok && int(index) < len(i) {
-		return New(class.Character, i[int(index)]), true
-	}
 	return nil, false
 }
 
 func (i String) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
-	if index, ok := key.(Integer); ok && int(index) < len(i) {
-		if character, ok := value.(Character); ok {
-			i[index] = rune(character)
-			return true
-		}
-	}
 	return false
 }
 

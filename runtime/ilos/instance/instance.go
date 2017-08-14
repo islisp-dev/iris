@@ -35,6 +35,8 @@ func New(c ilos.Class, s ...interface{}) ilos.Instance {
 		return Null{}
 	case class.GeneralVector:
 		return GeneralVector(s[0].([]ilos.Instance))
+	case class.GeneralArrayStar:
+		return &GeneralArrayStar{s[0].([]*GeneralArrayStar), s[1].(ilos.Instance)}
 	case class.String:
 		return String(s[0].(string))
 	default:
