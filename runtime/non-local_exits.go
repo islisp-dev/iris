@@ -210,3 +210,43 @@ func Go(local, global *environment.Environment, tag ilos.Instance) (ilos.Instanc
 	}
 	return nil, instance.New(class.TagbodyTag, map[string]ilos.Instance{"TAG": tag})
 }
+
+// UnwindProtect first evaluates form. Evaluation of the cleanup-forms always
+// occurs, regardless of whether the exit is normal or non-local.
+//
+// If the form exits normally yielding a value R, then if all of the
+// cleanup-forms exit normally the value R is returned by the
+// unwind-protect form.
+//
+// If a non-local exit from form occurs, then the cleanup-forms are executed as
+// part of that exit, and then if all of the cleanup-forms exit normally the
+// original non-local exit continues.
+//
+// The cleanup-forms are evaluated from left to right, discarding the resulting
+// values. If execution of the cleanup-forms finishes normally, exit from the
+// unwind-protect form proceeds as described above. It is permissible for a
+// cleanup-form to contain a non-local exit from the unwind-protect form,
+// subject to the following constraint:
+//
+// An error shall be signaled if during execution of the cleanup-forms of an
+// unwind-protect form, a non-local exit is executed to a destination which has
+// been marked as invalid due to some other non-local exit that is already in
+// progress (error-id. control-error).
+//
+// Note: Because ISLISP does not specify an interactive debugger, it is
+// unspecified whether or how error recovery can occur interactively if
+// programmatic handling fails. The intent is that if the ISLISP processor does
+// not terminate abnormally, normal mechanisms for non-local exit (return-from,
+// throw, or go) would be used as necessary and would respect these
+// cleanup-forms.
+func UnwindProtect(local, global *environment.Environment, form ilos.Instance, cleanupForms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	ret1, err1 := Eval(local, global, form)
+	ret2, err2 := Progn(local, global, cleanupForms...)
+	if instance.Of(class.Escape, err2) {
+		return nil, instance.New(class.ControlError)
+	}
+	if err2 != nil {
+		return ret2, err2
+	}
+	return ret1, err1
+}
