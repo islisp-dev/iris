@@ -15,6 +15,8 @@ type Environment struct {
 	Variable        stack
 	DynamicVariable stack // deep biding
 	Constant        stack
+	GensymID        int
+	Property        mmap
 }
 
 // New creates new environment
@@ -29,6 +31,8 @@ func New() *Environment {
 	env.Variable = newStack()
 	env.DynamicVariable = newStack()
 	env.Constant = newStack()
+	env.GensymID = 0
+	env.Property = mmap{}
 	return env
 }
 
@@ -42,6 +46,8 @@ func (env *Environment) Merge(before *Environment) *Environment {
 	env.Macro = append(before.Macro, env.Macro...)
 	env.DynamicVariable = append(before.DynamicVariable, env.DynamicVariable...)
 	env.Constant = append(before.Constant, env.Constant...)
+	env.GensymID = before.GensymID
+	env.Property = before.Property
 	return env
 }
 
