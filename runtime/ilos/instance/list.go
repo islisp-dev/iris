@@ -11,13 +11,17 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/class"
 )
 
+type List interface {
+	Slice() []ilos.Instance
+}
+
 //
 // Cons
 //
 
 type Cons struct {
-	car ilos.Instance
-	cdr ilos.Instance
+	Car ilos.Instance
+	Cdr ilos.Instance
 }
 
 func (*Cons) Class() ilos.Class {
@@ -28,9 +32,9 @@ func (i *Cons) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, boo
 	if symbol, ok := key.(Symbol); ok {
 		switch symbol {
 		case "CAR":
-			return i.car, true
+			return i.Car, true
 		case "CDR":
-			return i.cdr, true
+			return i.Cdr, true
 		}
 	}
 	return nil, false
@@ -40,10 +44,10 @@ func (i *Cons) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class
 	if symbol, ok := key.(Symbol); ok {
 		switch symbol {
 		case "CAR":
-			i.car = value
+			i.Car = value
 			return true
 		case "CDR":
-			i.cdr = value
+			i.Cdr = value
 			return true
 		}
 	}
@@ -51,11 +55,11 @@ func (i *Cons) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class
 }
 
 func (i *Cons) String() string {
-	str := "(" + fmt.Sprint(i.car)
-	cdr := i.cdr
+	str := "(" + fmt.Sprint(i.Car)
+	cdr := i.Cdr
 	for Of(class.Cons, cdr) {
-		str += fmt.Sprintf(" %v", UnsafeCar(cdr)) // Checked at the top of this loop
-		cdr = UnsafeCdr(cdr)                      // Checked at the top of this loop
+		str += fmt.Sprintf(" %v", cdr.(*Cons).Car) // Checked at the top of this loop
+		cdr = cdr.(*Cons).Cdr                      // Checked at the top of this loop
 	}
 	if Of(class.Null, cdr) {
 		str += ")"
@@ -65,22 +69,14 @@ func (i *Cons) String() string {
 	return str
 }
 
-func UnsafeCar(i ilos.Instance) ilos.Instance {
-	return i.(*Cons).car
-}
-
-func UnsafeCdr(i ilos.Instance) ilos.Instance {
-	return i.(*Cons).cdr
-}
-
-func UnsafeSetCar(o, i ilos.Instance) ilos.Instance {
-	i.(*Cons).car = o
-	return o
-}
-
-func UnsafeSetCdr(o, i ilos.Instance) ilos.Instance {
-	i.(*Cons).cdr = o
-	return o
+func (i *Cons) Slice() []ilos.Instance {
+	s := []ilos.Instance{}
+	var cdr ilos.Instance = i
+	for Of(class.Cons, cdr) {
+		s = append(s, cdr.(*Cons).Car)
+		cdr = cdr.(*Cons).Cdr
+	}
+	return s
 }
 
 //
@@ -103,4 +99,8 @@ func (i Null) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class)
 
 func (Null) String() string {
 	return "nil"
+}
+
+func (Null) Slice() []ilos.Instance {
+	return []ilos.Instance{}
 }

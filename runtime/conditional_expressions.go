@@ -43,11 +43,11 @@ func If(local, global *environment.Environment, testForm, thenForm ilos.Instance
 // If no form exists for the successful test then the value of this test is returned.
 func Cond(local, global *environment.Environment, testFrom ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	for _, tf := range testFrom {
-		s, ln, err := convSlice(tf)
-		if err != nil {
+		if err := ensure(class.List, tf); err != nil {
 			return nil, err
 		}
-		if ln == 0 {
+		s := tf.(instance.List).Slice()
+		if len(s) == 0 {
 			return nil, instance.New(class.ProgramError)
 		}
 		ret, err := Eval(local, global, s[0])
@@ -80,20 +80,20 @@ func Case(local, global *environment.Environment, key ilos.Instance, pattern ...
 		return nil, err
 	}
 	for idx, pat := range pattern {
-		form, ln, err := convSlice(pat)
-		if err != nil {
+		if err := ensure(class.List, pat); err != nil {
 			return nil, err
 		}
-		if ln < 1 {
+		form := pat.(instance.List).Slice()
+		if len(form) < 1 {
 			return nil, instance.New(class.ProgramError)
 		}
 		if idx == len(pattern)-1 && form[0] == T {
 			return Progn(local, global, form[1:]...)
 		}
-		keys, _, err := convSlice(form[0])
-		if err != nil {
+		if err := ensure(class.List, form[0]); err != nil {
 			return nil, err
 		}
+		keys := form[0].(instance.List).Slice()
 		for _, k := range keys {
 			if k == key {
 				return Progn(local, global, form[1:]...)
@@ -127,20 +127,20 @@ func CaseUsing(local, global *environment.Environment, key, pred ilos.Instance, 
 		return nil, err
 	}
 	for idx, pat := range pattern {
-		form, ln, err := convSlice(pat)
-		if err != nil {
+		if err := ensure(class.List, pat); err != nil {
 			return nil, err
 		}
-		if ln < 1 {
+		form := pat.(instance.List).Slice()
+		if len(form) < 1 {
 			return nil, instance.New(class.ProgramError)
 		}
 		if idx == len(pattern)-1 && form[0] == T {
 			return Progn(local, global, form[1:]...)
 		}
-		keys, _, err := convSlice(form[0])
-		if err != nil {
+		if err := ensure(class.List, form[0]); err != nil {
 			return nil, err
 		}
+		keys := form[0].(instance.List).Slice()
 		for _, k := range keys {
 			ret, err := pred.(instance.Function).Apply(local, global, instance.New(class.Cons, k, instance.New(class.Cons, key, Nil)))
 			if err != nil {

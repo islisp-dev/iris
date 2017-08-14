@@ -35,7 +35,7 @@ func Car(_, _ *environment.Environment, cons ilos.Instance) (ilos.Instance, ilos
 	if err := ensure(class.Cons, cons); err != nil {
 		return nil, err
 	}
-	return instance.UnsafeCar(cons), nil // Checked at the top of this function
+	return cons.(*instance.Cons).Car, nil // Checked at the top of this function
 }
 
 // Cdr returns the right component of the cons.
@@ -44,7 +44,7 @@ func Cdr(_, _ *environment.Environment, cons ilos.Instance) (ilos.Instance, ilos
 	if err := ensure(class.Cons, cons); err != nil {
 		return nil, err
 	}
-	return instance.UnsafeCdr(cons), nil // Checked at the top of this function
+	return cons.(*instance.Cons).Cdr, nil // Checked at the top of this function
 }
 
 // TODO: setf car
@@ -56,7 +56,7 @@ func SetCar(_, _ *environment.Environment, obj, cons ilos.Instance) (ilos.Instan
 	if err := ensure(class.Cons, cons); err != nil {
 		return nil, err
 	}
-	instance.UnsafeSetCar(obj, cons)
+	cons.(*instance.Cons).Car = obj
 	return obj, nil
 }
 
@@ -69,6 +69,6 @@ func SetCdr(_, _ *environment.Environment, obj, cons ilos.Instance) (ilos.Instan
 	if err := ensure(class.Cons, cons); err != nil {
 		return nil, err
 	}
-	instance.UnsafeSetCdr(obj, cons)
+	cons.(*instance.Cons).Cdr = obj
 	return obj, nil
 }
