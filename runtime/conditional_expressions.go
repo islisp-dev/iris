@@ -142,7 +142,11 @@ func CaseUsing(local, global *environment.Environment, key, pred ilos.Instance, 
 		}
 		keys := form[0].(instance.List).Slice()
 		for _, k := range keys {
-			ret, err := pred.(instance.Function).Apply(local, global, instance.New(class.Cons, k, instance.New(class.Cons, key, Nil)))
+			args, err := List(nil, nil, k, key)
+			if err != nil {
+				return nil, err
+			}
+			ret, err := pred.(instance.Function).Apply(local, global, args)
 			if err != nil {
 				return nil, err
 			}
