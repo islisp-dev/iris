@@ -12,10 +12,10 @@ import (
 )
 
 func checkLambdaList(lambdaList ilos.Instance) ilos.Instance {
-	cdr, _, err := convSlice(lambdaList)
-	if err != nil {
+	if err := ensure(class.List, lambdaList); err != nil {
 		return err
 	}
+	cdr := lambdaList.(instance.List).Slice()
 	for i, cadr := range cdr {
 		if !instance.Of(class.Symbol, cadr) {
 			return instance.New(class.ProgramError)
@@ -34,10 +34,9 @@ func newNamedFunction(local, global *environment.Environment, functionName, lamb
 	if err := checkLambdaList(lambdaList); err != nil {
 		return nil, err
 	}
-	cdr, _, _ := convSlice(lambdaList)
 	parameters := []ilos.Instance{}
 	variadic := false
-	for _, cadr := range cdr {
+	for _, cadr := range lambdaList.(instance.List).Slice() {
 		if cadr == instance.New(class.Symbol, ":REST") || cadr == instance.New(class.Symbol, "&REST") {
 			variadic = true
 		}

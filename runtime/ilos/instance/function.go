@@ -41,13 +41,12 @@ func (f Function) String() string {
 func (f Function) Apply(local, global *environment.Environment, arguments ilos.Instance) (ilos.Instance, ilos.Instance) {
 	fv := reflect.ValueOf(f.function)
 	ft := reflect.TypeOf(f.function)
-	cdr := arguments
 	argv := []reflect.Value{reflect.ValueOf(local), reflect.ValueOf(global)}
-	for Of(class.Cons, cdr) {
-		cadr := UnsafeCar(cdr) // Checked at the top of this loop
-		cddr := UnsafeCdr(cdr) // Checked at the top of this loop
+	if !Of(class.List, arguments) {
+		return nil, New(class.ProgramError)
+	}
+	for _, cadr := range arguments.(List).Slice() {
 		argv = append(argv, reflect.ValueOf(cadr))
-		cdr = cddr
 	}
 	if ft.NumIn() != len(argv) && (!ft.IsVariadic() || ft.NumIn()-2 >= len(argv)) {
 		return nil, New(class.ProgramError)

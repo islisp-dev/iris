@@ -56,16 +56,15 @@ func While(local, global *environment.Environment, testForm ilos.Instance, bodyF
 // If end-test returns a non-nil value, then the result * are evaluated sequentially and the value of the
 // last one is returned as value of the whole for macro. If no result is present, then the value of the for macro is nil.
 func For(local, global *environment.Environment, iterationSpecs, endTestAndResults ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	iss, _, err := convSlice(iterationSpecs)
-	if err != nil {
+	if err := ensure(class.List, iterationSpecs); err != nil {
 		return nil, err
 	}
-	for _, is := range iss {
-		i, ln, err := convSlice(is)
-		if err != nil {
+	for _, is := range iterationSpecs.(instance.List).Slice() {
+		if err := ensure(class.List, is); err != nil {
 			return nil, err
 		}
-		switch ln {
+		i := is.(instance.List).Slice()
+		switch len(i) {
 		case 2, 3:
 			var1 := i[0]
 			init := i[1]
@@ -76,11 +75,11 @@ func For(local, global *environment.Environment, iterationSpecs, endTestAndResul
 			return nil, instance.New(class.ProgramError)
 		}
 	}
-	ends, ln, err := convSlice(endTestAndResults)
-	if err != nil {
+	if err := ensure(class.List, endTestAndResults); err != nil {
 		return nil, err
 	}
-	if ln == 0 {
+	ends := endTestAndResults.(instance.List).Slice()
+	if len(ends) == 0 {
 		return nil, instance.New(class.ParseError)
 	}
 	endTest := ends[0]
@@ -94,12 +93,12 @@ func For(local, global *environment.Environment, iterationSpecs, endTestAndResul
 		if err != nil {
 			return nil, err
 		}
-		for _, is := range iss {
-			i, ln, err := convSlice(is)
-			if err != nil {
+		for _, is := range iterationSpecs.(instance.List).Slice() {
+			if err := ensure(class.List, is); err != nil {
 				return nil, err
 			}
-			switch ln {
+			i := is.(instance.List).Slice()
+			switch len(i) {
 			case 2:
 			case 3:
 				var1 := i[0]

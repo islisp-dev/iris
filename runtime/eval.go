@@ -16,15 +16,11 @@ func evalArguments(local, global *environment.Environment, arguments ilos.Instan
 	if arguments == Nil {
 		return Nil, nil
 	}
-	// arguments must be a instance of list and ends with nil
-	if !isProperList(arguments) {
-		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
-			"STRING":         arguments,
-			"EXPECTED-CLASS": class.List,
-		})
+	if err := ensure(class.Cons, arguments); err != nil {
+		return nil, err
 	}
-	car := instance.UnsafeCar(arguments) // Checked there
-	cdr := instance.UnsafeCdr(arguments) // Checked there
+	car := arguments.(*instance.Cons).Car // Checked there
+	cdr := arguments.(*instance.Cons).Cdr // Checked there
 	a, err := Eval(local, global, car)
 	if err != nil {
 		return nil, err
@@ -40,7 +36,7 @@ func evalArguments(local, global *environment.Environment, arguments ilos.Instan
 func evalLambda(local, global *environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// eval if lambda form
 	if instance.Of(class.Cons, car) {
-		caar := instance.UnsafeCar(car) // Checked at the top of// This sentence
+		caar := car.(*instance.Cons).Car // Checked at the top of// This sentence
 		if caar == instance.New(class.Symbol, "LAMBDA") {
 			fun, err := Eval(local, global, car)
 			if err != nil {
@@ -141,8 +137,8 @@ func evalCons(local, global *environment.Environment, obj ilos.Instance) (ilos.I
 			"EXPECTED-CLASS": class.Cons,
 		})
 	}
-	car := instance.UnsafeCar(obj) // Checked at the top of// This function
-	cdr := instance.UnsafeCdr(obj) // Checked at the top of// This function
+	car := obj.(*instance.Cons).Car // Checked at the top of// This function
+	cdr := obj.(*instance.Cons).Cdr // Checked at the top of// This function
 
 	// eval if lambda form
 	if a, b, c := evalLambda(local, global, car, cdr); c {

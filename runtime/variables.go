@@ -51,16 +51,16 @@ func Setq(local, global *environment.Environment, var1, form ilos.Instance) (ilo
 //
 // No var may appear more than once in let variable list.
 func Let(local, global *environment.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	cdr := varForm
 	vfs := map[ilos.Instance]ilos.Instance{}
-	for instance.Of(class.Cons, cdr) {
-		uCar, uCdr := instance.UnsafeCar, instance.UnsafeCdr
-		cadr, cddr := uCar(cdr), uCdr(cdr) // Checked at the top of this loop
-		s, ln, err := convSlice(cadr)
-		if err != nil {
+	if err := ensure(class.List, varForm); err != nil {
+		return nil, err
+	}
+	for _, cadr := range varForm.(instance.List).Slice() {
+		if err := ensure(class.List, cadr); err != nil {
 			return nil, err
 		}
-		if ln != 2 {
+		s := cadr.(instance.List).Slice()
+		if len(s) != 2 {
 			return nil, instance.New(class.ProgramError)
 		}
 		f, err := Eval(local, global, s[1])
@@ -68,7 +68,6 @@ func Let(local, global *environment.Environment, varForm ilos.Instance, bodyForm
 			return nil, err
 		}
 		vfs[s[0]] = f
-		cdr = cddr
 	}
 	for v, f := range vfs {
 		if !local.Variable.Define(v, f) {
@@ -93,15 +92,15 @@ func Let(local, global *environment.Environment, varForm ilos.Instance, bodyForm
 // The returned value of let* is the result of the evaluation of the last form
 // of its body (or nil if there is none).
 func LetStar(local, global *environment.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	cdr := varForm
-	for instance.Of(class.Cons, cdr) {
-		uCar, uCdr := instance.UnsafeCar, instance.UnsafeCdr
-		cadr, cddr := uCar(cdr), uCdr(cdr) // Checked at the top of this loop
-		s, ln, err := convSlice(cadr)
-		if err != nil {
+	if err := ensure(class.List, varForm); err != nil {
+		return nil, err
+	}
+	for _, cadr := range varForm.(instance.List).Slice() {
+		if err := ensure(class.List, cadr); err != nil {
 			return nil, err
 		}
-		if ln != 2 {
+		s := cadr.(instance.List).Slice()
+		if len(s) != 2 {
 			return nil, instance.New(class.ProgramError)
 		}
 		f, err := Eval(local, global, s[1])
@@ -111,7 +110,6 @@ func LetStar(local, global *environment.Environment, varForm ilos.Instance, body
 		if !local.Variable.Define(s[0], f) {
 			return nil, instance.New(class.ProgramError)
 		}
-		cdr = cddr
 	}
 	return Progn(local, global, bodyForm...)
 }

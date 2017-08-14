@@ -103,32 +103,24 @@ func Lambda(local, global *environment.Environment, lambdaList ilos.Instance, fo
 //
 // No function-name may appear more than once in the function bindings.
 func Labels(local, global *environment.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	cdr, _, err := convSlice(functions)
-	if err != nil {
+	if err := ensure(class.List, functions); err != nil {
 		return nil, err
 	}
-	for _, cadr := range cdr {
-		if !instance.Of(class.Cons, cadr) { // #1
-			return nil, instance.New(class.ProgramError)
-		}
-		functionName := instance.UnsafeCar(cadr) // Checked at #1
-		cdadr := instance.UnsafeCdr(cadr)
-		if !instance.Of(class.Cons, cdadr) { // #2
-			return nil, instance.New(class.ProgramError)
-		}
-		lambdaList := instance.UnsafeCar(cdadr) // Checked at #2
-		if err := checkLambdaList(lambdaList); err != nil {
+	for _, cadr := range functions.(instance.List).Slice() {
+		if err := ensure(class.Cons, cadr); err != nil { // #1
 			return nil, err
 		}
-		cddadr := instance.UnsafeCdr(cdadr) // Checked at #2
-		if !isProperList(cddadr) {
-			return nil, instance.New(class.ProgramError)
-		}
-		form, _, err := convSlice(cddadr)
-		if err != nil {
+		functionName := cadr.(*instance.Cons).Car         // Checked at #1
+		cdadr := cadr.(*instance.Cons).Cdr                // Checked at #1
+		if err := ensure(class.Cons, cdadr); err != nil { // #2
 			return nil, err
 		}
-		fun, err := newNamedFunction(local, global, functionName, lambdaList, form...)
+		lambdaList := cdadr.(*instance.Cons).Car // Checked at #2
+		forms := cdadr.(*instance.Cons).Cdr      // Checked at #2
+		if err := ensure(class.List, forms); err != nil {
+			return nil, err
+		}
+		fun, err := newNamedFunction(local, global, functionName, lambdaList, forms.(instance.List).Slice()...)
 		if err != nil {
 			return nil, err
 		}
@@ -142,33 +134,25 @@ func Labels(local, global *environment.Environment, functions ilos.Instance, bod
 // Flet special form allow the definition of new identifiers in the function
 // namespace for function objects (see Labels).
 func Flet(local, global *environment.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	cdr, _, err := convSlice(functions)
-	if err != nil {
+	if err := ensure(class.List, functions); err != nil {
 		return nil, err
 	}
 	env := environment.New().Merge(local)
-	for _, cadr := range cdr {
-		if !instance.Of(class.Cons, cadr) { // #1
-			return nil, instance.New(class.ProgramError)
-		}
-		functionName := instance.UnsafeCar(cadr) // Checked at #1
-		cdadr := instance.UnsafeCdr(cadr)
-		if !instance.Of(class.Cons, cdadr) { // #2
-			return nil, instance.New(class.ProgramError)
-		}
-		lambdaList := instance.UnsafeCar(cdadr) // Checked at #2
-		if err := checkLambdaList(lambdaList); err != nil {
+	for _, cadr := range functions.(instance.List).Slice() {
+		if err := ensure(class.Cons, cadr); err != nil { // #1
 			return nil, err
 		}
-		cddadr := instance.UnsafeCdr(cdadr) // Checked at #2
-		if !isProperList(cddadr) {
-			return nil, instance.New(class.ProgramError)
-		}
-		form, _, err := convSlice(cddadr)
-		if err != nil {
+		functionName := cadr.(*instance.Cons).Car         // Checked at #1
+		cdadr := cadr.(*instance.Cons).Cdr                // Checked at #1
+		if err := ensure(class.Cons, cdadr); err != nil { // #2
 			return nil, err
 		}
-		fun, err := newNamedFunction(local, global, functionName, lambdaList, form...)
+		lambdaList := cdadr.(*instance.Cons).Car // Checked at #2
+		forms := cdadr.(*instance.Cons).Cdr      // Checked at #2
+		if err := ensure(class.List, forms); err != nil {
+			return nil, err
+		}
+		fun, err := newNamedFunction(local, global, functionName, lambdaList, forms.(instance.List).Slice()...)
 		if err != nil {
 			return nil, err
 		}
