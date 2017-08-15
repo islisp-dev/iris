@@ -5,7 +5,6 @@
 package runtime
 
 import (
-	"fmt"
 	"reflect"
 	"regexp"
 	"runtime"
@@ -37,10 +36,7 @@ func convFloat64(x ilos.Instance) (float64, bool, ilos.Instance) {
 	case instance.Of(class.Float, x):
 		return float64(x.(instance.Float)), true, nil
 	default:
-		return 0.0, false, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         x,
-			"EXPECTED-CLASS": class.Number,
-		})
+		return 0.0, false, instance.NewDomainError(x, class.Number)
 	}
 }
 
@@ -87,23 +83,8 @@ func defglobal(name string, value ilos.Instance) {
 func ensure(c ilos.Class, i ...ilos.Instance) ilos.Instance {
 	for _, o := range i {
 		if !instance.Of(c, o) {
-			return instance.New(class.DomainError, map[string]ilos.Instance{
-				"OBJECT":         o,
-				"EXPECTED-CLASS": c,
-			})
+			return instance.NewDomainError(o, c)
 		}
 	}
 	return nil
-}
-
-func ProgramError(cause string) (ilos.Instance, ilos.Instance) {
-	pc := make([]uintptr, 10) // at least 1 entry needed
-	runtime.Callers(2, pc)
-	name := runtime.FuncForPC(pc[0]).Name()
-	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
-	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
-	name = strings.ToUpper(name)
-	return nil, instance.New(class.ProgramError, map[string]ilos.Instance{
-		"CAUSE": instance.NewString(cause + fmt.Sprintf(" in %v", name)),
-	})
 }

@@ -80,7 +80,7 @@ func For(local, global *environment.Environment, iterationSpecs, endTestAndResul
 	}
 	ends := endTestAndResults.(instance.List).Slice()
 	if len(ends) == 0 {
-		return nil, instance.New(class.ParseError)
+		return nil, instance.NewArityError()
 	}
 	endTest := ends[0]
 	results := ends[1:]

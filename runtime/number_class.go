@@ -35,10 +35,7 @@ func ParseNumber(_, _ *environment.Environment, str ilos.Instance) (ilos.Instanc
 	}
 	ret, err := parser.ParseAtom(string(str.(instance.String)))
 	if err != nil || !instance.Of(class.Number, ret) {
-		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
-			"STRING":         str,
-			"EXPECTED-CLASS": class.Number,
-		})
+		return nil, instance.NewParseError(str, class.Number)
 	}
 	return ret, err
 }
@@ -227,10 +224,7 @@ func Quotient(_, _ *environment.Environment, dividend, divisor1 ilos.Instance, d
 			for i := len(divisor) - 1; i >= 0; i-- {
 				arguments = instance.NewCons(divisor[i], arguments)
 			}
-			return nil, instance.New(class.DivisionByZero, map[string]ilos.Instance{
-				"OPERATION": instance.NewSymbol("QUOTIENT"),
-				"OPERANDS":  arguments,
-			})
+			return nil, instance.NewDivisionByZero(instance.NewSymbol("QUOTIENT"), arguments)
 		}
 		if !flt && !b && int(quotient)%int(f) != 0 {
 			flt = true
@@ -312,10 +306,7 @@ func Log(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.In
 		return nil, err
 	}
 	if f <= 0.0 {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         x,
-			"EXPECTED-CLASS": class.Number,
-		})
+		return nil, instance.NewDomainError(x, class.Number)
 	}
 	return instance.NewFloat(math.Log(f)), nil
 }
@@ -338,10 +329,12 @@ func Expt(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, i
 		return instance.NewInteger(int(math.Pow(a, b))), nil
 	}
 	if (a == 0 && b < 0) || (a == 0 && bf && b == 0) || (a < 0 && bf) {
-		return nil, instance.New(class.ArithmeticError, map[string]ilos.Instance{
-			"OPERATION": instance.NewSymbol("EXPT"),
-			"OPERANDS":  instance.NewCons(x1, instance.NewCons(x2, Nil)),
-		})
+		operation := instance.NewSymbol("EXPT")
+		operands, err := List(nil, nil, x1, x2)
+		if err != nil {
+			return nil, err
+		}
+		return nil, instance.NewArithmeticError(operation, operands)
 	}
 	return instance.NewFloat(math.Pow(a, b)), nil
 }
@@ -354,10 +347,7 @@ func Sqrt(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.I
 		return nil, err
 	}
 	if a < 0.0 {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         x,
-			"EXPECTED-CLASS": class.Number,
-		})
+		return nil, instance.NewDomainError(x, class.Number)
 	}
 	if math.Ceil(math.Sqrt(a)) == math.Sqrt(a) {
 		return instance.NewInteger(int(math.Sqrt(a))), nil
@@ -428,10 +418,12 @@ func Atan2(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, 
 		return nil, err
 	}
 	if a == 0 && b == 0 {
-		return nil, instance.New(class.ArithmeticError, map[string]ilos.Instance{
-			"OPERATION": instance.NewSymbol("ATAN2"),
-			"OPERANDS":  instance.NewCons(x1, instance.NewCons(x2, Nil)),
-		})
+		operation := instance.NewSymbol("ATAN2")
+		operands, err := List(nil, nil, x1, x2)
+		if err != nil {
+			return nil, err
+		}
+		return nil, instance.NewArithmeticError(operation, operands)
 	}
 	return instance.NewFloat(math.Atan2(a, b)), nil
 }
@@ -474,10 +466,7 @@ func Atanh(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.
 		return nil, err
 	}
 	if math.Abs(a) >= 1 {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         x,
-			"EXPECTED-CLASS": class.Number,
-		})
+		instance.NewDomainError(x, class.Number)
 	}
 	return instance.NewFloat(math.Atanh(a)), nil
 }

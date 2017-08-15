@@ -130,12 +130,8 @@ func evalFunction(local, global *environment.Environment, car, cdr ilos.Instance
 }
 
 func evalCons(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	// obj, function call form, must be a instance of Cons, NOT Null, and ends with nil
-	if !isProperList(obj) || obj == Nil {
-		return nil, instance.New(class.ParseError, map[string]ilos.Instance{
-			"STRING":         obj,
-			"EXPECTED-CLASS": class.Cons,
-		})
+	if err := ensure(class.Cons, obj); err != nil {
+		return nil, err
 	}
 	car := obj.(*instance.Cons).Car // Checked at the top of// This function
 	cdr := obj.(*instance.Cons).Cdr // Checked at the top of// This function
@@ -156,11 +152,7 @@ func evalCons(local, global *environment.Environment, obj ilos.Instance) (ilos.I
 	if a, b, c := evalFunction(local, global, car, cdr); c {
 		return a, b
 	}
-
-	return nil, instance.New(class.UndefinedFunction, map[string]ilos.Instance{
-		"NAME":      car,
-		"NAMESPACE": instance.NewSymbol("FUNCTION"),
-	})
+	return nil, instance.NewUndefinedFunction(car)
 }
 
 func evalVariable(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
@@ -173,10 +165,7 @@ func evalVariable(local, global *environment.Environment, obj ilos.Instance) (il
 	if val, ok := global.Constant.Get(obj); ok {
 		return val, nil
 	}
-	return nil, instance.New(class.UndefinedVariable, map[string]ilos.Instance{
-		"NAME":      obj,
-		"NAMESPACE": instance.NewSymbol("VARIABLE"),
-	})
+	return nil, instance.NewUndefinedVariable(obj)
 }
 
 // Eval evaluates any classs

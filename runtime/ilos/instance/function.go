@@ -50,9 +50,7 @@ func (f Function) Apply(local, global *environment.Environment, arguments ...ilo
 		argv = append(argv, reflect.ValueOf(cadr))
 	}
 	if ft.NumIn() != len(argv) && (!ft.IsVariadic() || ft.NumIn()-2 >= len(argv)) {
-		return nil, New(class.ProgramError, map[string]ilos.Instance{
-			"CAUSE": New(class.String, fmt.Sprintf("ARITY-ERROR in %v", f.name)),
-		})
+		return nil, NewArityError()
 	}
 	rets := fv.Call(argv)
 	a, _ := rets[0].Interface().(ilos.Instance)

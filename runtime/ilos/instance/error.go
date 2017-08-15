@@ -16,6 +16,13 @@ func NewArithmeticError(operation, operands ilos.Instance) ilos.Instance {
 	})
 }
 
+func NewDivisionByZero(operation, operands ilos.Instance) ilos.Instance {
+	return New(class.DivisionByZero, map[string]ilos.Instance{
+		"OPERATION": operation,
+		"OPERANDS":  operands,
+	})
+}
+
 func NewParseError(str, expectedClass ilos.Instance) ilos.Instance {
 	return New(class.ParseError, map[string]ilos.Instance{
 		"STRING":          str,
@@ -23,7 +30,7 @@ func NewParseError(str, expectedClass ilos.Instance) ilos.Instance {
 	})
 }
 
-func NewDomainError(object, expectedClass ilos.Instance) ilos.Instance {
+func NewDomainError(object ilos.Instance, expectedClass ilos.Class) ilos.Instance {
 	return New(class.DomainError, map[string]ilos.Instance{"CAUSE": Symbol("DOMAIN-ERROR"),
 		"OBJECT":          object,
 		"EXPECTED-CLASSS": expectedClass,
@@ -54,4 +61,15 @@ func NewIndexOutOfRange() ilos.Instance {
 
 func NewImmutableBinding() ilos.Instance {
 	return New(class.ProgramError, map[string]ilos.Instance{})
+}
+
+func NewSimpleError(formatString, formatArguments ilos.Instance) ilos.Instance {
+	return New(class.SimpleError, map[string]ilos.Instance{
+		"FORMAT-STRING":    formatString,
+		"FORMAT-ARGUMENTS": formatArguments,
+	})
+}
+
+func NewControlError() ilos.Instance {
+	return New(class.ControlError)
 }

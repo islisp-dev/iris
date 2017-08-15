@@ -24,20 +24,17 @@ import (
 //
 // An error shall be signaled if sequence is not a basic-vector or a list
 // (error-id. domain-error).
-func Length(_, _ *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Length(_, _ *environment.Environment, sequence ilos.Instance) (ilos.Instance, ilos.Instance) {
 	switch {
-	case instance.Of(class.String, obj):
-		return instance.NewInteger(len(obj.(instance.String))), nil
-	case instance.Of(class.GeneralVector, obj):
-		return instance.NewInteger(len(obj.(instance.GeneralVector))), nil
-	case instance.Of(class.List, obj):
-		return instance.NewInteger(len(obj.(instance.List).Slice())), nil
+	case instance.Of(class.String, sequence):
+		return instance.NewInteger(len(sequence.(instance.String))), nil
+	case instance.Of(class.GeneralVector, sequence):
+		return instance.NewInteger(len(sequence.(instance.GeneralVector))), nil
+	case instance.Of(class.List, sequence):
+		return instance.NewInteger(len(sequence.(instance.List).Slice())), nil
 	}
 	// TODO: class.Seq
-	return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-		"OBJECT":         obj,
-		"EXPECTED-CLASS": class.Object,
-	})
+	return nil, instance.NewDomainError(sequence, class.Object)
 }
 
 // Elt returns the element of sequence that has index z. Indexing is 0-based; i.e., z = 0
@@ -74,10 +71,8 @@ func Elt(_, _ *environment.Environment, sequence, z ilos.Instance) (ilos.Instanc
 		}
 		return seq[idx], nil
 	}
-	return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-		"OBJECT":         sequence,
-		"EXPECTED-CLASS": class.Object,
-	})
+	return nil, instance.NewDomainError(sequence, class.Object)
+
 }
 
 // SetElt is that these replace the object obtainable by elt with obj. The returned value is obj.
@@ -122,10 +117,7 @@ func SetElt(_, _ *environment.Environment, obj, sequence, z ilos.Instance) (ilos
 		sequence.(*instance.Cons).Car = obj
 		return obj, nil
 	}
-	return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-		"OBJECT":         sequence,
-		"EXPECTED-CLASS": class.Object,
-	})
+	return nil, instance.NewDomainError(sequence, class.Object)
 }
 
 // Subseq returns the subsequence of length z2 − z1, containing the elements with indices from
@@ -164,10 +156,7 @@ func Subseq(_, _ *environment.Environment, sequence, z1, z2 ilos.Instance) (ilos
 		}
 		return List(nil, nil, seq[start:end]...)
 	}
-	return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-		"OBJECT":         sequence,
-		"EXPECTED-CLASS": class.Object,
-	})
+	return nil, instance.NewDomainError(sequence, class.Object)
 }
 
 // Destructively modifies destination to contain the results of applying function to

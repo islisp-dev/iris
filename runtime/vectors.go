@@ -37,10 +37,7 @@ func GeneralVectorP(_, _ *environment.Environment, obj ilos.Instance) (ilos.Inst
 // initial-element may be any ISLISP object.
 func CreateVector(_, _ *environment.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if !instance.Of(class.Integer, i) || int(i.(instance.Integer)) < 0 {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         i,
-			"EXPECTED-CLASS": class.Integer,
-		})
+		return nil, instance.NewDomainError(i, class.Integer)
 	}
 	if len(initialElement) > 1 {
 		return nil, instance.NewArityError()

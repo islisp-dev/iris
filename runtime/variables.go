@@ -30,10 +30,7 @@ func Setq(local, global *environment.Environment, var1, form ilos.Instance) (ilo
 	if global.Variable.Set(var1, ret) {
 		return ret, nil
 	}
-	return nil, instance.New(class.UndefinedVariable, map[string]ilos.Instance{
-		"NAME":      var1,
-		"NAMESPACE": instance.NewSymbol("VARIABLE"),
-	})
+	return nil, instance.NewUndefinedVariable(var1)
 }
 
 // TODO: Setf
