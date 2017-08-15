@@ -359,6 +359,9 @@ func Sqrt(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.I
 			"EXPECTED-CLASS": class.Number,
 		})
 	}
+	if math.Ceil(math.Sqrt(a)) == math.Sqrt(a) {
+		return instance.New(class.Integer, int(math.Sqrt(a))), nil
+	}
 	return instance.New(class.Float, math.Sqrt(a)), nil
 }
 

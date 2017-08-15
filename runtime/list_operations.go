@@ -32,7 +32,7 @@ func CreateList(_, _ *environment.Environment, i ilos.Instance, initialElement .
 		return nil, err
 	}
 	if len(initialElement) > 1 {
-		return nil, instance.New(class.ProgramError)
+		return ProgramError("ARITY-ERROR")
 	}
 	elm := Nil
 	if len(initialElement) == 1 {
@@ -158,11 +158,7 @@ func Mapcar(local, global *environment.Environment, function, list1 ilos.Instanc
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).Slice()[i]
 		}
-		args, err := List(nil, nil, arguments...)
-		if err != nil {
-			return nil, err
-		}
-		ret, err := function.(instance.Function).Apply(local, global, args)
+		ret, err := function.(instance.Function).Apply(local, global, arguments...)
 		if err != nil {
 			return nil, err
 		}
@@ -190,11 +186,7 @@ func Mapc(local, global *environment.Environment, function, list1 ilos.Instance,
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).Slice()[i]
 		}
-		args, err := List(nil, nil, arguments...)
-		if err != nil {
-			return nil, err
-		}
-		if _, err = function.(instance.Function).Apply(local, global, args); err != nil {
+		if _, err := function.(instance.Function).Apply(local, global, arguments...); err != nil {
 			return nil, err
 		}
 	}
@@ -222,11 +214,7 @@ func Mapcan(local, global *environment.Environment, function, list1 ilos.Instanc
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).Slice()[i]
 		}
-		args, err := List(nil, nil, arguments...)
-		if err != nil {
-			return nil, err
-		}
-		ret, err := function.(instance.Function).Apply(local, global, args)
+		ret, err := function.(instance.Function).Apply(local, global, arguments...)
 		if err != nil {
 			return nil, err
 		}
@@ -260,11 +248,7 @@ func Maplist(local, global *environment.Environment, function, list1 ilos.Instan
 				return nil, err
 			}
 		}
-		args, err := List(nil, nil, arguments...)
-		if err != nil {
-			return nil, err
-		}
-		ret, err := function.(instance.Function).Apply(local, global, args)
+		ret, err := function.(instance.Function).Apply(local, global, arguments...)
 		if err != nil {
 			return nil, err
 		}
@@ -296,11 +280,7 @@ func Mapl(local, global *environment.Environment, function, list1 ilos.Instance,
 				return nil, err
 			}
 		}
-		args, err := List(nil, nil, arguments...)
-		if err != nil {
-			return nil, err
-		}
-		if _, err := function.(instance.Function).Apply(local, global, args); err != nil {
+		if _, err := function.(instance.Function).Apply(local, global, arguments...); err != nil {
 			return nil, err
 		}
 	}
@@ -332,11 +312,7 @@ func Mapcon(local, global *environment.Environment, function, list1 ilos.Instanc
 				return nil, err
 			}
 		}
-		args, err := List(nil, nil, arguments...)
-		if err != nil {
-			return nil, err
-		}
-		ret, err := function.(instance.Function).Apply(local, global, args)
+		ret, err := function.(instance.Function).Apply(local, global, arguments...)
 		if err != nil {
 			return nil, err
 		}

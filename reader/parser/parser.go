@@ -75,16 +75,13 @@ func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	if "nil" == tok {
 		return instance.New(class.Null), nil
 	}
-	if r := regexp.MustCompile("^:([<>/*=?_!$%[\\]^{}~0-9a-zA-Z]+)$").FindStringSubmatch(tok); len(r) >= 2 {
-		return instance.New(class.Symbol, strings.ToUpper(r[0])), nil
-	}
-	if r := regexp.MustCompile("^&([<>/*=?_!$%[\\]^{}~0-9a-zA-Z]+)$").FindStringSubmatch(tok); len(r) >= 2 {
-		return instance.New(class.Symbol, strings.ToUpper(r[0])), nil
-	}
-	if m, _ := regexp.MatchString("^\\|.*\\|$", tok); m {
-		return instance.New(class.Symbol, tok), nil
-	}
-	if m, _ := regexp.MatchString("^[<>/*=?_!$%[\\]^{}~a-zA-Z-][<>/*=?_!$%[\\]^{}~0-9a-zA-Z-]*$", tok); m {
+	str := `^(`
+	str += `[:&][a-zA-Z]+|`
+	str += `\|.*\||`
+	str += `\+|\-|1\+|1\-|`
+	str += `[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*|`
+	str += ")$"
+	if m, _ := regexp.MatchString(str, tok); m {
 		return instance.New(class.Symbol, strings.ToUpper(tok)), nil
 	}
 	return nil, instance.New(class.ParseError, map[string]ilos.Instance{

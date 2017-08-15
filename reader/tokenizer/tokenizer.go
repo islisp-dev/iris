@@ -23,21 +23,22 @@ type Tokenizer struct {
 var re *regexp.Regexp
 
 func New(r io.Reader) *Tokenizer {
-	str := ""
-	str += "[-+]?[[:digit:]]+|"
-	str += "#[bB][-+]?[01]+|"
-	str += "#[oO][-+]?[0-7]+|"
-	str += "#[xX][-+]?[[:xdigit:]]+|"
-	str += "[-+]?[[:digit:]]+\\.[[:digit:]]+|"
-	str += "[-+]?[[:digit:]]+(?:\\.[[:digit:]]+)?[eE][-+]?[[:digit:]]+|"
-	str += "#\\\\newline|"
-	str += "#\\\\space|"
-	str += "#\\\\[[:graph:]]|"
-	str += "\".*\"|"
-	str += ":[<>/*=?_!$%[\\]^{}~0-9a-zA-Z]+|"
-	str += "\\|.*\\||"
-	str += "[<>/*=?_!$%[\\]^{}~a-zA-Z-][<>/*=?_!$%[\\]^{}~0-9a-zA-Z-]*|"
-	str += "[.()]|"
+	str := ``
+	str += `[-+]?[[:digit:]]+|`
+	str += `#[bB][-+]?[01]+|`
+	str += `#[oO][-+]?[0-7]+|`
+	str += `#[xX][-+]?[[:xdigit:]]+|`
+	str += `[-+]?[[:digit:]]+\.[[:digit:]]+|`
+	str += `[-+]?[[:digit:]]+(?:\.[[:digit:]]+)?[eE][-+]?[[:digit:]]+|`
+	str += `#\\newline|`
+	str += `#\\space|`
+	str += `#\\[[:graph:]]|`
+	str += `".*"|` // TODO: support \"
+	str += `[:&][a-zA-Z]+|`
+	str += `\|.*\||` // TODO: support \"
+	str += `\+|\-|1\+|1\-|`
+	str += `[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*|`
+	str += `[.()]|`
 	str += "#'|,@?|'|`|#[[:digit:]]*[aA]"
 	re = regexp.MustCompile(str)
 	sc := bufio.NewScanner(r)
@@ -54,10 +55,21 @@ func (t *Tokenizer) Next() (string, ilos.Instance) {
 
 func splitter(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if atEOF {
-		return len(data), data, nil
+		advance = len(data)
+		token = data
+		err = nil
+		return
 	}
 	if loc := re.FindIndex(data); loc != nil {
-		return loc[1], data[loc[0]:loc[1]], nil
+		advance = loc[1]
+		token = data[loc[0]:loc[1]]
+		err = nil
+		if ok, _ := regexp.Match(`^[-+]?[[:digit:]]+$`, token); ok && len(data) > loc[1] && data[loc[1]] == '.' {
+			advance = 0
+			token = nil
+			err = nil
+		}
+		return
 	}
 	return
 }

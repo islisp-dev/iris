@@ -8,7 +8,6 @@ import (
 	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
-	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
 // Defconstant is used to define a named constant in the variable namespace of the current toplevel
@@ -28,9 +27,7 @@ func Defconstant(local, global *environment.Environment, name, form ilos.Instanc
 	if err != nil {
 		return nil, err
 	}
-	if !global.Constant.Define(name, ret) {
-		return nil, instance.New(class.ProgramError)
-	}
+	global.Constant.Define(name, ret)
 	return name, nil
 }
 
@@ -47,16 +44,14 @@ func Defglobal(local, global *environment.Environment, name, form ilos.Instance)
 	if err := ensure(class.Symbol, name); err != nil {
 		return nil, err
 	}
+	if _, ok := global.Constant.Get(name); ok {
+		return ProgramError("IMMUTABLE-BIDING")
+	}
 	ret, err := Eval(local, global, form)
 	if err != nil {
 		return nil, err
 	}
-	if _, ok := global.Constant.Get(name); ok {
-		return nil, instance.New(class.ProgramError)
-	}
-	if !global.Variable.Define(name, ret) {
-		return nil, instance.New(class.ProgramError)
-	}
+	global.Variable.Define(name, ret)
 	return name, nil
 }
 
@@ -68,13 +63,14 @@ func Defdynamic(local, global *environment.Environment, name, form ilos.Instance
 	if err := ensure(class.Symbol, name); err != nil {
 		return nil, err
 	}
+	if _, ok := global.Constant.Get(name); ok {
+		return ProgramError("IMMUTABLE-BIDING")
+	}
 	ret, err := Eval(local, global, form)
 	if err != nil {
 		return nil, err
 	}
-	if !global.DynamicVariable.Define(name, ret) {
-		return nil, instance.New(class.ProgramError)
-	}
+	global.DynamicVariable.Define(name, ret)
 	return name, nil
 }
 
@@ -96,8 +92,6 @@ func Defun(local, global *environment.Environment, functionName, lambdaList ilos
 	if err != nil {
 		return nil, err
 	}
-	if !global.Function.Define(functionName, ret) {
-		return nil, instance.New(class.ProgramError)
-	}
+	global.Function.Define(functionName, ret)
 	return functionName, nil
 }

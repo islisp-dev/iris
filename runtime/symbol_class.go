@@ -35,7 +35,7 @@ func Property(local, global *environment.Environment, symbol, propertyName ilos.
 		return nil, err
 	}
 	if len(obj) > 1 {
-		return nil, instance.New(class.ProgramError)
+		return ProgramError("ARITY-ERROR")
 	}
 	ret, ok := global.Property.Get(symbol, propertyName)
 	if ok {
