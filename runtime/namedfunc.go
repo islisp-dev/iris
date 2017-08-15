@@ -20,7 +20,7 @@ func checkLambdaList(lambdaList ilos.Instance) ilos.Instance {
 		if err := ensure(class.Symbol, cadr); err != nil {
 			return err
 		}
-		if cadr == instance.New(class.Symbol, ":REST") || cadr == instance.New(class.Symbol, "&REST") {
+		if cadr == instance.Symbol(":REST") || cadr == instance.Symbol("&REST") {
 			if len(cdr) != i+2 {
 				_, err := ProgramError("ARITY-ERROR")
 				return err
@@ -38,7 +38,7 @@ func newNamedFunction(local, global *environment.Environment, functionName, lamb
 	parameters := []ilos.Instance{}
 	variadic := false
 	for _, cadr := range lambdaList.(instance.List).Slice() {
-		if cadr == instance.New(class.Symbol, ":REST") || cadr == instance.New(class.Symbol, "&REST") {
+		if cadr == instance.Symbol(":REST") || cadr == instance.Symbol("&REST") {
 			variadic = true
 		}
 		parameters = append(parameters, cadr)
@@ -50,7 +50,7 @@ func newNamedFunction(local, global *environment.Environment, functionName, lamb
 		}
 		for idx := range parameters {
 			key := parameters[idx]
-			if key == instance.New(class.Symbol, ":REST") || key == instance.New(class.Symbol, "&REST") {
+			if key == instance.Symbol(":REST") || key == instance.Symbol("&REST") {
 				key := parameters[idx+1]
 				value, err := List(nil, nil, arguments[idx:]...)
 				if err != nil {

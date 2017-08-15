@@ -116,7 +116,7 @@ func Aref(_, _ *environment.Environment, basicArray ilos.Instance, dimensions ..
 		if len(basicArray.(instance.String)) <= index {
 			return ProgramError("INDEX-OUT-OF-RANGE")
 		}
-		return instance.New(class.Character, basicArray.(instance.String)[index]), nil
+		return instance.Character(basicArray.(instance.String)[index]), nil
 	case instance.Of(class.GeneralVector, basicArray):
 		if len(dimensions) != 1 {
 			return ProgramError("ARITY-ERROR")
@@ -227,14 +227,14 @@ func ArrayDimensions(_, _ *environment.Environment, basicArray ilos.Instance) (i
 	}
 	switch {
 	case instance.Of(class.String, basicArray):
-		return List(nil, nil, instance.New(class.Integer, len(basicArray.(instance.String))))
+		return List(nil, nil, instance.Integer(len(basicArray.(instance.String))))
 	case instance.Of(class.GeneralVector, basicArray):
-		return List(nil, nil, instance.New(class.Integer, len(basicArray.(instance.GeneralVector))))
+		return List(nil, nil, instance.Integer(len(basicArray.(instance.GeneralVector))))
 	default: // General Array*
 		var array *instance.GeneralArrayStar
 		dimensions := []ilos.Instance{}
 		for array.Vector != nil {
-			dimensions = append(dimensions, instance.New(class.Integer, len(array.Vector)))
+			dimensions = append(dimensions, instance.Integer(len(array.Vector)))
 			array = array.Vector[0]
 		}
 		return List(nil, nil, dimensions...)

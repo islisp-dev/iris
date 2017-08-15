@@ -16,8 +16,8 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-var eop = instance.New(class.Symbol, "End Of Parentheses")
-var bod = instance.New(class.Symbol, "Begin Of Dot")
+var eop = instance.Symbol("End Of Parentheses")
+var bod = instance.Symbol("Begin Of Dot")
 
 func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	//
@@ -25,49 +25,49 @@ func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	//
 	if m, _ := regexp.MatchString("^[-+]?[[:digit:]]+$", tok); m {
 		n, _ := strconv.ParseInt(tok, 10, 64)
-		return instance.New(class.Integer, int(n)), nil
+		return instance.Integer(int(n)), nil
 	}
 	if r := regexp.MustCompile("^#[bB]([-+]?[01]+)$").FindStringSubmatch(tok); len(r) >= 2 {
 		n, _ := strconv.ParseInt(r[1], 2, 64)
-		return instance.New(class.Integer, int(n)), nil
+		return instance.Integer(int(n)), nil
 	}
 	if r := regexp.MustCompile("^#[oO]([-+]?[0-7]+)$").FindStringSubmatch(tok); len(r) >= 2 {
 		n, _ := strconv.ParseInt(r[1], 8, 64)
-		return instance.New(class.Integer, int(n)), nil
+		return instance.Integer(int(n)), nil
 	}
 	if r := regexp.MustCompile("^#[xX]([-+]?[[:xdigit:]]+)$").FindStringSubmatch(tok); len(r) >= 2 {
 		n, _ := strconv.ParseInt(r[1], 16, 64)
-		return instance.New(class.Integer, int(n)), nil
+		return instance.Integer(int(n)), nil
 	}
 	//
 	// float
 	//
 	if m, _ := regexp.MatchString("^[-+]?[[:digit:]]+\\.[[:digit:]]+$", tok); m {
 		n, _ := strconv.ParseFloat(tok, 64)
-		return instance.New(class.Float, n), nil
+		return instance.Float(n), nil
 	}
 	if r := regexp.MustCompile("^([-+]?[[:digit:]]+(?:\\.[[:digit:]]+)?)[eE]([-+]?[[:digit:]]+)$").FindStringSubmatch(tok); len(r) >= 3 {
 		n, _ := strconv.ParseFloat(r[1], 64)
 		e, _ := strconv.ParseInt(r[2], 10, 64)
-		return instance.New(class.Float, n*math.Pow10(int(e))), nil
+		return instance.Float(n * math.Pow10(int(e))), nil
 	}
 	//
 	// character
 	//
 	if m, _ := regexp.MatchString("^#\\\\newline$", tok); m {
-		return instance.New(class.Character, '\n'), nil
+		return instance.Character('\n'), nil
 	}
 	if m, _ := regexp.MatchString("^#\\\\space$", tok); m {
-		return instance.New(class.Character, ' '), nil
+		return instance.Character(' '), nil
 	}
 	if r := regexp.MustCompile("^#\\\\([[:graph:]])$").FindStringSubmatch(tok); len(r) >= 2 {
-		return instance.New(class.Character, rune(r[1][0])), nil
+		return instance.Character(rune(r[1][0])), nil
 	}
 	//
 	// string
 	//
 	if m, _ := regexp.MatchString("^\".*\"$", tok); m {
-		return instance.New(class.String, tok), nil
+		return instance.String(tok), nil
 	}
 	//
 	// symbol
@@ -82,10 +82,10 @@ func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	str += `[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*|`
 	str += ")$"
 	if m, _ := regexp.MatchString(str, tok); m {
-		return instance.New(class.Symbol, strings.ToUpper(tok)), nil
+		return instance.Symbol(strings.ToUpper(tok)), nil
 	}
 	return nil, instance.New(class.ParseError, map[string]ilos.Instance{
-		"STRING":         instance.New(class.String, tok),
+		"STRING":         instance.String(tok),
 		"EXPECTED-CLASS": class.Object,
 	})
 }
@@ -97,17 +97,17 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instanc
 	}
 	n := tok
 	if m, _ := regexp.MatchString("#[[:digit:]]*[aA]", tok); m {
-		s := instance.New(class.Symbol, "array")
+		s := instance.Symbol("array")
 		i := strings.IndexRune(strings.ToLower(tok), 'a')
 		if i == 1 {
-			d := instance.New(class.Integer, 1)
+			d := instance.Integer(1)
 			return instance.New(class.Cons, s, instance.New(class.Cons, d, instance.New(class.Cons, cdr, instance.New(class.Null)))), nil
 		}
 		v, err := strconv.ParseInt(tok[1:i], 10, 32)
 		if err != nil {
-			return nil, instance.New(class.ParseError, instance.New(class.String, tok), class.Integer)
+			return nil, instance.New(class.ParseError, instance.String(tok), class.Integer)
 		}
-		d := instance.New(class.Integer, int(v))
+		d := instance.Integer(int(v))
 		return instance.New(class.Cons, s, instance.New(class.Cons, d, instance.New(class.Cons, cdr, instance.New(class.Null)))), nil
 	}
 	switch tok {
@@ -122,7 +122,7 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instanc
 	case "`":
 		n = "BACKQUOTE"
 	}
-	m := instance.New(class.Symbol, n)
+	m := instance.Symbol(n)
 	return instance.New(class.Cons, m, instance.New(class.Cons, cdr, instance.New(class.Null))), nil
 }
 func parseCons(t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instance) {

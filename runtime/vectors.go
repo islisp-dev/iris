@@ -54,7 +54,7 @@ func CreateVector(_, _ *environment.Environment, i ilos.Instance, initialElement
 			v[i] = initialElement[0]
 		}
 	}
-	return instance.New(class.GeneralVector, v), nil
+	return instance.GeneralVector(v), nil
 }
 
 // Vector returns a new general-vector whose elements are its obj arguments.
@@ -63,5 +63,5 @@ func CreateVector(_, _ *environment.Environment, i ilos.Instance, initialElement
 // if the requested vector cannot be allocated (error-id. cannot-create-vector).
 // Each obj may be any ISLISP object.
 func Vector(_, _ *environment.Environment, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	return instance.New(class.GeneralVector, obj), nil
+	return instance.GeneralVector(obj), nil
 }

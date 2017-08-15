@@ -59,9 +59,9 @@ func Block(local, global *environment.Environment, tag ilos.Instance, body ...il
 		sucess, fail = Eval(local, global, cadr)
 		if fail != nil {
 			if instance.Of(class.BlockTag, fail) {
-				tag1, _ := fail.GetSlotValue(instance.New(class.Symbol, "TAG"), class.Escape) // Checked at the head of// This condition
+				tag1, _ := fail.GetSlotValue(instance.Symbol("TAG"), class.Escape) // Checked at the head of// This condition
 				if tag == tag1 {
-					obj, _ := fail.GetSlotValue(instance.New(class.Symbol, "OBJECT"), class.BlockTag) // Checked at the head of// This condition
+					obj, _ := fail.GetSlotValue(instance.Symbol("OBJECT"), class.BlockTag) // Checked at the head of// This condition
 					return obj, nil
 				}
 			}
@@ -89,7 +89,7 @@ func ReturnFrom(local, global *environment.Environment, tag, object ilos.Instanc
 	}
 	if _, ok := local.BlockTag.Get(tag); !ok {
 		return nil, instance.New(class.SimpleError, map[string]ilos.Instance{
-			"FORMAT-STRING":    instance.New(class.String, "%v is not defined as the tag"),
+			"FORMAT-STRING":    instance.String("%v is not defined as the tag"),
 			"FORMAT-ARGUMENTS": tag,
 		})
 	}
@@ -117,9 +117,9 @@ func Catch(local, global *environment.Environment, tag ilos.Instance, body ...il
 		sucess, fail = Eval(local, global, cadr)
 		if fail != nil {
 			if instance.Of(class.CatchTag, fail) {
-				tag1, _ := fail.GetSlotValue(instance.New(class.Symbol, "TAG"), class.Escape) // Checked at the head of// This condition
+				tag1, _ := fail.GetSlotValue(instance.Symbol("TAG"), class.Escape) // Checked at the head of// This condition
 				if tag == tag1 {
-					obj, _ := fail.GetSlotValue(instance.New(class.Symbol, "OBJECT"), class.CatchTag) // Checked at the head of// This condition
+					obj, _ := fail.GetSlotValue(instance.Symbol("OBJECT"), class.CatchTag) // Checked at the head of// This condition
 					return obj, nil
 				}
 			}
@@ -147,7 +147,7 @@ func Throw(local, global *environment.Environment, tag, object ilos.Instance) (i
 	}
 	if _, ok := local.CatchTag.Get(tag); !ok {
 		return nil, instance.New(class.SimpleError, map[string]ilos.Instance{
-			"FORMAT-STRING":    instance.New(class.String, "%v is not defined as the tag"),
+			"FORMAT-STRING":    instance.String("%v is not defined as the tag"),
 			"FORMAT-ARGUMENTS": tag,
 		})
 	}
@@ -159,7 +159,7 @@ func Throw(local, global *environment.Environment, tag, object ilos.Instance) (i
 
 func Tagbody(local, global *environment.Environment, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	for idx, cadr := range body {
-		cddr := instance.New(class.GeneralVector, body[idx+1:])
+		cddr := instance.GeneralVector(body[idx+1:])
 		if !instance.Of(class.Cons, cadr) {
 			if !local.TagbodyTag.Define(cadr, cddr) {
 				return ProgramError("IMMUTABLE-BINDING")
@@ -172,7 +172,7 @@ func Tagbody(local, global *environment.Environment, body ...ilos.Instance) (ilo
 			if fail != nil {
 			TAG:
 				if instance.Of(class.TagbodyTag, fail) {
-					tag, _ := fail.GetSlotValue(instance.New(class.Symbol, "TAG"), class.Escape) // Checked at the top of// This loop
+					tag, _ := fail.GetSlotValue(instance.Symbol("TAG"), class.Escape) // Checked at the top of// This loop
 					found := false
 					for _, tag1 := range body {
 						if tag == tag1 {
@@ -204,7 +204,7 @@ func Tagbody(local, global *environment.Environment, body ...ilos.Instance) (ilo
 func Go(local, global *environment.Environment, tag ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if _, ok := local.TagbodyTag.Get(tag); !ok {
 		return nil, instance.New(class.SimpleError, map[string]ilos.Instance{
-			"FORMAT-STRING":    instance.New(class.String, "%v is not defined as the tag"),
+			"FORMAT-STRING":    instance.String("%v is not defined as the tag"),
 			"FORMAT-ARGUMENTS": tag,
 		})
 	}
