@@ -19,8 +19,8 @@ import (
 // The value of MostNegativeFloat is the implementation-dependent
 // ﬂoating-point number closest to negative infinity.
 var (
-	MostPositiveFloat = instance.New(class.Float, math.MaxFloat64)
-	MostNegativeFloat = instance.New(class.Float, -math.MaxFloat64)
+	MostPositiveFloat = instance.Float(math.MaxFloat64)
+	MostNegativeFloat = instance.Float(-math.MaxFloat64)
 )
 
 // Floatp returns t if obj is a ﬂoat (instance of class float);
@@ -40,7 +40,7 @@ func Float(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.
 	if err != nil {
 		return nil, err
 	}
-	return instance.New(class.Float, f), nil
+	return instance.Float(f), nil
 }
 
 // Floor returns the greatest integer less than or equal to x .
@@ -51,7 +51,7 @@ func Floor(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.
 	if err != nil {
 		return nil, err
 	}
-	return instance.New(class.Integer, int(math.Floor(f))), nil
+	return instance.Integer(int(math.Floor(f))), nil
 }
 
 // Ceiling Returns the smallest integer that is not smaller than x.
@@ -62,7 +62,7 @@ func Ceiling(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilo
 	if err != nil {
 		return nil, err
 	}
-	return instance.New(class.Integer, int(math.Ceil(f))), nil
+	return instance.Integer(int(math.Ceil(f))), nil
 }
 
 // Truncate returns the integer between 0 and x (inclusive) that is nearest to x.
@@ -73,7 +73,7 @@ func Truncate(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, il
 	if err != nil {
 		return nil, err
 	}
-	return instance.New(class.Integer, int(math.Trunc(f))), nil
+	return instance.Integer(int(math.Trunc(f))), nil
 }
 
 // Round returns the integer nearest to x.
@@ -84,5 +84,5 @@ func Round(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.
 	if err != nil {
 		return nil, err
 	}
-	return instance.New(class.Integer, int(math.Floor(f+.5))), nil
+	return instance.Integer(int(math.Floor(f + .5))), nil
 }

@@ -48,7 +48,7 @@ func CreateString(_, _ *environment.Environment, i ilos.Instance, initialElement
 			v[i] = initialElement[0]
 		}
 	}
-	return instance.New(class.GeneralVector, v), nil
+	return instance.GeneralVector(v), nil
 }
 
 // StringEqual tests whether string1 is the same string as string2.
@@ -145,7 +145,7 @@ func CharIndex(_, _ *environment.Environment, char, str ilos.Instance, startPosi
 	if i < 0 {
 		return Nil, nil
 	}
-	return instance.New(class.Integer, i), nil
+	return instance.Integer(i), nil
 }
 
 // StringIndex returns the position of the given substring within string. The search starts
@@ -178,7 +178,7 @@ func StringIndex(_, _ *environment.Environment, sub, str ilos.Instance, startPos
 	if i < 0 {
 		return Nil, nil
 	}
-	return instance.New(class.Integer, i), nil
+	return instance.Integer(i), nil
 }
 
 // StringAppend returns a single string containing a sequence of characters that results
@@ -197,5 +197,5 @@ func StringAppend(_, _ *environment.Environment, str ...ilos.Instance) (ilos.Ins
 		}
 		ret += string(s.(instance.String))
 	}
-	return instance.New(class.String, ret), nil
+	return instance.String(ret), nil
 }

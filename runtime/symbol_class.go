@@ -79,5 +79,5 @@ func RemoveProperty(local, global *environment.Environment, symbol, propertyName
 // It is impossible for an identifier to name an unnamed symbol.
 func Gensym(local, global *environment.Environment) (ilos.Instance, ilos.Instance) {
 	global.GensymID++
-	return instance.New(class.Symbol, fmt.Sprintf("IRIS:G#%v", global.GensymID)), nil
+	return instance.Symbol(fmt.Sprintf("IRIS:G#%v", global.GensymID)), nil
 }

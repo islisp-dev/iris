@@ -33,7 +33,7 @@ func Dynamic(local, global *environment.Environment, var1 ilos.Instance) (ilos.I
 	}
 	return nil, instance.New(class.UndefinedVariable, map[string]ilos.Instance{
 		"NAME":      var1,
-		"NAMESPACE": instance.New(class.Symbol, "Variable"),
+		"NAMESPACE": instance.Symbol("Variable"),
 	})
 }
 
@@ -62,7 +62,7 @@ func SetDynamic(local, global *environment.Environment, form, var1 ilos.Instance
 	}
 	return nil, instance.New(class.UndefinedFunction, map[string]ilos.Instance{
 		"NAME":      var1,
-		"NAMESPACE": instance.New(class.Symbol, "FUNCTION"),
+		"NAMESPACE": instance.Symbol("FUNCTION"),
 	})
 }
 

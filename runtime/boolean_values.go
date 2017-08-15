@@ -31,5 +31,5 @@ import (
 // nil is a named constant whose value is the symbol nil itself.
 var (
 	Nil = instance.New(class.Null)
-	T   = instance.New(class.Symbol, "T")
+	T   = instance.Symbol("T")
 )

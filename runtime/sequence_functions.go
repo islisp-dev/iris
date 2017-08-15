@@ -27,11 +27,11 @@ import (
 func Length(_, _ *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	switch {
 	case instance.Of(class.String, obj):
-		return instance.New(class.Integer, len(obj.(instance.String))), nil
+		return instance.Integer(len(obj.(instance.String))), nil
 	case instance.Of(class.GeneralVector, obj):
-		return instance.New(class.Integer, len(obj.(instance.GeneralVector))), nil
+		return instance.Integer(len(obj.(instance.GeneralVector))), nil
 	case instance.Of(class.List, obj):
-		return instance.New(class.Integer, len(obj.(instance.List).Slice())), nil
+		return instance.Integer(len(obj.(instance.List).Slice())), nil
 	}
 	// TODO: class.Seq
 	return nil, instance.New(class.DomainError, map[string]ilos.Instance{
@@ -58,7 +58,7 @@ func Elt(_, _ *environment.Environment, sequence, z ilos.Instance) (ilos.Instanc
 		if idx > 0 && len(seq) <= idx {
 			return ProgramError("INDEX-OUT-OF-RANGE")
 		}
-		return instance.New(class.Character, seq[idx]), nil
+		return instance.Character(seq[idx]), nil
 	case instance.Of(class.GeneralVector, sequence):
 		seq := sequence.(instance.GeneralVector)
 		idx := int(z.(instance.Integer))
@@ -210,7 +210,7 @@ func mapInto(local, global *environment.Environment, destination, function ilos.
 		arguments := make([]ilos.Instance, int(max))
 		for _, seq := range sequences {
 			var err ilos.Instance
-			arguments[i], err = Elt(nil, nil, seq, instance.New(class.Integer, i))
+			arguments[i], err = Elt(nil, nil, seq, instance.Integer(i))
 			if err != nil {
 				return nil, err
 			}
@@ -219,7 +219,7 @@ func mapInto(local, global *environment.Environment, destination, function ilos.
 		if err != nil {
 			return nil, err
 		}
-		_, err = SetElt(nil, nil, ret, destination, instance.New(class.Integer, i))
+		_, err = SetElt(nil, nil, ret, destination, instance.Integer(i))
 		if err != nil {
 			return nil, err
 		}

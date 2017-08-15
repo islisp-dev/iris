@@ -44,7 +44,7 @@ func Function(local, global *environment.Environment, fun ilos.Instance) (ilos.I
 	}
 	return nil, instance.New(class.UndefinedFunction, map[string]ilos.Instance{
 		"NAME":      fun,
-		"NAMESPACE": instance.New(class.Symbol, "FUNCTION"),
+		"NAMESPACE": instance.Symbol("FUNCTION"),
 	})
 }
 
@@ -76,7 +76,7 @@ func Lambda(local, global *environment.Environment, lambdaList ilos.Instance, fo
 	if err := checkLambdaList(lambdaList); err != nil {
 		return nil, err
 	}
-	return newNamedFunction(local, global, instance.New(class.Symbol, "ANONYMOUS-FUNCTION"), lambdaList, form...)
+	return newNamedFunction(local, global, instance.Symbol("ANONYMOUS-FUNCTION"), lambdaList, form...)
 }
 
 // Labels special form allow the definition of new identifiers in the function

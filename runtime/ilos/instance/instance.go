@@ -17,28 +17,14 @@ import (
 
 func New(c ilos.Class, s ...interface{}) ilos.Instance {
 	switch c {
-	case class.Integer:
-		return Integer(s[0].(int))
-	case class.Float:
-		return Float(s[0].(float64))
-	case class.String:
-		return String(s[0].(string))
-	case class.Symbol:
-		return Symbol(s[0].(string))
-	case class.Character:
-		return Character(s[0].(rune))
 	case class.Function:
 		return Function{s[0].(Symbol), s[1]}
 	case class.Cons:
 		return &Cons{s[0].(ilos.Instance), s[1].(ilos.Instance)}
 	case class.Null:
 		return Null{}
-	case class.GeneralVector:
-		return GeneralVector(s[0].([]ilos.Instance))
 	case class.GeneralArrayStar:
 		return &GeneralArrayStar{s[0].([]*GeneralArrayStar), s[1].(ilos.Instance)}
-	case class.String:
-		return String(s[0].(string))
 	default:
 		p := []ilos.Instance{}
 		for _, q := range c.Parents() {

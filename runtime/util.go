@@ -57,7 +57,7 @@ func defspecial(function interface{}) {
 	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
 	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
 	name = strings.ToUpper(name)
-	symbol := instance.New(class.Symbol, name)
+	symbol := instance.Symbol(name)
 	environment.TopLevel.Special.Define(symbol, instance.New(class.Function, symbol, function))
 }
 func defmacro(function interface{}) {
@@ -65,7 +65,7 @@ func defmacro(function interface{}) {
 	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
 	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
 	name = strings.ToUpper(name)
-	symbol := instance.New(class.Symbol, name)
+	symbol := instance.Symbol(name)
 	environment.TopLevel.Macro.Define(symbol, instance.New(class.Function, symbol, function))
 }
 func defun(function interface{}) {
@@ -73,15 +73,15 @@ func defun(function interface{}) {
 	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
 	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
 	name = strings.ToUpper(name)
-	symbol := instance.New(class.Symbol, name)
+	symbol := instance.Symbol(name)
 	environment.TopLevel.Function.Define(symbol, instance.New(class.Function, symbol, function))
 }
-func defun2(name, function interface{}) {
-	symbol := instance.New(class.Symbol, name)
+func defun2(name string, function interface{}) {
+	symbol := instance.Symbol(name)
 	environment.TopLevel.Function.Define(symbol, instance.New(class.Function, symbol, function))
 }
 func defglobal(name string, value ilos.Instance) {
-	symbol := instance.New(class.Symbol, name)
+	symbol := instance.Symbol(name)
 	environment.TopLevel.Variable.Define(symbol, value)
 }
 func ensure(c ilos.Class, i ...ilos.Instance) ilos.Instance {
@@ -95,12 +95,15 @@ func ensure(c ilos.Class, i ...ilos.Instance) ilos.Instance {
 	}
 	return nil
 }
+
 func ProgramError(cause string) (ilos.Instance, ilos.Instance) {
 	pc := make([]uintptr, 10) // at least 1 entry needed
 	runtime.Callers(2, pc)
-	f := runtime.FuncForPC(pc[0])
-	file, line := f.FileLine(pc[0])
+	name := runtime.FuncForPC(pc[0]).Name()
+	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
+	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
+	name = strings.ToUpper(name)
 	return nil, instance.New(class.ProgramError, map[string]ilos.Instance{
-		"CAUSE": instance.New(class.String, cause+fmt.Sprintf("(%s:%d %s)", file, line, f.Name())),
+		"CAUSE": instance.String(cause + fmt.Sprintf(" in %v", name)),
 	})
 }
