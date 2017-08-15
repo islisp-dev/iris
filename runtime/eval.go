@@ -29,7 +29,7 @@ func evalArguments(local, global *environment.Environment, arguments ilos.Instan
 	if err != nil {
 		return nil, err
 	}
-	return instance.New(class.Cons, a, b), nil
+	return instance.NewCons(a, b), nil
 
 }
 
@@ -37,7 +37,7 @@ func evalLambda(local, global *environment.Environment, car, cdr ilos.Instance) 
 	// eval if lambda form
 	if instance.Of(class.Cons, car) {
 		caar := car.(*instance.Cons).Car // Checked at the top of// This sentence
-		if caar == instance.Symbol("LAMBDA") {
+		if caar == instance.NewSymbol("LAMBDA") {
 			fun, err := Eval(local, global, car)
 			if err != nil {
 				return nil, err, true
@@ -159,7 +159,7 @@ func evalCons(local, global *environment.Environment, obj ilos.Instance) (ilos.I
 
 	return nil, instance.New(class.UndefinedFunction, map[string]ilos.Instance{
 		"NAME":      car,
-		"NAMESPACE": instance.Symbol("FUNCTION"),
+		"NAMESPACE": instance.NewSymbol("FUNCTION"),
 	})
 }
 
@@ -175,7 +175,7 @@ func evalVariable(local, global *environment.Environment, obj ilos.Instance) (il
 	}
 	return nil, instance.New(class.UndefinedVariable, map[string]ilos.Instance{
 		"NAME":      obj,
-		"NAMESPACE": instance.Symbol("VARIABLE"),
+		"NAMESPACE": instance.NewSymbol("VARIABLE"),
 	})
 }
 

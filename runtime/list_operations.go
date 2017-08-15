@@ -32,7 +32,7 @@ func CreateList(_, _ *environment.Environment, i ilos.Instance, initialElement .
 		return nil, err
 	}
 	if len(initialElement) > 1 {
-		return ProgramError("ARITY-ERROR")
+		return nil, instance.NewArityError()
 	}
 	elm := Nil
 	if len(initialElement) == 1 {
@@ -40,7 +40,7 @@ func CreateList(_, _ *environment.Environment, i ilos.Instance, initialElement .
 	}
 	cons := Nil
 	for j := 0; j < int(i.(instance.Integer)); j++ {
-		cons = instance.New(class.Cons, elm, cons)
+		cons = instance.NewCons(elm, cons)
 	}
 	return cons, nil
 }
@@ -51,7 +51,7 @@ func CreateList(_, _ *environment.Environment, i ilos.Instance, initialElement .
 func List(_, _ *environment.Environment, objs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	cons := Nil
 	for i := len(objs) - 1; i >= 0; i-- {
-		cons = instance.New(class.Cons, objs[i], cons)
+		cons = instance.NewCons(objs[i], cons)
 	}
 	return cons, nil
 }
@@ -67,7 +67,7 @@ func Reverse(_, _ *environment.Environment, list ilos.Instance) (ilos.Instance, 
 	}
 	cons := Nil
 	for _, car := range list.(instance.List).Slice() {
-		cons = instance.New(class.Cons, car, cons)
+		cons = instance.NewCons(car, cons)
 	}
 	return cons, nil
 }
@@ -85,7 +85,7 @@ func Nreverse(_, _ *environment.Environment, list ilos.Instance) (ilos.Instance,
 	}
 	cons := Nil
 	for _, car := range list.(instance.List).Slice() {
-		cons = instance.New(class.Cons, car, cons)
+		cons = instance.NewCons(car, cons)
 	}
 	return cons, nil
 }

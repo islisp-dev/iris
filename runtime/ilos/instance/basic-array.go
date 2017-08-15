@@ -19,6 +19,10 @@ type GeneralArrayStar struct {
 	Scalar ilos.Instance
 }
 
+func NewGeneralArrayStar(vector []*GeneralArrayStar, scalar ilos.Instance) ilos.Instance {
+	return GeneralArrayStar{vector, scalar}
+}
+
 func (GeneralArrayStar) Class() ilos.Class {
 	return class.GeneralArrayStar
 }
@@ -41,6 +45,10 @@ func (i GeneralArrayStar) String() string {
 
 type GeneralVector []ilos.Instance
 
+func NewGeneralVector(v []ilos.Instance) ilos.Instance {
+	return GeneralVector(v)
+}
+
 func (GeneralVector) Class() ilos.Class {
 	return class.GeneralVector
 }
@@ -62,6 +70,10 @@ func (i GeneralVector) String() string {
 //
 
 type String []rune
+
+func NewString(s string) ilos.Instance {
+	return String(s)
+}
 
 func (String) Class() ilos.Class {
 	return class.String

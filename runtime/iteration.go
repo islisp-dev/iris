@@ -69,10 +69,10 @@ func For(local, global *environment.Environment, iterationSpecs, endTestAndResul
 			var1 := i[0]
 			init := i[1]
 			if !local.Variable.Define(var1, init) {
-				return ProgramError("IMMUTABLE-BINDING")
+				return nil, instance.NewImmutableBinding()
 			}
 		default:
-			return ProgramError("ARITY-ERROR")
+			return nil, instance.NewArityError()
 		}
 	}
 	if err := ensure(class.List, endTestAndResults); err != nil {
@@ -104,10 +104,10 @@ func For(local, global *environment.Environment, iterationSpecs, endTestAndResul
 				var1 := i[0]
 				step := i[2]
 				if local.Variable.Set(var1, step) {
-					return ProgramError("IMMUTABLE-BINDING")
+					return nil, instance.NewImmutableBinding()
 				}
 			default:
-				return ProgramError("ARITY-ERROR")
+				return nil, instance.NewArityError()
 			}
 		}
 		test, err = Eval(local, global, endTest)

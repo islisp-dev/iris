@@ -18,8 +18,12 @@ type Applicable interface {
 }
 
 type Function struct {
-	name     Symbol
+	name     ilos.Instance
 	function interface{}
+}
+
+func NewFunction(name ilos.Instance, function interface{}) ilos.Instance {
+	return Function{name, function}
 }
 
 func (Function) Class() ilos.Class {

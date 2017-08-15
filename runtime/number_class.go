@@ -152,9 +152,9 @@ func Add(_, _ *environment.Environment, x ...ilos.Instance) (ilos.Instance, ilos
 		sum += f
 	}
 	if flt {
-		return instance.Float(sum), nil
+		return instance.NewFloat(sum), nil
 	}
-	return instance.Integer(int(sum)), nil
+	return instance.NewInteger(int(sum)), nil
 }
 
 // Multiply returns the product, respectively, of their arguments. If all arguments are integers,
@@ -172,9 +172,9 @@ func Multiply(_, _ *environment.Environment, x ...ilos.Instance) (ilos.Instance,
 		flt = flt || b
 	}
 	if flt {
-		return instance.Float(pdt), nil
+		return instance.NewFloat(pdt), nil
 	}
-	return instance.Integer(int(pdt)), nil
+	return instance.NewInteger(int(pdt)), nil
 }
 
 // Substruct returns its additive inverse. An error shall be signaled
@@ -186,7 +186,7 @@ func Multiply(_, _ *environment.Environment, x ...ilos.Instance) (ilos.Instance,
 // x1 −x2 − … −xn. An error shall be signaled if any x is not a number (error-id. domain-error).
 func Substruct(_, _ *environment.Environment, x ilos.Instance, xs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if len(xs) == 0 {
-		ret, err := Substruct(nil, nil, instance.Integer(0), x)
+		ret, err := Substruct(nil, nil, instance.NewInteger(0), x)
 		return ret, err
 	}
 	sub, flt, err := convFloat64(x)
@@ -202,9 +202,9 @@ func Substruct(_, _ *environment.Environment, x ilos.Instance, xs ...ilos.Instan
 		flt = flt || b
 	}
 	if flt {
-		return instance.Float(sub), nil
+		return instance.NewFloat(sub), nil
 	}
-	return instance.Integer(int(sub)), nil
+	return instance.NewInteger(int(sub)), nil
 }
 
 // Quotient returns the quotient of those numbers. The result is an integer if dividend and divisor are integers and divisor evenly divides dividend , otherwise it will be a ﬂoat.
@@ -225,10 +225,10 @@ func Quotient(_, _ *environment.Environment, dividend, divisor1 ilos.Instance, d
 		if f == 0.0 {
 			arguments := Nil
 			for i := len(divisor) - 1; i >= 0; i-- {
-				arguments = instance.New(class.Cons, divisor[i], arguments)
+				arguments = instance.NewCons(divisor[i], arguments)
 			}
 			return nil, instance.New(class.DivisionByZero, map[string]ilos.Instance{
-				"OPERATION": instance.Symbol("QUOTIENT"),
+				"OPERATION": instance.NewSymbol("QUOTIENT"),
 				"OPERANDS":  arguments,
 			})
 		}
@@ -238,15 +238,15 @@ func Quotient(_, _ *environment.Environment, dividend, divisor1 ilos.Instance, d
 		quotient /= f
 	}
 	if flt {
-		return instance.Float(quotient), nil
+		return instance.NewFloat(quotient), nil
 	}
-	return instance.Integer(int(quotient)), nil
+	return instance.NewInteger(int(quotient)), nil
 }
 
 // Reciprocal returns the reciprocal of its argument x ; that is, 1/x .
 // An error shall be signaled if x is zero (error-id. division-by-zero).
 func Reciprocal(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
-	return Quotient(nil, nil, instance.Integer(1), x)
+	return Quotient(nil, nil, instance.NewInteger(1), x)
 }
 
 // Max returns the greatest (closest to positive infinity) of its arguments. The comparison is done by >.
@@ -284,7 +284,7 @@ func Min(_, _ *environment.Environment, x ilos.Instance, xs ...ilos.Instance) (i
 // Abs returns the absolute value of its argument.
 // An error shall be signaled if x is not a number (error-id. domain-error).
 func Abs(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
-	ret, err := NumberLessThan(nil, nil, x, instance.Integer(0))
+	ret, err := NumberLessThan(nil, nil, x, instance.NewInteger(0))
 	if err != nil {
 		return nil, err
 	}
@@ -301,7 +301,7 @@ func Exp(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.In
 	if err != nil {
 		return nil, err
 	}
-	return instance.Float(math.Exp(f)), nil
+	return instance.NewFloat(math.Exp(f)), nil
 }
 
 // Log returns the natural logarithm of x.
@@ -317,7 +317,7 @@ func Log(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.In
 			"EXPECTED-CLASS": class.Number,
 		})
 	}
-	return instance.Float(math.Log(f)), nil
+	return instance.NewFloat(math.Log(f)), nil
 }
 
 // Expt returns x1 raised to the power x2. The result will be
@@ -335,15 +335,15 @@ func Expt(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, i
 		return nil, err
 	}
 	if !af && !bf && b >= 0 {
-		return instance.Integer(int(math.Pow(a, b))), nil
+		return instance.NewInteger(int(math.Pow(a, b))), nil
 	}
 	if (a == 0 && b < 0) || (a == 0 && bf && b == 0) || (a < 0 && bf) {
 		return nil, instance.New(class.ArithmeticError, map[string]ilos.Instance{
-			"OPERATION": instance.Symbol("EXPT"),
-			"OPERANDS":  instance.New(class.Cons, x1, instance.New(class.Cons, x2, Nil)),
+			"OPERATION": instance.NewSymbol("EXPT"),
+			"OPERANDS":  instance.NewCons(x1, instance.NewCons(x2, Nil)),
 		})
 	}
-	return instance.Float(math.Pow(a, b)), nil
+	return instance.NewFloat(math.Pow(a, b)), nil
 }
 
 // Sqrt returns the non-negative square root of x. An error shall be signaled
@@ -360,13 +360,13 @@ func Sqrt(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.I
 		})
 	}
 	if math.Ceil(math.Sqrt(a)) == math.Sqrt(a) {
-		return instance.Integer(int(math.Sqrt(a))), nil
+		return instance.NewInteger(int(math.Sqrt(a))), nil
 	}
-	return instance.Float(math.Sqrt(a)), nil
+	return instance.NewFloat(math.Sqrt(a)), nil
 }
 
 // Pi is an approximation of π.
-var Pi = instance.Float(3.141592653589793)
+var Pi = instance.NewFloat(3.141592653589793)
 
 // Sin returns the sine of x . x must be given in radians.
 // An error shall be signaled if x is not a number (error-id. domain-error).
@@ -375,7 +375,7 @@ func Sin(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.In
 	if err != nil {
 		return nil, err
 	}
-	return instance.Float(math.Sin(a)), nil
+	return instance.NewFloat(math.Sin(a)), nil
 }
 
 // Cos returns the cosine of x . x must be given in radians.
@@ -385,7 +385,7 @@ func Cos(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.In
 	if err != nil {
 		return nil, err
 	}
-	return instance.Float(math.Cos(a)), nil
+	return instance.NewFloat(math.Cos(a)), nil
 }
 
 // Tan returns the tangent of x . x must be given in radians.
@@ -395,7 +395,7 @@ func Tan(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.In
 	if err != nil {
 		return nil, err
 	}
-	return instance.Float(math.Tan(a)), nil
+	return instance.NewFloat(math.Tan(a)), nil
 }
 
 // Atan returns the arc tangent of x.
@@ -406,7 +406,7 @@ func Atan(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.I
 	if err != nil {
 		return nil, err
 	}
-	return instance.Float(math.Atan(a)), nil
+	return instance.NewFloat(math.Atan(a)), nil
 }
 
 // Atan2 returns the phase of its representation in polar coordinates.
@@ -429,11 +429,11 @@ func Atan2(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, 
 	}
 	if a == 0 && b == 0 {
 		return nil, instance.New(class.ArithmeticError, map[string]ilos.Instance{
-			"OPERATION": instance.Symbol("ATAN2"),
-			"OPERANDS":  instance.New(class.Cons, x1, instance.New(class.Cons, x2, Nil)),
+			"OPERATION": instance.NewSymbol("ATAN2"),
+			"OPERANDS":  instance.NewCons(x1, instance.NewCons(x2, Nil)),
 		})
 	}
-	return instance.Float(math.Atan2(a, b)), nil
+	return instance.NewFloat(math.Atan2(a, b)), nil
 }
 
 // Sinh returns the hyperbolic sine of x . x must be given in radians.
@@ -443,7 +443,7 @@ func Sinh(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.I
 	if err != nil {
 		return nil, err
 	}
-	return instance.Float(math.Sinh(a)), nil
+	return instance.NewFloat(math.Sinh(a)), nil
 }
 
 // Cosh returns the hyperbolic cosine of x . x must be given in radians.
@@ -453,7 +453,7 @@ func Cosh(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.I
 	if err != nil {
 		return nil, err
 	}
-	return instance.Float(math.Cosh(a)), nil
+	return instance.NewFloat(math.Cosh(a)), nil
 }
 
 // Tanh returns the hyperbolic tangent of x . x must be given in radians.
@@ -463,7 +463,7 @@ func Tanh(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.I
 	if err != nil {
 		return nil, err
 	}
-	return instance.Float(math.Tanh(a)), nil
+	return instance.NewFloat(math.Tanh(a)), nil
 }
 
 // Atanh returns the hyperbolic arc tangent of x.
@@ -479,5 +479,5 @@ func Atanh(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.
 			"EXPECTED-CLASS": class.Number,
 		})
 	}
-	return instance.Float(math.Atanh(a)), nil
+	return instance.NewFloat(math.Atanh(a)), nil
 }

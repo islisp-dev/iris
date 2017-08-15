@@ -15,6 +15,10 @@ import (
 
 type Symbol string
 
+func NewSymbol(s string) ilos.Instance {
+	return Symbol(s)
+}
+
 func (Symbol) Class() ilos.Class {
 	return class.Symbol
 }

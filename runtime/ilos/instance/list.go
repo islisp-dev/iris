@@ -24,6 +24,10 @@ type Cons struct {
 	Cdr ilos.Instance
 }
 
+func NewCons(car, cdr ilos.Instance) ilos.Instance {
+	return &Cons{car, cdr}
+}
+
 func (*Cons) Class() ilos.Class {
 	return class.Cons
 }
@@ -84,6 +88,10 @@ func (i *Cons) Slice() []ilos.Instance {
 //
 
 type Null struct{}
+
+func NewNull() ilos.Instance {
+	return Null{}
+}
 
 func (Null) Class() ilos.Class {
 	return class.Null

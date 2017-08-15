@@ -62,33 +62,33 @@ func CreateArray(_, _ *environment.Environment, dimensions ilos.Instance, initia
 	dim := dimensions.(instance.List).Slice()
 	elt := Nil
 	if len(initialElement) > 1 {
-		return ProgramError("ARITY-ERROR")
+		return nil, instance.NewArityError()
 	}
 	if len(initialElement) == 1 {
 		elt = initialElement[0]
 	}
 	switch len(dim) {
 	case 0:
-		return instance.New(class.GeneralArrayStar, nil, elt), nil
+		return instance.NewGeneralArrayStar(nil, elt), nil
 	case 1:
 		array := make([]*instance.GeneralArrayStar, int(dim[0].(instance.Integer)))
 		for i := range array {
-			array[i] = instance.New(class.GeneralArrayStar, nil, elt).(*instance.GeneralArrayStar)
+			array[i] = instance.NewGeneralArrayStar(nil, elt).(*instance.GeneralArrayStar)
 		}
-		return instance.New(class.GeneralArrayStar, array, nil), nil
+		return instance.NewGeneralArrayStar(array, nil), nil
 	default:
 		array := make([]*instance.GeneralArrayStar, int(dim[len(dim)-1].(instance.Integer)))
 		for i := range array {
-			array[i] = instance.New(class.GeneralArrayStar, nil, elt).(*instance.GeneralArrayStar)
+			array[i] = instance.NewGeneralArrayStar(nil, elt).(*instance.GeneralArrayStar)
 		}
 		for i := len(dim) - 2; i >= 0; i-- {
 			elt := array
 			array := make([]*instance.GeneralArrayStar, int(dim[i].(instance.Integer)))
 			for i := range array {
-				array[i] = instance.New(class.GeneralArrayStar, elt, nil).(*instance.GeneralArrayStar)
+				array[i] = instance.NewGeneralArrayStar(elt, nil).(*instance.GeneralArrayStar)
 			}
 		}
-		return instance.New(class.GeneralArrayStar, array, nil), nil
+		return instance.NewGeneralArrayStar(array, nil), nil
 	}
 }
 
@@ -110,20 +110,20 @@ func Aref(_, _ *environment.Environment, basicArray ilos.Instance, dimensions ..
 	switch {
 	case instance.Of(class.String, basicArray):
 		if len(dimensions) != 1 {
-			return ProgramError("ARITY-ERROR")
+			return nil, instance.NewArityError()
 		}
 		index := int(dimensions[0].(instance.Integer))
 		if len(basicArray.(instance.String)) <= index {
-			return ProgramError("INDEX-OUT-OF-RANGE")
+			return nil, instance.NewIndexOutOfRange()
 		}
-		return instance.Character(basicArray.(instance.String)[index]), nil
+		return instance.NewCharacter(basicArray.(instance.String)[index]), nil
 	case instance.Of(class.GeneralVector, basicArray):
 		if len(dimensions) != 1 {
-			return ProgramError("ARITY-ERROR")
+			return nil, instance.NewArityError()
 		}
 		index := int(dimensions[0].(instance.Integer))
 		if len(basicArray.(instance.GeneralVector)) <= index {
-			return ProgramError("INDEX-OUT-OF-RANGE")
+			return nil, instance.NewIndexOutOfRange()
 		}
 		return basicArray.(instance.GeneralVector)[index], nil
 	default: // General Array*
@@ -144,12 +144,12 @@ func Garef(_, _ *environment.Environment, generalArray ilos.Instance, dimensions
 	for _, dim := range dimensions {
 		index := int(dim.(instance.Integer))
 		if array.Vector == nil || len(array.Vector) <= index {
-			return ProgramError("INDEX-OUT-OF-RANGE")
+			return nil, instance.NewIndexOutOfRange()
 		}
 		array = array.Vector[index]
 	}
 	if array.Scalar == nil {
-		return ProgramError("INDEX-OUT-OF-RANGE")
+		return nil, instance.NewIndexOutOfRange()
 	}
 	return array.Scalar, nil
 }
@@ -170,21 +170,21 @@ func SetAref(_, _ *environment.Environment, obj, basicArray ilos.Instance, dimen
 			return nil, err
 		}
 		if len(dimensions) != 1 {
-			return ProgramError("ARITY-ERROR")
+			return nil, instance.NewArityError()
 		}
 		index := int(dimensions[0].(instance.Integer))
 		if len(basicArray.(instance.String)) <= index {
-			return ProgramError("INDEX-OUT-OF-RANGE")
+			return nil, instance.NewIndexOutOfRange()
 		}
 		basicArray.(instance.String)[index] = rune(obj.(instance.Character))
 		return obj, nil
 	case instance.Of(class.GeneralVector, basicArray):
 		if len(dimensions) != 1 {
-			return ProgramError("ARITY-ERROR")
+			return nil, instance.NewArityError()
 		}
 		index := int(dimensions[0].(instance.Integer))
 		if len(basicArray.(instance.GeneralVector)) <= index {
-			return ProgramError("INDEX-OUT-OF-RANGE")
+			return nil, instance.NewIndexOutOfRange()
 		}
 		basicArray.(instance.GeneralVector)[index] = obj
 		return obj, nil
@@ -207,12 +207,12 @@ func SetGaref(_, _ *environment.Environment, obj, generalArray ilos.Instance, di
 	for _, dim := range dimensions {
 		index := int(dim.(instance.Integer))
 		if array.Vector == nil || len(array.Vector) <= index {
-			return ProgramError("INDEX-OUT-OF-RANGE")
+			return nil, instance.NewIndexOutOfRange()
 		}
 		array = array.Vector[index]
 	}
 	if array.Scalar == nil {
-		return ProgramError("INDEX-OUT-OF-RANGE")
+		return nil, instance.NewIndexOutOfRange()
 	}
 	array.Scalar = obj
 	return obj, nil
@@ -227,14 +227,14 @@ func ArrayDimensions(_, _ *environment.Environment, basicArray ilos.Instance) (i
 	}
 	switch {
 	case instance.Of(class.String, basicArray):
-		return List(nil, nil, instance.Integer(len(basicArray.(instance.String))))
+		return List(nil, nil, instance.NewInteger(len(basicArray.(instance.String))))
 	case instance.Of(class.GeneralVector, basicArray):
-		return List(nil, nil, instance.Integer(len(basicArray.(instance.GeneralVector))))
+		return List(nil, nil, instance.NewInteger(len(basicArray.(instance.GeneralVector))))
 	default: // General Array*
 		var array *instance.GeneralArrayStar
 		dimensions := []ilos.Instance{}
 		for array.Vector != nil {
-			dimensions = append(dimensions, instance.Integer(len(array.Vector)))
+			dimensions = append(dimensions, instance.NewInteger(len(array.Vector)))
 			array = array.Vector[0]
 		}
 		return List(nil, nil, dimensions...)

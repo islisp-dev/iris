@@ -33,7 +33,7 @@ func Dynamic(local, global *environment.Environment, var1 ilos.Instance) (ilos.I
 	}
 	return nil, instance.New(class.UndefinedVariable, map[string]ilos.Instance{
 		"NAME":      var1,
-		"NAMESPACE": instance.Symbol("Variable"),
+		"NAMESPACE": instance.NewSymbol("Variable"),
 	})
 }
 
@@ -62,7 +62,7 @@ func SetDynamic(local, global *environment.Environment, form, var1 ilos.Instance
 	}
 	return nil, instance.New(class.UndefinedFunction, map[string]ilos.Instance{
 		"NAME":      var1,
-		"NAMESPACE": instance.Symbol("FUNCTION"),
+		"NAMESPACE": instance.NewSymbol("FUNCTION"),
 	})
 }
 
@@ -94,7 +94,7 @@ func DyamicLet(local, global *environment.Environment, varForm ilos.Instance, bo
 		}
 		s := cadr.(instance.List).Slice()
 		if len(s) != 2 {
-			return ProgramError("ARITY-ERROR")
+			return nil, instance.NewArityError()
 		}
 		f, err := Eval(local, global, s[1])
 		if err != nil {
@@ -104,7 +104,7 @@ func DyamicLet(local, global *environment.Environment, varForm ilos.Instance, bo
 	}
 	for v, f := range vfs {
 		if !local.DynamicVariable.Define(v, f) {
-			return ProgramError("IMMUTABLE-BINDING")
+			return nil, instance.NewImmutableBinding()
 		}
 	}
 	return Progn(local, global, bodyForm...)
