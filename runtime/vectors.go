@@ -43,7 +43,7 @@ func CreateVector(_, _ *environment.Environment, i ilos.Instance, initialElement
 		})
 	}
 	if len(initialElement) > 1 {
-		return ProgramError("ARITY-ERROR")
+		return nil, instance.NewArityError()
 	}
 	n := int(i.(instance.Integer))
 	v := make([]ilos.Instance, n)

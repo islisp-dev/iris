@@ -15,6 +15,10 @@ import (
 
 type Character rune
 
+func NewCharacter(r rune) ilos.Instance {
+	return Character(r)
+}
+
 func (Character) Class() ilos.Class {
 	return class.Character
 }

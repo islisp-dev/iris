@@ -57,31 +57,31 @@ func defspecial(function interface{}) {
 	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
 	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
 	name = strings.ToUpper(name)
-	symbol := instance.Symbol(name)
-	environment.TopLevel.Special.Define(symbol, instance.New(class.Function, symbol, function))
+	symbol := instance.NewSymbol(name)
+	environment.TopLevel.Special.Define(symbol, instance.NewFunction(symbol, function))
 }
 func defmacro(function interface{}) {
 	name := runtime.FuncForPC(reflect.ValueOf(function).Pointer()).Name()
 	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
 	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
 	name = strings.ToUpper(name)
-	symbol := instance.Symbol(name)
-	environment.TopLevel.Macro.Define(symbol, instance.New(class.Function, symbol, function))
+	symbol := instance.NewSymbol(name)
+	environment.TopLevel.Macro.Define(symbol, instance.NewFunction(symbol, function))
 }
 func defun(function interface{}) {
 	name := runtime.FuncForPC(reflect.ValueOf(function).Pointer()).Name()
 	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
 	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
 	name = strings.ToUpper(name)
-	symbol := instance.Symbol(name)
-	environment.TopLevel.Function.Define(symbol, instance.New(class.Function, symbol, function))
+	symbol := instance.NewSymbol(name)
+	environment.TopLevel.Function.Define(symbol, instance.NewFunction(symbol, function))
 }
 func defun2(name string, function interface{}) {
-	symbol := instance.Symbol(name)
-	environment.TopLevel.Function.Define(symbol, instance.New(class.Function, symbol, function))
+	symbol := instance.NewSymbol(name)
+	environment.TopLevel.Function.Define(symbol, instance.NewFunction(symbol, function))
 }
 func defglobal(name string, value ilos.Instance) {
-	symbol := instance.Symbol(name)
+	symbol := instance.NewSymbol(name)
 	environment.TopLevel.Variable.Define(symbol, value)
 }
 func ensure(c ilos.Class, i ...ilos.Instance) ilos.Instance {
@@ -104,6 +104,6 @@ func ProgramError(cause string) (ilos.Instance, ilos.Instance) {
 	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
 	name = strings.ToUpper(name)
 	return nil, instance.New(class.ProgramError, map[string]ilos.Instance{
-		"CAUSE": instance.String(cause + fmt.Sprintf(" in %v", name)),
+		"CAUSE": instance.NewString(cause + fmt.Sprintf(" in %v", name)),
 	})
 }

@@ -35,7 +35,7 @@ func Property(local, global *environment.Environment, symbol, propertyName ilos.
 		return nil, err
 	}
 	if len(obj) > 1 {
-		return ProgramError("ARITY-ERROR")
+		return nil, instance.NewArityError()
 	}
 	ret, ok := global.Property.Get(symbol, propertyName)
 	if ok {
@@ -79,5 +79,5 @@ func RemoveProperty(local, global *environment.Environment, symbol, propertyName
 // It is impossible for an identifier to name an unnamed symbol.
 func Gensym(local, global *environment.Environment) (ilos.Instance, ilos.Instance) {
 	global.GensymID++
-	return instance.Symbol(fmt.Sprintf("IRIS:G#%v", global.GensymID)), nil
+	return instance.NewSymbol(fmt.Sprintf("IRIS:G#%v", global.GensymID)), nil
 }

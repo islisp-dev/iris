@@ -8,6 +8,7 @@ import (
 	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
+	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
 // Defconstant is used to define a named constant in the variable namespace of the current toplevel
@@ -45,7 +46,7 @@ func Defglobal(local, global *environment.Environment, name, form ilos.Instance)
 		return nil, err
 	}
 	if _, ok := global.Constant.Get(name); ok {
-		return ProgramError("IMMUTABLE-BIDING")
+		return nil, instance.NewImmutableBinding()
 	}
 	ret, err := Eval(local, global, form)
 	if err != nil {
@@ -64,7 +65,7 @@ func Defdynamic(local, global *environment.Environment, name, form ilos.Instance
 		return nil, err
 	}
 	if _, ok := global.Constant.Get(name); ok {
-		return ProgramError("IMMUTABLE-BIDING")
+		return nil, instance.NewImmutableBinding()
 	}
 	ret, err := Eval(local, global, form)
 	if err != nil {

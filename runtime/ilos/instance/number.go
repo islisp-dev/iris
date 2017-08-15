@@ -17,6 +17,9 @@ import (
 
 type Integer int
 
+func NewInteger(i int) ilos.Instance {
+	return Integer(i)
+}
 func (Integer) Class() ilos.Class {
 	return class.Integer
 }
@@ -38,6 +41,10 @@ func (i Integer) String() string {
 //
 
 type Float float64
+
+func NewFloat(i float64) ilos.Instance {
+	return Float(i)
+}
 
 func (Float) Class() ilos.Class {
 	return class.Float

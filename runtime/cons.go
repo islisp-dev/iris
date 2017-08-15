@@ -26,7 +26,7 @@ func Consp(_, _ *environment.Environment, obj ilos.Instance) (ilos.Instance, ilo
 // be allocated (error-id. cannot-create-cons). Both obj1
 // and obj2 may be any ISLISP object.
 func Cons(_, _ *environment.Environment, obj1, obj2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	return instance.New(class.Cons, obj1, obj2), nil
+	return instance.NewCons(obj1, obj2), nil
 }
 
 // Car returns the left component of the cons.

@@ -34,7 +34,7 @@ func CreateString(_, _ *environment.Environment, i ilos.Instance, initialElement
 		})
 	}
 	if len(initialElement) > 1 {
-		return ProgramError("ARITY-ERROR")
+		return nil, instance.NewArityError()
 	}
 	n := int(i.(instance.Integer))
 	v := make([]ilos.Instance, n)
@@ -130,7 +130,7 @@ func CharIndex(_, _ *environment.Environment, char, str ilos.Instance, startPosi
 		return nil, err
 	}
 	if len(startPosition) > 1 {
-		return ProgramError("ARITY-ERROR")
+		return nil, instance.NewArityError()
 	}
 	n := 0
 	if len(startPosition) == 1 {
@@ -145,7 +145,7 @@ func CharIndex(_, _ *environment.Environment, char, str ilos.Instance, startPosi
 	if i < 0 {
 		return Nil, nil
 	}
-	return instance.Integer(i), nil
+	return instance.NewInteger(i), nil
 }
 
 // StringIndex returns the position of the given substring within string. The search starts
@@ -163,7 +163,7 @@ func StringIndex(_, _ *environment.Environment, sub, str ilos.Instance, startPos
 		return nil, err
 	}
 	if len(startPosition) > 1 {
-		return ProgramError("ARITY-ERROR")
+		return nil, instance.NewArityError()
 	}
 	n := 0
 	if len(startPosition) == 1 {
@@ -178,7 +178,7 @@ func StringIndex(_, _ *environment.Environment, sub, str ilos.Instance, startPos
 	if i < 0 {
 		return Nil, nil
 	}
-	return instance.Integer(i), nil
+	return instance.NewInteger(i), nil
 }
 
 // StringAppend returns a single string containing a sequence of characters that results
@@ -197,5 +197,5 @@ func StringAppend(_, _ *environment.Environment, str ...ilos.Instance) (ilos.Ins
 		}
 		ret += string(s.(instance.String))
 	}
-	return instance.String(ret), nil
+	return instance.NewString(ret), nil
 }

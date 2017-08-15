@@ -44,7 +44,7 @@ func Function(local, global *environment.Environment, fun ilos.Instance) (ilos.I
 	}
 	return nil, instance.New(class.UndefinedFunction, map[string]ilos.Instance{
 		"NAME":      fun,
-		"NAMESPACE": instance.Symbol("FUNCTION"),
+		"NAMESPACE": instance.NewSymbol("FUNCTION"),
 	})
 }
 
@@ -76,7 +76,7 @@ func Lambda(local, global *environment.Environment, lambdaList ilos.Instance, fo
 	if err := checkLambdaList(lambdaList); err != nil {
 		return nil, err
 	}
-	return newNamedFunction(local, global, instance.Symbol("ANONYMOUS-FUNCTION"), lambdaList, form...)
+	return newNamedFunction(local, global, instance.NewSymbol("ANONYMOUS-FUNCTION"), lambdaList, form...)
 }
 
 // Labels special form allow the definition of new identifiers in the function
@@ -112,7 +112,7 @@ func Labels(local, global *environment.Environment, functions ilos.Instance, bod
 		}
 		definition := function.(instance.List).Slice()
 		if len(definition) < 2 {
-			return ProgramError("ARITY-ERROR")
+			return nil, instance.NewArityError()
 		}
 		functionName := definition[0]
 		lambdaList := definition[1]
@@ -122,7 +122,7 @@ func Labels(local, global *environment.Environment, functions ilos.Instance, bod
 			return nil, err
 		}
 		if !local.Function.Define(functionName, fun) {
-			return ProgramError("IMMUTABLE-BINDING")
+			return nil, instance.NewImmutableBinding()
 		}
 	}
 	return Progn(local, global, bodyForm...)
@@ -141,7 +141,7 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 		}
 		definition := function.(instance.List).Slice()
 		if len(definition) < 2 {
-			return ProgramError("ARITY-ERROR")
+			return nil, instance.NewArityError()
 		}
 		functionName := definition[0]
 		lambdaList := definition[1]
@@ -151,7 +151,7 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 			return nil, err
 		}
 		if !env.Function.Define(functionName, fun) {
-			return ProgramError("IMMUTABLE-BIDING")
+			return nil, instance.NewImmutableBinding()
 		}
 	}
 	return Progn(env, global, bodyForm...)

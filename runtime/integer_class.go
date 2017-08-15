@@ -42,11 +42,11 @@ func Div(_, _ *environment.Environment, z1, z2 ilos.Instance) (ilos.Instance, il
 	}
 	if b == 0 {
 		return nil, instance.New(class.DivisionByZero, map[string]ilos.Instance{
-			"OPERATION": instance.Symbol("DIV"),
-			"OPERANDS":  instance.New(class.Cons, z1, instance.New(class.Cons, z2, Nil)),
+			"OPERATION": instance.NewSymbol("DIV"),
+			"OPERANDS":  instance.NewCons(z1, instance.NewCons(z2, Nil)),
 		})
 	}
-	return instance.Integer(a / b), nil
+	return instance.NewInteger(a / b), nil
 }
 
 // Mod returns the remainder of the integer division of z1 by z2.
@@ -66,11 +66,11 @@ func Mod(_, _ *environment.Environment, z1, z2 ilos.Instance) (ilos.Instance, il
 	}
 	if b == 0 {
 		return nil, instance.New(class.DivisionByZero, map[string]ilos.Instance{
-			"OPERATION": instance.Symbol("MOD"),
-			"OPERANDS":  instance.New(class.Cons, z1, instance.New(class.Cons, z2, Nil)),
+			"OPERATION": instance.NewSymbol("MOD"),
+			"OPERANDS":  instance.NewCons(z1, instance.NewCons(z2, Nil)),
 		})
 	}
-	return instance.Integer(a % b), nil
+	return instance.NewInteger(a % b), nil
 }
 
 // Gcd returns the greatest common divisor of its integer arguments.
@@ -95,7 +95,7 @@ func Gcd(_, _ *environment.Environment, z1, z2 ilos.Instance) (ilos.Instance, il
 	if err != nil {
 		return nil, err
 	}
-	return instance.Integer(gcd(a, b)), nil
+	return instance.NewInteger(gcd(a, b)), nil
 }
 
 // Lcm returns the least common multiple of its integer arguments.
@@ -117,7 +117,7 @@ func Lcm(_, _ *environment.Environment, z1, z2 ilos.Instance) (ilos.Instance, il
 	if err != nil {
 		return nil, err
 	}
-	return instance.Integer(a * b / gcd(a, b)), nil
+	return instance.NewInteger(a * b / gcd(a, b)), nil
 }
 
 // Isqrt Returns the greatest integer less than or equal to
@@ -134,5 +134,5 @@ func Isqrt(_, _ *environment.Environment, z ilos.Instance) (ilos.Instance, ilos.
 			"EXPECTED-CLASS": class.Number,
 		})
 	}
-	return instance.Integer(int(math.Sqrt(float64(a)))), nil
+	return instance.NewInteger(int(math.Sqrt(float64(a)))), nil
 }

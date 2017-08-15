@@ -16,26 +16,15 @@ import (
 //
 
 func New(c ilos.Class, s ...interface{}) ilos.Instance {
-	switch c {
-	case class.Function:
-		return Function{s[0].(Symbol), s[1]}
-	case class.Cons:
-		return &Cons{s[0].(ilos.Instance), s[1].(ilos.Instance)}
-	case class.Null:
-		return Null{}
-	case class.GeneralArrayStar:
-		return &GeneralArrayStar{s[0].([]*GeneralArrayStar), s[1].(ilos.Instance)}
-	default:
-		p := []ilos.Instance{}
-		for _, q := range c.Parents() {
-			p = append(p, New(q, s...))
-		}
-		t := map[string]ilos.Instance{}
-		for _, n := range c.Slots() {
-			t[n] = s[0].(map[string]ilos.Instance)[n]
-		}
-		return &instance{c, p, t}
+	p := []ilos.Instance{}
+	for _, q := range c.Parents() {
+		p = append(p, New(q, s...))
 	}
+	t := map[string]ilos.Instance{}
+	for _, n := range c.Slots() {
+		t[n] = s[0].(map[string]ilos.Instance)[n]
+	}
+	return &instance{c, p, t}
 }
 
 func Of(p ilos.Class, i ilos.Instance) bool {

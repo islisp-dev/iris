@@ -5,7 +5,6 @@
 package runtime
 
 import (
-	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
@@ -30,6 +29,6 @@ import (
 // t is a named constant whose value is the symbol t itself.
 // nil is a named constant whose value is the symbol nil itself.
 var (
-	Nil = instance.New(class.Null)
-	T   = instance.Symbol("T")
+	Nil = instance.NewNull()
+	T   = instance.NewSymbol("T")
 )

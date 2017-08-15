@@ -32,7 +32,7 @@ func Setq(local, global *environment.Environment, var1, form ilos.Instance) (ilo
 	}
 	return nil, instance.New(class.UndefinedVariable, map[string]ilos.Instance{
 		"NAME":      var1,
-		"NAMESPACE": instance.Symbol("VARIABLE"),
+		"NAMESPACE": instance.NewSymbol("VARIABLE"),
 	})
 }
 
@@ -61,7 +61,7 @@ func Let(local, global *environment.Environment, varForm ilos.Instance, bodyForm
 		}
 		s := cadr.(instance.List).Slice()
 		if len(s) != 2 {
-			return ProgramError("ARITY-ERROR")
+			return nil, instance.NewArityError()
 		}
 		f, err := Eval(local, global, s[1])
 		if err != nil {
@@ -71,7 +71,7 @@ func Let(local, global *environment.Environment, varForm ilos.Instance, bodyForm
 	}
 	for v, f := range vfs {
 		if !local.Variable.Define(v, f) {
-			return ProgramError("IMMUTABLE-BINDING")
+			return nil, instance.NewImmutableBinding()
 		}
 	}
 	return Progn(local, global, bodyForm...)
@@ -101,14 +101,14 @@ func LetStar(local, global *environment.Environment, varForm ilos.Instance, body
 		}
 		s := cadr.(instance.List).Slice()
 		if len(s) != 2 {
-			return ProgramError("ARITY-ERROR")
+			return nil, instance.NewArityError()
 		}
 		f, err := Eval(local, global, s[1])
 		if err != nil {
 			return nil, err
 		}
 		if !local.Variable.Define(s[0], f) {
-			return ProgramError("IMMUTABLE-BINDING")
+			return nil, instance.NewImmutableBinding()
 		}
 	}
 	return Progn(local, global, bodyForm...)

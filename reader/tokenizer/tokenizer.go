@@ -50,7 +50,7 @@ func (t *Tokenizer) Next() (string, ilos.Instance) {
 	if t.sc.Scan() {
 		return t.sc.Text(), nil
 	}
-	return "", instance.New(class.ParseError, instance.String(t.sc.Text()), class.Object)
+	return "", instance.New(class.ParseError, instance.NewString(t.sc.Text()), class.Object)
 }
 
 func splitter(data []byte, atEOF bool) (advance int, token []byte, err error) {
