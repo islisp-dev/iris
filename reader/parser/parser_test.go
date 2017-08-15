@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
