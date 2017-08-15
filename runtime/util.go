@@ -48,30 +48,27 @@ func evalString(local, global *environment.Environment, s string) ilos.Instance 
 	e, _ := Eval(local, global, readFromString(s))
 	return e
 }
+
+func func2symbol(function interface{}) ilos.Instance {
+	name := runtime.FuncForPC(reflect.ValueOf(function).Pointer()).Name()
+	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
+	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
+	name = strings.ToUpper(name)
+	return instance.NewSymbol(name)
+}
+
 func defspecial(function interface{}) {
-	name := runtime.FuncForPC(reflect.ValueOf(function).Pointer()).Name()
-	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
-	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
-	name = strings.ToUpper(name)
-	symbol := instance.NewSymbol(name)
-	environment.TopLevel.Special.Define(symbol, instance.NewFunction(symbol, function))
+	environment.TopLevel.Special.Define(func2symbol(function), instance.NewFunction(func2symbol(function), function))
 }
+
 func defmacro(function interface{}) {
-	name := runtime.FuncForPC(reflect.ValueOf(function).Pointer()).Name()
-	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
-	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
-	name = strings.ToUpper(name)
-	symbol := instance.NewSymbol(name)
-	environment.TopLevel.Macro.Define(symbol, instance.NewFunction(symbol, function))
+	environment.TopLevel.Macro.Define(func2symbol(function), instance.NewFunction(func2symbol(function), function))
 }
+
 func defun(function interface{}) {
-	name := runtime.FuncForPC(reflect.ValueOf(function).Pointer()).Name()
-	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
-	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
-	name = strings.ToUpper(name)
-	symbol := instance.NewSymbol(name)
-	environment.TopLevel.Function.Define(symbol, instance.NewFunction(symbol, function))
+	environment.TopLevel.Function.Define(func2symbol(function), instance.NewFunction(func2symbol(function), function))
 }
+
 func defun2(name string, function interface{}) {
 	symbol := instance.NewSymbol(name)
 	environment.TopLevel.Function.Define(symbol, instance.NewFunction(symbol, function))
