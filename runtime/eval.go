@@ -50,7 +50,7 @@ func evalLambda(local, global *environment.Environment, car, cdr ilos.Instance) 
 			env := environment.New()
 			env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
 			env.CatchTag = append(local.CatchTag, env.CatchTag...)
-			ret, err := fun.(instance.Applicable).Apply(env, global, arguments)
+			ret, err := fun.(instance.Applicable).Apply(env, global, arguments.(instance.List).Slice()...)
 			if err != nil {
 				return nil, err, true
 			}
@@ -68,7 +68,7 @@ func evalSpecial(local, global *environment.Environment, car, cdr ilos.Instance)
 	}
 	if spl != nil {
 		env := environment.New().Merge(local)
-		ret, err := spl.(instance.Applicable).Apply(env, global, cdr)
+		ret, err := spl.(instance.Applicable).Apply(env, global, cdr.(instance.List).Slice()...)
 		if err != nil {
 			return nil, err, true
 		}
@@ -90,7 +90,7 @@ func evalMacro(local, global *environment.Environment, car, cdr ilos.Instance) (
 		env := environment.New()
 		env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
 		env.CatchTag = append(local.DynamicVariable, env.CatchTag...)
-		ret, err := mac.(instance.Applicable).Apply(env, global, cdr)
+		ret, err := mac.(instance.Applicable).Apply(env, global, cdr.(instance.List).Slice()...)
 		if err != nil {
 			return nil, err, true
 		}
@@ -120,7 +120,7 @@ func evalFunction(local, global *environment.Environment, car, cdr ilos.Instance
 		if err != nil {
 			return nil, err, true
 		}
-		ret, err := fun.(instance.Applicable).Apply(env, global, arguments)
+		ret, err := fun.(instance.Applicable).Apply(env, global, arguments.(instance.List).Slice()...)
 		if err != nil {
 			return nil, err, true
 		}

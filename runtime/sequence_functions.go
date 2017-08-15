@@ -56,21 +56,21 @@ func Elt(_, _ *environment.Environment, sequence, z ilos.Instance) (ilos.Instanc
 		seq := sequence.(instance.String)
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("INDEX-OUT-OF-RANGE")
 		}
 		return instance.New(class.Character, seq[idx]), nil
 	case instance.Of(class.GeneralVector, sequence):
 		seq := sequence.(instance.GeneralVector)
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("INDEX-OUT-OF-RANGE")
 		}
 		return seq[idx], nil
 	case instance.Of(class.List, sequence):
 		seq := sequence.(instance.List).Slice()
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("INDEX-OUT-OF-RANGE")
 		}
 		return seq[idx], nil
 	}
@@ -94,7 +94,7 @@ func SetElt(_, _ *environment.Environment, obj, sequence, z ilos.Instance) (ilos
 		seq := sequence.(instance.String)
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("INDEX-OUT-OF-RANGE")
 		}
 		if err := ensure(class.Character, obj); err != nil {
 			return nil, err
@@ -105,7 +105,7 @@ func SetElt(_, _ *environment.Environment, obj, sequence, z ilos.Instance) (ilos
 		seq := sequence.(instance.GeneralVector)
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("INDEX-OUT-OF-RANGE")
 		}
 		seq[idx] = obj
 		return obj, nil
@@ -113,7 +113,7 @@ func SetElt(_, _ *environment.Environment, obj, sequence, z ilos.Instance) (ilos
 		seq := sequence.(instance.List).Slice()
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("INDEX-OUT-OF-RANGE")
 		}
 		for idx != 0 && instance.Of(class.Cons, sequence) {
 			idx--
@@ -148,19 +148,19 @@ func Subseq(_, _ *environment.Environment, sequence, z1, z2 ilos.Instance) (ilos
 	case instance.Of(class.String, sequence):
 		seq := sequence.(instance.String)
 		if !(0 <= start && start < len(seq) && 0 <= end && end < len(seq) && start <= end) {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("INDEX-OUT-OF-RANGE")
 		}
 		return seq[start:end], nil
 	case instance.Of(class.GeneralVector, sequence):
 		seq := sequence.(instance.GeneralVector)
 		if !(0 <= start && start < len(seq) && 0 <= end && end < len(seq) && start <= end) {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("INDEX-OUT-OF-RANGE")
 		}
 		return seq[start:end], nil
 	case instance.Of(class.List, sequence):
 		seq := sequence.(instance.List).Slice()
 		if !(0 < start && start < len(seq) && 0 < end && end < len(seq) && start <= end) {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("INDEX-OUT-OF-RANGE")
 		}
 		return List(nil, nil, seq[start:end]...)
 	}
@@ -215,11 +215,7 @@ func mapInto(local, global *environment.Environment, destination, function ilos.
 				return nil, err
 			}
 		}
-		args, err := List(nil, nil, arguments...)
-		if err != nil {
-			return nil, err
-		}
-		ret, err := function.(instance.Function).Apply(local, global, args)
+		ret, err := function.(instance.Function).Apply(local, global, arguments...)
 		if err != nil {
 			return nil, err
 		}

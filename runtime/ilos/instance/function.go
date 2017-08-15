@@ -14,7 +14,7 @@ import (
 )
 
 type Applicable interface {
-	Apply(*environment.Environment, *environment.Environment, ilos.Instance) (ilos.Instance, ilos.Instance)
+	Apply(*environment.Environment, *environment.Environment, ...ilos.Instance) (ilos.Instance, ilos.Instance)
 }
 
 type Function struct {
@@ -38,18 +38,17 @@ func (f Function) String() string {
 	return fmt.Sprintf("#%v", f.Class())
 }
 
-func (f Function) Apply(local, global *environment.Environment, arguments ilos.Instance) (ilos.Instance, ilos.Instance) {
+func (f Function) Apply(local, global *environment.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	fv := reflect.ValueOf(f.function)
 	ft := reflect.TypeOf(f.function)
 	argv := []reflect.Value{reflect.ValueOf(local), reflect.ValueOf(global)}
-	if !Of(class.List, arguments) {
-		return nil, New(class.ProgramError)
-	}
-	for _, cadr := range arguments.(List).Slice() {
+	for _, cadr := range arguments {
 		argv = append(argv, reflect.ValueOf(cadr))
 	}
 	if ft.NumIn() != len(argv) && (!ft.IsVariadic() || ft.NumIn()-2 >= len(argv)) {
-		return nil, New(class.ProgramError)
+		return nil, New(class.ProgramError, map[string]ilos.Instance{
+			"CAUSE": New(class.String, fmt.Sprintf("ARITY-ERROR in %v", f.name)),
+		})
 	}
 	rets := fv.Call(argv)
 	a, _ := rets[0].Interface().(ilos.Instance)

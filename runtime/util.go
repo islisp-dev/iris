@@ -5,6 +5,10 @@
 package runtime
 
 import (
+	"fmt"
+	"reflect"
+	"regexp"
+	"runtime"
 	"strings"
 
 	"github.com/ta2gch/iris/runtime/environment"
@@ -44,18 +48,35 @@ func readFromString(s string) ilos.Instance {
 	e, _ := parser.Parse(tokenizer.New(strings.NewReader(s)))
 	return e
 }
-
-func defspecial(name string, macro interface{}) {
-	symbol := instance.New(class.Symbol, name)
-	environment.TopLevel.Special.Define(symbol, instance.New(class.Function, symbol, macro))
+func evalString(local, global *environment.Environment, s string) ilos.Instance {
+	e, _ := Eval(local, global, readFromString(s))
+	return e
 }
-
-func defmacro(name string, macro interface{}) {
+func defspecial(function interface{}) {
+	name := runtime.FuncForPC(reflect.ValueOf(function).Pointer()).Name()
+	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
+	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
+	name = strings.ToUpper(name)
 	symbol := instance.New(class.Symbol, name)
-	environment.TopLevel.Macro.Define(symbol, instance.New(class.Function, symbol, macro))
+	environment.TopLevel.Special.Define(symbol, instance.New(class.Function, symbol, function))
 }
-
-func defun(name string, function interface{}) {
+func defmacro(function interface{}) {
+	name := runtime.FuncForPC(reflect.ValueOf(function).Pointer()).Name()
+	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
+	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
+	name = strings.ToUpper(name)
+	symbol := instance.New(class.Symbol, name)
+	environment.TopLevel.Macro.Define(symbol, instance.New(class.Function, symbol, function))
+}
+func defun(function interface{}) {
+	name := runtime.FuncForPC(reflect.ValueOf(function).Pointer()).Name()
+	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
+	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
+	name = strings.ToUpper(name)
+	symbol := instance.New(class.Symbol, name)
+	environment.TopLevel.Function.Define(symbol, instance.New(class.Function, symbol, function))
+}
+func defun2(name, function interface{}) {
 	symbol := instance.New(class.Symbol, name)
 	environment.TopLevel.Function.Define(symbol, instance.New(class.Function, symbol, function))
 }
@@ -73,4 +94,13 @@ func ensure(c ilos.Class, i ...ilos.Instance) ilos.Instance {
 		}
 	}
 	return nil
+}
+func ProgramError(cause string) (ilos.Instance, ilos.Instance) {
+	pc := make([]uintptr, 10) // at least 1 entry needed
+	runtime.Callers(2, pc)
+	f := runtime.FuncForPC(pc[0])
+	file, line := f.FileLine(pc[0])
+	return nil, instance.New(class.ProgramError, map[string]ilos.Instance{
+		"CAUSE": instance.New(class.String, cause+fmt.Sprintf("(%s:%d %s)", file, line, f.Name())),
+	})
 }

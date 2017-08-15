@@ -51,7 +51,7 @@ func Block(local, global *environment.Environment, tag ilos.Instance, body ...il
 		})
 	}
 	if !local.BlockTag.Define(tag, nil) {
-		return nil, instance.New(class.ProgramError)
+		return ProgramError("IMMUTABLE-BINDING")
 	}
 	var fail ilos.Instance
 	sucess := Nil
@@ -109,7 +109,7 @@ func Catch(local, global *environment.Environment, tag ilos.Instance, body ...il
 		return nil, instance.New(class.DomainError, tag, class.Object)
 	}
 	if !local.CatchTag.Define(tag, nil) {
-		return nil, instance.New(class.ProgramError)
+		return ProgramError("IMMUTABLE-BINDING")
 	}
 	var fail ilos.Instance
 	sucess := Nil
@@ -162,7 +162,7 @@ func Tagbody(local, global *environment.Environment, body ...ilos.Instance) (ilo
 		cddr := instance.New(class.GeneralVector, body[idx+1:])
 		if !instance.Of(class.Cons, cadr) {
 			if !local.TagbodyTag.Define(cadr, cddr) {
-				return nil, instance.New(class.ProgramError)
+				return ProgramError("IMMUTABLE-BINDING")
 			}
 		}
 	}

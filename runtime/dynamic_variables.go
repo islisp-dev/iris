@@ -94,7 +94,7 @@ func DyamicLet(local, global *environment.Environment, varForm ilos.Instance, bo
 		}
 		s := cadr.(instance.List).Slice()
 		if len(s) != 2 {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("ARITY-ERROR")
 		}
 		f, err := Eval(local, global, s[1])
 		if err != nil {
@@ -104,7 +104,7 @@ func DyamicLet(local, global *environment.Environment, varForm ilos.Instance, bo
 	}
 	for v, f := range vfs {
 		if !local.DynamicVariable.Define(v, f) {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("IMMUTABLE-BINDING")
 		}
 	}
 	return Progn(local, global, bodyForm...)

@@ -112,7 +112,7 @@ func Labels(local, global *environment.Environment, functions ilos.Instance, bod
 		}
 		definition := function.(instance.List).Slice()
 		if len(definition) < 2 {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("ARITY-ERROR")
 		}
 		functionName := definition[0]
 		lambdaList := definition[1]
@@ -122,7 +122,7 @@ func Labels(local, global *environment.Environment, functions ilos.Instance, bod
 			return nil, err
 		}
 		if !local.Function.Define(functionName, fun) {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("IMMUTABLE-BINDING")
 		}
 	}
 	return Progn(local, global, bodyForm...)
@@ -141,7 +141,7 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 		}
 		definition := function.(instance.List).Slice()
 		if len(definition) < 2 {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("ARITY-ERROR")
 		}
 		functionName := definition[0]
 		lambdaList := definition[1]
@@ -151,7 +151,7 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 			return nil, err
 		}
 		if !env.Function.Define(functionName, fun) {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("IMMUTABLE-BIDING")
 		}
 	}
 	return Progn(env, global, bodyForm...)
@@ -164,22 +164,14 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 // Each obj may be any ISLISP object. An error shall be signaled
 // if list is not a proper list (error-id. improper-argument-list).
 func Apply(local, global *environment.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	list := Nil
-	if instance.Of(class.List, obj[len(obj)-1]) {
-		list = obj[len(obj)-1]
-		if !isProperList(list) {
-			return nil, instance.New(class.ProgramError)
-		}
-		obj = obj[:len(obj)-1]
-	}
-	for i := len(obj) - 1; i >= 0; i-- {
-		list = instance.New(class.Cons, obj[i], list)
-	}
 	if err := ensure(class.Function, function); err != nil {
 		return nil, err
 	}
-	ret, err := function.(instance.Applicable).Apply(local, global, list)
-	return ret, err
+	if err := ensure(class.List, obj[len(obj)-1]); err != nil {
+		return nil, err
+	}
+	obj = append(obj[:len(obj)-1], obj[len(obj)-1].(instance.List).Slice()...)
+	return function.(instance.Applicable).Apply(local, global, obj...)
 }
 
 // Funcall activates the specified function function and returns the value that the function returns.
@@ -188,6 +180,6 @@ func Apply(local, global *environment.Environment, function ilos.Instance, obj .
 // An error shall be signaled if function is not a function (error-id. domain-error).
 // Each obj may be any ISLISP object.
 func Funcall(local, global *environment.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	ret, err := Apply(local, global, function, obj...)
-	return ret, err
+	obj = append(obj, Nil)
+	return Apply(local, global, function, obj...)
 }

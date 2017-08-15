@@ -27,7 +27,7 @@ func If(local, global *environment.Environment, testForm, thenForm ilos.Instance
 		return Eval(local, global, thenForm)
 	}
 	if len(elseForm) > 1 {
-		return nil, instance.New(class.ProgramError)
+		return ProgramError("ARITY-ERROR")
 	}
 	if len(elseForm) == 0 {
 		return Nil, nil
@@ -48,7 +48,7 @@ func Cond(local, global *environment.Environment, testFrom ...ilos.Instance) (il
 		}
 		s := tf.(instance.List).Slice()
 		if len(s) == 0 {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("ARITY-ERROR")
 		}
 		ret, err := Eval(local, global, s[0])
 		if err != nil {
@@ -85,7 +85,7 @@ func Case(local, global *environment.Environment, key ilos.Instance, pattern ...
 		}
 		form := pat.(instance.List).Slice()
 		if len(form) < 1 {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("ARITY-ERROR")
 		}
 		if idx == len(pattern)-1 && form[0] == T {
 			return Progn(local, global, form[1:]...)
@@ -132,7 +132,7 @@ func CaseUsing(local, global *environment.Environment, key, pred ilos.Instance, 
 		}
 		form := pat.(instance.List).Slice()
 		if len(form) < 1 {
-			return nil, instance.New(class.ProgramError)
+			return ProgramError("ARITY-ERROR")
 		}
 		if idx == len(pattern)-1 && form[0] == T {
 			return Progn(local, global, form[1:]...)
@@ -142,11 +142,7 @@ func CaseUsing(local, global *environment.Environment, key, pred ilos.Instance, 
 		}
 		keys := form[0].(instance.List).Slice()
 		for _, k := range keys {
-			args, err := List(nil, nil, k, key)
-			if err != nil {
-				return nil, err
-			}
-			ret, err := pred.(instance.Function).Apply(local, global, args)
+			ret, err := pred.(instance.Function).Apply(local, global, k, key)
 			if err != nil {
 				return nil, err
 			}

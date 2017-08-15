@@ -9,6 +9,8 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos"
 )
 
-func quote(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+// Quote is used to include any object in an ISLisp text.
+// A quoted expression denotes a reference to an object.
+func Quote(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	return obj, nil
 }
