@@ -84,10 +84,7 @@ func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	if m, _ := regexp.MatchString(str, tok); m {
 		return instance.NewSymbol(strings.ToUpper(tok)), nil
 	}
-	return nil, instance.New(class.ParseError, map[string]ilos.Instance{
-		"STRING":         instance.NewString(tok),
-		"EXPECTED-CLASS": class.Object,
-	})
+	return nil, instance.NewParseError(instance.NewString(tok), class.Object)
 }
 
 func parseMacro(tok string, t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instance) {
@@ -105,7 +102,7 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instanc
 		}
 		v, err := strconv.ParseInt(tok[1:i], 10, 32)
 		if err != nil {
-			return nil, instance.New(class.ParseError, instance.NewString(tok), class.Integer)
+			return nil, instance.NewParseError(instance.NewString(tok), class.Integer)
 		}
 		d := instance.NewInteger(int(v))
 		return instance.NewCons(s, instance.NewCons(d, instance.NewCons(cdr, instance.NewNull()))), nil

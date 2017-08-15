@@ -41,10 +41,12 @@ func Div(_, _ *environment.Environment, z1, z2 ilos.Instance) (ilos.Instance, il
 		return nil, err
 	}
 	if b == 0 {
-		return nil, instance.New(class.DivisionByZero, map[string]ilos.Instance{
-			"OPERATION": instance.NewSymbol("DIV"),
-			"OPERANDS":  instance.NewCons(z1, instance.NewCons(z2, Nil)),
-		})
+		operation := instance.NewSymbol("DIV")
+		operands, err := List(nil, nil, z1, z2)
+		if err != nil {
+			return nil, err
+		}
+		return nil, instance.NewDivisionByZero(operation, operands)
 	}
 	return instance.NewInteger(a / b), nil
 }
@@ -65,10 +67,12 @@ func Mod(_, _ *environment.Environment, z1, z2 ilos.Instance) (ilos.Instance, il
 		return nil, err
 	}
 	if b == 0 {
-		return nil, instance.New(class.DivisionByZero, map[string]ilos.Instance{
-			"OPERATION": instance.NewSymbol("MOD"),
-			"OPERANDS":  instance.NewCons(z1, instance.NewCons(z2, Nil)),
-		})
+		operation := instance.NewSymbol("MOD")
+		operands, err := List(nil, nil, z1, z2)
+		if err != nil {
+			return nil, err
+		}
+		return nil, instance.NewDivisionByZero(operation, operands)
 	}
 	return instance.NewInteger(a % b), nil
 }
@@ -129,10 +133,7 @@ func Isqrt(_, _ *environment.Environment, z ilos.Instance) (ilos.Instance, ilos.
 		return nil, err
 	}
 	if a < 0 {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         z,
-			"EXPECTED-CLASS": class.Number,
-		})
+		return nil, instance.NewDomainError(z, class.Number)
 	}
 	return instance.NewInteger(int(math.Sqrt(float64(a)))), nil
 }

@@ -31,10 +31,7 @@ func Dynamic(local, global *environment.Environment, var1 ilos.Instance) (ilos.I
 	if v, ok := global.DynamicVariable.Get(var1); ok {
 		return v, nil
 	}
-	return nil, instance.New(class.UndefinedVariable, map[string]ilos.Instance{
-		"NAME":      var1,
-		"NAMESPACE": instance.NewSymbol("Variable"),
-	})
+	return nil, instance.NewUndefinedVariable(var1)
 }
 
 // SetDynamic denotes an assignment to a dynamic variable. This
@@ -60,10 +57,7 @@ func SetDynamic(local, global *environment.Environment, form, var1 ilos.Instance
 	if global.DynamicVariable.Set(var1, form) {
 		return form, nil
 	}
-	return nil, instance.New(class.UndefinedFunction, map[string]ilos.Instance{
-		"NAME":      var1,
-		"NAMESPACE": instance.NewSymbol("FUNCTION"),
-	})
+	return nil, instance.NewUndefinedVariable(var1)
 }
 
 // DyamicLet is used to establish dynamic variable bindings.

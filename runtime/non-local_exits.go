@@ -45,10 +45,7 @@ func Block(local, global *environment.Environment, tag ilos.Instance, body ...il
 		return nil, err
 	}
 	if instance.Of(class.Number, tag) || instance.Of(class.Character, tag) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         tag,
-			"EXPECTED-CLASS": class.Object,
-		})
+		return nil, instance.NewDomainError(tag, class.Object)
 	}
 	if !local.BlockTag.Define(tag, nil) {
 		return nil, instance.NewImmutableBinding()
@@ -78,25 +75,16 @@ func ReturnFrom(local, global *environment.Environment, tag, object ilos.Instanc
 		return nil, err
 	}
 	if instance.Of(class.Number, tag) || instance.Of(class.Character, tag) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         tag,
-			"EXPECTED-CLASS": class.Object,
-		})
+		return nil, instance.NewDomainError(tag, class.Object)
 	}
 	object, err = Eval(local, global, object)
 	if err != nil {
 		return nil, err
 	}
 	if _, ok := local.BlockTag.Get(tag); !ok {
-		return nil, instance.New(class.SimpleError, map[string]ilos.Instance{
-			"FORMAT-STRING":    instance.NewString("%v is not defined as the tag"),
-			"FORMAT-ARGUMENTS": tag,
-		})
+		return nil, instance.NewSimpleError(instance.NewString("%v is not defined as the tag"), tag)
 	}
-	return nil, instance.New(class.BlockTag, map[string]ilos.Instance{
-		"TAG":    tag,
-		"OBJECT": object,
-	})
+	return nil, instance.NewBlockTag(tag, object)
 }
 
 func Catch(local, global *environment.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
@@ -106,7 +94,7 @@ func Catch(local, global *environment.Environment, tag ilos.Instance, body ...il
 		return nil, err
 	}
 	if instance.Of(class.Number, tag) || instance.Of(class.Character, tag) {
-		return nil, instance.New(class.DomainError, tag, class.Object)
+		return nil, instance.NewDomainError(tag, class.Object)
 	}
 	if !local.CatchTag.Define(tag, nil) {
 		return nil, instance.NewImmutableBinding()
@@ -136,25 +124,17 @@ func Throw(local, global *environment.Environment, tag, object ilos.Instance) (i
 		return nil, err
 	}
 	if instance.Of(class.Number, tag) || instance.Of(class.Character, tag) {
-		return nil, instance.New(class.DomainError, map[string]ilos.Instance{
-			"OBJECT":         tag,
-			"EXPECTED-CLASS": class.Object,
-		})
+		return nil, instance.NewDomainError(tag, class.Object)
 	}
 	object, err = Eval(local, global, object)
 	if err != nil {
 		return nil, err
 	}
 	if _, ok := local.CatchTag.Get(tag); !ok {
-		return nil, instance.New(class.SimpleError, map[string]ilos.Instance{
-			"FORMAT-STRING":    instance.NewString("%v is not defined as the tag"),
-			"FORMAT-ARGUMENTS": tag,
-		})
+		return nil, instance.NewSimpleError(instance.NewString("%v is not defined as the tag"), tag)
+
 	}
-	return nil, instance.New(class.CatchTag, map[string]ilos.Instance{
-		"TAG":    tag,
-		"OBJECT": object,
-	})
+	return nil, instance.NewCatchTag(tag, object)
 }
 
 func Tagbody(local, global *environment.Environment, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
@@ -203,12 +183,10 @@ func Tagbody(local, global *environment.Environment, body ...ilos.Instance) (ilo
 
 func Go(local, global *environment.Environment, tag ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if _, ok := local.TagbodyTag.Get(tag); !ok {
-		return nil, instance.New(class.SimpleError, map[string]ilos.Instance{
-			"FORMAT-STRING":    instance.NewString("%v is not defined as the tag"),
-			"FORMAT-ARGUMENTS": tag,
-		})
+		return nil, instance.NewSimpleError(instance.NewString("%v is not defined as the tag"), tag)
+
 	}
-	return nil, instance.New(class.TagbodyTag, map[string]ilos.Instance{"TAG": tag})
+	return nil, instance.NewTagbodyTag(tag)
 }
 
 // UnwindProtect first evaluates form. Evaluation of the cleanup-forms always
@@ -243,7 +221,7 @@ func UnwindProtect(local, global *environment.Environment, form ilos.Instance, c
 	ret1, err1 := Eval(local, global, form)
 	ret2, err2 := Progn(local, global, cleanupForms...)
 	if instance.Of(class.Escape, err2) {
-		return nil, instance.New(class.ControlError)
+		return nil, instance.NewControlError()
 	}
 	if err2 != nil {
 		return ret2, err2

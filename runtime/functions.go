@@ -42,10 +42,7 @@ func Function(local, global *environment.Environment, fun ilos.Instance) (ilos.I
 	if f, ok := global.Function.Get(fun); ok {
 		return f, nil
 	}
-	return nil, instance.New(class.UndefinedFunction, map[string]ilos.Instance{
-		"NAME":      fun,
-		"NAMESPACE": instance.NewSymbol("FUNCTION"),
-	})
+	return nil, instance.NewUndefinedFunction(fun)
 }
 
 // Lambda special form creates a function object.
