@@ -110,7 +110,7 @@ func TestEq(t *testing.T) {
 		},
 		{
 			exp:     `(eq "a" "a")`,
-			want:    `t`,
+			want:    `nil`,
 			wantErr: false,
 		},
 		{
@@ -120,7 +120,7 @@ func TestEq(t *testing.T) {
 		},
 		{
 			exp:     `(eq "" "")`,
-			want:    `t`,
+			want:    `nil`,
 			wantErr: false,
 		},
 		{
@@ -251,7 +251,7 @@ func TestEql(t *testing.T) {
 		},
 		{
 			exp:     `(eql "a" "a")`,
-			want:    `t`,
+			want:    `nil`,
 			wantErr: false,
 		},
 		{
@@ -261,7 +261,7 @@ func TestEql(t *testing.T) {
 		},
 		{
 			exp:     `(eql "" "")`,
-			want:    `t`,
+			want:    `nil`,
 			wantErr: false,
 		},
 		{

@@ -9,8 +9,6 @@ import (
 
 	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/class"
-	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
 // Eq tests whether obj1 and obj2 are same identical object.
@@ -18,10 +16,15 @@ import (
 // Two objects are the same if there is no operation that could distinguish
 // them (without modifying them), and if modifying one would modify the other the same way.
 func Eq(_, _ *environment.Environment, obj1, obj2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if instance.Of(class.String, obj1) && instance.Of(class.String, obj1) {
-		return StringEqual(nil, nil, obj1, obj2)
+	t1, t2 := reflect.TypeOf(obj1), reflect.TypeOf(obj2)
+	if t1.Comparable() || t2.Comparable() {
+		if obj1 == obj2 {
+			return T, nil
+		}
+		return Nil, nil
 	}
-	if obj1 == obj2 {
+	v1, v2 := reflect.ValueOf(obj1), reflect.ValueOf(obj2)
+	if v1 == v2 {
 		return T, nil
 	}
 	return Nil, nil
