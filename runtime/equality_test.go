@@ -48,7 +48,7 @@ func TestEq(t *testing.T) {
 		},
 		{
 			exp:     `(eq 2 2)`,
-			want:    `T`,
+			want:    `nil`,
 			wantErr: false,
 		},
 		{
@@ -58,12 +58,12 @@ func TestEq(t *testing.T) {
 		},
 		{
 			exp:     `(eq 100000000 100000000)`,
-			want:    `T`,
+			want:    `nil`,
 			wantErr: false,
 		},
 		{
 			exp:     `(eq 10.00000 10.0)`,
-			want:    `T`,
+			want:    `nil`,
 			wantErr: false,
 		},
 		{
@@ -130,17 +130,17 @@ func TestEq(t *testing.T) {
 		},
 		{
 			exp:     `(eq #\a #\a)`,
-			want:    `t`,
+			want:    `nil`,
 			wantErr: false,
 		},
 		{
 			exp:     `(eq #\space #\Space)`,
-			want:    `t`,
+			want:    `nil`,
 			wantErr: false,
 		},
 		{
 			exp:     `(eq #\space #\space)`,
-			want:    `t`,
+			want:    `nil`,
 			wantErr: false,
 		},
 	}
