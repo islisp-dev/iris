@@ -24,12 +24,12 @@ var re *regexp.Regexp
 
 func New(r io.Reader) *Tokenizer {
 	str := ``
+	str += `[-+]?[[:digit:]]+\.[[:digit:]]+|`
+	str += `[-+]?[[:digit:]]+(?:\.[[:digit:]]+)?[eE][-+]?[[:digit:]]+|`
 	str += `[-+]?[[:digit:]]+|`
 	str += `#[bB][-+]?[01]+|`
 	str += `#[oO][-+]?[0-7]+|`
 	str += `#[xX][-+]?[[:xdigit:]]+|`
-	str += `[-+]?[[:digit:]]+\.[[:digit:]]+|`
-	str += `[-+]?[[:digit:]]+(?:\.[[:digit:]]+)?[eE][-+]?[[:digit:]]+|`
 	str += `#\\newline|`
 	str += `#\\space|`
 	str += `#\\[[:graph:]]|`
@@ -64,11 +64,6 @@ func splitter(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		advance = loc[1]
 		token = data[loc[0]:loc[1]]
 		err = nil
-		if ok, _ := regexp.Match(`^[-+]?[[:digit:]]+$`, token); ok && len(data) > loc[1] && data[loc[1]] == '.' {
-			advance = 0
-			token = nil
-			err = nil
-		}
 		return
 	}
 	return

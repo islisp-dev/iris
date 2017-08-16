@@ -60,7 +60,7 @@ func SetDynamic(local, global *environment.Environment, form, var1 ilos.Instance
 	return nil, instance.NewUndefinedVariable(var1)
 }
 
-// DyamicLet is used to establish dynamic variable bindings.
+// DynamicLet is used to establish dynamic variable bindings.
 // The first subform (the dynamic-let variable list) is a list of pairs (var
 // form). The scope of an identifier var defined by dynamic-let is the current
 // toplevel scope. The extent of the bindings of each var is the extent of the
@@ -77,7 +77,7 @@ func SetDynamic(local, global *environment.Environment, form, var1 ilos.Instance
 // returned value of dynamic-let is that of the last body-form of the body (or
 // nil if there is none). The bindings are undone when control leaves the
 // prepared dynamic-let special form.
-func DyamicLet(local, global *environment.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func DynamicLet(local, global *environment.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	vfs := map[ilos.Instance]ilos.Instance{}
 	if err := ensure(class.List, varForm); err != nil {
 		return nil, err

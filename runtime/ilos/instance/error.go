@@ -5,6 +5,8 @@
 package instance
 
 import (
+	"fmt"
+
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 )
@@ -52,14 +54,17 @@ func NewUndefinedVariable(name ilos.Instance) ilos.Instance {
 }
 
 func NewArityError() ilos.Instance {
+	fmt.Println("Arity-Error")
 	return New(class.ProgramError, map[string]ilos.Instance{})
 }
 
 func NewIndexOutOfRange() ilos.Instance {
+	fmt.Println("Index Out Of Range")
 	return New(class.ProgramError, map[string]ilos.Instance{})
 }
 
 func NewImmutableBinding() ilos.Instance {
+	fmt.Println("Immutable binding")
 	return New(class.ProgramError, map[string]ilos.Instance{})
 }
 

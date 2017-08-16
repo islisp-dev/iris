@@ -106,10 +106,10 @@ func evalMacro(local, global *environment.Environment, car, cdr ilos.Instance) (
 func evalFunction(local, global *environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// get special instance has value of Function interface
 	var fun ilos.Instance
-	if f, ok := local.Function.Get(car); ok {
+	if f, ok := global.Function.Get(car); ok {
 		fun = f
 	}
-	if f, ok := global.Function.Get(car); ok {
+	if f, ok := local.Function.Get(car); ok {
 		fun = f
 	}
 	if fun != nil {

@@ -36,10 +36,10 @@ func Function(local, global *environment.Environment, fun ilos.Instance) (ilos.I
 	if err := ensure(class.Symbol, fun); err != nil {
 		return nil, err
 	}
-	if f, ok := local.Function.Get(fun); ok {
+	if f, ok := global.Function.Get(fun); ok {
 		return f, nil
 	}
-	if f, ok := global.Function.Get(fun); ok {
+	if f, ok := local.Function.Get(fun); ok {
 		return f, nil
 	}
 	return nil, instance.NewUndefinedFunction(fun)
