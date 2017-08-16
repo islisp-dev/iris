@@ -23,7 +23,7 @@ type Function struct {
 }
 
 func NewFunction(name ilos.Instance, function interface{}) ilos.Instance {
-	return &Function{name, function}
+	return Function{name, function}
 }
 
 func (Function) Class() ilos.Class {
@@ -38,11 +38,11 @@ func (Function) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Clas
 	return false
 }
 
-func (f *Function) String() string {
+func (f Function) String() string {
 	return fmt.Sprintf("#%v", f.Class())
 }
 
-func (f *Function) Apply(local, global *environment.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func (f Function) Apply(local, global *environment.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	fv := reflect.ValueOf(f.function)
 	ft := reflect.TypeOf(f.function)
 	argv := []reflect.Value{reflect.ValueOf(local), reflect.ValueOf(global)}

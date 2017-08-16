@@ -29,6 +29,6 @@ import (
 // t is a named constant whose value is the symbol t itself.
 // nil is a named constant whose value is the symbol nil itself.
 var (
-	Nil = instance.NewNull()
+	Nil = instance.Nil
 	T   = instance.NewSymbol("T")
 )
