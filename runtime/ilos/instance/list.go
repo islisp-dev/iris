@@ -89,26 +89,28 @@ func (i *Cons) Slice() []ilos.Instance {
 
 type Null struct{}
 
+var Nil = NewNull()
+
 func NewNull() ilos.Instance {
-	return Null{}
+	return &Null{}
 }
 
-func (Null) Class() ilos.Class {
+func (*Null) Class() ilos.Class {
 	return class.Null
 }
 
-func (i Null) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
+func (i *Null) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
 	return nil, false
 }
 
-func (i Null) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
+func (i *Null) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
 	return false
 }
 
-func (Null) String() string {
-	return "nil"
+func (*Null) String() string {
+	return "NIL"
 }
 
-func (Null) Slice() []ilos.Instance {
+func (*Null) Slice() []ilos.Instance {
 	return []ilos.Instance{}
 }

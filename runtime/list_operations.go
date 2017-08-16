@@ -158,7 +158,7 @@ func Mapcar(local, global *environment.Environment, function, list1 ilos.Instanc
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).Slice()[i]
 		}
-		ret, err := function.(*instance.Function).Apply(local, global, arguments...)
+		ret, err := function.(instance.Function).Apply(local, global, arguments...)
 		if err != nil {
 			return nil, err
 		}
@@ -186,7 +186,7 @@ func Mapc(local, global *environment.Environment, function, list1 ilos.Instance,
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).Slice()[i]
 		}
-		if _, err := function.(*instance.Function).Apply(local, global, arguments...); err != nil {
+		if _, err := function.(instance.Function).Apply(local, global, arguments...); err != nil {
 			return nil, err
 		}
 	}
@@ -214,7 +214,7 @@ func Mapcan(local, global *environment.Environment, function, list1 ilos.Instanc
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).Slice()[i]
 		}
-		ret, err := function.(*instance.Function).Apply(local, global, arguments...)
+		ret, err := function.(instance.Function).Apply(local, global, arguments...)
 		if err != nil {
 			return nil, err
 		}
@@ -248,7 +248,7 @@ func Maplist(local, global *environment.Environment, function, list1 ilos.Instan
 				return nil, err
 			}
 		}
-		ret, err := function.(*instance.Function).Apply(local, global, arguments...)
+		ret, err := function.(instance.Function).Apply(local, global, arguments...)
 		if err != nil {
 			return nil, err
 		}
@@ -280,7 +280,7 @@ func Mapl(local, global *environment.Environment, function, list1 ilos.Instance,
 				return nil, err
 			}
 		}
-		if _, err := function.(*instance.Function).Apply(local, global, arguments...); err != nil {
+		if _, err := function.(instance.Function).Apply(local, global, arguments...); err != nil {
 			return nil, err
 		}
 	}
@@ -312,7 +312,7 @@ func Mapcon(local, global *environment.Environment, function, list1 ilos.Instanc
 				return nil, err
 			}
 		}
-		ret, err := function.(*instance.Function).Apply(local, global, arguments...)
+		ret, err := function.(instance.Function).Apply(local, global, arguments...)
 		if err != nil {
 			return nil, err
 		}

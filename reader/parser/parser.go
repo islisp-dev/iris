@@ -73,7 +73,7 @@ func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	// symbol
 	//
 	if "nil" == tok {
-		return instance.NewNull(), nil
+		return instance.Nil, nil
 	}
 	str := `^(`
 	str += `[:&][a-zA-Z]+|`
@@ -121,12 +121,12 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instanc
 		n = "BACKQUOTE"
 	}
 	m := instance.NewSymbol(n)
-	return instance.NewCons(m, instance.NewCons(cdr, instance.NewNull())), nil
+	return instance.NewCons(m, instance.NewCons(cdr, instance.Nil)), nil
 }
 func parseCons(t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instance) {
 	car, err := Parse(t)
 	if err == eop {
-		return instance.NewNull(), nil
+		return instance.Nil, nil
 	}
 	if err == bod {
 		cdr, err := Parse(t)

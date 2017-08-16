@@ -7,12 +7,28 @@ package runtime
 import (
 	"reflect"
 
-	"github.com/ta2gch/iris/runtime/ilos/class"
-	"github.com/ta2gch/iris/runtime/ilos/instance"
-
 	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
+	"github.com/ta2gch/iris/runtime/ilos/class"
+	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
+
+func isComparable(t reflect.Type) bool {
+	if t.Comparable() {
+		if t.Kind() == reflect.Interface {
+			return false
+		}
+		if t.Kind() == reflect.Struct {
+			for i := 0; i < t.NumField(); i++ {
+				if !isComparable(t.Field(i).Type) {
+					return false
+				}
+			}
+		}
+		return true
+	}
+	return false
+}
 
 // Eq tests whether obj1 and obj2 are same identical object.
 // They return t if the objects are the same; otherwise, they return nil.
@@ -32,7 +48,7 @@ func Eq(_, _ *environment.Environment, obj1, obj2 ilos.Instance) (ilos.Instance,
 // them (without modifying them), and if modifying one would modify the other the same way.
 func Eql(_, _ *environment.Environment, obj1, obj2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	t1, t2 := reflect.TypeOf(obj1), reflect.TypeOf(obj2)
-	if t1.Comparable() || t2.Comparable() {
+	if isComparable(t1) || isComparable(t2) {
 		if obj1 == obj2 {
 			return T, nil
 		}
