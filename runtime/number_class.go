@@ -16,7 +16,7 @@ import (
 
 // Numberp returns t if obj is a number (instance of class number); otherwise,
 // returns nil. The obj may be any ISLISP object.
-func Numberp(_, _ *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Numberp(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if instance.Of(class.Number, obj) {
 		return T, nil
 	}
@@ -29,7 +29,7 @@ func Numberp(_, _ *environment.Environment, obj ilos.Instance) (ilos.Instance, i
 // An error shall be signaled if string is not a string (error-id. domain-error).
 // An error shall be signaled if string is not the textual representation
 // of a number (error-id. cannot-parse-number).
-func ParseNumber(_, _ *environment.Environment, str ilos.Instance) (ilos.Instance, ilos.Instance) {
+func ParseNumber(local, global environment.Environment, str ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.String, str); err != nil {
 		return nil, err
 	}
@@ -46,7 +46,7 @@ func ParseNumber(_, _ *environment.Environment, str ilos.Instance) (ilos.Instanc
 //
 // Note: = differs from eql because = compares only the mathematical values of its arguments,
 // whereas eql also compares the representations
-func NumberEqual(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func NumberEqual(local, global environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Number, x1, x2); err != nil {
 		return nil, err
 	}
@@ -70,16 +70,16 @@ func NumberEqual(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Inst
 // NumberNotEqual returns t if x1 and x2 have mathematically distinct values;
 // otherwise, returns nil. An error shall be signaled if either x1 or x2 is not
 // a number (error-id. domain-error).
-func NumberNotEqual(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	ret, err := NumberEqual(nil, nil, x1, x2)
+func NumberNotEqual(local, global environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	ret, err := NumberEqual(local, global, x1, x2)
 	if err != nil {
 		return ret, err
 	}
-	return Not(nil, nil, ret)
+	return Not(local, global, ret)
 }
 
 // NumberGreaterThan returns t if x1 is greater than x2
-func NumberGreaterThan(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func NumberGreaterThan(local, global environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Number, x1, x2); err != nil {
 		return nil, err
 	}
@@ -101,12 +101,12 @@ func NumberGreaterThan(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilo
 }
 
 // NumberGreaterThanOrEqual returns t if x1 is greater than or = x2
-func NumberGreaterThanOrEqual(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := NumberGreaterThan(nil, nil, x1, x2)
+func NumberGreaterThanOrEqual(local, global environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	gt, err := NumberGreaterThan(local, global, x1, x2)
 	if err != nil {
 		return nil, err
 	}
-	eq, err := NumberEqual(nil, nil, x1, x2)
+	eq, err := NumberEqual(local, global, x1, x2)
 	if err != nil {
 		return nil, err
 	}
@@ -117,27 +117,27 @@ func NumberGreaterThanOrEqual(_, _ *environment.Environment, x1, x2 ilos.Instanc
 }
 
 // NumberLessThan returns t if x1 is less than x2
-func NumberLessThan(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	ge, err := NumberGreaterThanOrEqual(nil, nil, x1, x2)
+func NumberLessThan(local, global environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	ge, err := NumberGreaterThanOrEqual(local, global, x1, x2)
 	if err != nil {
 		return nil, err
 	}
-	return Not(nil, nil, ge)
+	return Not(local, global, ge)
 }
 
 // NumberLessThanOrEqulal returns t if x1 is less than or = x2
-func NumberLessThanOrEqulal(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := NumberGreaterThan(nil, nil, x1, x2)
+func NumberLessThanOrEqulal(local, global environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	gt, err := NumberGreaterThan(local, global, x1, x2)
 	if err != nil {
 		return nil, err
 	}
-	return Not(nil, nil, gt)
+	return Not(local, global, gt)
 }
 
 // Add returns the sum, respectively, of their arguments. If all arguments are integers,
 // the result is an integer. If any argument is a ﬂoat, the result is a ﬂoat. When given no arguments,
 // + returns 0. An error shall be signaled if any x is not a number (error-id. domain-error).
-func Add(_, _ *environment.Environment, x ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Add(local, global environment.Environment, x ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	flt := false
 	sum := 0.0
 	for _, a := range x {
@@ -157,7 +157,7 @@ func Add(_, _ *environment.Environment, x ...ilos.Instance) (ilos.Instance, ilos
 // Multiply returns the product, respectively, of their arguments. If all arguments are integers,
 // the result is an integer. If any argument is a ﬂoat, the result is a ﬂoat. When given no arguments,
 // Multiply returns 1. An error shall be signaled if any x is not a number (error-id. domain-error).
-func Multiply(_, _ *environment.Environment, x ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Multiply(local, global environment.Environment, x ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	flt := false
 	pdt := 1.0
 	for _, a := range x {
@@ -181,9 +181,9 @@ func Multiply(_, _ *environment.Environment, x ...ilos.Instance) (ilos.Instance,
 // returns -0.0; in implementations where -0.0 and 0.0 are not distinct, (- 0.0) returns 0.0.
 // Given more than one argument, x1 … xn , - returns their successive differences,
 // x1 −x2 − … −xn. An error shall be signaled if any x is not a number (error-id. domain-error).
-func Substruct(_, _ *environment.Environment, x ilos.Instance, xs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Substruct(local, global environment.Environment, x ilos.Instance, xs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if len(xs) == 0 {
-		ret, err := Substruct(nil, nil, instance.NewInteger(0), x)
+		ret, err := Substruct(local, global, instance.NewInteger(0), x)
 		return ret, err
 	}
 	sub, flt, err := convFloat64(x)
@@ -208,7 +208,7 @@ func Substruct(_, _ *environment.Environment, x ilos.Instance, xs ...ilos.Instan
 //
 // Given more than two arguments, quotient operates iteratively on each of the divisor1 … divisorn as in dividend /divisor1 / … /divisorn. The type of the result follows from the two-argument case because the three-or-more-argument quotient can be defined as follows:
 // An error shall be signaled if dividend is not a number (error-id. domain-error). An error shall be signaled if any divisor is not a number (error-id. domain-error). An error shall be signaled if any divisor is zero (error-id. division-by-zero).
-func Quotient(_, _ *environment.Environment, dividend, divisor1 ilos.Instance, divisor ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Quotient(local, global environment.Environment, dividend, divisor1 ilos.Instance, divisor ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	divisor = append([]ilos.Instance{divisor1}, divisor...)
 	quotient, flt, err := convFloat64(dividend)
 	if err != nil {
@@ -239,16 +239,16 @@ func Quotient(_, _ *environment.Environment, dividend, divisor1 ilos.Instance, d
 
 // Reciprocal returns the reciprocal of its argument x ; that is, 1/x .
 // An error shall be signaled if x is zero (error-id. division-by-zero).
-func Reciprocal(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
-	return Quotient(nil, nil, instance.NewInteger(1), x)
+func Reciprocal(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+	return Quotient(local, global, instance.NewInteger(1), x)
 }
 
 // Max returns the greatest (closest to positive infinity) of its arguments. The comparison is done by >.
 // An error shall be signaled if any x is not a number (error-id. domain-error).
-func Max(_, _ *environment.Environment, x ilos.Instance, xs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Max(local, global environment.Environment, x ilos.Instance, xs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	max := x
 	for _, y := range xs {
-		ret, err := NumberGreaterThan(nil, nil, y, max)
+		ret, err := NumberGreaterThan(local, global, y, max)
 		if err != nil {
 			return nil, err
 		}
@@ -261,10 +261,10 @@ func Max(_, _ *environment.Environment, x ilos.Instance, xs ...ilos.Instance) (i
 
 // Min returns the least (closest to negative infinity) of its arguments. The comparison is done by <.
 // An error shall be signaled if any x is not a number (error-id. domain-error).
-func Min(_, _ *environment.Environment, x ilos.Instance, xs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Min(local, global environment.Environment, x ilos.Instance, xs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	min := x
 	for _, y := range xs {
-		ret, err := NumberLessThan(nil, nil, y, min)
+		ret, err := NumberLessThan(local, global, y, min)
 		if err != nil {
 			return nil, err
 		}
@@ -277,20 +277,20 @@ func Min(_, _ *environment.Environment, x ilos.Instance, xs ...ilos.Instance) (i
 
 // Abs returns the absolute value of its argument.
 // An error shall be signaled if x is not a number (error-id. domain-error).
-func Abs(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
-	ret, err := NumberLessThan(nil, nil, x, instance.NewInteger(0))
+func Abs(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+	ret, err := NumberLessThan(local, global, x, instance.NewInteger(0))
 	if err != nil {
 		return nil, err
 	}
 	if ret == T {
-		return Substruct(nil, nil, x)
+		return Substruct(local, global, x)
 	}
 	return x, nil
 }
 
 // Exp returns e raised to the power x , where e is the base of the natural logarithm.
 // An error shall be signaled if x is not a number (error-id. domain-error).
-func Exp(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Exp(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	f, _, err := convFloat64(x)
 	if err != nil {
 		return nil, err
@@ -300,7 +300,7 @@ func Exp(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.In
 
 // Log returns the natural logarithm of x.
 // An error shall be signaled if x is not a positive number (error-id. domain-error).
-func Log(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Log(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	f, _, err := convFloat64(x)
 	if err != nil {
 		return nil, err
@@ -316,7 +316,7 @@ func Log(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.In
 // An error shall be signaled if x1 is zero and x2 is negative,
 // or if x1 is zero and x2 is a zero ﬂoat, or if x1 is negative
 // and x2 is not an integer.
-func Expt(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Expt(local, global environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, af, err := convFloat64(x1)
 	if err != nil {
 		return nil, err
@@ -330,7 +330,7 @@ func Expt(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, i
 	}
 	if (a == 0 && b < 0) || (a == 0 && bf && b == 0) || (a < 0 && bf) {
 		operation := instance.NewSymbol("EXPT")
-		operands, err := List(nil, nil, x1, x2)
+		operands, err := List(local, global, x1, x2)
 		if err != nil {
 			return nil, err
 		}
@@ -341,7 +341,7 @@ func Expt(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, i
 
 // Sqrt returns the non-negative square root of x. An error shall be signaled
 // if x is not a non-negative number (error-id. domain-error).
-func Sqrt(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Sqrt(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, _, err := convFloat64(x)
 	if err != nil {
 		return nil, err
@@ -360,7 +360,7 @@ var Pi = instance.NewFloat(3.141592653589793)
 
 // Sin returns the sine of x . x must be given in radians.
 // An error shall be signaled if x is not a number (error-id. domain-error).
-func Sin(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Sin(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, _, err := convFloat64(x)
 	if err != nil {
 		return nil, err
@@ -370,7 +370,7 @@ func Sin(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.In
 
 // Cos returns the cosine of x . x must be given in radians.
 // An error shall be signaled if x is not a number (error-id. domain-error).
-func Cos(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Cos(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, _, err := convFloat64(x)
 	if err != nil {
 		return nil, err
@@ -380,7 +380,7 @@ func Cos(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.In
 
 // Tan returns the tangent of x . x must be given in radians.
 // An error shall be signaled if x is not a number (error-id. domain-error).
-func Tan(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Tan(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, _, err := convFloat64(x)
 	if err != nil {
 		return nil, err
@@ -391,7 +391,7 @@ func Tan(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.In
 // Atan returns the arc tangent of x.
 // The result is a (real) number that lies between −π/2 and π/2 (both exclusive).
 // An error shall be signaled if x is not a number (error-id. domain-error).
-func Atan(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Atan(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, _, err := convFloat64(x)
 	if err != nil {
 		return nil, err
@@ -408,7 +408,7 @@ func Atan(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.I
 // is not supported; when minus zero is supported, the range includes −π.
 //
 // The signs of x1 (indicated as y) and x2 (indicated as x) are used to derive quadrant information.
-func Atan2(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Atan2(local, global environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, _, err := convFloat64(x1)
 	if err != nil {
 		return nil, err
@@ -419,7 +419,7 @@ func Atan2(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, 
 	}
 	if a == 0 && b == 0 {
 		operation := instance.NewSymbol("ATAN2")
-		operands, err := List(nil, nil, x1, x2)
+		operands, err := List(local, global, x1, x2)
 		if err != nil {
 			return nil, err
 		}
@@ -430,7 +430,7 @@ func Atan2(_, _ *environment.Environment, x1, x2 ilos.Instance) (ilos.Instance, 
 
 // Sinh returns the hyperbolic sine of x . x must be given in radians.
 // An error shall be signaled if x is not a number (error-id. domain-error).
-func Sinh(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Sinh(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, _, err := convFloat64(x)
 	if err != nil {
 		return nil, err
@@ -440,7 +440,7 @@ func Sinh(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.I
 
 // Cosh returns the hyperbolic cosine of x . x must be given in radians.
 // An error shall be signaled if x is not a number (error-id. domain-error).
-func Cosh(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Cosh(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, _, err := convFloat64(x)
 	if err != nil {
 		return nil, err
@@ -450,7 +450,7 @@ func Cosh(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.I
 
 // Tanh returns the hyperbolic tangent of x . x must be given in radians.
 // An error shall be signaled if x is not a number (error-id. domain-error).
-func Tanh(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Tanh(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, _, err := convFloat64(x)
 	if err != nil {
 		return nil, err
@@ -460,7 +460,7 @@ func Tanh(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.I
 
 // Atanh returns the hyperbolic arc tangent of x.
 // An error shall be signaled if x is not a number with absolute value less than 1 (error-id. domain-error).
-func Atanh(_, _ *environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Atanh(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, _, err := convFloat64(x)
 	if err != nil {
 		return nil, err

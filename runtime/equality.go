@@ -34,7 +34,7 @@ func isComparable(t reflect.Type) bool {
 // They return t if the objects are the same; otherwise, they return nil.
 // Two objects are the same if there is no operation that could distinguish
 // them (without modifying them), and if modifying one would modify the other the same way.
-func Eq(_, _ *environment.Environment, obj1, obj2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Eq(local, global environment.Environment, obj1, obj2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	v1, v2 := reflect.ValueOf(obj1), reflect.ValueOf(obj2)
 	if v1 == v2 || instance.Of(class.Symbol, obj1) && instance.Of(class.Symbol, obj2) && obj1 == obj2 {
 		return T, nil
@@ -46,7 +46,7 @@ func Eq(_, _ *environment.Environment, obj1, obj2 ilos.Instance) (ilos.Instance,
 // They return t if the objects are the same; otherwise, they return nil.
 // Two objects are the same if there is no operation that could distinguish
 // them (without modifying them), and if modifying one would modify the other the same way.
-func Eql(_, _ *environment.Environment, obj1, obj2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Eql(local, global environment.Environment, obj1, obj2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	t1, t2 := reflect.TypeOf(obj1), reflect.TypeOf(obj2)
 	if isComparable(t1) || isComparable(t2) {
 		if obj1 == obj2 {
@@ -66,7 +66,7 @@ func Eql(_, _ *environment.Environment, obj1, obj2 ilos.Instance) (ilos.Instance
 // Specifically:
 //
 // If obj1 and obj2 are direct instances of the same class, equal returns t if they are eql.
-func Equal(_, _ *environment.Environment, obj1, obj2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Equal(local, global environment.Environment, obj1, obj2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if reflect.DeepEqual(obj1, obj2) {
 		return T, nil
 	}

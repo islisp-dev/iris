@@ -29,7 +29,7 @@ func checkLambdaList(lambdaList ilos.Instance) ilos.Instance {
 	return nil
 }
 
-func newNamedFunction(local, global *environment.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func newNamedFunction(local, global environment.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lexical := local
 	if err := ensure(class.Symbol, functionName); err != nil {
 		return nil, err
@@ -45,7 +45,7 @@ func newNamedFunction(local, global *environment.Environment, functionName, lamb
 		}
 		parameters = append(parameters, cadr)
 	}
-	return instance.NewFunction(functionName.(instance.Symbol), func(local, global *environment.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	return instance.NewFunction(functionName.(instance.Symbol), func(local, global environment.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 		local.Merge(lexical)
 		if (variadic && len(parameters)-2 > len(arguments)) || (!variadic && len(parameters) != len(arguments)) {
 			return nil, instance.NewArityError()
@@ -54,7 +54,7 @@ func newNamedFunction(local, global *environment.Environment, functionName, lamb
 			key := parameters[idx]
 			if key == instance.NewSymbol(":REST") || key == instance.NewSymbol("&REST") {
 				key := parameters[idx+1]
-				value, err := List(nil, nil, arguments[idx:]...)
+				value, err := List(local, global, arguments[idx:]...)
 				if err != nil {
 					return nil, err
 				}

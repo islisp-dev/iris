@@ -18,7 +18,7 @@ import (
 // is evaluated and its value is returned.
 //
 // If no else-form is provided, it defaults to nil.
-func If(local, global *environment.Environment, testForm, thenForm ilos.Instance, elseForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func If(local, global environment.Environment, testForm, thenForm ilos.Instance, elseForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	tf, err := Eval(local, global, testForm)
 	if err != nil {
 		return nil, err
@@ -41,7 +41,7 @@ func If(local, global *environment.Environment, testForm, thenForm ilos.Instance
 //are sequentially evaluated and the value of the last one is returned.
 // If no test is true, then nil is returned.
 // If no form exists for the successful test then the value of this test is returned.
-func Cond(local, global *environment.Environment, testFrom ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Cond(local, global environment.Environment, testFrom ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	for _, tf := range testFrom {
 		if err := ensure(class.List, tf); err != nil {
 			return nil, err
@@ -74,7 +74,7 @@ func Cond(local, global *environment.Environment, testFrom ...ilos.Instance) (il
 // the value returned by keyform and key. If no form exists for a matching key, the case form evaluates to nil.
 // If the value of keyform is different from every key, and there is a default clause, its forms, if any,
 // are evaluated sequentially, and the value of the last one is the result of the case form.
-func Case(local, global *environment.Environment, key ilos.Instance, pattern ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Case(local, global environment.Environment, key ilos.Instance, pattern ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	key, err := Eval(local, global, key)
 	if err != nil {
 		return nil, err
@@ -118,7 +118,7 @@ func Case(local, global *environment.Environment, key ilos.Instance, pattern ...
 // the value returned by keyform and key. If no form exists for a matching key, the case form evaluates to nil.
 // If the value of keyform is different from every key, and there is a default clause, its forms, if any,
 // are evaluated sequentially, and the value of the last one is the result of the case form.
-func CaseUsing(local, global *environment.Environment, key, pred ilos.Instance, pattern ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func CaseUsing(local, global environment.Environment, key, pred ilos.Instance, pattern ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	key, err := Eval(local, global, key)
 	if err != nil {
 		return nil, err

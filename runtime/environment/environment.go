@@ -20,7 +20,7 @@ type Environment struct {
 }
 
 // New creates new environment
-func New() *Environment {
+func New() Environment {
 	env := new(Environment)
 	env.BlockTag = newStack()
 	env.TagbodyTag = newStack()
@@ -31,12 +31,12 @@ func New() *Environment {
 	env.Variable = newStack()
 	env.DynamicVariable = newStack()
 	env.Constant = newStack()
-	env.GensymID = 0
+	env.GensymID = 0 // Will Not Worked
 	env.Property = mmap{}
-	return env
+	return *env
 }
 
-func (env *Environment) Merge(before *Environment) *Environment {
+func (env *Environment) Merge(before Environment) {
 	env.BlockTag = append(before.BlockTag, env.BlockTag...)
 	env.TagbodyTag = append(before.TagbodyTag, env.TagbodyTag...)
 	env.CatchTag = append(before.CatchTag, env.CatchTag...)
@@ -48,7 +48,6 @@ func (env *Environment) Merge(before *Environment) *Environment {
 	env.Constant = append(before.Constant, env.Constant...)
 	env.GensymID = before.GensymID
 	env.Property = before.Property
-	return env
 }
 
 // TopLevel is a global environment
