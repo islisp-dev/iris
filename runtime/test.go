@@ -10,7 +10,6 @@ import (
 	"runtime"
 	"testing"
 
-	"github.com/k0kubun/pp"
 	"github.com/ta2gch/iris/runtime/environment"
 )
 
@@ -30,7 +29,6 @@ func execTests(t *testing.T, function interface{}, tests []test) {
 			got, err := Eval(local, global, readFromString(tt.exp))
 			want, _ := Eval(local, global, readFromString(tt.want))
 			if !reflect.DeepEqual(got, want) {
-				pp.Println(got, want)
 				t.Errorf("%v() got = %v, want %v", name, got, want)
 			}
 			if (err != nil) != tt.wantErr {

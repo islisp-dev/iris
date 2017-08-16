@@ -54,10 +54,10 @@ func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	//
 	// character
 	//
-	if m, _ := regexp.MatchString(`^#\\newline$`, tok); m {
+	if m, _ := regexp.MatchString(`^#\\newline$`, strings.ToLower(tok)); m {
 		return instance.NewCharacter('\n'), nil
 	}
-	if m, _ := regexp.MatchString(`^#\\space$`, tok); m {
+	if m, _ := regexp.MatchString(`^#\\space$`, strings.ToLower(tok)); m {
 		return instance.NewCharacter(' '), nil
 	}
 	if r := regexp.MustCompile(`^#\\([[:graph:]])$`).FindStringSubmatch(tok); len(r) >= 2 {
@@ -66,8 +66,8 @@ func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	//
 	// string
 	//
-	if m, _ := regexp.MatchString(`^".*"$`, tok); m {
-		return instance.NewString(tok), nil
+	if r := regexp.MustCompile(`^"(.*)"$`).FindStringSubmatch(tok); len(r) >= 2 {
+		return instance.NewString(r[1]), nil
 	}
 	//
 	// symbol
@@ -93,19 +93,20 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instanc
 		return nil, err
 	}
 	n := tok
-	if m, _ := regexp.MatchString("#[[:digit:]]*[aA]", tok); m {
-		s := instance.NewSymbol("array")
+	if m, _ := regexp.MatchString("#[[:digit:]]+[aA]", tok); m {
 		i := strings.IndexRune(strings.ToLower(tok), 'a')
-		if i == 1 {
-			d := instance.NewInteger(1)
-			return instance.NewCons(s, instance.NewCons(d, instance.NewCons(cdr, instance.NewNull()))), nil
+		var v int64 = 1
+		if i != 1 {
+			var err error
+			v, err = strconv.ParseInt(tok[1:i], 10, 64)
+			if err != nil {
+				return nil, instance.NewParseError(instance.NewString(tok), class.Integer)
+			}
 		}
-		v, err := strconv.ParseInt(tok[1:i], 10, 32)
-		if err != nil {
-			return nil, instance.NewParseError(instance.NewString(tok), class.Integer)
-		}
-		d := instance.NewInteger(int(v))
-		return instance.NewCons(s, instance.NewCons(d, instance.NewCons(cdr, instance.NewNull()))), nil
+		return list2array(int(v), cdr)
+	}
+	if tok == "#" {
+		return list2vector(cdr)
 	}
 	switch tok {
 	case "#'":
@@ -166,7 +167,7 @@ func Parse(t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instance) {
 	if tok == "." {
 		return nil, bod
 	}
-	if mat, _ := regexp.MatchString("^(?:#'|,@?|'|`|#[[:digit:]]*[aA])$", tok); mat {
+	if mat, _ := regexp.MatchString("^(?:#'|,@?|'|`|#[[:digit:]]*[aA]|#)$", tok); mat {
 		m, err := parseMacro(tok, t)
 		if err != nil {
 			return nil, err

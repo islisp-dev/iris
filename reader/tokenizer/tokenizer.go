@@ -30,16 +30,15 @@ func New(r io.Reader) *Tokenizer {
 	str += `#[bB][-+]?[01]+|`
 	str += `#[oO][-+]?[0-7]+|`
 	str += `#[xX][-+]?[[:xdigit:]]+|`
-	str += `#\\newline|`
-	str += `#\\space|`
+	str += `#\\[[:alpha:]]+|`
 	str += `#\\[[:graph:]]|`
-	str += `".*"|` // TODO: support \"
+	str += `"[^"]*"|` // TODO: support \"
 	str += `[:&][a-zA-Z]+|`
 	str += `\|.*\||` // TODO: support \"
 	str += `\+|\-|1\+|1\-|`
 	str += `[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*|`
 	str += `[.()]|`
-	str += "#'|,@?|'|`|#[[:digit:]]*[aA]"
+	str += "#'|,@?|'|`|#[[:digit:]]*[aA]|#" // TODO: hangs at #ab or #3
 	re = regexp.MustCompile(str)
 	sc := bufio.NewScanner(r)
 	sc.Split(splitter)

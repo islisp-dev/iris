@@ -204,7 +204,7 @@ func mapInto(local, global *environment.Environment, destination, function ilos.
 				return nil, err
 			}
 		}
-		ret, err := function.(instance.Function).Apply(local, global, arguments...)
+		ret, err := function.(*instance.Function).Apply(local, global, arguments...)
 		if err != nil {
 			return nil, err
 		}

@@ -53,7 +53,7 @@ func StringEqual(_, _ *environment.Environment, string1, string2 ilos.Instance) 
 	if err := ensure(class.String, string1, string2); err != nil {
 		return nil, err
 	}
-	if string1 == string2 {
+	if string(string1.(instance.String)) == string(string2.(instance.String)) {
 		return T, nil
 	}
 	return Nil, nil

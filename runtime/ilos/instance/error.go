@@ -5,11 +5,34 @@
 package instance
 
 import (
-	"fmt"
+	"log"
+	"runtime"
+	"strings"
 
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 )
+
+func stackTrace() {
+	println("----")
+	programCounter, sourceFileName, sourceFileLineNum, ok := runtime.Caller(2)
+	log.Printf("programCounter: %v\n", programCounter)
+	log.Printf("souruntime: %s\n", sourceFileName)
+	log.Printf("sourceFileLineNum: %d\n", sourceFileLineNum)
+	log.Printf("ok: %t\n", ok)
+
+	fn := runtime.FuncForPC(programCounter)
+	log.Printf("Function Name: %s\n", fn.Name())
+	fileName, fileLine := fn.FileLine(programCounter)
+	log.Printf("FileName:%s, FileLine: %d\n", fileName, fileLine)
+
+	splitedFnName := strings.Split(fn.Name(), ".")
+	packageName := splitedFnName[0]
+	callerFuncName := splitedFnName[1]
+	log.Printf("packageName: %s\n", packageName)
+	log.Printf("functionName: %s\n", callerFuncName)
+	println("-----")
+}
 
 func NewArithmeticError(operation, operands ilos.Instance) ilos.Instance {
 	return New(class.ArithmeticError, map[string]ilos.Instance{
@@ -54,17 +77,17 @@ func NewUndefinedVariable(name ilos.Instance) ilos.Instance {
 }
 
 func NewArityError() ilos.Instance {
-	fmt.Println("Arity-Error")
+	//stackTrace()
 	return New(class.ProgramError, map[string]ilos.Instance{})
 }
 
 func NewIndexOutOfRange() ilos.Instance {
-	fmt.Println("Index Out Of Range")
+	//stackTrace()
 	return New(class.ProgramError, map[string]ilos.Instance{})
 }
 
 func NewImmutableBinding() ilos.Instance {
-	fmt.Println("Immutable binding")
+	//stackTrace()
 	return New(class.ProgramError, map[string]ilos.Instance{})
 }
 

@@ -110,7 +110,7 @@ func TestDefdynamic(t *testing.T) {
 			wantErr: false,
 		},
 	}
-	execTests(t, Defconstant, tests)
+	execTests(t, Defdynamic, tests)
 }
 
 func TestDefun(t *testing.T) {
@@ -124,5 +124,5 @@ func TestDefun(t *testing.T) {
 			wantErr: false,
 		},
 	}
-	execTests(t, Defconstant, tests)
+	execTests(t, Defun, tests)
 }
