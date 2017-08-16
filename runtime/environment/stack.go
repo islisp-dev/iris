@@ -38,5 +38,6 @@ func (s stack) Define(key, value ilos.Instance) bool {
 		s[len(s)-1][key] = value
 		return true
 	}
+	s[len(s)-1][key] = value
 	return false
 }

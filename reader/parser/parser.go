@@ -42,11 +42,11 @@ func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	//
 	// float
 	//
-	if m, _ := regexp.MatchString("^[-+]?[[:digit:]]+\\.[[:digit:]]+$", tok); m {
+	if m, _ := regexp.MatchString(`^[-+]?[[:digit:]]+\.[[:digit:]]+$`, tok); m {
 		n, _ := strconv.ParseFloat(tok, 64)
 		return instance.NewFloat(n), nil
 	}
-	if r := regexp.MustCompile("^([-+]?[[:digit:]]+(?:\\.[[:digit:]]+)?)[eE]([-+]?[[:digit:]]+)$").FindStringSubmatch(tok); len(r) >= 3 {
+	if r := regexp.MustCompile(`^([-+]?[[:digit:]]+(?:\.[[:digit:]]+)?)[eE]([-+]?[[:digit:]]+)$`).FindStringSubmatch(tok); len(r) >= 3 {
 		n, _ := strconv.ParseFloat(r[1], 64)
 		e, _ := strconv.ParseInt(r[2], 10, 64)
 		return instance.NewFloat(n * math.Pow10(int(e))), nil
@@ -54,19 +54,19 @@ func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	//
 	// character
 	//
-	if m, _ := regexp.MatchString("^#\\\\newline$", tok); m {
+	if m, _ := regexp.MatchString(`^#\\newline$`, tok); m {
 		return instance.NewCharacter('\n'), nil
 	}
-	if m, _ := regexp.MatchString("^#\\\\space$", tok); m {
+	if m, _ := regexp.MatchString(`^#\\space$`, tok); m {
 		return instance.NewCharacter(' '), nil
 	}
-	if r := regexp.MustCompile("^#\\\\([[:graph:]])$").FindStringSubmatch(tok); len(r) >= 2 {
+	if r := regexp.MustCompile(`^#\\([[:graph:]])$`).FindStringSubmatch(tok); len(r) >= 2 {
 		return instance.NewCharacter(rune(r[1][0])), nil
 	}
 	//
 	// string
 	//
-	if m, _ := regexp.MatchString("^\".*\"$", tok); m {
+	if m, _ := regexp.MatchString(`^".*"$`, tok); m {
 		return instance.NewString(tok), nil
 	}
 	//
@@ -80,7 +80,7 @@ func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	str += `\|.*\||`
 	str += `\+|\-|1\+|1\-|`
 	str += `[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*|`
-	str += ")$"
+	str += `)$`
 	if m, _ := regexp.MatchString(str, tok); m {
 		return instance.NewSymbol(strings.ToUpper(tok)), nil
 	}
