@@ -67,29 +67,22 @@ func CreateArray(_, _ *environment.Environment, dimensions ilos.Instance, initia
 	if len(initialElement) == 1 {
 		elt = initialElement[0]
 	}
-	switch len(dim) {
-	case 0:
+	if len(dim) == 0 {
 		return instance.NewGeneralArrayStar(nil, elt), nil
-	case 1:
-		array := make([]*instance.GeneralArrayStar, int(dim[0].(instance.Integer)))
-		for i := range array {
-			array[i] = instance.NewGeneralArrayStar(nil, elt).(*instance.GeneralArrayStar)
-		}
-		return instance.NewGeneralArrayStar(array, nil), nil
-	default:
-		array := make([]*instance.GeneralArrayStar, int(dim[len(dim)-1].(instance.Integer)))
-		for i := range array {
-			array[i] = instance.NewGeneralArrayStar(nil, elt).(*instance.GeneralArrayStar)
-		}
-		for i := len(dim) - 2; i >= 0; i-- {
-			elt := array
-			array := make([]*instance.GeneralArrayStar, int(dim[i].(instance.Integer)))
-			for i := range array {
-				array[i] = instance.NewGeneralArrayStar(elt, nil).(*instance.GeneralArrayStar)
-			}
-		}
-		return instance.NewGeneralArrayStar(array, nil), nil
 	}
+	array := make([]instance.GeneralArrayStar, int(dim[0].(instance.Integer)))
+	for i := range array {
+		d, err := List(nil, nil, dim[1:]...) // TODO: replace UnsafeCdr
+		if err != nil {
+			return nil, err
+		}
+		a, err := CreateArray(nil, nil, d, elt)
+		if err != nil {
+			return nil, err
+		}
+		array[i] = a.(instance.GeneralArrayStar)
+	}
+	return instance.NewGeneralArrayStar(array, nil), nil
 }
 
 // Aref returns the object stored in the component of the basic-array specified by the sequence
@@ -140,7 +133,7 @@ func Garef(_, _ *environment.Environment, generalArray ilos.Instance, dimensions
 	if err := ensure(class.Integer, dimensions...); err != nil {
 		return nil, err
 	}
-	var array *instance.GeneralArrayStar
+	var array instance.GeneralArrayStar
 	for _, dim := range dimensions {
 		index := int(dim.(instance.Integer))
 		if array.Vector == nil || len(array.Vector) <= index {
@@ -203,7 +196,7 @@ func SetGaref(_, _ *environment.Environment, obj, generalArray ilos.Instance, di
 	if err := ensure(class.Integer, dimensions...); err != nil {
 		return nil, err
 	}
-	var array *instance.GeneralArrayStar
+	var array instance.GeneralArrayStar
 	for _, dim := range dimensions {
 		index := int(dim.(instance.Integer))
 		if array.Vector == nil || len(array.Vector) <= index {
@@ -231,7 +224,7 @@ func ArrayDimensions(_, _ *environment.Environment, basicArray ilos.Instance) (i
 	case instance.Of(class.GeneralVector, basicArray):
 		return List(nil, nil, instance.NewInteger(len(basicArray.(instance.GeneralVector))))
 	default: // General Array*
-		var array *instance.GeneralArrayStar
+		var array instance.GeneralArrayStar
 		dimensions := []ilos.Instance{}
 		for array.Vector != nil {
 			dimensions = append(dimensions, instance.NewInteger(len(array.Vector)))

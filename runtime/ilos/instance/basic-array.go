@@ -15,11 +15,11 @@ import (
 //
 
 type GeneralArrayStar struct {
-	Vector []*GeneralArrayStar
+	Vector []GeneralArrayStar
 	Scalar ilos.Instance
 }
 
-func NewGeneralArrayStar(vector []*GeneralArrayStar, scalar ilos.Instance) ilos.Instance {
+func NewGeneralArrayStar(vector []GeneralArrayStar, scalar ilos.Instance) ilos.Instance {
 	return GeneralArrayStar{vector, scalar}
 }
 
