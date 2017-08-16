@@ -5,13 +5,14 @@
 package runtime
 
 import (
+	"github.com/k0kubun/pp"
 	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func evalArguments(local, global *environment.Environment, arguments ilos.Instance) (ilos.Instance, ilos.Instance) {
+func evalArguments(local, global environment.Environment, arguments ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// if arguments ends here
 	if arguments == Nil {
 		return Nil, nil
@@ -33,7 +34,7 @@ func evalArguments(local, global *environment.Environment, arguments ilos.Instan
 
 }
 
-func evalLambda(local, global *environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
+func evalLambda(local, global environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// eval if lambda form
 	if instance.Of(class.Cons, car) {
 		caar := car.(*instance.Cons).Car // Checked at the top of// This sentence
@@ -60,14 +61,15 @@ func evalLambda(local, global *environment.Environment, car, cdr ilos.Instance) 
 	return nil, nil, false
 }
 
-func evalSpecial(local, global *environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
+func evalSpecial(local, global environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// get special instance has value of Function interface
 	var spl ilos.Instance
 	if s, ok := global.Special.Get(car); ok {
 		spl = s
 	}
 	if spl != nil {
-		env := environment.New().Merge(local)
+		env := environment.New()
+		env.Merge(local)
 		ret, err := spl.(instance.Applicable).Apply(env, global, cdr.(instance.List).Slice()...)
 		if err != nil {
 			return nil, err, true
@@ -77,7 +79,7 @@ func evalSpecial(local, global *environment.Environment, car, cdr ilos.Instance)
 	return nil, nil, false
 }
 
-func evalMacro(local, global *environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
+func evalMacro(local, global environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// get special instance has value of Function interface
 	var mac ilos.Instance
 	if m, ok := local.Macro.Get(car); ok {
@@ -103,7 +105,7 @@ func evalMacro(local, global *environment.Environment, car, cdr ilos.Instance) (
 	return nil, nil, false
 }
 
-func evalFunction(local, global *environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
+func evalFunction(local, global environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// get special instance has value of Function interface
 	var fun ilos.Instance
 	if f, ok := global.Function.Get(car); ok {
@@ -129,7 +131,7 @@ func evalFunction(local, global *environment.Environment, car, cdr ilos.Instance
 	return nil, nil, false
 }
 
-func evalCons(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func evalCons(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Cons, obj); err != nil {
 		return nil, err
 	}
@@ -152,10 +154,11 @@ func evalCons(local, global *environment.Environment, obj ilos.Instance) (ilos.I
 	if a, b, c := evalFunction(local, global, car, cdr); c {
 		return a, b
 	}
+	pp.Println(global, local)
 	return nil, instance.NewUndefinedFunction(car)
 }
 
-func evalVariable(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func evalVariable(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if val, ok := local.Variable.Get(obj); ok {
 		return val, nil
 	}
@@ -169,7 +172,7 @@ func evalVariable(local, global *environment.Environment, obj ilos.Instance) (il
 }
 
 // Eval evaluates any classs
-func Eval(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Eval(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if obj == Nil {
 		return Nil, nil
 	}

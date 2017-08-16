@@ -38,7 +38,7 @@ more recently than the destination to which control is being transferred
 is immediately considered invalid.
 */
 
-func Block(local, global *environment.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Block(local, global environment.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	tag, err = Eval(local, global, tag) // Checked at the top of// This function
 	if err != nil {
@@ -68,7 +68,7 @@ func Block(local, global *environment.Environment, tag ilos.Instance, body ...il
 	return sucess, nil
 }
 
-func ReturnFrom(local, global *environment.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
+func ReturnFrom(local, global environment.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	tag, err = Eval(local, global, tag)
 	if err != nil {
@@ -87,7 +87,7 @@ func ReturnFrom(local, global *environment.Environment, tag, object ilos.Instanc
 	return nil, instance.NewBlockTag(tag, object)
 }
 
-func Catch(local, global *environment.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Catch(local, global environment.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	tag, err = Eval(local, global, tag)
 	if err != nil {
@@ -117,7 +117,7 @@ func Catch(local, global *environment.Environment, tag ilos.Instance, body ...il
 	return sucess, nil
 }
 
-func Throw(local, global *environment.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Throw(local, global environment.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	tag, err = Eval(local, global, tag)
 	if err != nil {
@@ -137,7 +137,7 @@ func Throw(local, global *environment.Environment, tag, object ilos.Instance) (i
 	return nil, instance.NewCatchTag(tag, object)
 }
 
-func Tagbody(local, global *environment.Environment, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Tagbody(local, global environment.Environment, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	for idx, cadr := range body {
 		cddr := instance.GeneralVector(body[idx+1:])
 		if !instance.Of(class.Cons, cadr) {
@@ -181,7 +181,7 @@ func Tagbody(local, global *environment.Environment, body ...ilos.Instance) (ilo
 	return Nil, nil
 }
 
-func Go(local, global *environment.Environment, tag ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Go(local, global environment.Environment, tag ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if _, ok := local.TagbodyTag.Get(tag); !ok {
 		return nil, instance.NewSimpleError(instance.NewString("%v is not defined as the tag"), tag)
 
@@ -217,7 +217,7 @@ func Go(local, global *environment.Environment, tag ilos.Instance) (ilos.Instanc
 // not terminate abnormally, normal mechanisms for non-local exit (return-from,
 // throw, or go) would be used as necessary and would respect these
 // cleanup-forms.
-func UnwindProtect(local, global *environment.Environment, form ilos.Instance, cleanupForms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func UnwindProtect(local, global environment.Environment, form ilos.Instance, cleanupForms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	ret1, err1 := Eval(local, global, form)
 	ret2, err2 := Progn(local, global, cleanupForms...)
 	if instance.Of(class.Escape, err2) {

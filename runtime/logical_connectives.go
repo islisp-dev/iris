@@ -11,7 +11,7 @@ import (
 
 // Not is the logical “not” (or “¬”). It returns t if obj is nil
 // and nil otherwise. obj may be any ISLISP object.
-func Not(_, _ *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Not(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if obj == Nil {
 		return T, nil
 	}
@@ -22,7 +22,7 @@ func Not(_, _ *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.
 // from left to right until either one of them evaluates to nil or else
 // none are left. If one of them evaluates to nil, then nil is returned
 // from the and; otherwise, the value of the last evaluated form is returned.
-func And(_, _ *environment.Environment, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func And(local, global environment.Environment, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	for _, f := range form {
 		if f == Nil {
 			return Nil, nil
@@ -38,7 +38,7 @@ func And(_, _ *environment.Environment, form ...ilos.Instance) (ilos.Instance, i
 // from left to right until either one of them evaluates to a non-nil value
 // or else none are left. If one of them evaluates to a non-nil value,
 // then this non-nil value is returned, otherwise nil is returned.
-func Or(_, _ *environment.Environment, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Or(local, global environment.Environment, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	for _, f := range form {
 		if f != Nil {
 			return f, nil

@@ -19,7 +19,7 @@ import (
 // setq can be used only for modifying bindings, and not for establishing a variable.
 // The setq special form must be contained in the scope of var , established by defglobal,
 // let, let*, for, or a lambda expression.
-func Setq(local, global *environment.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Setq(local, global environment.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Instance) {
 	ret, err := Eval(local, global, form)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func Setq(local, global *environment.Environment, var1, form ilos.Instance) (ilo
 // of the evaluation of the last body-form of its body (or nil if there is none).
 //
 // No var may appear more than once in let variable list.
-func Let(local, global *environment.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Let(local, global environment.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	vfs := map[ilos.Instance]ilos.Instance{}
 	if err := ensure(class.List, varForm); err != nil {
 		return nil, err
@@ -88,7 +88,7 @@ func Let(local, global *environment.Environment, varForm ilos.Instance, bodyForm
 // and in this enlarged or modified environment the body-forms are executed.
 // The returned value of let* is the result of the evaluation of the last form
 // of its body (or nil if there is none).
-func LetStar(local, global *environment.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func LetStar(local, global environment.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.List, varForm); err != nil {
 		return nil, err
 	}

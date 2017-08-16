@@ -14,7 +14,7 @@ import (
 )
 
 type Applicable interface {
-	Apply(*environment.Environment, *environment.Environment, ...ilos.Instance) (ilos.Instance, ilos.Instance)
+	Apply(environment.Environment, environment.Environment, ...ilos.Instance) (ilos.Instance, ilos.Instance)
 }
 
 type Function struct {
@@ -42,7 +42,7 @@ func (f Function) String() string {
 	return fmt.Sprintf("#%v", f.Class())
 }
 
-func (f Function) Apply(local, global *environment.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func (f Function) Apply(local, global environment.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	fv := reflect.ValueOf(f.function)
 	ft := reflect.TypeOf(f.function)
 	argv := []reflect.Value{reflect.ValueOf(local), reflect.ValueOf(global)}

@@ -24,7 +24,7 @@ import (
 //
 // An error shall be signaled if sequence is not a basic-vector or a list
 // (error-id. domain-error).
-func Length(_, _ *environment.Environment, sequence ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Length(local, global environment.Environment, sequence ilos.Instance) (ilos.Instance, ilos.Instance) {
 	switch {
 	case instance.Of(class.String, sequence):
 		return instance.NewInteger(len(sequence.(instance.String))), nil
@@ -44,7 +44,7 @@ func Length(_, _ *environment.Environment, sequence ilos.Instance) (ilos.Instanc
 //
 // An error shall be signaled if sequence is not a basic-vector or a list or if z is not an
 // integer (error-id. domain-error).
-func Elt(_, _ *environment.Environment, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Elt(local, global environment.Environment, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Integer, z); err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func Elt(_, _ *environment.Environment, sequence, z ilos.Instance) (ilos.Instanc
 // An error shall be signaled if z is an integer outside of the valid range of indices
 // (error-id. index-out-of-range). An error shall be signaled if sequence is not a basic-vector
 // or a list or if z is not an integer (error-id. domain-error). obj may be any ISLISP object.
-func SetElt(_, _ *environment.Environment, obj, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
+func SetElt(local, global environment.Environment, obj, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Integer, z); err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func SetElt(_, _ *environment.Environment, obj, sequence, z ilos.Instance) (ilos
 // mentioned (error-id. index-out-of-range). An error shall be signaled if sequence is not a
 // basic-vector or a list, or if z1 is not an integer, or if z2 is not an integer
 // (error-id. domain-error).
-func Subseq(_, _ *environment.Environment, sequence, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Subseq(local, global environment.Environment, sequence, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Integer, z1, z2); err != nil {
 		return nil, err
 	}
@@ -154,7 +154,7 @@ func Subseq(_, _ *environment.Environment, sequence, z1, z2 ilos.Instance) (ilos
 		if !(0 < start && start < len(seq) && 0 < end && end < len(seq) && start <= end) {
 			return nil, instance.NewIndexOutOfRange()
 		}
-		return List(nil, nil, seq[start:end]...)
+		return List(local, global, seq[start:end]...)
 	}
 	return nil, instance.NewDomainError(sequence, class.Object)
 }
@@ -175,7 +175,7 @@ func Subseq(_, _ *environment.Environment, sequence, z1, z2 ilos.Instance) (ilos
 //
 // An error shall be signaled if any sequence is not a basic-vector or a list
 // (error-id. domain-error).
-func mapInto(local, global *environment.Environment, destination, function ilos.Instance, sequences ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func mapInto(local, global environment.Environment, destination, function ilos.Instance, sequences ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.List, append(sequences, destination)...); err != nil {
 		if err := ensure(class.BasicVector, append(sequences, destination)...); err != nil {
 			return nil, err
@@ -199,7 +199,7 @@ func mapInto(local, global *environment.Environment, destination, function ilos.
 		arguments := make([]ilos.Instance, int(max))
 		for _, seq := range sequences {
 			var err ilos.Instance
-			arguments[i], err = Elt(nil, nil, seq, instance.NewInteger(i))
+			arguments[i], err = Elt(local, global, seq, instance.NewInteger(i))
 			if err != nil {
 				return nil, err
 			}
@@ -208,7 +208,7 @@ func mapInto(local, global *environment.Environment, destination, function ilos.
 		if err != nil {
 			return nil, err
 		}
-		_, err = SetElt(nil, nil, ret, destination, instance.NewInteger(i))
+		_, err = SetElt(local, global, ret, destination, instance.NewInteger(i))
 		if err != nil {
 			return nil, err
 		}

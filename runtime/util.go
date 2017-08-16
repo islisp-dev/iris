@@ -44,7 +44,7 @@ func readFromString(s string) ilos.Instance {
 	e, _ := parser.Parse(tokenizer.New(strings.NewReader(s)))
 	return e
 }
-func evalString(local, global *environment.Environment, s string) ilos.Instance {
+func evalString(local, global environment.Environment, s string) ilos.Instance {
 	e, _ := Eval(local, global, readFromString(s))
 	return e
 }

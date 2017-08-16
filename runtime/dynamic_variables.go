@@ -21,7 +21,7 @@ import (
 // returned that was established most recently and is still in effect. An
 // error shall be signaled if such a binding does not exist
 // (error-id. unbound-variable).
-func Dynamic(local, global *environment.Environment, var1 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Dynamic(local, global environment.Environment, var1 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Symbol, var1); err != nil {
 		return nil, err
 	}
@@ -43,7 +43,7 @@ func Dynamic(local, global *environment.Environment, var1 ilos.Instance) (ilos.I
 // An error shall be signaled if var has no dynamic value
 // (error-id.  unbound-variable). setf of dynamic can be used only for
 // modifying bindings, and not for establishing them.
-func SetDynamic(local, global *environment.Environment, form, var1 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func SetDynamic(local, global environment.Environment, form, var1 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Symbol, var1); err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func SetDynamic(local, global *environment.Environment, form, var1 ilos.Instance
 // returned value of dynamic-let is that of the last body-form of the body (or
 // nil if there is none). The bindings are undone when control leaves the
 // prepared dynamic-let special form.
-func DynamicLet(local, global *environment.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func DynamicLet(local, global environment.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	vfs := map[ilos.Instance]ilos.Instance{}
 	if err := ensure(class.List, varForm); err != nil {
 		return nil, err

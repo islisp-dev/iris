@@ -19,7 +19,7 @@ import (
 // A function binding is an association between an identifier, function-name,
 // and a function object that is denoted by function-name—if in operator
 // position—or by (function function-name) elsewhere.
-func Functionp(local, global *environment.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Functionp(local, global environment.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if instance.Of(class.Function, fun) {
 		return T, nil
 	}
@@ -31,7 +31,7 @@ func Functionp(local, global *environment.Environment, fun ilos.Instance) (ilos.
 // An error shall be signaled if no binding has been established for the identifier
 // in the function namespace of current lexical environment (error-id. undefined-function).
 // The consequences are undefined if the function-name names a macro or special form
-func Function(local, global *environment.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Function(local, global environment.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// car must be a symbol
 	if err := ensure(class.Symbol, fun); err != nil {
 		return nil, err
@@ -69,7 +69,7 @@ func Function(local, global *environment.Environment, fun ilos.Instance) (ilos.I
 // was called with apply and R corresponds to the final argument, L2 , to that call
 // to apply (or some subtail of L2), in which case it is implementation defined whether
 // L1 shares structure with L2 .
-func Lambda(local, global *environment.Environment, lambdaList ilos.Instance, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Lambda(local, global environment.Environment, lambdaList ilos.Instance, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := checkLambdaList(lambdaList); err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func Lambda(local, global *environment.Environment, lambdaList ilos.Instance, fo
 // (or nil if there is none) is the value returned by the special form activation.
 //
 // No function-name may appear more than once in the function bindings.
-func Labels(local, global *environment.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Labels(local, global environment.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.List, functions); err != nil {
 		return nil, err
 	}
@@ -127,11 +127,12 @@ func Labels(local, global *environment.Environment, functions ilos.Instance, bod
 
 // Flet special form allow the definition of new identifiers in the function
 // namespace for function objects (see Labels).
-func Flet(local, global *environment.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Flet(local, global environment.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.List, functions); err != nil {
 		return nil, err
 	}
-	env := environment.New().Merge(local)
+	env := environment.New()
+	env.Merge(local)
 	for _, function := range functions.(instance.List).Slice() {
 		if err := ensure(class.List, function); err != nil {
 			return nil, err
@@ -160,7 +161,7 @@ func Flet(local, global *environment.Environment, functions ilos.Instance, bodyF
 // An error shall be signaled if function is not a function (error-id. domain-error).
 // Each obj may be any ISLISP object. An error shall be signaled
 // if list is not a proper list (error-id. improper-argument-list).
-func Apply(local, global *environment.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Apply(local, global environment.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Function, function); err != nil {
 		return nil, err
 	}
@@ -176,7 +177,7 @@ func Apply(local, global *environment.Environment, function ilos.Instance, obj .
 //
 // An error shall be signaled if function is not a function (error-id. domain-error).
 // Each obj may be any ISLISP object.
-func Funcall(local, global *environment.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Funcall(local, global environment.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	obj = append(obj, Nil)
 	return Apply(local, global, function, obj...)
 }

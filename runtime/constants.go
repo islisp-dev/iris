@@ -11,6 +11,6 @@ import (
 
 // Quote is used to include any object in an ISLisp text.
 // A quoted expression denotes a reference to an object.
-func Quote(local, global *environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Quote(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	return obj, nil
 }
