@@ -9,6 +9,19 @@ import "testing"
 func TestDefmacro(t *testing.T) {
 	defspecial(Defmacro)
 	defun(List)
+	defspecial(Quote)
+	tests := []test{
+		{
+			exp:     "(defmacro caar(x) (list ’car (list ’car x)))",
+			want:    "'caar",
+			wantErr: false,
+		},
+	}
+	execTests(t, Defmacro, tests)
+}
+
+func TestQuasiquote(t *testing.T) {
+	defun(List)
 	defun2("+", Add)
 	defspecial(Let)
 	defspecial(Quasiquote)
@@ -49,5 +62,5 @@ func TestDefmacro(t *testing.T) {
 			wantErr: false,
 		},
 	}
-	execTests(t, Defmacro, tests)
+	execTests(t, Quasiquote, tests)
 }
