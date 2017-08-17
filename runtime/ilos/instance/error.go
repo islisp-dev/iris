@@ -50,15 +50,15 @@ func NewDivisionByZero(operation, operands ilos.Instance) ilos.Instance {
 
 func NewParseError(str, expectedClass ilos.Instance) ilos.Instance {
 	return New(class.ParseError, map[string]ilos.Instance{
-		"STRING":          str,
-		"EXPECTED-CLASSS": expectedClass,
+		"STRING":         str,
+		"EXPECTED-CLASS": expectedClass,
 	})
 }
 
 func NewDomainError(object ilos.Instance, expectedClass ilos.Class) ilos.Instance {
 	return New(class.DomainError, map[string]ilos.Instance{"CAUSE": Symbol("DOMAIN-ERROR"),
-		"OBJECT":          object,
-		"EXPECTED-CLASSS": expectedClass,
+		"OBJECT":         object,
+		"EXPECTED-CLASS": expectedClass,
 	})
 }
 
