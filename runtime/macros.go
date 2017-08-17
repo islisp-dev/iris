@@ -158,6 +158,7 @@ func expand(local, global environment.Environment, form ilos.Instance, level int
 			cdr = cdr.(*instance.Cons).Cdr
 			continue
 		}
+		// If the cadr is not special forms then,
 		elt, err := expand(local, global, cadr, level)
 		if err != nil {
 			return nil, err
@@ -183,6 +184,8 @@ func expand(local, global environment.Environment, form ilos.Instance, level int
 			}
 		} else {
 			// To expand `((foo ,(- 10 3)) ,@(cdr '(c)) . ,(car '(cons)))
+			// If the last cell of forms is not Nil, run this statements at first
+
 			// the elements of exp is always a instance of <list> because exp isn't appended lists in for-loop
 			slice := exp[i].(instance.List).Slice()
 			for j := len(slice) - 1; j >= 0; j-- {
