@@ -15,15 +15,25 @@ import (
 // instance
 //
 
-func New(c ilos.Class, s ...interface{}) ilos.Instance {
+func newInstance(c ilos.Class, s ...interface{}) ilos.Instance {
 	p := []ilos.Instance{}
 	for _, q := range c.Supers() {
-		p = append(p, New(q, s...))
+		p = append(p, newInstance(q, s...))
 	}
 	t := map[ilos.Instance]ilos.Instance{}
-	for _, n := range c.Slots() {
-		t[n] = s[0].(map[ilos.Instance]ilos.Instance)[n]
+	for argName, argValue := range s[0].(map[ilos.Instance]ilos.Instance) {
+		if slotName, ok := c.Initarg(argName); ok {
+			t[slotName] = argValue
+		}
 	}
+	/*
+		for _, slotName := range c.Slots() {
+			if _, ok := t[slotName]; !ok {
+				t[slotName], _ = c.Initform(slotName)
+				t[slotName], _ = Eval(local, global, t[slotName])
+			}
+		}
+	*/
 	return instance{c, p, t}
 }
 

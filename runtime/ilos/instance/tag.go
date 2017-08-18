@@ -9,19 +9,19 @@ import (
 )
 
 func NewBlockTag(tag, object ilos.Instance) ilos.Instance {
-	return New(BlockTagClass, map[ilos.Instance]ilos.Instance{
-		Symbol("TAG"):    tag,
-		Symbol("OBJECT"): object,
+	return newInstance(BlockTagClass, map[ilos.Instance]ilos.Instance{
+		NewSymbol("TAG"):    tag,
+		NewSymbol("OBJECT"): object,
 	})
 }
 func NewCatchTag(tag, object ilos.Instance) ilos.Instance {
-	return New(CatchTagClass, map[ilos.Instance]ilos.Instance{
-		Symbol("TAG"):    tag,
-		Symbol("OBJECT"): object,
+	return newInstance(CatchTagClass, map[ilos.Instance]ilos.Instance{
+		NewSymbol("TAG"):    tag,
+		NewSymbol("OBJECT"): object,
 	})
 }
 func NewTagbodyTag(tag ilos.Instance) ilos.Instance {
-	return New(TagbodyTagClass, map[ilos.Instance]ilos.Instance{
-		Symbol("TAG"): tag,
+	return newInstance(TagbodyTagClass, map[ilos.Instance]ilos.Instance{
+		NewSymbol("TAG"): tag,
 	})
 }

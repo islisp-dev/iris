@@ -4,12 +4,16 @@
 
 package instance
 
-import "github.com/ta2gch/iris/runtime/ilos"
+import (
+	"fmt"
+
+	"github.com/ta2gch/iris/runtime/ilos"
+)
 
 type BuiltInClass struct {
+	name   ilos.Instance
 	supers []ilos.Class
 	slots  []ilos.Instance
-	name   string
 }
 
 func NewBuiltInClass(name string, super ilos.Class, slots ...string) ilos.Class {
@@ -18,13 +22,9 @@ func NewBuiltInClass(name string, super ilos.Class, slots ...string) ilos.Class 
 		slotNames = append(slotNames, NewSymbol(slot))
 	}
 	if super == nil {
-		return BuiltInClass{[]ilos.Class{}, slotNames, name}
+		return BuiltInClass{NewSymbol(name), []ilos.Class{}, slotNames}
 	}
-	return BuiltInClass{[]ilos.Class{super}, slotNames, name}
-}
-
-func (BuiltInClass) Class() ilos.Class {
-	return BuiltInClassClass
+	return BuiltInClass{NewSymbol(name), []ilos.Class{super}, slotNames}
 }
 
 func (p BuiltInClass) Supers() []ilos.Class {
@@ -33,6 +33,18 @@ func (p BuiltInClass) Supers() []ilos.Class {
 
 func (p BuiltInClass) Slots() []ilos.Instance {
 	return p.slots
+}
+
+func (p BuiltInClass) Initform(arg ilos.Instance) (ilos.Instance, bool) {
+	return arg, true
+}
+
+func (p BuiltInClass) Initarg(arg ilos.Instance) (ilos.Instance, bool) {
+	return nil, false
+}
+
+func (BuiltInClass) Class() ilos.Class {
+	return BuiltInClassClass
 }
 
 func (p BuiltInClass) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
@@ -44,5 +56,5 @@ func (p BuiltInClass) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilo
 }
 
 func (p BuiltInClass) String() string {
-	return p.name
+	return fmt.Sprint(p.name)
 }
