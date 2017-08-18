@@ -34,70 +34,70 @@ func stackTrace() {
 }
 
 func NewArithmeticError(operation, operands ilos.Instance) ilos.Instance {
-	return New(ArithmeticErrorClass, map[ilos.Instance]ilos.Instance{
-		Symbol("OPERATION"): operation,
-		Symbol("OPERANDS"):  operands,
+	return newInstance(ArithmeticErrorClass, map[ilos.Instance]ilos.Instance{
+		NewSymbol("OPERATION"): operation,
+		NewSymbol("OPERANDS"):  operands,
 	})
 }
 
 func NewDivisionByZero(operation, operands ilos.Instance) ilos.Instance {
-	return New(DivisionByZeroClass, map[ilos.Instance]ilos.Instance{
-		Symbol("OPERATION"): operation,
-		Symbol("OPERANDS"):  operands,
+	return newInstance(DivisionByZeroClass, map[ilos.Instance]ilos.Instance{
+		NewSymbol("OPERATION"): operation,
+		NewSymbol("OPERANDS"):  operands,
 	})
 }
 
 func NewParseError(str, expectedClass ilos.Instance) ilos.Instance {
-	return New(ParseErrorClass, map[ilos.Instance]ilos.Instance{
-		Symbol("STRING"):         str,
-		Symbol("EXPECTED-CLASS"): expectedClass,
+	return newInstance(ParseErrorClass, map[ilos.Instance]ilos.Instance{
+		NewSymbol("STRING"):         str,
+		NewSymbol("EXPECTED-CLASS"): expectedClass,
 	})
 }
 
 func NewDomainError(object ilos.Instance, expectedClass ilos.Class) ilos.Instance {
-	return New(DomainErrorClass, map[ilos.Instance]ilos.Instance{
-		Symbol("CAUSE"):          Symbol("DOMAIN-ERROR"),
-		Symbol("OBJECT"):         object,
-		Symbol("EXPECTED-CLASS"): expectedClass,
+	return newInstance(DomainErrorClass, map[ilos.Instance]ilos.Instance{
+		NewSymbol("CAUSE"):          NewSymbol("DOMAIN-ERROR"),
+		NewSymbol("OBJECT"):         object,
+		NewSymbol("EXPECTED-CLASS"): expectedClass,
 	})
 }
 
 func NewUndefinedFunction(name ilos.Instance) ilos.Instance {
-	return New(UndefinedFunctionClass, map[ilos.Instance]ilos.Instance{
-		Symbol("NAME"):      name,
-		Symbol("NAMESPACE"): Symbol("FUNCTION"),
+	return newInstance(UndefinedFunctionClass, map[ilos.Instance]ilos.Instance{
+		NewSymbol("NAME"):      name,
+		NewSymbol("NAMESPACE"): NewSymbol("FUNCTION"),
 	})
 }
 
 func NewUndefinedVariable(name ilos.Instance) ilos.Instance {
-	return New(UndefinedVariableClass, map[ilos.Instance]ilos.Instance{
-		Symbol("NAME"):      name,
-		Symbol("NAMESPACE"): Symbol("VARIABLE"),
+	return newInstance(UndefinedVariableClass, map[ilos.Instance]ilos.Instance{
+		NewSymbol("NAME"):      name,
+		NewSymbol("NAMESPACE"): NewSymbol("VARIABLE"),
 	})
 }
 
 func NewArityError() ilos.Instance {
 	//stackTrace()
-	return New(ProgramErrorClass, map[ilos.Instance]ilos.Instance{})
+	return newInstance(ProgramErrorClass, map[ilos.Instance]ilos.Instance{})
 }
 
 func NewIndexOutOfRange() ilos.Instance {
 	//stackTrace()
-	return New(ProgramErrorClass, map[ilos.Instance]ilos.Instance{})
+	return newInstance(ProgramErrorClass, map[ilos.Instance]ilos.Instance{})
 }
 
 func NewImmutableBinding() ilos.Instance {
 	//stackTrace()
-	return New(ProgramErrorClass, map[ilos.Instance]ilos.Instance{})
+	return newInstance(ProgramErrorClass, map[ilos.Instance]ilos.Instance{})
 }
 
 func NewSimpleError(formatString, formatArguments ilos.Instance) ilos.Instance {
-	return New(SimpleErrorClass, map[ilos.Instance]ilos.Instance{
-		Symbol("FORMAT-STRING"):    formatString,
-		Symbol("FORMAT-ARGUMENTS"): formatArguments,
+	return newInstance(SimpleErrorClass, map[ilos.Instance]ilos.Instance{
+		NewSymbol("FORMAT-STRING"):    formatString,
+		NewSymbol("FORMAT-ARGUMENTS"): formatArguments,
 	})
 }
 
 func NewControlError() ilos.Instance {
-	return New(ControlErrorClass)
+	return newInstance(ControlErrorClass)
 }

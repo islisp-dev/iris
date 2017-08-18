@@ -5,9 +5,11 @@
 package ilos
 
 type Class interface {
-	Class() Class
 	Supers() []Class
 	Slots() []Instance
+	Initform(Instance) (Instance, bool)
+	Initarg(Instance) (Instance, bool)
+	Class() Class
 	GetSlotValue(Instance, Class) (Instance, bool)
 	SetSlotValue(Instance, Instance, Class) bool
 	String() string

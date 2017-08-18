@@ -4,13 +4,19 @@
 
 package runtime
 
-/*
 import (
 	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
+
+func Class(local, global environment.Environment, className ilos.Instance) (ilos.Class, ilos.Instance) {
+	if v, ok := global.Class.Get(className); ok {
+		return v.(ilos.Class), nil
+	}
+	return nil, nil
+}
 
 func Defclass(local, global environment.Environment, className, scNames, slotSpecs ilos.Instance, classOpts ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Symbol, className); err != nil {
@@ -20,42 +26,65 @@ func Defclass(local, global environment.Environment, className, scNames, slotSpe
 		return nil, err
 	}
 	supers := []ilos.Class{}
-	specs := slotSpecs.(instance.List).Slice()
 	for _, scName := range scNames.(instance.List).Slice() {
-		super, ok := global.Class.Get(scName)
-		if !ok {
-			return nil, nil // TOOD: Undefined Entity
+		super, err := Class(local, global, scName)
+		if err != nil {
+			return nil, err
 		}
 		supers = append(supers, super.(ilos.Class))
 	}
+	slots := []ilos.Instance{}
+	initforms := map[ilos.Instance]ilos.Instance{}
+	initargs := map[ilos.Instance]ilos.Instance{}
 	for _, slotSpec := range slotSpecs.(instance.List).Slice() {
 		if instance.Of(class.Symbol, slotSpec) {
 			slotName := slotSpec
+			slots = append(slots, slotName)
+			continue
 		}
 		slotName := slotSpec.(*instance.Cons).Car
+		slots = append(slots, slotName)
 		slotOpts := slotSpec.(*instance.Cons).Cdr.(instance.List).Slice()
-		var readerFunctionName, writerFunctionName, boundpFunctionName ilos.Instance
 		for i := 0; i < len(slotOpts); i += 2 {
 			switch slotOpts[i] {
 			case instance.NewSymbol(":INITFORM"):
-				form := slotOpts[i+1]
+				initforms[slotName] = slotOpts[i+1]
 			case instance.NewSymbol(":INITARG"):
-				initargName := slotOpts[i+1]
+				initargs[slotOpts[i+1]] = slotName
 			}
 		}
 	}
+	metaclass := class.StandardClass
+	abstractp := Nil
 	for _, classOpt := range classOpts {
+		var err ilos.Instance
 		switch classOpt.(*instance.Cons).Car {
 		case instance.NewSymbol(":METACLASS"):
-			metaclass := classOpt.(*instance.Cons).Cdr.(*instance.Cons).Car
-		case instance.NewSymbol(":ABSTRACTP"):
-			switch classOpt.(*instance.Cons).Cdr.(*instance.Cons).Car {
-			case T:
-			case Nil:
-			default:
+			if metaclass, err = Class(local, global, classOpt.(*instance.Cons).Cdr.(*instance.Cons).Car); err != nil {
+				return nil, err
 			}
-		default:
+		case instance.NewSymbol(":ABSTRACTP"):
+			if abstractp, err = Eval(local, global, classOpt.(*instance.Cons).Cdr.(*instance.Cons).Car); err != nil {
+				return nil, err
+			}
 		}
 	}
+	global.Class.Define(className, instance.NewStandardClass(className, supers, slots, initforms, initargs, metaclass, abstractp))
+	for _, slotSpec := range slotSpecs.(instance.List).Slice() {
+		if instance.Of(class.Symbol, slotSpec) {
+			continue
+		}
+		// slotName := slotSpec.(*instance.Cons).Car
+		slotOpts := slotSpec.(*instance.Cons).Cdr.(instance.List).Slice()
+		for i := 0; i < len(slotOpts); i += 2 {
+			switch slotOpts[i] {
+			// Add to generic functions
+			case instance.NewSymbol(":READER"):
+			case instance.NewSymbol(":WRITER"):
+			case instance.NewSymbol(":ACCESSOR"):
+			case instance.NewSymbol(":BOUNDP"):
+			}
+		}
+	}
+	return className, nil
 }
-*/
