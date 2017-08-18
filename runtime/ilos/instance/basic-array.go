@@ -7,7 +7,6 @@ package instance
 import (
 	"github.com/k0kubun/pp"
 	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/class"
 )
 
 //
@@ -24,7 +23,7 @@ func NewGeneralArrayStar(vector []GeneralArrayStar, scalar ilos.Instance) ilos.I
 }
 
 func (GeneralArrayStar) Class() ilos.Class {
-	return class.GeneralArrayStar
+	return GeneralArrayStarClass
 }
 
 func (i GeneralArrayStar) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
@@ -50,7 +49,7 @@ func NewGeneralVector(v []ilos.Instance) ilos.Instance {
 }
 
 func (GeneralVector) Class() ilos.Class {
-	return class.GeneralVector
+	return GeneralVectorClass
 }
 
 func (i GeneralVector) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
@@ -76,7 +75,7 @@ func NewString(s string) ilos.Instance {
 }
 
 func (String) Class() ilos.Class {
-	return class.String
+	return StringClass
 }
 
 func (i String) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {

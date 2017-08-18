@@ -6,7 +6,6 @@ package instance
 
 import (
 	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/class"
 )
 
 //
@@ -20,7 +19,7 @@ func NewSymbol(s string) ilos.Instance {
 }
 
 func (Symbol) Class() ilos.Class {
-	return class.Symbol
+	return SymbolClass
 }
 
 func (i Symbol) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {

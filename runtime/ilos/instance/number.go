@@ -8,7 +8,6 @@ import (
 	"fmt"
 
 	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/class"
 )
 
 //
@@ -21,7 +20,7 @@ func NewInteger(i int) ilos.Instance {
 	return Integer(i)
 }
 func (Integer) Class() ilos.Class {
-	return class.Integer
+	return IntegerClass
 }
 
 func (i Integer) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
@@ -47,7 +46,7 @@ func NewFloat(i float64) ilos.Instance {
 }
 
 func (Float) Class() ilos.Class {
-	return class.Float
+	return FloatClass
 }
 
 func (i Float) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {

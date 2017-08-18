@@ -6,6 +6,7 @@ package environment
 
 // Environment struct is the struct for keeping functions and variables
 type Environment struct {
+	Class           stack
 	BlockTag        stack
 	TagbodyTag      stack
 	CatchTag        stack
@@ -22,6 +23,7 @@ type Environment struct {
 // New creates new environment
 func New() Environment {
 	env := new(Environment)
+	env.Class = newStack()
 	env.BlockTag = newStack()
 	env.TagbodyTag = newStack()
 	env.CatchTag = newStack()
@@ -37,6 +39,7 @@ func New() Environment {
 }
 
 func (env *Environment) Merge(before Environment) {
+	env.Class = append(before.Class, env.Class...)
 	env.BlockTag = append(before.BlockTag, env.BlockTag...)
 	env.TagbodyTag = append(before.TagbodyTag, env.TagbodyTag...)
 	env.CatchTag = append(before.CatchTag, env.CatchTag...)
