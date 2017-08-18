@@ -6,7 +6,6 @@ package instance
 
 import (
 	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/class"
 )
 
 //
@@ -20,7 +19,7 @@ func NewCharacter(r rune) ilos.Instance {
 }
 
 func (Character) Class() ilos.Class {
-	return class.Character
+	return CharacterClass
 }
 
 func (i Character) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {

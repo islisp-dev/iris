@@ -10,7 +10,6 @@ import (
 
 	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/class"
 )
 
 type Applicable interface {
@@ -27,7 +26,7 @@ func NewFunction(name ilos.Instance, function interface{}) ilos.Instance {
 }
 
 func (Function) Class() ilos.Class {
-	return class.Function
+	return FunctionClass
 }
 
 func (Function) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {

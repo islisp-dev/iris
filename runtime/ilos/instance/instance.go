@@ -9,7 +9,6 @@ import (
 	"reflect"
 
 	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/class"
 )
 
 //
@@ -21,24 +20,44 @@ func New(c ilos.Class, s ...interface{}) ilos.Instance {
 	for _, q := range c.Supers() {
 		p = append(p, New(q, s...))
 	}
-	t := map[string]ilos.Instance{}
+	t := map[ilos.Instance]ilos.Instance{}
 	for _, n := range c.Slots() {
-		t[n] = s[0].(map[string]ilos.Instance)[n]
+		t[n] = s[0].(map[ilos.Instance]ilos.Instance)[n]
 	}
 	return instance{c, p, t}
 }
 
 func Of(p ilos.Class, i ilos.Instance) bool {
+	is := func(c, p ilos.Class) bool {
+		var sub func(c, p ilos.Class) bool
+		sub = func(c, p ilos.Class) bool {
+			if reflect.DeepEqual(c, p) {
+				return true
+			}
+			for _, d := range c.Supers() {
+				if sub(d, p) {
+					return true
+				}
+			}
+			return false
+		}
+		for _, d := range c.Supers() {
+			if sub(d, p) {
+				return true
+			}
+		}
+		return false
+	}
 	if reflect.DeepEqual(i.Class(), p) {
 		return true
 	}
-	return class.Is(i.Class(), p)
+	return is(i.Class(), p)
 }
 
 type instance struct {
 	class  ilos.Class
 	supers []ilos.Instance
-	slots  map[string]ilos.Instance
+	slots  map[ilos.Instance]ilos.Instance
 }
 
 func (i instance) Class() ilos.Class {
@@ -46,7 +65,7 @@ func (i instance) Class() ilos.Class {
 }
 
 func (i instance) GetSlotValue(key ilos.Instance, class ilos.Class) (ilos.Instance, bool) {
-	if v, ok := i.slots[string(key.(Symbol))]; ok && i.class == class {
+	if v, ok := i.slots[key]; ok && i.class == class {
 		return v, ok
 	}
 	for _, s := range i.supers {
@@ -58,8 +77,8 @@ func (i instance) GetSlotValue(key ilos.Instance, class ilos.Class) (ilos.Instan
 }
 
 func (i instance) SetSlotValue(key ilos.Instance, value ilos.Instance, class ilos.Class) bool {
-	if _, ok := i.slots[string(key.(Symbol))]; ok && i.class == class {
-		i.slots[string(key.(Symbol))] = value
+	if _, ok := i.slots[key]; ok && i.class == class {
+		i.slots[key] = value
 		return true
 	}
 	for _, s := range i.supers {
@@ -70,8 +89,8 @@ func (i instance) SetSlotValue(key ilos.Instance, value ilos.Instance, class ilo
 	return false
 }
 
-func (i instance) Slots() map[string]ilos.Instance {
-	m := map[string]ilos.Instance{}
+func (i instance) Slots() map[ilos.Instance]ilos.Instance {
+	m := map[ilos.Instance]ilos.Instance{}
 	for k, v := range i.slots {
 		m[k] = v
 	}

@@ -8,7 +8,6 @@ import (
 	"fmt"
 
 	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/class"
 )
 
 type List interface {
@@ -29,7 +28,7 @@ func NewCons(car, cdr ilos.Instance) ilos.Instance {
 }
 
 func (*Cons) Class() ilos.Class {
-	return class.Cons
+	return ConsClass
 }
 
 func (i *Cons) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
@@ -61,11 +60,11 @@ func (i *Cons) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class
 func (i *Cons) String() string {
 	str := "(" + fmt.Sprint(i.Car)
 	cdr := i.Cdr
-	for Of(class.Cons, cdr) {
+	for Of(ConsClass, cdr) {
 		str += fmt.Sprintf(" %v", cdr.(*Cons).Car) // Checked at the top of this loop
 		cdr = cdr.(*Cons).Cdr                      // Checked at the top of this loop
 	}
-	if Of(class.Null, cdr) {
+	if Of(NullClass, cdr) {
 		str += ")"
 	} else {
 		str += fmt.Sprintf(" . %v)", cdr)
@@ -76,7 +75,7 @@ func (i *Cons) String() string {
 func (i *Cons) Slice() []ilos.Instance {
 	s := []ilos.Instance{}
 	var cdr ilos.Instance = i
-	for Of(class.Cons, cdr) {
+	for Of(ConsClass, cdr) {
 		s = append(s, cdr.(*Cons).Car)
 		cdr = cdr.(*Cons).Cdr
 	}
@@ -96,7 +95,7 @@ func NewNull() ilos.Instance {
 }
 
 func (*Null) Class() ilos.Class {
-	return class.Null
+	return NullClass
 }
 
 func (i *Null) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
