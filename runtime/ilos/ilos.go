@@ -6,8 +6,10 @@ package ilos
 
 type Class interface {
 	Class() Class
-	Parents() []Class
+	Supers() []Class
 	Slots() []string
+	InitForms() map[string]Instance
+	InitArgs() map[Instance]string
 	GetSlotValue(Instance, Class) (Instance, bool)
 	SetSlotValue(Instance, Instance, Class) bool
 	String() string

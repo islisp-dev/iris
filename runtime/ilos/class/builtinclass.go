@@ -7,31 +7,39 @@ package class
 import "github.com/ta2gch/iris/runtime/ilos"
 
 type builtinclass struct {
-	parents []ilos.Class
-	slots   []string
-	name    string
+	supers []ilos.Class
+	slots  []string
+	name   string
 }
 
-func (*builtinclass) Class() ilos.Class {
+func (builtinclass) Class() ilos.Class {
 	return BuiltInClass
 }
 
-func (p *builtinclass) Parents() []ilos.Class {
-	return p.parents
+func (p builtinclass) Supers() []ilos.Class {
+	return p.supers
 }
 
-func (p *builtinclass) Slots() []string {
+func (p builtinclass) Slots() []string {
 	return p.slots
 }
 
-func (i *builtinclass) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
+func (p builtinclass) InitForms() map[string]ilos.Instance {
+	return map[string]ilos.Instance{}
+}
+
+func (p builtinclass) InitArgs() map[ilos.Instance]string {
+	return map[ilos.Instance]string{}
+}
+
+func (p builtinclass) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
 	return nil, false
 }
 
-func (i *builtinclass) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
+func (p builtinclass) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
 	return false
 }
 
-func (p *builtinclass) String() string {
+func (p builtinclass) String() string {
 	return p.name
 }
