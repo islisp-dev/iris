@@ -6,6 +6,7 @@ package instance
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
@@ -17,18 +18,18 @@ import (
 
 func New(c ilos.Class, s ...interface{}) ilos.Instance {
 	p := []ilos.Instance{}
-	for _, q := range c.Parents() {
+	for _, q := range c.Supers() {
 		p = append(p, New(q, s...))
 	}
 	t := map[string]ilos.Instance{}
 	for _, n := range c.Slots() {
 		t[n] = s[0].(map[string]ilos.Instance)[n]
 	}
-	return &instance{c, p, t}
+	return instance{c, p, t}
 }
 
 func Of(p ilos.Class, i ilos.Instance) bool {
-	if i.Class() == p {
+	if reflect.DeepEqual(i.Class(), p) {
 		return true
 	}
 	return class.Is(i.Class(), p)
@@ -40,11 +41,11 @@ type instance struct {
 	slots  map[string]ilos.Instance
 }
 
-func (i *instance) Class() ilos.Class {
+func (i instance) Class() ilos.Class {
 	return i.class
 }
 
-func (i *instance) GetSlotValue(key ilos.Instance, class ilos.Class) (ilos.Instance, bool) {
+func (i instance) GetSlotValue(key ilos.Instance, class ilos.Class) (ilos.Instance, bool) {
 	if v, ok := i.slots[string(key.(Symbol))]; ok && i.class == class {
 		return v, ok
 	}
@@ -56,7 +57,7 @@ func (i *instance) GetSlotValue(key ilos.Instance, class ilos.Class) (ilos.Insta
 	return nil, false
 }
 
-func (i *instance) SetSlotValue(key ilos.Instance, value ilos.Instance, class ilos.Class) bool {
+func (i instance) SetSlotValue(key ilos.Instance, value ilos.Instance, class ilos.Class) bool {
 	if _, ok := i.slots[string(key.(Symbol))]; ok && i.class == class {
 		i.slots[string(key.(Symbol))] = value
 		return true
@@ -69,7 +70,7 @@ func (i *instance) SetSlotValue(key ilos.Instance, value ilos.Instance, class il
 	return false
 }
 
-func (i *instance) Slots() map[string]ilos.Instance {
+func (i instance) Slots() map[string]ilos.Instance {
 	m := map[string]ilos.Instance{}
 	for k, v := range i.slots {
 		m[k] = v
@@ -84,7 +85,7 @@ func (i *instance) Slots() map[string]ilos.Instance {
 	return m
 }
 
-func (i *instance) String() string {
+func (i instance) String() string {
 	c := i.Class().String()
 	return fmt.Sprintf("#%v %v>", c[:len(c)-1], i.Slots())
 }
