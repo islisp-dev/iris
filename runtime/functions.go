@@ -20,7 +20,7 @@ import (
 // and a function object that is denoted by function-name—if in operator
 // position—or by (function function-name) elsewhere.
 func Functionp(local, global environment.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if instance.Of(class.Function, fun) {
+	if ilos.InstanceOf(class.Function, fun) {
 		return T, nil
 	}
 	return Nil, nil

@@ -18,7 +18,7 @@ import (
 // Symbolp returns t if obj is a symbol (instance of class symbol);
 // otherwise, returns nil. The obj may be any ISLISP object.
 func Symbolp(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if instance.Of(class.Symbol, obj) {
+	if ilos.InstanceOf(class.Symbol, obj) {
 		return T, nil
 	}
 	return Nil, nil

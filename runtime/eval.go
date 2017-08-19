@@ -36,7 +36,7 @@ func evalArguments(local, global environment.Environment, arguments ilos.Instanc
 
 func evalLambda(local, global environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// eval if lambda form
-	if instance.Of(class.Cons, car) {
+	if ilos.InstanceOf(class.Cons, car) {
 		caar := car.(*instance.Cons).Car // Checked at the top of// This sentence
 		if caar == instance.NewSymbol("LAMBDA") {
 			fun, err := Eval(local, global, car)
@@ -49,8 +49,7 @@ func evalLambda(local, global environment.Environment, car, cdr ilos.Instance) (
 				return nil, err, true
 			}
 			env := environment.New()
-			env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
-			env.CatchTag = append(local.CatchTag, env.CatchTag...)
+			env.PartialMerge(local)
 			ret, err := fun.(instance.Applicable).Apply(env, global, arguments.(instance.List).Slice()...)
 			if err != nil {
 				return nil, err, true
@@ -90,8 +89,7 @@ func evalMacro(local, global environment.Environment, car, cdr ilos.Instance) (i
 	}
 	if mac != nil {
 		env := environment.New()
-		env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
-		env.CatchTag = append(local.DynamicVariable, env.CatchTag...)
+		env.PartialMerge(local)
 		ret, err := mac.(instance.Applicable).Apply(env, global, cdr.(instance.List).Slice()...)
 		if err != nil {
 			return nil, err, true
@@ -116,8 +114,7 @@ func evalFunction(local, global environment.Environment, car, cdr ilos.Instance)
 	}
 	if fun != nil {
 		env := environment.New()
-		env.DynamicVariable = append(local.DynamicVariable, env.DynamicVariable...)
-		env.CatchTag = append(local.DynamicVariable, env.CatchTag...)
+		env.PartialMerge(local)
 		arguments, err := evalArguments(local, global, cdr)
 		if err != nil {
 			return nil, err, true
@@ -176,14 +173,14 @@ func Eval(local, global environment.Environment, obj ilos.Instance) (ilos.Instan
 	if obj == Nil {
 		return Nil, nil
 	}
-	if instance.Of(class.Symbol, obj) {
+	if ilos.InstanceOf(class.Symbol, obj) {
 		ret, err := evalVariable(local, global, obj)
 		if err != nil {
 			return nil, err
 		}
 		return ret, nil
 	}
-	if instance.Of(class.Cons, obj) {
+	if ilos.InstanceOf(class.Cons, obj) {
 		ret, err := evalCons(local, global, obj)
 		if err != nil {
 			return nil, err

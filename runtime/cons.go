@@ -14,7 +14,7 @@ import (
 // Consp returns t if obj is a cons (instance of class cons);
 // otherwise, returns nil. obj may be any ISLISP object.
 func Consp(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if instance.Of(class.Cons, obj) {
+	if ilos.InstanceOf(class.Cons, obj) {
 		return T, nil
 	}
 	return Nil, nil

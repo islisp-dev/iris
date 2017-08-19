@@ -20,7 +20,7 @@ import (
 )
 
 func isProperList(i ilos.Instance) bool {
-	if instance.Of(class.Cons, i) {
+	if ilos.InstanceOf(class.Cons, i) {
 		return isProperList(i.(*instance.Cons).Cdr) // Checked at the top of this statements
 	}
 	if i == Nil {
@@ -31,9 +31,9 @@ func isProperList(i ilos.Instance) bool {
 
 func convFloat64(x ilos.Instance) (float64, bool, ilos.Instance) {
 	switch {
-	case instance.Of(class.Integer, x):
+	case ilos.InstanceOf(class.Integer, x):
 		return float64(x.(instance.Integer)), false, nil
-	case instance.Of(class.Float, x):
+	case ilos.InstanceOf(class.Float, x):
 		return float64(x.(instance.Float)), true, nil
 	default:
 		return 0.0, false, instance.NewDomainError(x, class.Number)
@@ -79,7 +79,7 @@ func defglobal(name string, value ilos.Instance) {
 }
 func ensure(c ilos.Class, i ...ilos.Instance) ilos.Instance {
 	for _, o := range i {
-		if !instance.Of(c, o) {
+		if !ilos.InstanceOf(c, o) {
 			return instance.NewDomainError(o, c)
 		}
 	}

@@ -50,12 +50,12 @@ func Quasiquote(local, global environment.Environment, form ilos.Instance) (ilos
 }
 
 func expand(local, global environment.Environment, form ilos.Instance, level int) (ilos.Instance, ilos.Instance) {
-	if !instance.Of(class.Cons, form) {
+	if !ilos.InstanceOf(class.Cons, form) {
 		return form, nil
 	} // If form is a instance of <cons> then,
 	exp := []ilos.Instance{}
 	cdr := form
-	for instance.Of(class.Cons, cdr) {
+	for ilos.InstanceOf(class.Cons, cdr) {
 		cadr := cdr.(*instance.Cons).Car
 		cddr := cdr.(*instance.Cons).Cdr
 		// To expand `((foo ,(- 10 3)) ,@(cdr '(c)) . ,(car '(cons)))
@@ -68,7 +68,7 @@ func expand(local, global environment.Environment, form ilos.Instance, level int
 			exp = append(exp, elt)
 			break
 		}
-		if !instance.Of(class.Cons, cadr) {
+		if !ilos.InstanceOf(class.Cons, cadr) {
 			lst, err := List(local, global, cadr)
 			if err != nil {
 				return nil, err
@@ -171,12 +171,12 @@ func expand(local, global environment.Environment, form ilos.Instance, level int
 		cdr = cddr
 		continue
 	}
-	if instance.Of(class.Null, cdr) {
+	if ilos.InstanceOf(class.Null, cdr) {
 		exp = append(exp, Nil)
 	}
 	lst := exp[len(exp)-1]
 	for i := len(exp) - 2; i >= 0; i-- {
-		if instance.Of(class.List, lst) {
+		if ilos.InstanceOf(class.List, lst) {
 			var err ilos.Instance
 			lst, err = Append(local, global, exp[i], lst)
 			if err != nil {

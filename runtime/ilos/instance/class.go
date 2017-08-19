@@ -4,6 +4,10 @@
 
 package instance
 
+import (
+	"github.com/ta2gch/iris/runtime/ilos"
+)
+
 var ObjectClass = NewBuiltInClass("<OBJECT>", nil)
 var BuiltInClassClass = NewBuiltInClass("<BUILT-IN-CLASS>", ObjectClass)
 var StandardClassClass = NewBuiltInClass("<STANDARD-CLASS>", ObjectClass)
@@ -19,7 +23,7 @@ var GenericFunctionClass = NewBuiltInClass("<GENERIC-FUNCTION>", FunctionClass)
 var StandardGenericFunctionClass = NewBuiltInClass("<STANDARD-GENERIC-FUNCTION>", GenericFunctionClass)
 var ListClass = NewBuiltInClass("<LIST>", ObjectClass)
 var ConsClass = NewBuiltInClass("<CONS>", ListClass)
-var NullClass = NewBuiltInClass("<NULL>", ListClass)
+var NullClass = BuiltInClass{NewSymbol("<NULL>"), []ilos.Class{ListClass, SymbolClass}, []ilos.Instance{}}
 var SymbolClass = NewBuiltInClass("<SYMBOL>", ObjectClass)
 var NumberClass = NewBuiltInClass("<NUMBER>", ObjectClass)
 var IntegerClass = NewBuiltInClass("<INTEGER>", NumberClass)

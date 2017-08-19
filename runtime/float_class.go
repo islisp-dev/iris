@@ -26,7 +26,7 @@ var (
 // Floatp returns t if obj is a ﬂoat (instance of class float);
 // otherwise, returns nil. The obj may be any ISLISP object.
 func Floatp(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if instance.Of(class.Float, obj) {
+	if ilos.InstanceOf(class.Float, obj) {
 		return T, nil
 	}
 	return Nil, nil

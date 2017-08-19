@@ -14,7 +14,7 @@ import (
 // BasicArrayP returns t if obj is a basic-array (instance of class basic-array);
 // otherwise, returns nil. obj may be any ISLISP object.
 func BasicArrayP(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if instance.Of(class.BasicArray, obj) {
+	if ilos.InstanceOf(class.BasicArray, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -23,7 +23,7 @@ func BasicArrayP(local, global environment.Environment, obj ilos.Instance) (ilos
 // BasicArrayStarP returns t if obj is a basic-array* (instance of class <basic-array*>);
 // otherwise, returns nil. obj may be any ISLISP object.
 func BasicArrayStarP(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if instance.Of(class.BasicArrayStar, obj) {
+	if ilos.InstanceOf(class.BasicArrayStar, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -32,7 +32,7 @@ func BasicArrayStarP(local, global environment.Environment, obj ilos.Instance) (
 // GeneralArrayStarP returns t if obj is a general-array* (instance of class <general-array*>);
 // otherwise, returns nil. obj may be any ISLISP object.
 func GeneralArrayStarP(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if instance.Of(class.GeneralArrayStar, obj) {
+	if ilos.InstanceOf(class.GeneralArrayStar, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -101,7 +101,7 @@ func Aref(local, global environment.Environment, basicArray ilos.Instance, dimen
 		return nil, err
 	}
 	switch {
-	case instance.Of(class.String, basicArray):
+	case ilos.InstanceOf(class.String, basicArray):
 		if len(dimensions) != 1 {
 			return nil, instance.NewArityError()
 		}
@@ -110,7 +110,7 @@ func Aref(local, global environment.Environment, basicArray ilos.Instance, dimen
 			return nil, instance.NewIndexOutOfRange()
 		}
 		return instance.NewCharacter(basicArray.(instance.String)[index]), nil
-	case instance.Of(class.GeneralVector, basicArray):
+	case ilos.InstanceOf(class.GeneralVector, basicArray):
 		if len(dimensions) != 1 {
 			return nil, instance.NewArityError()
 		}
@@ -158,7 +158,7 @@ func SetAref(local, global environment.Environment, obj, basicArray ilos.Instanc
 		return nil, err
 	}
 	switch {
-	case instance.Of(class.String, basicArray):
+	case ilos.InstanceOf(class.String, basicArray):
 		if err := ensure(class.Character, obj); err != nil {
 			return nil, err
 		}
@@ -171,7 +171,7 @@ func SetAref(local, global environment.Environment, obj, basicArray ilos.Instanc
 		}
 		basicArray.(instance.String)[index] = rune(obj.(instance.Character))
 		return obj, nil
-	case instance.Of(class.GeneralVector, basicArray):
+	case ilos.InstanceOf(class.GeneralVector, basicArray):
 		if len(dimensions) != 1 {
 			return nil, instance.NewArityError()
 		}
@@ -219,9 +219,9 @@ func ArrayDimensions(local, global environment.Environment, basicArray ilos.Inst
 		return nil, err
 	}
 	switch {
-	case instance.Of(class.String, basicArray):
+	case ilos.InstanceOf(class.String, basicArray):
 		return List(local, global, instance.NewInteger(len(basicArray.(instance.String))))
-	case instance.Of(class.GeneralVector, basicArray):
+	case ilos.InstanceOf(class.GeneralVector, basicArray):
 		return List(local, global, instance.NewInteger(len(basicArray.(instance.GeneralVector))))
 	default: // General Array*
 		var array instance.GeneralArrayStar

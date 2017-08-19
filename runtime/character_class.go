@@ -14,7 +14,7 @@ import (
 // Characterp returns t if obj is a character (instance of class character);
 // otherwise, returns nil. obj may be any ISLISP object.
 func Characterp(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if instance.Of(class.Character, obj) {
+	if ilos.InstanceOf(class.Character, obj) {
 		return T, nil
 	}
 	return Nil, nil

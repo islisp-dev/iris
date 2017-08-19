@@ -17,7 +17,7 @@ import (
 // Numberp returns t if obj is a number (instance of class number); otherwise,
 // returns nil. The obj may be any ISLISP object.
 func Numberp(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if instance.Of(class.Number, obj) {
+	if ilos.InstanceOf(class.Number, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -34,7 +34,7 @@ func ParseNumber(local, global environment.Environment, str ilos.Instance) (ilos
 		return nil, err
 	}
 	ret, err := parser.ParseAtom(string(str.(instance.String)))
-	if err != nil || !instance.Of(class.Number, ret) {
+	if err != nil || !ilos.InstanceOf(class.Number, ret) {
 		return nil, instance.NewParseError(str, class.Number)
 	}
 	return ret, err
@@ -52,13 +52,13 @@ func NumberEqual(local, global environment.Environment, x1, x2 ilos.Instance) (i
 	}
 	ret := false
 	switch {
-	case instance.Of(class.Integer, x1) && instance.Of(class.Integer, x2):
+	case ilos.InstanceOf(class.Integer, x1) && ilos.InstanceOf(class.Integer, x2):
 		ret = x1 == x2
-	case instance.Of(class.Integer, x1) && instance.Of(class.Float, x2):
+	case ilos.InstanceOf(class.Integer, x1) && ilos.InstanceOf(class.Float, x2):
 		ret = float64(x1.(instance.Integer)) == float64(x2.(instance.Float))
-	case instance.Of(class.Float, x1) && instance.Of(class.Integer, x2):
+	case ilos.InstanceOf(class.Float, x1) && ilos.InstanceOf(class.Integer, x2):
 		ret = float64(x1.(instance.Float)) == float64(x2.(instance.Integer))
-	case instance.Of(class.Float, x1) && instance.Of(class.Float, x2):
+	case ilos.InstanceOf(class.Float, x1) && ilos.InstanceOf(class.Float, x2):
 		ret = x1 == x2
 	}
 	if ret {
@@ -85,13 +85,13 @@ func NumberGreaterThan(local, global environment.Environment, x1, x2 ilos.Instan
 	}
 	ret := false
 	switch {
-	case instance.Of(class.Integer, x1) && instance.Of(class.Integer, x2):
+	case ilos.InstanceOf(class.Integer, x1) && ilos.InstanceOf(class.Integer, x2):
 		ret = float64(x1.(instance.Integer)) > float64(x2.(instance.Integer))
-	case instance.Of(class.Integer, x1) && instance.Of(class.Float, x2):
+	case ilos.InstanceOf(class.Integer, x1) && ilos.InstanceOf(class.Float, x2):
 		ret = float64(x1.(instance.Integer)) > float64(x2.(instance.Float))
-	case instance.Of(class.Float, x1) && instance.Of(class.Integer, x2):
+	case ilos.InstanceOf(class.Float, x1) && ilos.InstanceOf(class.Integer, x2):
 		ret = float64(x1.(instance.Float)) > float64(x2.(instance.Integer))
-	case instance.Of(class.Float, x1) && instance.Of(class.Float, x2):
+	case ilos.InstanceOf(class.Float, x1) && ilos.InstanceOf(class.Float, x2):
 		ret = float64(x1.(instance.Float)) > float64(x2.(instance.Float))
 	}
 	if ret {

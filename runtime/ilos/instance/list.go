@@ -60,11 +60,11 @@ func (i *Cons) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class
 func (i *Cons) String() string {
 	str := "(" + fmt.Sprint(i.Car)
 	cdr := i.Cdr
-	for Of(ConsClass, cdr) {
+	for ilos.InstanceOf(ConsClass, cdr) {
 		str += fmt.Sprintf(" %v", cdr.(*Cons).Car) // Checked at the top of this loop
 		cdr = cdr.(*Cons).Cdr                      // Checked at the top of this loop
 	}
-	if Of(NullClass, cdr) {
+	if ilos.InstanceOf(NullClass, cdr) {
 		str += ")"
 	} else {
 		str += fmt.Sprintf(" . %v)", cdr)
@@ -75,7 +75,7 @@ func (i *Cons) String() string {
 func (i *Cons) Slice() []ilos.Instance {
 	s := []ilos.Instance{}
 	var cdr ilos.Instance = i
-	for Of(ConsClass, cdr) {
+	for ilos.InstanceOf(ConsClass, cdr) {
 		s = append(s, cdr.(*Cons).Car)
 		cdr = cdr.(*Cons).Cdr
 	}
