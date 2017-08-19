@@ -53,5 +53,10 @@ func (env *Environment) Merge(before Environment) {
 	env.Property = before.Property
 }
 
+func (env *Environment) PartialMerge(before Environment) {
+	env.CatchTag = append(before.CatchTag, env.CatchTag...)
+	env.DynamicVariable = append(before.DynamicVariable, env.DynamicVariable...)
+}
+
 // TopLevel is a global environment
 var TopLevel = New()

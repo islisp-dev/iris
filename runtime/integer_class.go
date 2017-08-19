@@ -23,7 +23,7 @@ func convInt(z ilos.Instance) (int, ilos.Instance) {
 // Integerp returns t if obj is an integer (instance of class integer);
 // otherwise, returns nil. obj may be any ISLISP object.
 func Integerp(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if instance.Of(class.Integer, obj) {
+	if ilos.InstanceOf(class.Integer, obj) {
 		return T, nil
 	}
 	return Nil, nil

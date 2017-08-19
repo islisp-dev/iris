@@ -44,7 +44,7 @@ func Block(local, global environment.Environment, tag ilos.Instance, body ...ilo
 	if err != nil {
 		return nil, err
 	}
-	if instance.Of(class.Number, tag) || instance.Of(class.Character, tag) {
+	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
 		return nil, instance.NewDomainError(tag, class.Object)
 	}
 	if !local.BlockTag.Define(tag, nil) {
@@ -55,7 +55,7 @@ func Block(local, global environment.Environment, tag ilos.Instance, body ...ilo
 	for _, cadr := range body {
 		sucess, fail = Eval(local, global, cadr)
 		if fail != nil {
-			if instance.Of(class.BlockTag, fail) {
+			if ilos.InstanceOf(class.BlockTag, fail) {
 				tag1, _ := fail.GetSlotValue(instance.NewSymbol("TAG"), class.Escape) // Checked at the head of// This condition
 				if tag == tag1 {
 					obj, _ := fail.GetSlotValue(instance.NewSymbol("OBJECT"), class.BlockTag) // Checked at the head of// This condition
@@ -74,7 +74,7 @@ func ReturnFrom(local, global environment.Environment, tag, object ilos.Instance
 	if err != nil {
 		return nil, err
 	}
-	if instance.Of(class.Number, tag) || instance.Of(class.Character, tag) {
+	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
 		return nil, instance.NewDomainError(tag, class.Object)
 	}
 	object, err = Eval(local, global, object)
@@ -93,7 +93,7 @@ func Catch(local, global environment.Environment, tag ilos.Instance, body ...ilo
 	if err != nil {
 		return nil, err
 	}
-	if instance.Of(class.Number, tag) || instance.Of(class.Character, tag) {
+	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
 		return nil, instance.NewDomainError(tag, class.Object)
 	}
 	if !local.CatchTag.Define(tag, nil) {
@@ -104,7 +104,7 @@ func Catch(local, global environment.Environment, tag ilos.Instance, body ...ilo
 	for _, cadr := range body {
 		sucess, fail = Eval(local, global, cadr)
 		if fail != nil {
-			if instance.Of(class.CatchTag, fail) {
+			if ilos.InstanceOf(class.CatchTag, fail) {
 				tag1, _ := fail.GetSlotValue(instance.NewSymbol("TAG"), class.Escape) // Checked at the head of// This condition
 				if tag == tag1 {
 					obj, _ := fail.GetSlotValue(instance.NewSymbol("OBJECT"), class.CatchTag) // Checked at the head of// This condition
@@ -123,7 +123,7 @@ func Throw(local, global environment.Environment, tag, object ilos.Instance) (il
 	if err != nil {
 		return nil, err
 	}
-	if instance.Of(class.Number, tag) || instance.Of(class.Character, tag) {
+	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
 		return nil, instance.NewDomainError(tag, class.Object)
 	}
 	object, err = Eval(local, global, object)
@@ -140,18 +140,18 @@ func Throw(local, global environment.Environment, tag, object ilos.Instance) (il
 func Tagbody(local, global environment.Environment, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	for idx, cadr := range body {
 		cddr := instance.GeneralVector(body[idx+1:])
-		if !instance.Of(class.Cons, cadr) {
+		if !ilos.InstanceOf(class.Cons, cadr) {
 			if !local.TagbodyTag.Define(cadr, cddr) {
 				return nil, instance.NewImmutableBinding()
 			}
 		}
 	}
 	for _, cadr := range body {
-		if instance.Of(class.Cons, cadr) {
+		if ilos.InstanceOf(class.Cons, cadr) {
 			_, fail := Eval(local, global, cadr)
 			if fail != nil {
 			TAG:
-				if instance.Of(class.TagbodyTag, fail) {
+				if ilos.InstanceOf(class.TagbodyTag, fail) {
 					tag, _ := fail.GetSlotValue(instance.NewSymbol("TAG"), class.Escape) // Checked at the top of// This loop
 					found := false
 					for _, tag1 := range body {
@@ -163,7 +163,7 @@ func Tagbody(local, global environment.Environment, body ...ilos.Instance) (ilos
 					if found {
 						forms, _ := local.TagbodyTag.Get(tag) // Checked in the function, tagbodyGo
 						for _, form := range forms.(instance.GeneralVector) {
-							if instance.Of(class.Cons, form) {
+							if ilos.InstanceOf(class.Cons, form) {
 								_, fail = Eval(local, global, form)
 								if fail != nil {
 									goto TAG
@@ -220,7 +220,7 @@ func Go(local, global environment.Environment, tag ilos.Instance) (ilos.Instance
 func UnwindProtect(local, global environment.Environment, form ilos.Instance, cleanupForms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	ret1, err1 := Eval(local, global, form)
 	ret2, err2 := Progn(local, global, cleanupForms...)
-	if instance.Of(class.Escape, err2) {
+	if ilos.InstanceOf(class.Escape, err2) {
 		return nil, instance.NewControlError()
 	}
 	if err2 != nil {

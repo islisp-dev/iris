@@ -26,11 +26,11 @@ import (
 // (error-id. domain-error).
 func Length(local, global environment.Environment, sequence ilos.Instance) (ilos.Instance, ilos.Instance) {
 	switch {
-	case instance.Of(class.String, sequence):
+	case ilos.InstanceOf(class.String, sequence):
 		return instance.NewInteger(len(sequence.(instance.String))), nil
-	case instance.Of(class.GeneralVector, sequence):
+	case ilos.InstanceOf(class.GeneralVector, sequence):
 		return instance.NewInteger(len(sequence.(instance.GeneralVector))), nil
-	case instance.Of(class.List, sequence):
+	case ilos.InstanceOf(class.List, sequence):
 		return instance.NewInteger(len(sequence.(instance.List).Slice())), nil
 	}
 	// TODO: class.Seq
@@ -49,21 +49,21 @@ func Elt(local, global environment.Environment, sequence, z ilos.Instance) (ilos
 		return nil, err
 	}
 	switch {
-	case instance.Of(class.String, sequence):
+	case ilos.InstanceOf(class.String, sequence):
 		seq := sequence.(instance.String)
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
 			return nil, instance.NewIndexOutOfRange()
 		}
 		return instance.NewCharacter(seq[idx]), nil
-	case instance.Of(class.GeneralVector, sequence):
+	case ilos.InstanceOf(class.GeneralVector, sequence):
 		seq := sequence.(instance.GeneralVector)
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
 			return nil, instance.NewIndexOutOfRange()
 		}
 		return seq[idx], nil
-	case instance.Of(class.List, sequence):
+	case ilos.InstanceOf(class.List, sequence):
 		seq := sequence.(instance.List).Slice()
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
@@ -85,7 +85,7 @@ func SetElt(local, global environment.Environment, obj, sequence, z ilos.Instanc
 		return nil, err
 	}
 	switch {
-	case instance.Of(class.String, sequence):
+	case ilos.InstanceOf(class.String, sequence):
 		seq := sequence.(instance.String)
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
@@ -96,7 +96,7 @@ func SetElt(local, global environment.Environment, obj, sequence, z ilos.Instanc
 		}
 		seq[idx] = rune(obj.(instance.Character))
 		return obj, nil
-	case instance.Of(class.GeneralVector, sequence):
+	case ilos.InstanceOf(class.GeneralVector, sequence):
 		seq := sequence.(instance.GeneralVector)
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
@@ -104,13 +104,13 @@ func SetElt(local, global environment.Environment, obj, sequence, z ilos.Instanc
 		}
 		seq[idx] = obj
 		return obj, nil
-	case instance.Of(class.List, sequence):
+	case ilos.InstanceOf(class.List, sequence):
 		seq := sequence.(instance.List).Slice()
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
 			return nil, instance.NewIndexOutOfRange()
 		}
-		for idx != 0 && instance.Of(class.Cons, sequence) {
+		for idx != 0 && ilos.InstanceOf(class.Cons, sequence) {
 			idx--
 			sequence = sequence.(*instance.Cons).Cdr
 		}
@@ -137,19 +137,19 @@ func Subseq(local, global environment.Environment, sequence, z1, z2 ilos.Instanc
 	start := int(z1.(instance.Integer))
 	end := int(z2.(instance.Integer))
 	switch {
-	case instance.Of(class.String, sequence):
+	case ilos.InstanceOf(class.String, sequence):
 		seq := sequence.(instance.String)
 		if !(0 <= start && start < len(seq) && 0 <= end && end < len(seq) && start <= end) {
 			return nil, instance.NewIndexOutOfRange()
 		}
 		return seq[start:end], nil
-	case instance.Of(class.GeneralVector, sequence):
+	case ilos.InstanceOf(class.GeneralVector, sequence):
 		seq := sequence.(instance.GeneralVector)
 		if !(0 <= start && start < len(seq) && 0 <= end && end < len(seq) && start <= end) {
 			return nil, instance.NewIndexOutOfRange()
 		}
 		return seq[start:end], nil
-	case instance.Of(class.List, sequence):
+	case ilos.InstanceOf(class.List, sequence):
 		seq := sequence.(instance.List).Slice()
 		if !(0 < start && start < len(seq) && 0 < end && end < len(seq) && start <= end) {
 			return nil, instance.NewIndexOutOfRange()
@@ -187,11 +187,11 @@ func mapInto(local, global environment.Environment, destination, function ilos.I
 	max := 0.0
 	for _, seq := range sequences {
 		switch {
-		case instance.Of(class.String, seq):
+		case ilos.InstanceOf(class.String, seq):
 			max = math.Max(max, float64(len(seq.(instance.String))))
-		case instance.Of(class.GeneralVector, seq):
+		case ilos.InstanceOf(class.GeneralVector, seq):
 			max = math.Max(max, float64(len(seq.(instance.GeneralVector))))
-		case instance.Of(class.List, seq):
+		case ilos.InstanceOf(class.List, seq):
 			max = math.Max(max, float64(len(seq.(instance.List).Slice())))
 		}
 	}

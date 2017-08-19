@@ -6,7 +6,6 @@ package instance
 
 import (
 	"fmt"
-	"reflect"
 
 	"github.com/ta2gch/iris/runtime/ilos"
 )
@@ -35,33 +34,6 @@ func newInstance(c ilos.Class, s ...interface{}) ilos.Instance {
 		}
 	*/
 	return instance{c, p, t}
-}
-
-func Of(p ilos.Class, i ilos.Instance) bool {
-	is := func(c, p ilos.Class) bool {
-		var sub func(c, p ilos.Class) bool
-		sub = func(c, p ilos.Class) bool {
-			if reflect.DeepEqual(c, p) {
-				return true
-			}
-			for _, d := range c.Supers() {
-				if sub(d, p) {
-					return true
-				}
-			}
-			return false
-		}
-		for _, d := range c.Supers() {
-			if sub(d, p) {
-				return true
-			}
-		}
-		return false
-	}
-	if reflect.DeepEqual(i.Class(), p) {
-		return true
-	}
-	return is(i.Class(), p)
 }
 
 type instance struct {

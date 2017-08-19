@@ -10,7 +10,6 @@ import (
 	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
-	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
 func isComparable(t reflect.Type) bool {
@@ -36,7 +35,7 @@ func isComparable(t reflect.Type) bool {
 // them (without modifying them), and if modifying one would modify the other the same way.
 func Eq(local, global environment.Environment, obj1, obj2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	v1, v2 := reflect.ValueOf(obj1), reflect.ValueOf(obj2)
-	if v1 == v2 || instance.Of(class.Symbol, obj1) && instance.Of(class.Symbol, obj2) && obj1 == obj2 {
+	if v1 == v2 || ilos.InstanceOf(class.Symbol, obj1) && ilos.InstanceOf(class.Symbol, obj2) && obj1 == obj2 {
 		return T, nil
 	}
 	return Nil, nil

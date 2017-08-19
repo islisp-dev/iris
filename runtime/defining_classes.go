@@ -37,7 +37,7 @@ func Defclass(local, global environment.Environment, className, scNames, slotSpe
 	initforms := map[ilos.Instance]ilos.Instance{}
 	initargs := map[ilos.Instance]ilos.Instance{}
 	for _, slotSpec := range slotSpecs.(instance.List).Slice() {
-		if instance.Of(class.Symbol, slotSpec) {
+		if ilos.InstanceOf(class.Symbol, slotSpec) {
 			slotName := slotSpec
 			slots = append(slots, slotName)
 			continue
@@ -71,7 +71,7 @@ func Defclass(local, global environment.Environment, className, scNames, slotSpe
 	}
 	global.Class.Define(className, instance.NewStandardClass(className, supers, slots, initforms, initargs, metaclass, abstractp))
 	for _, slotSpec := range slotSpecs.(instance.List).Slice() {
-		if instance.Of(class.Symbol, slotSpec) {
+		if ilos.InstanceOf(class.Symbol, slotSpec) {
 			continue
 		}
 		// slotName := slotSpec.(*instance.Cons).Car
