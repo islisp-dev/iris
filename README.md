@@ -4,7 +4,7 @@ Iris is a interpreter of ISLisp implemented with golang
 
 [![Build Status](https://travis-ci.org/ta2gch/iris.svg?branch=master)](https://travis-ci.org/ta2gch/iris)
 
-<img height="300" src="https://upload.wikimedia.org/wikipedia/commons/4/49/Iris_germanica_%28Purple_bearded_Iris%29%2C_Wakehurst_Place%2C_UK_-_Diliff.jpg">
+![logo](logo.png)
 
 ## Introduction
 
