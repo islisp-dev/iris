@@ -5,6 +5,8 @@
 package runtime
 
 import (
+	"fmt"
+
 	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
@@ -33,7 +35,25 @@ func Setq(local, global environment.Environment, var1, form ilos.Instance) (ilos
 	return nil, instance.NewUndefinedVariable(var1)
 }
 
-// TODO: Setf
+func Setf(local, global environment.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Instance) {
+	if ilos.InstanceOf(class.Symbol, var1) {
+		val, err := Eval(local, global, form)
+		if err != nil {
+			return nil, err
+		}
+		return Setq(local, global, var1, val)
+	}
+	funcSpec := instance.NewSymbol(fmt.Sprintf("(SETF %v)", var1.(instance.List).Nth(0)))
+	fun, ok := global.Function.Get(funcSpec)
+	if !ok {
+		return nil, instance.NewUndefinedFunction(funcSpec)
+	}
+	arguments, err := evalArguments(local, global, instance.NewCons(form, var1.(*instance.Cons).Cdr))
+	if err != nil {
+		return nil, err
+	}
+	return fun.(instance.Applicable).Apply(local, global, arguments.(instance.List).Slice()...)
+}
 
 // Let is used to define a scope for a group of identifiers
 // for a sequence of forms body-form* (collectively referred to as the body).
