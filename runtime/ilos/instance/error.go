@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/k0kubun/pp"
 	"github.com/ta2gch/iris/runtime/ilos"
 )
 
@@ -55,6 +56,7 @@ func NewParseError(str, expectedClass ilos.Instance) ilos.Instance {
 }
 
 func NewDomainError(object ilos.Instance, expectedClass ilos.Class) ilos.Instance {
+	pp.Println(object, expectedClass)
 	return newInstance(DomainErrorClass, map[ilos.Instance]ilos.Instance{
 		NewSymbol("CAUSE"):          NewSymbol("DOMAIN-ERROR"),
 		NewSymbol("OBJECT"):         object,
@@ -73,6 +75,13 @@ func NewUndefinedVariable(name ilos.Instance) ilos.Instance {
 	return newInstance(UndefinedVariableClass, map[ilos.Instance]ilos.Instance{
 		NewSymbol("NAME"):      name,
 		NewSymbol("NAMESPACE"): NewSymbol("VARIABLE"),
+	})
+}
+
+func NewUndefinedClass(name ilos.Instance) ilos.Instance {
+	return newInstance(UndefinedVariableClass, map[ilos.Instance]ilos.Instance{
+		NewSymbol("NAME"):      name,
+		NewSymbol("NAMESPACE"): NewSymbol("CLASS"),
 	})
 }
 

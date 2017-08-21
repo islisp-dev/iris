@@ -56,15 +56,14 @@ func Let(local, global environment.Environment, varForm ilos.Instance, bodyForm 
 		if err := ensure(class.List, cadr); err != nil {
 			return nil, err
 		}
-		s := cadr.(instance.List).Slice()
-		if len(s) != 2 {
+		if cadr.(instance.List).Length() != 2 {
 			return nil, instance.NewArityError()
 		}
-		f, err := Eval(local, global, s[1])
+		f, err := Eval(local, global, cadr.(instance.List).Nth(1))
 		if err != nil {
 			return nil, err
 		}
-		vfs[s[0]] = f
+		vfs[cadr.(instance.List).Nth(0)] = f
 	}
 	for v, f := range vfs {
 		if !local.Variable.Define(v, f) {
@@ -96,15 +95,14 @@ func LetStar(local, global environment.Environment, varForm ilos.Instance, bodyF
 		if err := ensure(class.List, cadr); err != nil {
 			return nil, err
 		}
-		s := cadr.(instance.List).Slice()
-		if len(s) != 2 {
+		if cadr.(instance.List).Length() != 2 {
 			return nil, instance.NewArityError()
 		}
-		f, err := Eval(local, global, s[1])
+		f, err := Eval(local, global, cadr.(instance.List).Nth(1))
 		if err != nil {
 			return nil, err
 		}
-		if !local.Variable.Define(s[0], f) {
+		if !local.Variable.Define(cadr.(instance.List).Nth(0), f) {
 			return nil, instance.NewImmutableBinding()
 		}
 	}

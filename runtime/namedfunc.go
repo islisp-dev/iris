@@ -15,13 +15,12 @@ func checkLambdaList(lambdaList ilos.Instance) ilos.Instance {
 	if err := ensure(class.List, lambdaList); err != nil {
 		return err
 	}
-	cdr := lambdaList.(instance.List).Slice()
-	for i, cadr := range cdr {
+	for i, cadr := range lambdaList.(instance.List).Slice() {
 		if err := ensure(class.Symbol, cadr); err != nil {
 			return err
 		}
 		if cadr == instance.NewSymbol(":REST") || cadr == instance.NewSymbol("&REST") {
-			if len(cdr) != i+2 {
+			if lambdaList.(instance.List).Length() != i+2 {
 				return instance.NewArityError()
 			}
 		}

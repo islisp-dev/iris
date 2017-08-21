@@ -33,3 +33,5 @@ func (i Symbol) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Clas
 func (i Symbol) String() string {
 	return string(i)
 }
+
+var T = NewSymbol("T")

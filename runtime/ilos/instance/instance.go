@@ -6,6 +6,7 @@ package instance
 
 import (
 	"fmt"
+	"reflect"
 
 	"github.com/ta2gch/iris/runtime/ilos"
 )
@@ -25,32 +26,28 @@ func newInstance(c ilos.Class, s ...interface{}) ilos.Instance {
 			t[slotName] = argValue
 		}
 	}
-	/*
-		for _, slotName := range c.Slots() {
-			if _, ok := t[slotName]; !ok {
-				t[slotName], _ = c.Initform(slotName)
-				t[slotName], _ = Eval(local, global, t[slotName])
-			}
-		}
-	*/
-	return instance{c, p, t}
+	return Instance{c, p, t}
 }
 
-type instance struct {
+func NewInstance(class ilos.Class, supers []ilos.Instance) ilos.Instance {
+	return Instance{class, supers, map[ilos.Instance]ilos.Instance{}}
+}
+
+type Instance struct {
 	class  ilos.Class
-	supers []ilos.Instance
+	Supers []ilos.Instance
 	slots  map[ilos.Instance]ilos.Instance
 }
 
-func (i instance) Class() ilos.Class {
+func (i Instance) Class() ilos.Class {
 	return i.class
 }
 
-func (i instance) GetSlotValue(key ilos.Instance, class ilos.Class) (ilos.Instance, bool) {
-	if v, ok := i.slots[key]; ok && i.class == class {
+func (i Instance) GetSlotValue(key ilos.Instance, class ilos.Class) (ilos.Instance, bool) {
+	if v, ok := i.slots[key]; ok && reflect.DeepEqual(i.class, class) {
 		return v, ok
 	}
-	for _, s := range i.supers {
+	for _, s := range i.Supers {
 		if v, ok := s.GetSlotValue(key, class); ok {
 			return v, ok
 		}
@@ -58,12 +55,12 @@ func (i instance) GetSlotValue(key ilos.Instance, class ilos.Class) (ilos.Instan
 	return nil, false
 }
 
-func (i instance) SetSlotValue(key ilos.Instance, value ilos.Instance, class ilos.Class) bool {
-	if _, ok := i.slots[key]; ok && i.class == class {
+func (i Instance) SetSlotValue(key ilos.Instance, value ilos.Instance, class ilos.Class) bool {
+	if reflect.DeepEqual(i.class, class) {
 		i.slots[key] = value
 		return true
 	}
-	for _, s := range i.supers {
+	for _, s := range i.Supers {
 		if ok := s.SetSlotValue(key, value, class); ok {
 			return ok
 		}
@@ -71,14 +68,14 @@ func (i instance) SetSlotValue(key ilos.Instance, value ilos.Instance, class ilo
 	return false
 }
 
-func (i instance) Slots() map[ilos.Instance]ilos.Instance {
+func (i Instance) Slots() map[ilos.Instance]ilos.Instance {
 	m := map[ilos.Instance]ilos.Instance{}
 	for k, v := range i.slots {
 		m[k] = v
 	}
-	for _, c := range i.supers {
-		if _, ok := c.(*instance); ok {
-			for k, v := range c.(*instance).Slots() {
+	for _, c := range i.Supers {
+		if _, ok := c.(Instance); ok {
+			for k, v := range c.(Instance).Slots() {
 				m[k] = v
 			}
 		}
@@ -86,7 +83,7 @@ func (i instance) Slots() map[ilos.Instance]ilos.Instance {
 	return m
 }
 
-func (i instance) String() string {
+func (i Instance) String() string {
 	c := i.Class().String()
 	return fmt.Sprintf("#%v %v>", c[:len(c)-1], i.Slots())
 }

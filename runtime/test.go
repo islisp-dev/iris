@@ -28,7 +28,7 @@ func execTests(t *testing.T, function interface{}, tests []test) {
 		t.Run(tt.exp, func(t *testing.T) {
 			got, err := Eval(local, global, readFromString(tt.exp))
 			want, _ := Eval(local, global, readFromString(tt.want))
-			if !reflect.DeepEqual(got, want) {
+			if !tt.wantErr && !reflect.DeepEqual(got, want) {
 				t.Errorf("%v() got = %v, want %v", name, got, want)
 			}
 			if (err != nil) != tt.wantErr {
