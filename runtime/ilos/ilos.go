@@ -27,27 +27,24 @@ type Instance interface {
 }
 
 func SubclassOf(super, sub Class) bool {
-	is := func(c, p Class) bool {
-		var sub func(c, p Class) bool
-		sub = func(c, p Class) bool {
-			if reflect.DeepEqual(c, p) {
-				return true
-			}
-			for _, d := range c.Supers() {
-				if sub(d, p) {
-					return true
-				}
-			}
-			return false
+	var subclassof func(p, c Class) bool
+	subclassof = func(p, c Class) bool {
+		if reflect.DeepEqual(c, p) {
+			return true
 		}
 		for _, d := range c.Supers() {
-			if sub(d, p) {
+			if subclassof(p, d) {
 				return true
 			}
 		}
 		return false
 	}
-	return is(sub, super)
+	for _, d := range sub.Supers() {
+		if subclassof(super, d) {
+			return true
+		}
+	}
+	return false
 }
 
 func InstanceOf(p Class, i Instance) bool {

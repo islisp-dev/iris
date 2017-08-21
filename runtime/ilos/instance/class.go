@@ -8,7 +8,7 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos"
 )
 
-var ObjectClass = NewBuiltInClass("<OBJECT>", nil)
+var ObjectClass = BuiltInClass{NewSymbol("<OBJECT>"), []ilos.Class{}, []ilos.Instance{}}
 var BuiltInClassClass = NewBuiltInClass("<BUILT-IN-CLASS>", ObjectClass)
 var StandardClassClass = NewBuiltInClass("<STANDARD-CLASS>", ObjectClass)
 var BasicArrayClass = NewBuiltInClass("<BASIC-ARRAY>", ObjectClass)

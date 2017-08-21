@@ -130,7 +130,7 @@ func Member(local, global environment.Environment, obj, list ilos.Instance) (ilo
 	}
 	for idx, elt := range list.(instance.List).Slice() {
 		if obj == elt { // eql
-			return List(local, global, list.(instance.List).Slice()[idx:]...)
+			return list.(instance.List).NthCdr(idx), nil
 		}
 	}
 	return Nil, nil
@@ -156,9 +156,9 @@ func Mapcar(local, global environment.Environment, function, list1 ilos.Instance
 	for i := 0; i < int(max); i++ {
 		arguments := make([]ilos.Instance, len(lists))
 		for j, list := range lists {
-			arguments[j] = list.(instance.List).Slice()[i]
+			arguments[j] = list.(instance.List).Nth(i)
 		}
-		ret, err := function.(instance.Function).Apply(local, global, arguments...)
+		ret, err := function.(instance.Applicable).Apply(local, global, arguments...)
 		if err != nil {
 			return nil, err
 		}
@@ -184,9 +184,9 @@ func Mapc(local, global environment.Environment, function, list1 ilos.Instance, 
 	for i := 0; i < int(max); i++ {
 		arguments := make([]ilos.Instance, len(lists))
 		for j, list := range lists {
-			arguments[j] = list.(instance.List).Slice()[i]
+			arguments[j] = list.(instance.List).Nth(i)
 		}
-		if _, err := function.(instance.Function).Apply(local, global, arguments...); err != nil {
+		if _, err := function.(instance.Applicable).Apply(local, global, arguments...); err != nil {
 			return nil, err
 		}
 	}
@@ -212,9 +212,9 @@ func Mapcan(local, global environment.Environment, function, list1 ilos.Instance
 	for i := 0; i < int(max); i++ {
 		arguments := make([]ilos.Instance, len(lists))
 		for j, list := range lists {
-			arguments[j] = list.(instance.List).Slice()[i]
+			arguments[j] = list.(instance.List).Nth(i)
 		}
-		ret, err := function.(instance.Function).Apply(local, global, arguments...)
+		ret, err := function.(instance.Applicable).Apply(local, global, arguments...)
 		if err != nil {
 			return nil, err
 		}
@@ -242,13 +242,9 @@ func Maplist(local, global environment.Environment, function, list1 ilos.Instanc
 	for i := 0; i < int(max); i++ {
 		arguments := make([]ilos.Instance, len(lists))
 		for j, list := range lists {
-			var err ilos.Instance
-			arguments[j], err = List(local, global, list.(instance.List).Slice()[i:]...)
-			if err != nil {
-				return nil, err
-			}
+			arguments[j] = list.(instance.List).NthCdr(i)
 		}
-		ret, err := function.(instance.Function).Apply(local, global, arguments...)
+		ret, err := function.(instance.Applicable).Apply(local, global, arguments...)
 		if err != nil {
 			return nil, err
 		}
@@ -274,13 +270,9 @@ func Mapl(local, global environment.Environment, function, list1 ilos.Instance, 
 	for i := 0; i < int(max); i++ {
 		arguments := make([]ilos.Instance, len(lists))
 		for j, list := range lists {
-			var err ilos.Instance
-			arguments[j], err = List(local, global, list.(instance.List).Slice()[i:]...)
-			if err != nil {
-				return nil, err
-			}
+			arguments[j] = list.(instance.List).NthCdr(i)
 		}
-		if _, err := function.(instance.Function).Apply(local, global, arguments...); err != nil {
+		if _, err := function.(instance.Applicable).Apply(local, global, arguments...); err != nil {
 			return nil, err
 		}
 	}
@@ -306,13 +298,9 @@ func Mapcon(local, global environment.Environment, function, list1 ilos.Instance
 	for i := 0; i < int(max); i++ {
 		arguments := make([]ilos.Instance, len(lists))
 		for j, list := range lists {
-			var err ilos.Instance
-			arguments[j], err = List(local, global, list.(instance.List).Slice()[i:]...)
-			if err != nil {
-				return nil, err
-			}
+			arguments[j] = list.(instance.List).NthCdr(i)
 		}
-		ret, err := function.(instance.Function).Apply(local, global, arguments...)
+		ret, err := function.(instance.Applicable).Apply(local, global, arguments...)
 		if err != nil {
 			return nil, err
 		}

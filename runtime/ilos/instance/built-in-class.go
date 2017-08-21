@@ -21,9 +21,6 @@ func NewBuiltInClass(name string, super ilos.Class, slots ...string) ilos.Class 
 	for _, slot := range slots {
 		slotNames = append(slotNames, NewSymbol(slot))
 	}
-	if super == nil {
-		return BuiltInClass{NewSymbol(name), []ilos.Class{}, slotNames}
-	}
 	return BuiltInClass{NewSymbol(name), []ilos.Class{super}, slotNames}
 }
 

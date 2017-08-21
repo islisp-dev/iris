@@ -187,9 +187,8 @@ func expand(local, global environment.Environment, form ilos.Instance, level int
 			// If the last cell of forms is not Nil, run this statements at first
 
 			// the elements of exp is always a instance of <list> because exp isn't appended lists in for-loop
-			slice := exp[i].(instance.List).Slice()
-			for j := len(slice) - 1; j >= 0; j-- {
-				lst = instance.NewCons(slice[j], lst)
+			for j := exp[i].(instance.List).Length() - 1; j >= 0; j-- {
+				lst = instance.NewCons(exp[i].(instance.List).Nth(j), lst)
 			}
 		}
 	}

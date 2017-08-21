@@ -12,6 +12,10 @@ import (
 
 type List interface {
 	Slice() []ilos.Instance
+	Nth(i int) ilos.Instance
+	SetNth(obj ilos.Instance, i int)
+	NthCdr(i int) ilos.Instance
+	Length() int
 }
 
 //
@@ -82,6 +86,31 @@ func (i *Cons) Slice() []ilos.Instance {
 	return s
 }
 
+func (i *Cons) Length() int {
+	return 1 + i.Cdr.(List).Length()
+}
+
+func (i *Cons) Nth(n int) ilos.Instance {
+	if n == 0 {
+		return i.Car
+	}
+	return i.Cdr.(List).Nth(n - 1)
+}
+
+func (i *Cons) SetNth(obj ilos.Instance, n int) {
+	if n == 0 {
+		i.Car = obj
+	}
+	i.Cdr.(List).SetNth(obj, n-1)
+}
+
+func (i *Cons) NthCdr(n int) ilos.Instance {
+	if n == 0 {
+		return i.Cdr
+	}
+	return i.Cdr.(List).NthCdr(n - 1)
+}
+
 //
 // Null
 //
@@ -112,4 +141,20 @@ func (*Null) String() string {
 
 func (*Null) Slice() []ilos.Instance {
 	return []ilos.Instance{}
+}
+
+func (i *Null) Nth(n int) ilos.Instance {
+	return Nil
+}
+
+func (i *Null) SetNth(obj ilos.Instance, n int) {
+	panic("NOT a cons")
+}
+
+func (i *Null) NthCdr(n int) ilos.Instance {
+	return Nil
+}
+
+func (i *Null) Length() int {
+	return 0
 }

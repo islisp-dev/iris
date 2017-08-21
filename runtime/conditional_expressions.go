@@ -93,8 +93,7 @@ func Case(local, global environment.Environment, key ilos.Instance, pattern ...i
 		if err := ensure(class.List, form[0]); err != nil {
 			return nil, err
 		}
-		keys := form[0].(instance.List).Slice()
-		for _, k := range keys {
+		for _, k := range form[0].(instance.List).Slice() {
 			if k == key {
 				return Progn(local, global, form[1:]...)
 			}
@@ -140,9 +139,8 @@ func CaseUsing(local, global environment.Environment, key, pred ilos.Instance, p
 		if err := ensure(class.List, form[0]); err != nil {
 			return nil, err
 		}
-		keys := form[0].(instance.List).Slice()
-		for _, k := range keys {
-			ret, err := pred.(instance.Function).Apply(local, global, k, key)
+		for _, k := range form[0].(instance.List).Slice() {
+			ret, err := pred.(instance.Applicable).Apply(local, global, k, key)
 			if err != nil {
 				return nil, err
 			}

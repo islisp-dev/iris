@@ -31,7 +31,7 @@ func Length(local, global environment.Environment, sequence ilos.Instance) (ilos
 	case ilos.InstanceOf(class.GeneralVector, sequence):
 		return instance.NewInteger(len(sequence.(instance.GeneralVector))), nil
 	case ilos.InstanceOf(class.List, sequence):
-		return instance.NewInteger(len(sequence.(instance.List).Slice())), nil
+		return instance.NewInteger(sequence.(instance.List).Length()), nil
 	}
 	// TODO: class.Seq
 	return nil, instance.NewDomainError(sequence, class.Object)
@@ -204,7 +204,7 @@ func mapInto(local, global environment.Environment, destination, function ilos.I
 				return nil, err
 			}
 		}
-		ret, err := function.(instance.Function).Apply(local, global, arguments...)
+		ret, err := function.(instance.Applicable).Apply(local, global, arguments...)
 		if err != nil {
 			return nil, err
 		}

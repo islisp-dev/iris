@@ -97,12 +97,11 @@ func For(local, global environment.Environment, iterationSpecs, endTestAndResult
 			if err := ensure(class.List, is); err != nil {
 				return nil, err
 			}
-			i := is.(instance.List).Slice()
-			switch len(i) {
+			switch is.(instance.List).Length() {
 			case 2:
 			case 3:
-				var1 := i[0]
-				step := i[2]
+				var1 := is.(instance.List).Nth(0)
+				step := is.(instance.List).Nth(2)
 				if local.Variable.Set(var1, step) {
 					return nil, instance.NewImmutableBinding()
 				}

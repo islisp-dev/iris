@@ -74,26 +74,47 @@ type GenericFunction struct {
 }
 
 func NewGenericFunction(funcSpec, lambdaList, methodCombination ilos.Instance, genericFunctionClass ilos.Class) ilos.Instance {
-	return GenericFunction{funcSpec, lambdaList, methodCombination, genericFunctionClass, []method{}}
+	return &GenericFunction{funcSpec, lambdaList, methodCombination, genericFunctionClass, []method{}}
 }
 
-func (GenericFunction) Class() ilos.Class {
-	return GenericFunctionClass
+func (f *GenericFunction) AddMethod(qualifier, lambdaList ilos.Instance, classList []ilos.Class, function ilos.Instance) bool {
+	if f.lambdaList.(List).Length() != lambdaList.(List).Length() {
+		return false
+	}
+	for i, param := range f.lambdaList.(List).Slice() {
+		if param == NewSymbol(":REST") || param == NewSymbol("&REST") {
+			if lambdaList.(List).Nth(i) != NewSymbol(":REST") && lambdaList.(List).Nth(i) != NewSymbol("&REST") {
+				return false
+			}
+		}
+	}
+	for _, method := range f.methods {
+		if method.qualifier == qualifier {
+			method.function = function.(Function)
+			return true
+		}
+	}
+	f.methods = append(f.methods, method{qualifier, classList, function.(Function)})
+	return true
 }
 
-func (f GenericFunction) GetSlotValue(_ ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
+func (f *GenericFunction) Class() ilos.Class {
+	return f.genericFunctionClass
+}
+
+func (f *GenericFunction) GetSlotValue(_ ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
 	return nil, false
 }
 
-func (f GenericFunction) SetSlotValue(_, _ ilos.Instance, _ ilos.Class) bool {
+func (f *GenericFunction) SetSlotValue(_, _ ilos.Instance, _ ilos.Class) bool {
 	return false
 }
 
-func (f GenericFunction) String() string {
+func (f *GenericFunction) String() string {
 	return fmt.Sprintf("#%v", f.Class())
 }
 
-func (f GenericFunction) Apply(local, global environment.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func (f *GenericFunction) Apply(local, global environment.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	parameters := f.lambdaList.(List).Slice()
 	variadic := false
 	{
@@ -138,7 +159,7 @@ func (f GenericFunction) Apply(local, global environment.Environment, arguments 
 		return Nil, nil
 	})
 	nextMethodPisT := NewFunction(NewSymbol("NEXT-METHOD-P"), func(local, global environment.Environment) (ilos.Instance, ilos.Instance) {
-		return NewSymbol("T"), nil
+		return T, nil
 	})
 	if f.methodCombination == NewSymbol("NIL") {
 		var callNextMethod func(local, global environment.Environment) (ilos.Instance, ilos.Instance) // To Recursive
@@ -291,12 +312,23 @@ func (f GenericFunction) Apply(local, global environment.Environment, arguments 
 			}
 			return methods[int(depth.(Integer))].function.Apply(local, global, arguments...)
 		} // callNextMethod ends here
+		// Do All :before mehtods
+		for _, method := range methods {
+			if method.qualifier == before {
+				if _, err := method.function.Apply(local, global, arguments...); err != nil {
+					return nil, err
+				}
+			}
+		}
 		index := 0 // index of the first primary method
 		{
 			test := func(i int) bool { return methods[i].qualifier == nil }
 			width := len(methods)
 			index := sort.Search(width, test)
 			local.DynamicVariable.Define(NewSymbol("IRIS/DEPTH"), NewInteger(index))
+			if index == len(methods) {
+				return nil, NewUndefinedFunction(f.funcSpec)
+			}
 		}
 		local.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisNil)
 		{ // If Generic Function has next method, set these functions
@@ -307,6 +339,15 @@ func (f GenericFunction) Apply(local, global environment.Environment, arguments 
 				local.Function.Define(NewSymbol("CALL-NEXT-METHOD"), NewFunction(NewSymbol("CALL-NEXT-METHOD"), callNextMethod))
 			}
 		}
-		return methods[index].function.Apply(local, global, arguments...)
+		ret, err := methods[index].function.Apply(local, global, arguments...)
+		// Do all :after methods
+		for i := len(methods) - 1; i >= 0; i-- {
+			if methods[i].qualifier == after {
+				if _, err := methods[i].function.Apply(local, global, arguments...); err != nil {
+					return nil, err
+				}
+			}
+		}
+		return ret, err
 	}
 }
