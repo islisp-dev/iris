@@ -14,15 +14,11 @@ type Class interface {
 	Initform(Instance) (Instance, bool)
 	Initarg(Instance) (Instance, bool)
 	Class() Class
-	GetSlotValue(Instance, Class) (Instance, bool)
-	SetSlotValue(Instance, Instance, Class) bool
 	String() string
 }
 
 type Instance interface {
 	Class() Class
-	GetSlotValue(Instance, Class) (Instance, bool)
-	SetSlotValue(Instance, Instance, Class) bool
 	String() string
 }
 

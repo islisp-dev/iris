@@ -26,14 +26,6 @@ func (GeneralArrayStar) Class() ilos.Class {
 	return GeneralArrayStarClass
 }
 
-func (i GeneralArrayStar) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
-	return nil, false
-}
-
-func (i GeneralArrayStar) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
-	return false
-}
-
 func (i GeneralArrayStar) String() string {
 	return ""
 }
@@ -52,14 +44,6 @@ func (GeneralVector) Class() ilos.Class {
 	return GeneralVectorClass
 }
 
-func (i GeneralVector) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
-	return nil, false
-}
-
-func (i GeneralVector) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
-	return false
-}
-
 func (i GeneralVector) String() string {
 	return pp.Sprint([]ilos.Instance(i))
 }
@@ -76,14 +60,6 @@ func NewString(s string) ilos.Instance {
 
 func (String) Class() ilos.Class {
 	return StringClass
-}
-
-func (i String) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
-	return nil, false
-}
-
-func (i String) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
-	return false
 }
 
 func (i String) String() string {

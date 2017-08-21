@@ -33,23 +33,15 @@ func (p BuiltInClass) Slots() []ilos.Instance {
 }
 
 func (p BuiltInClass) Initform(arg ilos.Instance) (ilos.Instance, bool) {
-	return arg, true
+	return nil, true
 }
 
 func (p BuiltInClass) Initarg(arg ilos.Instance) (ilos.Instance, bool) {
-	return nil, false
+	return arg, true
 }
 
 func (BuiltInClass) Class() ilos.Class {
 	return BuiltInClassClass
-}
-
-func (p BuiltInClass) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
-	return nil, false
-}
-
-func (p BuiltInClass) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
-	return false
 }
 
 func (p BuiltInClass) String() string {

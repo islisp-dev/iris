@@ -51,9 +51,9 @@ func TestDefclass(t *testing.T) {
 		{
 			exp: `
 			(defclass <point3d> ()
-				((x :accessor point-x :initform 0.0 :initarg x)
-				 (y :accessor point-y :initform 0.0 :initarg y)
-				 (z :accessor point-z :initform 0.0 :initarg z)))
+				((x :boundp point-x :initarg x)
+				 (y :boundp point-y :initarg y)
+				 (z :boundp point-z :initarg z)))
 			`,
 			want:    `'<point3d>`,
 			wantErr: false,
@@ -78,6 +78,11 @@ func TestDefclass(t *testing.T) {
 		{
 			exp:     `(distance (create (class <point>) 'x 100) (create (class <point>)  'y 100))`,
 			want:    `(sqrt 5000)`,
+			wantErr: false,
+		},
+		{
+			exp:     `(point-x (create (class <point3d>)))`,
+			want:    `nil`,
 			wantErr: false,
 		},
 	}

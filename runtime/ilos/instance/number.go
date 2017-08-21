@@ -23,14 +23,6 @@ func (Integer) Class() ilos.Class {
 	return IntegerClass
 }
 
-func (i Integer) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
-	return nil, false
-}
-
-func (i Integer) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
-	return false
-}
-
 func (i Integer) String() string {
 	return fmt.Sprint(int(i))
 }
@@ -47,14 +39,6 @@ func NewFloat(i float64) ilos.Instance {
 
 func (Float) Class() ilos.Class {
 	return FloatClass
-}
-
-func (i Float) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
-	return nil, false
-}
-
-func (i Float) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
-	return false
 }
 
 func (i Float) String() string {

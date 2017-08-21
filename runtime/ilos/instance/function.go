@@ -30,14 +30,6 @@ func (Function) Class() ilos.Class {
 	return FunctionClass
 }
 
-func (Function) GetSlotValue(_ ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
-	return nil, false
-}
-
-func (Function) SetSlotValue(_, _ ilos.Instance, _ ilos.Class) bool {
-	return false
-}
-
 func (f Function) String() string {
 	return fmt.Sprintf("#%v", f.Class())
 }
@@ -88,9 +80,9 @@ func (f *GenericFunction) AddMethod(qualifier, lambdaList ilos.Instance, classLi
 			}
 		}
 	}
-	for _, method := range f.methods {
-		if method.qualifier == qualifier {
-			method.function = function.(Function)
+	for i := range f.methods {
+		if f.methods[i].qualifier == qualifier && reflect.DeepEqual(f.methods[i].classList, classList) {
+			f.methods[i].function = function.(Function)
 			return true
 		}
 	}
@@ -100,14 +92,6 @@ func (f *GenericFunction) AddMethod(qualifier, lambdaList ilos.Instance, classLi
 
 func (f *GenericFunction) Class() ilos.Class {
 	return f.genericFunctionClass
-}
-
-func (f *GenericFunction) GetSlotValue(_ ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
-	return nil, false
-}
-
-func (f *GenericFunction) SetSlotValue(_, _ ilos.Instance, _ ilos.Class) bool {
-	return false
 }
 
 func (f *GenericFunction) String() string {

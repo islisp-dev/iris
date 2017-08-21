@@ -50,14 +50,15 @@ func InitializeObject(local, global environment.Environment, object ilos.Instanc
 		argName := inits[i]
 		argValue := inits[i+1]
 		if slotName, ok := object.Class().Initarg(argName); ok {
-			object.SetSlotValue(slotName, argValue, object.Class())
+			object.(Instance).SetSlotValue(slotName, argValue, object.Class())
 		}
 	}
 	for _, slotName := range object.Class().Slots() {
-		if _, ok := object.GetSlotValue(slotName, object.Class()); !ok {
-			form, _ := object.Class().Initform(slotName)
-			value, _ := form.(Applicable).Apply(local, global)
-			object.SetSlotValue(slotName, value, object.Class())
+		if _, ok := object.(Instance).GetSlotValue(slotName, object.Class()); !ok {
+			if form, ok := object.Class().Initform(slotName); ok {
+				value, _ := form.(Applicable).Apply(local, global)
+				object.(Instance).SetSlotValue(slotName, value, object.Class())
+			}
 		}
 	}
 	return object, nil
@@ -78,7 +79,7 @@ func (i Instance) GetSlotValue(key ilos.Instance, class ilos.Class) (ilos.Instan
 		return v, ok
 	}
 	for _, s := range i.supers {
-		if v, ok := s.GetSlotValue(key, class); ok {
+		if v, ok := s.(Instance).GetSlotValue(key, class); ok {
 			return v, ok
 		}
 	}
@@ -91,7 +92,7 @@ func (i Instance) SetSlotValue(key ilos.Instance, value ilos.Instance, class ilo
 		return true
 	}
 	for _, s := range i.supers {
-		if ok := s.SetSlotValue(key, value, class); ok {
+		if ok := s.(Instance).SetSlotValue(key, value, class); ok {
 			return ok
 		}
 	}
