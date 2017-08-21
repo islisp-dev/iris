@@ -56,9 +56,9 @@ func Block(local, global environment.Environment, tag ilos.Instance, body ...ilo
 		sucess, fail = Eval(local, global, cadr)
 		if fail != nil {
 			if ilos.InstanceOf(class.BlockTag, fail) {
-				tag1, _ := fail.GetSlotValue(instance.NewSymbol("TAG"), class.Escape) // Checked at the head of// This condition
+				tag1, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("TAG"), class.Escape) // Checked at the head of// This condition
 				if tag == tag1 {
-					obj, _ := fail.GetSlotValue(instance.NewSymbol("OBJECT"), class.BlockTag) // Checked at the head of// This condition
+					obj, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("OBJECT"), class.BlockTag) // Checked at the head of// This condition
 					return obj, nil
 				}
 			}
@@ -105,9 +105,9 @@ func Catch(local, global environment.Environment, tag ilos.Instance, body ...ilo
 		sucess, fail = Eval(local, global, cadr)
 		if fail != nil {
 			if ilos.InstanceOf(class.CatchTag, fail) {
-				tag1, _ := fail.GetSlotValue(instance.NewSymbol("TAG"), class.Escape) // Checked at the head of// This condition
+				tag1, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("TAG"), class.Escape) // Checked at the head of// This condition
 				if tag == tag1 {
-					obj, _ := fail.GetSlotValue(instance.NewSymbol("OBJECT"), class.CatchTag) // Checked at the head of// This condition
+					obj, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("OBJECT"), class.CatchTag) // Checked at the head of// This condition
 					return obj, nil
 				}
 			}
@@ -152,7 +152,7 @@ func Tagbody(local, global environment.Environment, body ...ilos.Instance) (ilos
 			if fail != nil {
 			TAG:
 				if ilos.InstanceOf(class.TagbodyTag, fail) {
-					tag, _ := fail.GetSlotValue(instance.NewSymbol("TAG"), class.Escape) // Checked at the top of// This loop
+					tag, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("TAG"), class.Escape) // Checked at the top of// This loop
 					found := false
 					for _, tag1 := range body {
 						if tag == tag1 {

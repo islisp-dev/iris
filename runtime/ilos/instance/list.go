@@ -35,32 +35,6 @@ func (*Cons) Class() ilos.Class {
 	return ConsClass
 }
 
-func (i *Cons) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
-	if symbol, ok := key.(Symbol); ok {
-		switch symbol {
-		case "CAR":
-			return i.Car, true
-		case "CDR":
-			return i.Cdr, true
-		}
-	}
-	return nil, false
-}
-
-func (i *Cons) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
-	if symbol, ok := key.(Symbol); ok {
-		switch symbol {
-		case "CAR":
-			i.Car = value
-			return true
-		case "CDR":
-			i.Cdr = value
-			return true
-		}
-	}
-	return false
-}
-
 func (i *Cons) String() string {
 	str := "(" + fmt.Sprint(i.Car)
 	cdr := i.Cdr
@@ -125,14 +99,6 @@ func NewNull() ilos.Instance {
 
 func (*Null) Class() ilos.Class {
 	return NullClass
-}
-
-func (i *Null) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
-	return nil, false
-}
-
-func (i *Null) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
-	return false
 }
 
 func (*Null) String() string {

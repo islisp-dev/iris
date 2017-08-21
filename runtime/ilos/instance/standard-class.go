@@ -46,14 +46,6 @@ func (p StandardClass) Class() ilos.Class {
 	return p.metaclass
 }
 
-func (p StandardClass) GetSlotValue(key ilos.Instance, _ ilos.Class) (ilos.Instance, bool) {
-	return nil, false
-}
-
-func (p StandardClass) SetSlotValue(key ilos.Instance, value ilos.Instance, _ ilos.Class) bool {
-	return false
-}
-
 func (p StandardClass) String() string {
 	return fmt.Sprint(p.name)
 }
