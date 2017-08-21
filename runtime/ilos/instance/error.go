@@ -9,7 +9,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/k0kubun/pp"
+	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
 )
 
@@ -35,78 +35,74 @@ func stackTrace() {
 }
 
 func NewArithmeticError(operation, operands ilos.Instance) ilos.Instance {
-	return newInstance(ArithmeticErrorClass, map[ilos.Instance]ilos.Instance{
-		NewSymbol("OPERATION"): operation,
-		NewSymbol("OPERANDS"):  operands,
-	})
+	return Create(environment.New(), environment.New(),
+		ArithmeticErrorClass,
+		NewSymbol("OPERATION"), operation,
+		NewSymbol("OPERANDS"), operands)
 }
 
 func NewDivisionByZero(operation, operands ilos.Instance) ilos.Instance {
-	return newInstance(DivisionByZeroClass, map[ilos.Instance]ilos.Instance{
-		NewSymbol("OPERATION"): operation,
-		NewSymbol("OPERANDS"):  operands,
-	})
+	return Create(environment.New(), environment.New(),
+		DivisionByZeroClass,
+		NewSymbol("OPERATION"), operation,
+		NewSymbol("OPERANDS"), operands)
 }
 
 func NewParseError(str, expectedClass ilos.Instance) ilos.Instance {
-	return newInstance(ParseErrorClass, map[ilos.Instance]ilos.Instance{
-		NewSymbol("STRING"):         str,
-		NewSymbol("EXPECTED-CLASS"): expectedClass,
-	})
+	return Create(environment.New(), environment.New(),
+		ParseErrorClass,
+		NewSymbol("STRING"), str,
+		NewSymbol("EXPECTED-CLASS"), expectedClass)
 }
 
 func NewDomainError(object ilos.Instance, expectedClass ilos.Class) ilos.Instance {
-	pp.Println(object, expectedClass)
-	return newInstance(DomainErrorClass, map[ilos.Instance]ilos.Instance{
-		NewSymbol("CAUSE"):          NewSymbol("DOMAIN-ERROR"),
-		NewSymbol("OBJECT"):         object,
-		NewSymbol("EXPECTED-CLASS"): expectedClass,
-	})
+	return Create(environment.New(), environment.New(),
+		DomainErrorClass,
+		NewSymbol("CAUSE"), NewSymbol("DOMAIN-ERROR"),
+		NewSymbol("OBJECT"), object,
+		NewSymbol("EXPECTED-CLASS"), expectedClass)
 }
 
 func NewUndefinedFunction(name ilos.Instance) ilos.Instance {
-	return newInstance(UndefinedFunctionClass, map[ilos.Instance]ilos.Instance{
-		NewSymbol("NAME"):      name,
-		NewSymbol("NAMESPACE"): NewSymbol("FUNCTION"),
-	})
+	return Create(environment.New(), environment.New(),
+		UndefinedFunctionClass,
+		NewSymbol("NAME"), name,
+		NewSymbol("NAMESPACE"), NewSymbol("FUNCTION"))
 }
 
 func NewUndefinedVariable(name ilos.Instance) ilos.Instance {
-	return newInstance(UndefinedVariableClass, map[ilos.Instance]ilos.Instance{
-		NewSymbol("NAME"):      name,
-		NewSymbol("NAMESPACE"): NewSymbol("VARIABLE"),
-	})
+	return Create(environment.New(), environment.New(),
+		UndefinedVariableClass,
+		NewSymbol("NAME"), name,
+		NewSymbol("NAMESPACE"), NewSymbol("VARIABLE"))
 }
 
 func NewUndefinedClass(name ilos.Instance) ilos.Instance {
-	return newInstance(UndefinedVariableClass, map[ilos.Instance]ilos.Instance{
-		NewSymbol("NAME"):      name,
-		NewSymbol("NAMESPACE"): NewSymbol("CLASS"),
-	})
+	return Create(environment.New(), environment.New(),
+		UndefinedEntityClass,
+		NewSymbol("NAME"), name,
+		NewSymbol("NAMESPACE"), NewSymbol("CLASS"))
 }
 
 func NewArityError() ilos.Instance {
-	//stackTrace()
-	return newInstance(ProgramErrorClass, map[ilos.Instance]ilos.Instance{})
+	return Create(environment.New(), environment.New(), ProgramErrorClass)
 }
 
 func NewIndexOutOfRange() ilos.Instance {
-	//stackTrace()
-	return newInstance(ProgramErrorClass, map[ilos.Instance]ilos.Instance{})
+	return Create(environment.New(), environment.New(), ProgramErrorClass)
 }
 
 func NewImmutableBinding() ilos.Instance {
-	//stackTrace()
-	return newInstance(ProgramErrorClass, map[ilos.Instance]ilos.Instance{})
+	return Create(environment.New(), environment.New(), ProgramErrorClass)
 }
 
 func NewSimpleError(formatString, formatArguments ilos.Instance) ilos.Instance {
-	return newInstance(SimpleErrorClass, map[ilos.Instance]ilos.Instance{
-		NewSymbol("FORMAT-STRING"):    formatString,
-		NewSymbol("FORMAT-ARGUMENTS"): formatArguments,
-	})
+	return Create(environment.New(), environment.New(),
+		SimpleErrorClass,
+		NewSymbol("FORMAT-STRING"), formatString,
+		NewSymbol("FORMAT-ARGUMENTS"), formatArguments)
 }
 
 func NewControlError() ilos.Instance {
-	return newInstance(ControlErrorClass)
+	return Create(environment.New(), environment.New(), ControlErrorClass)
 }

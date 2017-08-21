@@ -184,12 +184,12 @@ func Create(local, global environment.Environment, c ilos.Instance, i ...ilos.In
 	if err := ensure(class.StandardClass, c); err != nil {
 		return nil, err
 	}
-	return instance.Create(local, global, c, i...)
+	return instance.Create(local, global, c, i...), nil
 }
 
 func InitializeObject(local, global environment.Environment, object ilos.Instance, inits ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.StandardObject, object); err != nil {
 		return nil, err
 	}
-	return instance.InitializeObject(local, global, object, inits...)
+	return instance.InitializeObject(local, global, object, inits...), nil
 }

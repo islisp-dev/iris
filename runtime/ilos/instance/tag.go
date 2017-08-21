@@ -5,23 +5,22 @@
 package instance
 
 import (
+	"github.com/ta2gch/iris/runtime/environment"
 	"github.com/ta2gch/iris/runtime/ilos"
 )
 
 func NewBlockTag(tag, object ilos.Instance) ilos.Instance {
-	return newInstance(BlockTagClass, map[ilos.Instance]ilos.Instance{
-		NewSymbol("TAG"):    tag,
-		NewSymbol("OBJECT"): object,
-	})
+	return Create(environment.New(), environment.New(),
+		BlockTagClass,
+		NewSymbol("TAG"), tag,
+		NewSymbol("OBJECT"), object)
 }
 func NewCatchTag(tag, object ilos.Instance) ilos.Instance {
-	return newInstance(CatchTagClass, map[ilos.Instance]ilos.Instance{
-		NewSymbol("TAG"):    tag,
-		NewSymbol("OBJECT"): object,
-	})
+	return Create(environment.New(), environment.New(),
+		CatchTagClass,
+		NewSymbol("TAG"), tag,
+		NewSymbol("OBJECT"), object)
 }
 func NewTagbodyTag(tag ilos.Instance) ilos.Instance {
-	return newInstance(TagbodyTagClass, map[ilos.Instance]ilos.Instance{
-		NewSymbol("TAG"): tag,
-	})
+	return Create(environment.New(), environment.New(), TagbodyTagClass, NewSymbol("TAG"), tag)
 }
