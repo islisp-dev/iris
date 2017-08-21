@@ -10,7 +10,6 @@ import (
 )
 
 func list2array(dim int, list ilos.Instance) (ilos.Instance, ilos.Instance) {
-	// TODO: check array correctly ( #2((a) ()) )
 	if dim == 0 {
 		return instance.NewGeneralArrayStar(nil, list), nil
 	}
