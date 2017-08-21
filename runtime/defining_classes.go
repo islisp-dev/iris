@@ -76,7 +76,11 @@ func Defclass(local, global environment.Environment, className, scNames, slotSpe
 		for i := 0; i < len(slotOpts); i += 2 {
 			switch slotOpts[i] {
 			case instance.NewSymbol(":INITFORM"):
-				initforms[slotName] = slotOpts[i+1]
+				closure, err := newNamedFunction(local, global, instance.NewSymbol("CLOSURE"), Nil, slotOpts[i+1])
+				if err != nil {
+					return nil, err
+				}
+				initforms[slotName] = closure
 			case instance.NewSymbol(":INITARG"):
 				initargs[slotOpts[i+1]] = slotName
 			}
@@ -175,50 +179,16 @@ func Defclass(local, global environment.Environment, className, scNames, slotSpe
 	return className, nil
 }
 
-func create(local, global environment.Environment, c ilos.Instance, i ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	p := []ilos.Instance{}
-	for _, q := range c.(ilos.Class).Supers() {
-		s, err := create(local, global, q, i...)
-		if err != nil {
-			return nil, err
-		}
-		p = append(p, s)
-	}
-	return initializeObject(local, global, instance.NewInstance(c.(ilos.Class), p), i...)
-}
-
 func Create(local, global environment.Environment, c ilos.Instance, i ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.StandardClass, c); err != nil {
 		return nil, err
 	}
-	//pp.Print(create(local, global, c, i...))
-	return create(local, global, c, i...)
-}
-
-func initializeObject(local, global environment.Environment, object ilos.Instance, inits ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	for _, super := range object.(instance.Instance).Supers {
-		initializeObject(local, global, super, inits...)
-	}
-	for i := 0; i < len(inits); i += 2 {
-		argName := inits[i]
-		argValue := inits[i+1]
-		if slotName, ok := object.Class().Initarg(argName); ok {
-			object.SetSlotValue(slotName, argValue, object.Class())
-		}
-	}
-	for _, slotName := range object.Class().Slots() {
-		if _, ok := object.GetSlotValue(slotName, object.Class()); !ok {
-			form, _ := object.Class().Initform(slotName)
-			value, _ := Eval(local, global, form)
-			object.SetSlotValue(slotName, value, object.Class())
-		}
-	}
-	return object, nil
+	return instance.Create(local, global, c, i...)
 }
 
 func InitializeObject(local, global environment.Environment, object ilos.Instance, inits ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.StandardObject, object); err != nil {
 		return nil, err
 	}
-	return initializeObject(local, global, object, inits...)
+	return instance.InitializeObject(local, global, object, inits...)
 }
