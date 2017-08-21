@@ -47,8 +47,6 @@ func Cdr(local, global environment.Environment, cons ilos.Instance) (ilos.Instan
 	return cons.(*instance.Cons).Cdr, nil // Checked at the top of this function
 }
 
-// TODO: setf car
-
 // SetCar updates the left component of cons with obj. The returned value is obj .
 // An error shall be signaled if cons is not a cons (error-id. domain-error).
 // obj may be any ISLISP object.
@@ -59,8 +57,6 @@ func SetCar(local, global environment.Environment, obj, cons ilos.Instance) (ilo
 	cons.(*instance.Cons).Car = obj
 	return obj, nil
 }
-
-// TODO: setf cdr
 
 // SetCdr updates the right component of cons with obj. The returned value is obj .
 // An error shall be signaled if cons is not a cons (error-id. domain-error).

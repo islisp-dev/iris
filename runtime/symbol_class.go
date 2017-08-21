@@ -13,8 +13,6 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-// TODO: setf property
-
 // Symbolp returns t if obj is a symbol (instance of class symbol);
 // otherwise, returns nil. The obj may be any ISLISP object.
 func Symbolp(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {

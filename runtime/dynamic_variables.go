@@ -11,8 +11,6 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-// TODO: setf dynamic
-
 // Dynamic denotes a reference to the identifier denoting a
 // dynamic variable. This special form is not allowed in the scope of a
 // definition of var which is not done by defdynamic or dynamic-let.

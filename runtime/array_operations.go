@@ -72,7 +72,7 @@ func CreateArray(local, global environment.Environment, dimensions ilos.Instance
 	}
 	array := make([]instance.GeneralArrayStar, int(dim[0].(instance.Integer)))
 	for i := range array {
-		d, err := List(local, global, dim[1:]...) // TODO: replace UnsafeCdr
+		d, err := List(local, global, dim[1:]...)
 		if err != nil {
 			return nil, err
 		}
