@@ -15,13 +15,6 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func Class(local, global environment.Environment, className ilos.Instance) (ilos.Class, ilos.Instance) {
-	if v, ok := global.Class.Get(className); ok {
-		return v.(ilos.Class), nil
-	}
-	return nil, instance.NewUndefinedClass(className)
-}
-
 func checkSuperClass(a, b ilos.Class) bool {
 	if reflect.DeepEqual(a, class.StandardObject) || reflect.DeepEqual(b, class.StandardObject) {
 		return false

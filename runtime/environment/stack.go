@@ -10,7 +10,7 @@ import (
 
 type stack []map[ilos.Instance]ilos.Instance
 
-func newStack() stack {
+func NewStack() stack {
 	return []map[ilos.Instance]ilos.Instance{map[ilos.Instance]ilos.Instance{}}
 }
 

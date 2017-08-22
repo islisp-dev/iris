@@ -5,6 +5,7 @@
 package runtime
 
 import (
+	"os"
 	"reflect"
 	"regexp"
 	"runtime"
@@ -58,24 +59,24 @@ func func2symbol(function interface{}) ilos.Instance {
 }
 
 func defspecial(function interface{}) {
-	environment.TopLevel.Special.Define(func2symbol(function), instance.NewFunction(func2symbol(function), function))
+	TopLevel.Special.Define(func2symbol(function), instance.NewFunction(func2symbol(function), function))
 }
 
 func defmacro(function interface{}) {
-	environment.TopLevel.Macro.Define(func2symbol(function), instance.NewFunction(func2symbol(function), function))
+	TopLevel.Macro.Define(func2symbol(function), instance.NewFunction(func2symbol(function), function))
 }
 
 func defun(function interface{}) {
-	environment.TopLevel.Function.Define(func2symbol(function), instance.NewFunction(func2symbol(function), function))
+	TopLevel.Function.Define(func2symbol(function), instance.NewFunction(func2symbol(function), function))
 }
 
 func defun2(name string, function interface{}) {
 	symbol := instance.NewSymbol(name)
-	environment.TopLevel.Function.Define(symbol, instance.NewFunction(symbol, function))
+	TopLevel.Function.Define(symbol, instance.NewFunction(symbol, function))
 }
 func defglobal(name string, value ilos.Instance) {
 	symbol := instance.NewSymbol(name)
-	environment.TopLevel.Variable.Define(symbol, value)
+	TopLevel.Variable.Define(symbol, value)
 }
 func ensure(c ilos.Class, i ...ilos.Instance) ilos.Instance {
 	for _, o := range i {
@@ -85,3 +86,32 @@ func ensure(c ilos.Class, i ...ilos.Instance) ilos.Instance {
 	}
 	return nil
 }
+
+// New creates new environment
+func NewEnvironment() environment.Environment {
+	env := new(environment.Environment)
+
+	// Lexical
+	env.BlockTag = environment.NewStack()
+	env.TagbodyTag = environment.NewStack()
+	env.Function = environment.NewStack()
+	env.Variable = environment.NewStack()
+
+	// Global
+	env.Macro = environment.NewStack()
+	env.Class = environment.NewStack()
+	env.Special = environment.NewStack()
+	env.Constant = environment.NewStack()
+	env.Property = environment.NewMap2()
+	env.GensymID = 0
+
+	// Dynamic
+	env.CatchTag = environment.NewStack()
+	env.DynamicVariable = environment.NewStack()
+	env.StandardInput = instance.NewStream(os.Stdin, nil)
+	env.StandardOutput = instance.NewStream(nil, os.Stdout)
+	env.ErrorOutput = instance.NewStream(nil, os.Stderr)
+	return *env
+}
+
+var TopLevel = NewEnvironment()

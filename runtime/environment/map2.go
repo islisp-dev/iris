@@ -8,19 +8,23 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos"
 )
 
-type mmap map[[2]ilos.Instance]ilos.Instance
+type map2 map[[2]ilos.Instance]ilos.Instance
 
-func (s mmap) Get(key1, key2 ilos.Instance) (ilos.Instance, bool) {
+func NewMap2() map2 {
+	return map[[2]ilos.Instance]ilos.Instance{}
+}
+
+func (s map2) Get(key1, key2 ilos.Instance) (ilos.Instance, bool) {
 	if v, ok := s[[2]ilos.Instance{key1, key2}]; ok {
 		return v, true
 	}
 	return nil, false
 }
-func (s mmap) Set(key1, key2, value ilos.Instance) {
+func (s map2) Set(key1, key2, value ilos.Instance) {
 	s[[2]ilos.Instance{key1, key2}] = value
 }
 
-func (s mmap) Delete(key1, key2 ilos.Instance) (ilos.Instance, bool) {
+func (s map2) Delete(key1, key2 ilos.Instance) (ilos.Instance, bool) {
 	if v, ok := s[[2]ilos.Instance{key1, key2}]; ok {
 		delete(s, [2]ilos.Instance{key1, key2})
 		return v, true
