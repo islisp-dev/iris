@@ -131,8 +131,7 @@ func Flet(local, global environment.Environment, functions ilos.Instance, bodyFo
 	if err := ensure(class.List, functions); err != nil {
 		return nil, err
 	}
-	env := NewEnvironment()
-	env.Merge(local)
+	env := environment.Push(local)
 	for _, function := range functions.(instance.List).Slice() {
 		if err := ensure(class.List, function); err != nil {
 			return nil, err
