@@ -30,6 +30,34 @@ type Environment struct {
 	StandardInput   ilos.Instance
 	StandardOutput  ilos.Instance
 	ErrorOutput     ilos.Instance
+	Handler         stack
+}
+
+// New creates new environment
+func NewEnvironment(stdin, stdout, stderr ilos.Instance) Environment {
+	env := new(Environment)
+
+	// Lexical
+	env.BlockTag = NewStack()
+	env.TagbodyTag = NewStack()
+	env.Function = NewStack()
+	env.Variable = NewStack()
+
+	// Global
+	env.Macro = NewStack()
+	env.Class = NewStack()
+	env.Special = NewStack()
+	env.Constant = NewStack()
+	env.Property = NewMap2()
+	env.GensymID = 0
+
+	// Dynamic
+	env.CatchTag = NewStack()
+	env.DynamicVariable = NewStack()
+	env.StandardInput = stdin
+	env.StandardOutput = stdout
+	env.ErrorOutput = stderr
+	return *env
 }
 
 func (env *Environment) Merge(before Environment) {
@@ -43,12 +71,12 @@ func (env *Environment) Merge(before Environment) {
 	env.Macro = append(before.Macro, env.Macro...)
 	env.DynamicVariable = append(before.DynamicVariable, env.DynamicVariable...)
 	env.Constant = append(before.Constant, env.Constant...)
+	env.Handler = append(before.Handler, env.Handler...)
 	env.GensymID = before.GensymID
 	env.Property = before.Property
 	env.StandardInput = before.StandardInput
 	env.StandardOutput = before.StandardOutput
 	env.ErrorOutput = before.ErrorOutput
-
 }
 
 func (env *Environment) MergeDynamic(before Environment) {
@@ -57,4 +85,17 @@ func (env *Environment) MergeDynamic(before Environment) {
 	env.StandardInput = before.StandardInput
 	env.StandardOutput = before.StandardOutput
 	env.ErrorOutput = before.ErrorOutput
+	env.Handler = append(before.Handler, env.Handler...)
+}
+
+func Push(before Environment) Environment {
+	env := NewEnvironment(before.StandardInput, before.StandardOutput, before.ErrorOutput)
+	env.Merge(before)
+	return env
+}
+
+func PushDynamic(before Environment) Environment {
+	env := NewEnvironment(before.StandardInput, before.StandardOutput, before.ErrorOutput)
+	env.MergeDynamic(before)
+	return env
 }

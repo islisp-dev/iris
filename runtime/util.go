@@ -87,31 +87,4 @@ func ensure(c ilos.Class, i ...ilos.Instance) ilos.Instance {
 	return nil
 }
 
-// New creates new environment
-func NewEnvironment() environment.Environment {
-	env := new(environment.Environment)
-
-	// Lexical
-	env.BlockTag = environment.NewStack()
-	env.TagbodyTag = environment.NewStack()
-	env.Function = environment.NewStack()
-	env.Variable = environment.NewStack()
-
-	// Global
-	env.Macro = environment.NewStack()
-	env.Class = environment.NewStack()
-	env.Special = environment.NewStack()
-	env.Constant = environment.NewStack()
-	env.Property = environment.NewMap2()
-	env.GensymID = 0
-
-	// Dynamic
-	env.CatchTag = environment.NewStack()
-	env.DynamicVariable = environment.NewStack()
-	env.StandardInput = instance.NewStream(os.Stdin, nil)
-	env.StandardOutput = instance.NewStream(nil, os.Stdout)
-	env.ErrorOutput = instance.NewStream(nil, os.Stderr)
-	return *env
-}
-
-var TopLevel = NewEnvironment()
+var TopLevel = environment.NewEnvironment(instance.NewStream(os.Stdin, nil), instance.NewStream(nil, os.Stdout), instance.NewStream(nil, os.Stderr))

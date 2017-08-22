@@ -5,10 +5,14 @@
 package runtime
 
 import (
+	"os"
 	"reflect"
 	"regexp"
 	"runtime"
 	"testing"
+
+	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
 type test struct {
@@ -20,7 +24,7 @@ type test struct {
 func execTests(t *testing.T, function interface{}, tests []test) {
 	name := runtime.FuncForPC(reflect.ValueOf(function).Pointer()).Name()
 	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
-	local := NewEnvironment()
+	local := environment.NewEnvironment(instance.NewStream(os.Stdin, nil), instance.NewStream(nil, os.Stdout), instance.NewStream(nil, os.Stderr))
 	global := TopLevel
 	for _, tt := range tests {
 		t.Run(tt.exp, func(t *testing.T) {
