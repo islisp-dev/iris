@@ -9,8 +9,6 @@ import (
 	"regexp"
 	"runtime"
 	"testing"
-
-	"github.com/ta2gch/iris/runtime/environment"
 )
 
 type test struct {
@@ -22,8 +20,8 @@ type test struct {
 func execTests(t *testing.T, function interface{}, tests []test) {
 	name := runtime.FuncForPC(reflect.ValueOf(function).Pointer()).Name()
 	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
-	local := environment.New()
-	global := environment.TopLevel
+	local := NewEnvironment()
+	global := TopLevel
 	for _, tt := range tests {
 		t.Run(tt.exp, func(t *testing.T) {
 			got, err := Eval(local, global, readFromString(tt.exp))

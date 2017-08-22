@@ -4,38 +4,32 @@
 
 package environment
 
+import (
+	"github.com/ta2gch/iris/runtime/ilos"
+)
+
 // Environment struct is the struct for keeping functions and variables
 type Environment struct {
-	Class           stack
-	BlockTag        stack
-	TagbodyTag      stack
-	CatchTag        stack
-	Macro           stack
-	Function        stack
-	Special         stack
-	Variable        stack
-	DynamicVariable stack // deep biding
-	Constant        stack
-	GensymID        int
-	Property        mmap
-}
+	// Lexical
+	BlockTag   stack
+	TagbodyTag stack
+	Function   stack
+	Variable   stack
 
-// New creates new environment
-func New() Environment {
-	env := new(Environment)
-	env.Class = newStack()
-	env.BlockTag = newStack()
-	env.TagbodyTag = newStack()
-	env.CatchTag = newStack()
-	env.Macro = newStack()
-	env.Function = newStack()
-	env.Special = newStack()
-	env.Variable = newStack()
-	env.DynamicVariable = newStack()
-	env.Constant = newStack()
-	env.GensymID = 0 // Will Not Worked
-	env.Property = mmap{}
-	return *env
+	// Global
+	Class    stack
+	Macro    stack
+	Special  stack
+	Property map2
+	GensymID int
+	Constant stack
+
+	// Dynamic
+	CatchTag        stack
+	DynamicVariable stack // deep biding
+	StandardInput   ilos.Instance
+	StandardOutput  ilos.Instance
+	ErrorOutput     ilos.Instance
 }
 
 func (env *Environment) Merge(before Environment) {
@@ -51,12 +45,16 @@ func (env *Environment) Merge(before Environment) {
 	env.Constant = append(before.Constant, env.Constant...)
 	env.GensymID = before.GensymID
 	env.Property = before.Property
+	env.StandardInput = before.StandardInput
+	env.StandardOutput = before.StandardOutput
+	env.ErrorOutput = before.ErrorOutput
+
 }
 
-func (env *Environment) PartialMerge(before Environment) {
+func (env *Environment) MergeDynamic(before Environment) {
 	env.CatchTag = append(before.CatchTag, env.CatchTag...)
 	env.DynamicVariable = append(before.DynamicVariable, env.DynamicVariable...)
+	env.StandardInput = before.StandardInput
+	env.StandardOutput = before.StandardOutput
+	env.ErrorOutput = before.ErrorOutput
 }
-
-// TopLevel is a global environment
-var TopLevel = New()
