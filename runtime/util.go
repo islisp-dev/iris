@@ -87,4 +87,10 @@ func ensure(c ilos.Class, i ...ilos.Instance) ilos.Instance {
 	return nil
 }
 
-var TopLevel = env.NewEnvironment(instance.NewStream(os.Stdin, nil), instance.NewStream(nil, os.Stdout), instance.NewStream(nil, os.Stderr))
+var TopLevel = env.NewEnvironment(instance.NewStream(os.Stdin, nil), instance.NewStream(nil, os.Stdout), instance.NewStream(nil, os.Stderr), nil)
+var uidsrc = 0
+
+func genUID() ilos.Instance {
+	uidsrc++
+	return instance.NewInteger(uidsrc)
+}

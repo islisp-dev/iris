@@ -307,7 +307,7 @@ func StreamReadyP(e env.Environment, inputStream ilos.Instance) (ilos.Instance, 
 
 func Format(e env.Environment, stream, formatString ilos.Instance, objs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	f := regexp.MustCompile("([^~])~A").ReplaceAllString(string(formatString.(instance.String)), "%1%v")
-	f = regexp.MustCompile(`\`).ReplaceAllString(string(formatString.(instance.String)), `\\`)
+	f = regexp.MustCompile(`\\`).ReplaceAllString(string(formatString.(instance.String)), `\\`)
 	f = regexp.MustCompile("([^~])~%").ReplaceAllString(string(formatString.(instance.String)), "%1\n")
 	if b, _ := OutputStreamp(e, stream); b == Nil {
 		return nil, nil // throw Error

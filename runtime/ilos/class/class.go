@@ -54,3 +54,4 @@ var Escape = instance.EscapeClass
 var CatchTag = instance.CatchTagClass
 var TagbodyTag = instance.TagbodyTagClass
 var BlockTag = instance.BlockTagClass
+var Continue = instance.ContinueClass
