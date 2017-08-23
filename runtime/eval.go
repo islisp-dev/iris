@@ -5,13 +5,13 @@
 package runtime
 
 import (
-	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func evalArguments(local environment.Environment, arguments ilos.Instance) (ilos.Instance, ilos.Instance) {
+func evalArguments(e env.Environment, arguments ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// if arguments ends here
 	if arguments == Nil {
 		return Nil, nil
@@ -21,11 +21,11 @@ func evalArguments(local environment.Environment, arguments ilos.Instance) (ilos
 	}
 	car := arguments.(*instance.Cons).Car // Checked there
 	cdr := arguments.(*instance.Cons).Cdr // Checked there
-	a, err := Eval(local, car)
+	a, err := Eval(e, car)
 	if err != nil {
 		return nil, err
 	}
-	b, err := evalArguments(local, cdr)
+	b, err := evalArguments(e, cdr)
 	if err != nil {
 		return nil, err
 	}
@@ -33,21 +33,21 @@ func evalArguments(local environment.Environment, arguments ilos.Instance) (ilos
 
 }
 
-func evalLambda(local environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
+func evalLambda(e env.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// eval if lambda form
 	if ilos.InstanceOf(class.Cons, car) {
 		caar := car.(*instance.Cons).Car // Checked at the top of// This sentence
 		if caar == instance.NewSymbol("LAMBDA") {
-			fun, err := Eval(local, car)
+			fun, err := Eval(e, car)
 			if err != nil {
 				return nil, err, true
 			}
 
-			arguments, err := evalArguments(local, cdr)
+			arguments, err := evalArguments(e, cdr)
 			if err != nil {
 				return nil, err, true
 			}
-			ret, err := fun.(instance.Applicable).Apply(environment.PushDynamic(local), arguments.(instance.List).Slice()...)
+			ret, err := fun.(instance.Applicable).Apply(e.NewDynamic(), arguments.(instance.List).Slice()...)
 			if err != nil {
 				return nil, err, true
 			}
@@ -57,14 +57,14 @@ func evalLambda(local environment.Environment, car, cdr ilos.Instance) (ilos.Ins
 	return nil, nil, false
 }
 
-func evalSpecial(local environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
+func evalSpecial(e env.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// get special instance has value of Function interface
 	var spl ilos.Instance
-	if s, ok := local.Special.Get(car); ok {
+	if s, ok := e.Special.Get(car); ok {
 		spl = s
 	}
 	if spl != nil {
-		ret, err := spl.(instance.Applicable).Apply(environment.Push(local), cdr.(instance.List).Slice()...)
+		ret, err := spl.(instance.Applicable).Apply(e.NewLexical(), cdr.(instance.List).Slice()...)
 		if err != nil {
 			return nil, err, true
 		}
@@ -73,18 +73,18 @@ func evalSpecial(local environment.Environment, car, cdr ilos.Instance) (ilos.In
 	return nil, nil, false
 }
 
-func evalMacro(local environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
+func evalMacro(e env.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// get special instance has value of Function interface
 	var mac ilos.Instance
-	if m, ok := local.Macro.Get(car); ok {
+	if m, ok := e.Macro.Get(car); ok {
 		mac = m
 	}
 	if mac != nil {
-		ret, err := mac.(instance.Applicable).Apply(environment.PushDynamic(local), cdr.(instance.List).Slice()...)
+		ret, err := mac.(instance.Applicable).Apply(e.NewDynamic(), cdr.(instance.List).Slice()...)
 		if err != nil {
 			return nil, err, true
 		}
-		ret, err = Eval(local, ret)
+		ret, err = Eval(e, ret)
 		if err != nil {
 			return nil, err, true
 		}
@@ -93,18 +93,18 @@ func evalMacro(local environment.Environment, car, cdr ilos.Instance) (ilos.Inst
 	return nil, nil, false
 }
 
-func evalFunction(local environment.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
+func evalFunction(e env.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// get special instance has value of Function interface
 	var fun ilos.Instance
-	if f, ok := local.Function.Get(car); ok {
+	if f, ok := e.Function.Get(car); ok {
 		fun = f
 	}
 	if fun != nil {
-		arguments, err := evalArguments(local, cdr)
+		arguments, err := evalArguments(e, cdr)
 		if err != nil {
 			return nil, err, true
 		}
-		ret, err := fun.(instance.Applicable).Apply(environment.PushDynamic(local), arguments.(instance.List).Slice()...)
+		ret, err := fun.(instance.Applicable).Apply(e.NewDynamic(), arguments.(instance.List).Slice()...)
 		if err != nil {
 			return nil, err, true
 		}
@@ -113,7 +113,7 @@ func evalFunction(local environment.Environment, car, cdr ilos.Instance) (ilos.I
 	return nil, nil, false
 }
 
-func evalCons(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func evalCons(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Cons, obj); err != nil {
 		return nil, err
 	}
@@ -121,48 +121,48 @@ func evalCons(local environment.Environment, obj ilos.Instance) (ilos.Instance, 
 	cdr := obj.(*instance.Cons).Cdr // Checked at the top of// This function
 
 	// eval if lambda form
-	if a, b, c := evalLambda(local, car, cdr); c {
+	if a, b, c := evalLambda(e, car, cdr); c {
 		return a, b
 	}
 	// get special instance has value of Function interface
-	if a, b, c := evalSpecial(local, car, cdr); c {
+	if a, b, c := evalSpecial(e, car, cdr); c {
 		return a, b
 	}
 	// get macro instance has value of Function interface
-	if a, b, c := evalMacro(local, car, cdr); c {
+	if a, b, c := evalMacro(e, car, cdr); c {
 		return a, b
 	}
 	// get function instance has value of Function interface
-	if a, b, c := evalFunction(local, car, cdr); c {
+	if a, b, c := evalFunction(e, car, cdr); c {
 		return a, b
 	}
 	return nil, instance.NewUndefinedFunction(car)
 }
 
-func evalVariable(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if val, ok := local.Variable.Get(obj); ok {
+func evalVariable(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+	if val, ok := e.Variable.Get(obj); ok {
 		return val, nil
 	}
-	if val, ok := local.Constant.Get(obj); ok {
+	if val, ok := e.Constant.Get(obj); ok {
 		return val, nil
 	}
 	return nil, instance.NewUndefinedVariable(obj)
 }
 
 // Eval evaluates any classs
-func Eval(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Eval(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if obj == Nil {
 		return Nil, nil
 	}
 	if ilos.InstanceOf(class.Symbol, obj) {
-		ret, err := evalVariable(local, obj)
+		ret, err := evalVariable(e, obj)
 		if err != nil {
 			return nil, err
 		}
 		return ret, nil
 	}
 	if ilos.InstanceOf(class.Cons, obj) {
-		ret, err := evalCons(local, obj)
+		ret, err := evalCons(e, obj)
 		if err != nil {
 			return nil, err
 		}

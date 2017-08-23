@@ -5,7 +5,7 @@
 package runtime
 
 import (
-	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
@@ -28,8 +28,8 @@ func checkLambdaList(lambdaList ilos.Instance) ilos.Instance {
 	return nil
 }
 
-func newNamedFunction(local environment.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	lexical := local
+func newNamedFunction(e env.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	lexical := e
 	if err := ensure(class.Symbol, functionName); err != nil {
 		return nil, err
 	}
@@ -44,8 +44,8 @@ func newNamedFunction(local environment.Environment, functionName, lambdaList il
 		}
 		parameters = append(parameters, cadr)
 	}
-	return instance.NewFunction(functionName.(instance.Symbol), func(local environment.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-		local.Merge(lexical)
+	return instance.NewFunction(functionName.(instance.Symbol), func(e env.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+		e.MergeLexical(lexical)
 		if (variadic && len(parameters)-2 > len(arguments)) || (!variadic && len(parameters) != len(arguments)) {
 			return nil, instance.NewArityError()
 		}
@@ -53,20 +53,20 @@ func newNamedFunction(local environment.Environment, functionName, lambdaList il
 			key := parameters[idx]
 			if key == instance.NewSymbol(":REST") || key == instance.NewSymbol("&REST") {
 				key := parameters[idx+1]
-				value, err := List(local, arguments[idx:]...)
+				value, err := List(e, arguments[idx:]...)
 				if err != nil {
 					return nil, err
 				}
-				if !local.Variable.Define(key, value) {
+				if !e.Variable.Define(key, value) {
 					return nil, instance.NewImmutableBinding()
 				}
 				break
 			}
 			value := arguments[idx]
-			if !local.Variable.Define(key, value) {
+			if !e.Variable.Define(key, value) {
 				return nil, instance.NewImmutableBinding()
 			}
 		}
-		return Progn(local, forms...)
+		return Progn(e, forms...)
 	}), nil
 }

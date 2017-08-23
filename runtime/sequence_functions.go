@@ -7,7 +7,7 @@ package runtime
 import (
 	"math"
 
-	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
@@ -24,7 +24,7 @@ import (
 //
 // An error shall be signaled if sequence is not a basic-vector or a list
 // (error-id. domain-error).
-func Length(local environment.Environment, sequence ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Length(e env.Environment, sequence ilos.Instance) (ilos.Instance, ilos.Instance) {
 	switch {
 	case ilos.InstanceOf(class.String, sequence):
 		return instance.NewInteger(len(sequence.(instance.String))), nil
@@ -44,7 +44,7 @@ func Length(local environment.Environment, sequence ilos.Instance) (ilos.Instanc
 //
 // An error shall be signaled if sequence is not a basic-vector or a list or if z is not an
 // integer (error-id. domain-error).
-func Elt(local environment.Environment, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Elt(e env.Environment, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Integer, z); err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func Elt(local environment.Environment, sequence, z ilos.Instance) (ilos.Instanc
 // An error shall be signaled if z is an integer outside of the valid range of indices
 // (error-id. index-out-of-range). An error shall be signaled if sequence is not a basic-vector
 // or a list or if z is not an integer (error-id. domain-error). obj may be any ISLISP object.
-func SetElt(local environment.Environment, obj, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
+func SetElt(e env.Environment, obj, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Integer, z); err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func SetElt(local environment.Environment, obj, sequence, z ilos.Instance) (ilos
 // mentioned (error-id. index-out-of-range). An error shall be signaled if sequence is not a
 // basic-vector or a list, or if z1 is not an integer, or if z2 is not an integer
 // (error-id. domain-error).
-func Subseq(local environment.Environment, sequence, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Subseq(e env.Environment, sequence, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Integer, z1, z2); err != nil {
 		return nil, err
 	}
@@ -154,7 +154,7 @@ func Subseq(local environment.Environment, sequence, z1, z2 ilos.Instance) (ilos
 		if !(0 < start && start < len(seq) && 0 < end && end < len(seq) && start <= end) {
 			return nil, instance.NewIndexOutOfRange()
 		}
-		return List(local, seq[start:end]...)
+		return List(e, seq[start:end]...)
 	}
 	return nil, instance.NewDomainError(sequence, class.Object)
 }
@@ -175,7 +175,7 @@ func Subseq(local environment.Environment, sequence, z1, z2 ilos.Instance) (ilos
 //
 // An error shall be signaled if any sequence is not a basic-vector or a list
 // (error-id. domain-error).
-func mapInto(local environment.Environment, destination, function ilos.Instance, sequences ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func mapInto(e env.Environment, destination, function ilos.Instance, sequences ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.List, append(sequences, destination)...); err != nil {
 		if err := ensure(class.BasicVector, append(sequences, destination)...); err != nil {
 			return nil, err
@@ -199,16 +199,16 @@ func mapInto(local environment.Environment, destination, function ilos.Instance,
 		arguments := make([]ilos.Instance, int(max))
 		for _, seq := range sequences {
 			var err ilos.Instance
-			arguments[i], err = Elt(local, seq, instance.NewInteger(i))
+			arguments[i], err = Elt(e, seq, instance.NewInteger(i))
 			if err != nil {
 				return nil, err
 			}
 		}
-		ret, err := function.(instance.Applicable).Apply(local, arguments...)
+		ret, err := function.(instance.Applicable).Apply(e, arguments...)
 		if err != nil {
 			return nil, err
 		}
-		_, err = SetElt(local, ret, destination, instance.NewInteger(i))
+		_, err = SetElt(e, ret, destination, instance.NewInteger(i))
 		if err != nil {
 			return nil, err
 		}

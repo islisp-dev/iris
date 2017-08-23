@@ -5,13 +5,13 @@
 package runtime
 
 import (
-	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func Defmethod(local environment.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Defmethod(e env.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if len(arguments) < 2 {
 		return nil, instance.NewArityError()
 	}
@@ -30,7 +30,7 @@ func Defmethod(local environment.Environment, arguments ...ilos.Instance) (ilos.
 			parameterList = append(parameterList, pp.(instance.List).Nth(0))
 		}
 	}
-	lambdaList, err := List(local, parameterList...)
+	lambdaList, err := List(e, parameterList...)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +49,7 @@ func Defmethod(local environment.Environment, arguments ...ilos.Instance) (ilos.
 			classList = append(classList, class.(ilos.Class))
 		}
 	}
-	fun, err := newNamedFunction(local, name, lambdaList, arguments[i+2:]...)
+	fun, err := newNamedFunction(e, name, lambdaList, arguments[i+2:]...)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func Defmethod(local environment.Environment, arguments ...ilos.Instance) (ilos.
 	return name, nil
 }
 
-func Defgeneric(local environment.Environment, funcSpec, lambdaList ilos.Instance, optionsOrMethodDescs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Defgeneric(e env.Environment, funcSpec, lambdaList ilos.Instance, optionsOrMethodDescs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var methodCombination ilos.Instance
 	genericFunctionClass := class.StandardGenericFunction
 	forms := []ilos.Instance{}
@@ -82,6 +82,6 @@ func Defgeneric(local environment.Environment, funcSpec, lambdaList ilos.Instanc
 		}
 	}
 	TopLevel.Function.Define(funcSpec, instance.NewGenericFunction(funcSpec, lambdaList, methodCombination, genericFunctionClass))
-	Progn(local, forms...)
+	Progn(e, forms...)
 	return funcSpec, nil
 }

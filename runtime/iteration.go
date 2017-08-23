@@ -5,7 +5,7 @@
 package runtime
 
 import (
-	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
@@ -20,17 +20,17 @@ import (
 // 3. Otherwise, if Vt is non-nil, the forms body-form* are evaluated sequentially (from left to right).
 //
 // 4. Upon successful completion of the body-forms*, the while form begins again with step 1.
-func While(local environment.Environment, testForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	test, err := Eval(local, testForm)
+func While(e env.Environment, testForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	test, err := Eval(e, testForm)
 	if err != nil {
 		return nil, err
 	}
 	for test == T {
-		_, err := Progn(local, bodyForm...)
+		_, err := Progn(e, bodyForm...)
 		if err != nil {
 			return nil, err
 		}
-		test, err = Eval(local, testForm)
+		test, err = Eval(e, testForm)
 		if err != nil {
 			return nil, err
 		}
@@ -39,7 +39,7 @@ func While(local environment.Environment, testForm ilos.Instance, bodyForm ...il
 }
 
 // For repeatedly executes a sequence of forms form*, called its body. It specifies a set of identifiers naming
-// variables that will be local to the for form, their initialization, and their update for each iteration.
+// variables that will be e to the for form, their initialization, and their update for each iteration.
 // When a termination condition is met, the iteration exits with a specified result value.
 //
 // The scope of an identifier var is the body, the steps, the end-test , and the result *. A step might be omitted,
@@ -55,7 +55,7 @@ func While(local environment.Environment, testForm ilos.Instance, bodyForm ...il
 // order from left to right. Then their values are assigned to the corresponding variables and the next iteration begins.
 // If end-test returns a non-nil value, then the result * are evaluated sequentially and the value of the
 // last one is returned as value of the whole for macro. If no result is present, then the value of the for macro is nil.
-func For(local environment.Environment, iterationSpecs, endTestAndResults ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.List, iterationSpecs); err != nil {
 		return nil, err
 	}
@@ -68,7 +68,7 @@ func For(local environment.Environment, iterationSpecs, endTestAndResults ilos.I
 		case 2, 3:
 			var1 := i[0]
 			init := i[1]
-			if !local.Variable.Define(var1, init) {
+			if !e.Variable.Define(var1, init) {
 				return nil, instance.NewImmutableBinding()
 			}
 		default:
@@ -84,12 +84,12 @@ func For(local environment.Environment, iterationSpecs, endTestAndResults ilos.I
 	}
 	endTest := ends[0]
 	results := ends[1:]
-	test, err := Eval(local, endTest)
+	test, err := Eval(e, endTest)
 	if err != nil {
 		return nil, err
 	}
 	for test == Nil {
-		_, err := Progn(local, forms...)
+		_, err := Progn(e, forms...)
 		if err != nil {
 			return nil, err
 		}
@@ -102,17 +102,17 @@ func For(local environment.Environment, iterationSpecs, endTestAndResults ilos.I
 			case 3:
 				var1 := is.(instance.List).Nth(0)
 				step := is.(instance.List).Nth(2)
-				if local.Variable.Set(var1, step) {
+				if e.Variable.Set(var1, step) {
 					return nil, instance.NewImmutableBinding()
 				}
 			default:
 				return nil, instance.NewArityError()
 			}
 		}
-		test, err = Eval(local, endTest)
+		test, err = Eval(e, endTest)
 		if err != nil {
 			return nil, err
 		}
 	}
-	return Progn(local, results...)
+	return Progn(e, results...)
 }

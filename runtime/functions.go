@@ -5,7 +5,7 @@
 package runtime
 
 import (
-	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
@@ -19,7 +19,7 @@ import (
 // A function binding is an association between an identifier, function-name,
 // and a function object that is denoted by function-name—if in operator
 // position—or by (function function-name) elsewhere.
-func Functionp(local environment.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Functionp(e env.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(class.Function, fun) {
 		return T, nil
 	}
@@ -29,17 +29,17 @@ func Functionp(local environment.Environment, fun ilos.Instance) (ilos.Instance,
 // Function returns the function object named by function-name.
 //
 // An error shall be signaled if no binding has been established for the identifier
-// in the function namespace of current lexical environment (error-id. undefined-function).
+// in the function namespace of current lexical eironment (error-id. undefined-function).
 // The consequences are undefined if the function-name names a macro or special form
-func Function(local environment.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Function(e env.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// car must be a symbol
 	if err := ensure(class.Symbol, fun); err != nil {
 		return nil, err
 	}
-	if f, ok := local.Function.Get(fun); ok {
+	if f, ok := e.Function.Get(fun); ok {
 		return f, nil
 	}
-	if f, ok := local.Function.Get(fun); ok {
+	if f, ok := e.Function.Get(fun); ok {
 		return f, nil
 	}
 	return nil, instance.NewUndefinedFunction(fun)
@@ -62,18 +62,18 @@ func Function(local environment.Environment, fun ilos.Instance) (ilos.Instance, 
 //
 // Once the lambda variables have been bound, the body is executed.
 // If the body is empty, nil is returned otherwise the result of the evaluation of
-// the last form of body is returned if the body was not left by a non-local exit.
+// the last form of body is returned if the body was not left by a non-e exit.
 //
 // If the function receives a &rest or :rest parameter R, the list L1 to which that
 // parameter is bound has indefinite extent. L1 is newly allocated unless the function
 // was called with apply and R corresponds to the final argument, L2 , to that call
 // to apply (or some subtail of L2), in which case it is implementation defined whether
 // L1 shares structure with L2 .
-func Lambda(local environment.Environment, lambdaList ilos.Instance, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Lambda(e env.Environment, lambdaList ilos.Instance, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := checkLambdaList(lambdaList); err != nil {
 		return nil, err
 	}
-	return newNamedFunction(local, instance.NewSymbol("ANONYMOUS-FUNCTION"), lambdaList, form...)
+	return newNamedFunction(e, instance.NewSymbol("ANONYMOUS-FUNCTION"), lambdaList, form...)
 }
 
 // Labels special form allow the definition of new identifiers in the function
@@ -85,13 +85,13 @@ func Lambda(local environment.Environment, lambdaList ilos.Instance, form ...ilo
 // each function-name is bound to a function object whose behavior is equivalent
 // to (lambda lambda-list form*), where free identifier references are resolved as follows:
 //
-// For a labels form, such free references are resolved in the lexical environment
+// For a labels form, such free references are resolved in the lexical eironment
 // that was active immediately outside the labels form augmented by the function
 // bindings for the given function-names (i.e., any reference to a function
 // function-name refers to a binding created by the labels).
 //
 // For a flet form, free identifier references in the lambda-expression are resolved
-// in the lexical environment that was active immediately outside the flet form
+// in the lexical eironment that was active immediately outside the flet form
 // (i.e., any reference to a function function-name are not visible).
 //
 // During activation, the prepared labels or flet establishes function bindings and
@@ -99,7 +99,7 @@ func Lambda(local environment.Environment, lambdaList ilos.Instance, form ...ilo
 // (or nil if there is none) is the value returned by the special form activation.
 //
 // No function-name may appear more than once in the function bindings.
-func Labels(local environment.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Labels(e env.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.List, functions); err != nil {
 		return nil, err
 	}
@@ -114,24 +114,24 @@ func Labels(local environment.Environment, functions ilos.Instance, bodyForm ...
 		functionName := definition[0]
 		lambdaList := definition[1]
 		forms := definition[2:]
-		fun, err := newNamedFunction(local, functionName, lambdaList, forms...)
+		fun, err := newNamedFunction(e, functionName, lambdaList, forms...)
 		if err != nil {
 			return nil, err
 		}
-		if !local.Function.Define(functionName, fun) {
+		if !e.Function.Define(functionName, fun) {
 			return nil, instance.NewImmutableBinding()
 		}
 	}
-	return Progn(local, bodyForm...)
+	return Progn(e, bodyForm...)
 }
 
 // Flet special form allow the definition of new identifiers in the function
 // namespace for function objects (see Labels).
-func Flet(local environment.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Flet(e env.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.List, functions); err != nil {
 		return nil, err
 	}
-	env := environment.Push(local)
+	newEnv := e.NewLexical()
 	for _, function := range functions.(instance.List).Slice() {
 		if err := ensure(class.List, function); err != nil {
 			return nil, err
@@ -143,15 +143,15 @@ func Flet(local environment.Environment, functions ilos.Instance, bodyForm ...il
 		functionName := definition[0]
 		lambdaList := definition[1]
 		forms := definition[2:]
-		fun, err := newNamedFunction(local, functionName, lambdaList, forms...)
+		fun, err := newNamedFunction(e, functionName, lambdaList, forms...)
 		if err != nil {
 			return nil, err
 		}
-		if !env.Function.Define(functionName, fun) {
+		if !newEnv.Function.Define(functionName, fun) {
 			return nil, instance.NewImmutableBinding()
 		}
 	}
-	return Progn(env, bodyForm...)
+	return Progn(newEnv, bodyForm...)
 }
 
 // Apply applies function to the arguments, obj*, followed by the elements of list,
@@ -160,7 +160,7 @@ func Flet(local environment.Environment, functions ilos.Instance, bodyForm ...il
 // An error shall be signaled if function is not a function (error-id. domain-error).
 // Each obj may be any ISLISP object. An error shall be signaled
 // if list is not a proper list (error-id. improper-argument-list).
-func Apply(local environment.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Apply(e env.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Function, function); err != nil {
 		return nil, err
 	}
@@ -168,7 +168,7 @@ func Apply(local environment.Environment, function ilos.Instance, obj ...ilos.In
 		return nil, err
 	}
 	obj = append(obj[:len(obj)-1], obj[len(obj)-1].(instance.List).Slice()...)
-	return function.(instance.Applicable).Apply(local, obj...)
+	return function.(instance.Applicable).Apply(e, obj...)
 }
 
 // Funcall activates the specified function function and returns the value that the function returns.
@@ -176,7 +176,7 @@ func Apply(local environment.Environment, function ilos.Instance, obj ...ilos.In
 //
 // An error shall be signaled if function is not a function (error-id. domain-error).
 // Each obj may be any ISLISP object.
-func Funcall(local environment.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Funcall(e env.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	obj = append(obj, Nil)
-	return Apply(local, function, obj...)
+	return Apply(e, function, obj...)
 }
