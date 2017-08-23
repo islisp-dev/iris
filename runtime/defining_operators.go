@@ -20,15 +20,18 @@ import (
 // The result of the evaluation of form is bound to the variable named by name. The binding and
 // the object created as the result of evaluating the second argument are immutable. The symbol named
 // name is returned.
-func Defconstant(local, global environment.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Defconstant(local environment.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Symbol, name); err != nil {
 		return nil, err
 	}
-	ret, err := Eval(local, global, form)
+	if _, ok := TopLevel.Constant.Get(name); ok {
+		return nil, instance.NewImmutableBinding()
+	}
+	ret, err := Eval(local, form)
 	if err != nil {
 		return nil, err
 	}
-	global.Constant.Define(name, ret)
+	TopLevel.Constant.Define(name, ret)
 	return name, nil
 }
 
@@ -40,19 +43,19 @@ func Defconstant(local, global environment.Environment, name, form ilos.Instance
 // returned.
 //
 // A lexical variable binding for name can still be locally established by a binding form; in that
-// case, the local binding lexically shadows the outer binding of name defined by defglobal.
-func Defglobal(local, global environment.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
+// case, the local binding lexically shadows the outer binding of name defined by deflocal.
+func Defglobal(local environment.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Symbol, name); err != nil {
 		return nil, err
 	}
-	if _, ok := global.Constant.Get(name); ok {
+	if _, ok := TopLevel.Constant.Get(name); ok {
 		return nil, instance.NewImmutableBinding()
 	}
-	ret, err := Eval(local, global, form)
+	ret, err := Eval(local, form)
 	if err != nil {
 		return nil, err
 	}
-	global.Variable.Define(name, ret)
+	TopLevel.Variable.Define(name, ret)
 	return name, nil
 }
 
@@ -60,18 +63,18 @@ func Defglobal(local, global environment.Environment, name, form ilos.Instance) 
 // The scope of name is the entire current toplevel scope except the body form.
 //
 //The symbol named name is returned.
-func Defdynamic(local, global environment.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Defdynamic(local environment.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Symbol, name); err != nil {
 		return nil, err
 	}
-	if _, ok := global.Constant.Get(name); ok {
+	if _, ok := TopLevel.Constant.Get(name); ok {
 		return nil, instance.NewImmutableBinding()
 	}
-	ret, err := Eval(local, global, form)
+	ret, err := Eval(local, form)
 	if err != nil {
 		return nil, err
 	}
-	global.DynamicVariable.Define(name, ret)
+	TopLevel.DynamicVariable.Define(name, ret)
 	return name, nil
 }
 
@@ -85,14 +88,14 @@ func Defdynamic(local, global environment.Environment, name, form ilos.Instance)
 // defun returns the function name which is the symbol named function-name. The free identifiers in
 // the body form* (i.e., those which are not contained in the lambda list) follow the rules of lexical
 // scoping.
-func Defun(local, global environment.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Defun(local environment.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Symbol, functionName); err != nil {
 		return nil, err
 	}
-	ret, err := newNamedFunction(local, global, functionName, lambdaList, forms...)
+	ret, err := newNamedFunction(local, functionName, lambdaList, forms...)
 	if err != nil {
 		return nil, err
 	}
-	global.Function.Define(functionName, ret)
+	TopLevel.Function.Define(functionName, ret)
 	return functionName, nil
 }

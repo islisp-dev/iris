@@ -20,17 +20,17 @@ import (
 // 3. Otherwise, if Vt is non-nil, the forms body-form* are evaluated sequentially (from left to right).
 //
 // 4. Upon successful completion of the body-forms*, the while form begins again with step 1.
-func While(local, global environment.Environment, testForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	test, err := Eval(local, global, testForm)
+func While(local environment.Environment, testForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	test, err := Eval(local, testForm)
 	if err != nil {
 		return nil, err
 	}
 	for test == T {
-		_, err := Progn(local, global, bodyForm...)
+		_, err := Progn(local, bodyForm...)
 		if err != nil {
 			return nil, err
 		}
-		test, err = Eval(local, global, testForm)
+		test, err = Eval(local, testForm)
 		if err != nil {
 			return nil, err
 		}
@@ -55,7 +55,7 @@ func While(local, global environment.Environment, testForm ilos.Instance, bodyFo
 // order from left to right. Then their values are assigned to the corresponding variables and the next iteration begins.
 // If end-test returns a non-nil value, then the result * are evaluated sequentially and the value of the
 // last one is returned as value of the whole for macro. If no result is present, then the value of the for macro is nil.
-func For(local, global environment.Environment, iterationSpecs, endTestAndResults ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func For(local environment.Environment, iterationSpecs, endTestAndResults ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.List, iterationSpecs); err != nil {
 		return nil, err
 	}
@@ -84,12 +84,12 @@ func For(local, global environment.Environment, iterationSpecs, endTestAndResult
 	}
 	endTest := ends[0]
 	results := ends[1:]
-	test, err := Eval(local, global, endTest)
+	test, err := Eval(local, endTest)
 	if err != nil {
 		return nil, err
 	}
 	for test == Nil {
-		_, err := Progn(local, global, forms...)
+		_, err := Progn(local, forms...)
 		if err != nil {
 			return nil, err
 		}
@@ -109,10 +109,10 @@ func For(local, global environment.Environment, iterationSpecs, endTestAndResult
 				return nil, instance.NewArityError()
 			}
 		}
-		test, err = Eval(local, global, endTest)
+		test, err = Eval(local, endTest)
 		if err != nil {
 			return nil, err
 		}
 	}
-	return Progn(local, global, results...)
+	return Progn(local, results...)
 }

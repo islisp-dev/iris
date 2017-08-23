@@ -22,7 +22,7 @@ func convInt(z ilos.Instance) (int, ilos.Instance) {
 
 // Integerp returns t if obj is an integer (instance of class integer);
 // otherwise, returns nil. obj may be any ISLISP object.
-func Integerp(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Integerp(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(class.Integer, obj) {
 		return T, nil
 	}
@@ -31,7 +31,7 @@ func Integerp(local, global environment.Environment, obj ilos.Instance) (ilos.In
 
 // Div returns the greatest integer less than or equal to the quotient of z1 and z2.
 // An error shall be signaled if z2 is zero (error-id. division-by-zero).
-func Div(local, global environment.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Div(local environment.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, err := convInt(z1)
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func Div(local, global environment.Environment, z1, z2 ilos.Instance) (ilos.Inst
 	}
 	if b == 0 {
 		operation := instance.NewSymbol("DIV")
-		operands, err := List(local, global, z1, z2)
+		operands, err := List(local, z1, z2)
 		if err != nil {
 			return nil, err
 		}
@@ -57,7 +57,7 @@ func Div(local, global environment.Environment, z1, z2 ilos.Instance) (ilos.Inst
 // and this result is divisible by z2 without remainder.
 //
 // An error shall be signaled if either z1 or z2 is not an integer (error-id. domain-error).
-func Mod(local, global environment.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Mod(local environment.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, err := convInt(z1)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func Mod(local, global environment.Environment, z1, z2 ilos.Instance) (ilos.Inst
 	}
 	if b == 0 {
 		operation := instance.NewSymbol("MOD")
-		operands, err := List(local, global, z1, z2)
+		operands, err := List(local, z1, z2)
 		if err != nil {
 			return nil, err
 		}
@@ -84,7 +84,7 @@ func Mod(local, global environment.Environment, z1, z2 ilos.Instance) (ilos.Inst
 //
 // An error shall be signaled if either z1 or z2 is not an integer
 // (error-id. domain-error).
-func Gcd(local, global environment.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Gcd(local environment.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	gcd := func(x, y int) int {
 		for y != 0 {
 			x, y = y, x%y
@@ -106,7 +106,7 @@ func Gcd(local, global environment.Environment, z1, z2 ilos.Instance) (ilos.Inst
 //
 // An error shall be signaled if either z1 or z2 is not an integer
 // (error-id. domain-error).
-func Lcm(local, global environment.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Lcm(local environment.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	gcd := func(x, y int) int {
 		for y != 0 {
 			x, y = y, x%y
@@ -127,7 +127,7 @@ func Lcm(local, global environment.Environment, z1, z2 ilos.Instance) (ilos.Inst
 // Isqrt Returns the greatest integer less than or equal to
 // the exact positive square root of z . An error shall be signaled
 // if z is not a non-negative integer (error-id. domain-error).
-func Isqrt(local, global environment.Environment, z ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Isqrt(local environment.Environment, z ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, err := convInt(z)
 	if err != nil {
 		return nil, err

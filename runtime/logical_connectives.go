@@ -11,7 +11,7 @@ import (
 
 // Not is the logical “not” (or “¬”). It returns t if obj is nil
 // and nil otherwise. obj may be any ISLISP object.
-func Not(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Not(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if obj == Nil {
 		return T, nil
 	}
@@ -22,26 +22,39 @@ func Not(local, global environment.Environment, obj ilos.Instance) (ilos.Instanc
 // from left to right until either one of them evaluates to nil or else
 // none are left. If one of them evaluates to nil, then nil is returned
 // from the and; otherwise, the value of the last evaluated form is returned.
-func And(local, global environment.Environment, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	for _, f := range form {
-		if f == Nil {
+func And(local environment.Environment, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	var ret ilos.Instance
+	for _, form := range forms {
+		//fmt.Printf("%v\n%#v\n", form, local.Variable)
+		var err ilos.Instance
+		ret, err = Eval(local, form)
+		if err != nil {
+			return nil, err
+		}
+		if ret == Nil {
 			return Nil, nil
 		}
 	}
-	if len(form) == 0 {
+	if len(forms) == 0 {
 		return T, nil
 	}
-	return form[len(form)-1], nil
+	return ret, nil
 }
 
 // Or is the sequential logical "or" (or "∨"). forms are evaluated
 // from left to right until either one of them evaluates to a non-nil value
 // or else none are left. If one of them evaluates to a non-nil value,
 // then this non-nil value is returned, otherwise nil is returned.
-func Or(local, global environment.Environment, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	for _, f := range form {
-		if f != Nil {
-			return f, nil
+func Or(local environment.Environment, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	var ret ilos.Instance
+	for _, form := range forms {
+		var err ilos.Instance
+		ret, err = Eval(local, form)
+		if err != nil {
+			return nil, err
+		}
+		if ret != Nil {
+			return ret, nil
 		}
 	}
 	return Nil, nil

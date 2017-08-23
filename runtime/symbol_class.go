@@ -15,7 +15,7 @@ import (
 
 // Symbolp returns t if obj is a symbol (instance of class symbol);
 // otherwise, returns nil. The obj may be any ISLISP object.
-func Symbolp(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Symbolp(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(class.Symbol, obj) {
 		return T, nil
 	}
@@ -28,14 +28,14 @@ func Symbolp(local, global environment.Environment, obj ilos.Instance) (ilos.Ins
 //
 // An error shall be signaled if either symbol or property-name is not a
 // symbol (error-id. domain-error). obj may be any ISLISP object
-func Property(local, global environment.Environment, symbol, propertyName ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Property(local environment.Environment, symbol, propertyName ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Symbol, symbol); err != nil {
 		return nil, err
 	}
 	if len(obj) > 1 {
 		return nil, instance.NewArityError()
 	}
-	ret, ok := global.Property.Get(symbol, propertyName)
+	ret, ok := local.Property.Get(symbol, propertyName)
 	if ok {
 		return ret, nil
 	}
@@ -49,11 +49,11 @@ func Property(local, global environment.Environment, symbol, propertyName ilos.I
 //
 // An error shall be signaled if either symbol or property-name is not a
 // symbol (error-id. domain-error). obj may be any ISLISP object
-func SetProperty(local, global environment.Environment, obj, symbol, propertyName ilos.Instance) (ilos.Instance, ilos.Instance) {
+func SetProperty(local environment.Environment, obj, symbol, propertyName ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Symbol, symbol); err != nil {
 		return nil, err
 	}
-	global.Property.Set(symbol, propertyName, obj)
+	local.Property.Set(symbol, propertyName, obj)
 	return obj, nil
 }
 
@@ -63,11 +63,11 @@ func SetProperty(local, global environment.Environment, obj, symbol, propertyNam
 //
 // An error shall be signaled if either symbol or property-name is not a
 // symbol (error-id. domain-error).
-func RemoveProperty(local, global environment.Environment, symbol, propertyName ilos.Instance) (ilos.Instance, ilos.Instance) {
+func RemoveProperty(local environment.Environment, symbol, propertyName ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Symbol, symbol); err != nil {
 		return nil, err
 	}
-	if v, ok := global.Property.Delete(symbol, propertyName); ok {
+	if v, ok := local.Property.Delete(symbol, propertyName); ok {
 		return v, nil
 	}
 	return Nil, nil
@@ -75,7 +75,7 @@ func RemoveProperty(local, global environment.Environment, symbol, propertyName 
 
 // Gensym returns an unnamed symbol. gensym is useful for writing macros.
 // It is impossible for an identifier to name an unnamed symbol.
-func Gensym(local, global environment.Environment) (ilos.Instance, ilos.Instance) {
-	global.GensymID++
-	return instance.NewSymbol(fmt.Sprintf("IRIS/G#%v", global.GensymID)), nil
+func Gensym(local environment.Environment) (ilos.Instance, ilos.Instance) {
+	local.GensymID++
+	return instance.NewSymbol(fmt.Sprintf("IRIS/G#%v", local.GensymID)), nil
 }

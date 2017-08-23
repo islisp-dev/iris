@@ -13,7 +13,7 @@ import (
 
 // Characterp returns t if obj is a character (instance of class character);
 // otherwise, returns nil. obj may be any ISLISP object.
-func Characterp(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Characterp(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(class.Character, obj) {
 		return T, nil
 	}
@@ -21,7 +21,7 @@ func Characterp(local, global environment.Environment, obj ilos.Instance) (ilos.
 }
 
 // CharEqual tests whether char1 is the same character as char2.
-func CharEqual(local, global environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func CharEqual(local environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Character, char1, char2); err != nil {
 		return nil, err
 	}
@@ -32,17 +32,17 @@ func CharEqual(local, global environment.Environment, char1, char2 ilos.Instance
 }
 
 // CharNotEqual if and only if they are not char=.
-func CharNotEqual(local, global environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	ret, err := CharEqual(local, global, char1, char2)
+func CharNotEqual(local environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	ret, err := CharEqual(local, char1, char2)
 	if err != nil {
 		return nil, err
 	}
-	return Not(local, global, ret)
+	return Not(local, ret)
 }
 
 // CharGreaterThan tests whether char1 is greater than char2.
 // An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
-func CharGreaterThan(local, global environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func CharGreaterThan(local environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Character, char1, char2); err != nil {
 		return nil, err
 	}
@@ -54,12 +54,12 @@ func CharGreaterThan(local, global environment.Environment, char1, char2 ilos.In
 
 // CharGreaterThanOrEqual tests whether char1 is greater than or equal to char2.
 // An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
-func CharGreaterThanOrEqual(local, global environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := CharGreaterThan(local, global, char1, char2)
+func CharGreaterThanOrEqual(local environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	gt, err := CharGreaterThan(local, char1, char2)
 	if err != nil {
 		return nil, err
 	}
-	eq, err := CharEqual(local, global, char1, char2)
+	eq, err := CharEqual(local, char1, char2)
 	if err != nil {
 		return nil, err
 	}
@@ -71,20 +71,20 @@ func CharGreaterThanOrEqual(local, global environment.Environment, char1, char2 
 
 // CharLessThan tests whether char1 is less than char2.
 // An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
-func CharLessThan(local, global environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := CharGreaterThanOrEqual(local, global, char1, char2)
+func CharLessThan(local environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	gt, err := CharGreaterThanOrEqual(local, char1, char2)
 	if err != nil {
 		return nil, err
 	}
-	return Not(local, global, gt)
+	return Not(local, gt)
 }
 
 // CharLessThanOrEqual tests whether char1 is less than or equal to char2.
 // An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
-func CharLessThanOrEqual(local, global environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := CharGreaterThan(local, global, char1, char2)
+func CharLessThanOrEqual(local environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	gt, err := CharGreaterThan(local, char1, char2)
 	if err != nil {
 		return nil, err
 	}
-	return Not(local, global, gt)
+	return Not(local, gt)
 }

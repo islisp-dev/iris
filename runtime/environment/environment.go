@@ -57,45 +57,98 @@ func NewEnvironment(stdin, stdout, stderr ilos.Instance) Environment {
 	env.StandardInput = stdin
 	env.StandardOutput = stdout
 	env.ErrorOutput = stderr
+	env.Handler = NewStack()
 	return *env
 }
 
 func (env *Environment) Merge(before Environment) {
-	env.Class = append(before.Class, env.Class...)
-	env.BlockTag = append(before.BlockTag, env.BlockTag...)
-	env.TagbodyTag = append(before.TagbodyTag, env.TagbodyTag...)
-	env.CatchTag = append(before.CatchTag, env.CatchTag...)
-	env.Variable = append(before.Variable, env.Variable...)
-	env.Function = append(before.Function, env.Function...)
-	env.Special = append(before.Special, env.Special...)
-	env.Macro = append(before.Macro, env.Macro...)
-	env.DynamicVariable = append(before.DynamicVariable, env.DynamicVariable...)
-	env.Constant = append(before.Constant, env.Constant...)
-	env.Handler = append(before.Handler, env.Handler...)
-	env.GensymID = before.GensymID
+	env.BlockTag = append(before.BlockTag, env.BlockTag[1:]...)
+	env.TagbodyTag = append(before.TagbodyTag, env.TagbodyTag[1:]...)
+	env.Variable = append(before.Variable, env.Variable[1:]...)
+	env.Function = append(before.Function, env.Function[1:]...)
+
+	env.Macro = append(before.Macro, env.Macro[1:]...)
+	env.Class = append(before.Class, env.Class[1:]...)
+	env.Special = append(before.Special, env.Special[1:]...)
+	env.Constant = append(before.Constant, env.Constant[1:]...)
 	env.Property = before.Property
+	env.GensymID = before.GensymID
+
+	env.CatchTag = append(before.CatchTag, env.CatchTag[1:]...)
+	env.DynamicVariable = append(before.DynamicVariable, env.DynamicVariable[1:]...)
 	env.StandardInput = before.StandardInput
 	env.StandardOutput = before.StandardOutput
 	env.ErrorOutput = before.ErrorOutput
+	env.Handler = append(before.Handler, env.Handler[1:]...)
 }
 
 func (env *Environment) MergeDynamic(before Environment) {
-	env.CatchTag = append(before.CatchTag, env.CatchTag...)
-	env.DynamicVariable = append(before.DynamicVariable, env.DynamicVariable...)
+	env.BlockTag = append(stack{before.BlockTag[0]}, env.BlockTag[1:]...)
+	env.TagbodyTag = append(stack{before.TagbodyTag[0]}, env.TagbodyTag[1:]...)
+	env.Variable = append(stack{before.Variable[0]}, env.Variable[1:]...)
+	env.Function = append(stack{before.Function[0]}, env.Function[1:]...)
+
+	env.Macro = append(stack{before.Macro[0]}, env.Macro[1:]...)
+	env.Class = append(stack{before.Class[0]}, env.Class[1:]...)
+	env.Special = append(stack{before.Special[0]}, env.Special[1:]...)
+	env.Constant = append(stack{before.Constant[0]}, env.Constant[1:]...)
+	env.Property = before.Property
+	env.GensymID = before.GensymID
+
+	env.CatchTag = append(before.CatchTag, env.CatchTag[1:]...)
+	env.DynamicVariable = append(before.DynamicVariable, env.DynamicVariable[1:]...)
 	env.StandardInput = before.StandardInput
 	env.StandardOutput = before.StandardOutput
 	env.ErrorOutput = before.ErrorOutput
-	env.Handler = append(before.Handler, env.Handler...)
+	env.Handler = append(before.Handler, env.Handler[1:]...)
 }
 
 func Push(before Environment) Environment {
 	env := NewEnvironment(before.StandardInput, before.StandardOutput, before.ErrorOutput)
-	env.Merge(before)
+
+	env.BlockTag = append(before.BlockTag, env.BlockTag[0])
+	env.TagbodyTag = append(before.TagbodyTag, env.TagbodyTag[0])
+	env.Variable = append(before.Variable, env.Variable[0])
+	env.Function = append(before.Function, env.Function[0])
+
+	env.Macro = append(before.Macro, env.Macro[0])
+	env.Class = append(before.Class, env.Class[0])
+	env.Special = append(before.Special, env.Special[0])
+	env.Constant = append(before.Constant, env.Constant[0])
+	env.Property = before.Property
+	env.GensymID = before.GensymID
+
+	env.CatchTag = append(before.CatchTag, env.CatchTag[0])
+	env.DynamicVariable = append(before.DynamicVariable, env.DynamicVariable[0])
+	env.StandardInput = before.StandardInput
+	env.StandardOutput = before.StandardOutput
+	env.ErrorOutput = before.ErrorOutput
+	env.Handler = append(before.Handler, env.Handler[0])
+
 	return env
 }
 
 func PushDynamic(before Environment) Environment {
 	env := NewEnvironment(before.StandardInput, before.StandardOutput, before.ErrorOutput)
-	env.MergeDynamic(before)
+
+	env.BlockTag = append(stack{before.BlockTag[0]}, env.BlockTag[0])
+	env.TagbodyTag = append(stack{before.TagbodyTag[0]}, env.TagbodyTag[0])
+	env.Variable = append(stack{before.Variable[0]}, env.Variable[0])
+	env.Function = append(stack{before.Function[0]}, env.Function[0])
+
+	env.Macro = append(stack{before.Macro[0]}, env.Macro[0])
+	env.Class = append(stack{before.Class[0]}, env.Class[0])
+	env.Special = append(stack{before.Special[0]}, env.Special[0])
+	env.Constant = append(stack{before.Constant[0]}, env.Constant[0])
+	env.Property = before.Property
+	env.GensymID = before.GensymID
+
+	env.CatchTag = append(before.CatchTag, env.CatchTag[0])
+	env.DynamicVariable = append(before.DynamicVariable, env.DynamicVariable[0])
+	env.StandardInput = before.StandardInput
+	env.StandardOutput = before.StandardOutput
+	env.ErrorOutput = before.ErrorOutput
+	env.Handler = append(before.Handler, env.Handler[0])
+
 	return env
 }
