@@ -48,7 +48,7 @@ func TestNot(t *testing.T) {
 }
 
 func TestAnd(t *testing.T) {
-	defun(And)
+	defspecial(And)
 	defun2("=", NumberEqual)
 	defun2(">", NumberGreaterThan)
 	defun2("<", NumberLessThan)
@@ -119,7 +119,7 @@ func TestAnd(t *testing.T) {
 }
 
 func TestOr(t *testing.T) {
-	defun(Or)
+	defspecial(Or)
 	defun2("=", NumberEqual)
 	defun2(">", NumberGreaterThan)
 	defun2("<", NumberLessThan)

@@ -14,11 +14,11 @@ import (
 // The result of evaluation of the last form of form* is returned. All the forms are
 // evaluated from left to right. The values of all the forms but the last are discarded,
 // so they are executed only for their side-effects. progn without forms returns nil.
-func Progn(local, global environment.Environment, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Progn(local environment.Environment, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	ret := Nil
 	for _, e := range form {
-		ret, err = Eval(local, global, e)
+		ret, err = Eval(local, e)
 		if err != nil {
 			return nil, err
 		}

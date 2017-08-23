@@ -24,7 +24,7 @@ import (
 //
 // An error shall be signaled if sequence is not a basic-vector or a list
 // (error-id. domain-error).
-func Length(local, global environment.Environment, sequence ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Length(local environment.Environment, sequence ilos.Instance) (ilos.Instance, ilos.Instance) {
 	switch {
 	case ilos.InstanceOf(class.String, sequence):
 		return instance.NewInteger(len(sequence.(instance.String))), nil
@@ -44,7 +44,7 @@ func Length(local, global environment.Environment, sequence ilos.Instance) (ilos
 //
 // An error shall be signaled if sequence is not a basic-vector or a list or if z is not an
 // integer (error-id. domain-error).
-func Elt(local, global environment.Environment, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Elt(local environment.Environment, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Integer, z); err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func Elt(local, global environment.Environment, sequence, z ilos.Instance) (ilos
 // An error shall be signaled if z is an integer outside of the valid range of indices
 // (error-id. index-out-of-range). An error shall be signaled if sequence is not a basic-vector
 // or a list or if z is not an integer (error-id. domain-error). obj may be any ISLISP object.
-func SetElt(local, global environment.Environment, obj, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
+func SetElt(local environment.Environment, obj, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Integer, z); err != nil {
 		return nil, err
 	}
@@ -130,7 +130,7 @@ func SetElt(local, global environment.Environment, obj, sequence, z ilos.Instanc
 // mentioned (error-id. index-out-of-range). An error shall be signaled if sequence is not a
 // basic-vector or a list, or if z1 is not an integer, or if z2 is not an integer
 // (error-id. domain-error).
-func Subseq(local, global environment.Environment, sequence, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Subseq(local environment.Environment, sequence, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Integer, z1, z2); err != nil {
 		return nil, err
 	}
@@ -154,7 +154,7 @@ func Subseq(local, global environment.Environment, sequence, z1, z2 ilos.Instanc
 		if !(0 < start && start < len(seq) && 0 < end && end < len(seq) && start <= end) {
 			return nil, instance.NewIndexOutOfRange()
 		}
-		return List(local, global, seq[start:end]...)
+		return List(local, seq[start:end]...)
 	}
 	return nil, instance.NewDomainError(sequence, class.Object)
 }
@@ -175,7 +175,7 @@ func Subseq(local, global environment.Environment, sequence, z1, z2 ilos.Instanc
 //
 // An error shall be signaled if any sequence is not a basic-vector or a list
 // (error-id. domain-error).
-func mapInto(local, global environment.Environment, destination, function ilos.Instance, sequences ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func mapInto(local environment.Environment, destination, function ilos.Instance, sequences ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.List, append(sequences, destination)...); err != nil {
 		if err := ensure(class.BasicVector, append(sequences, destination)...); err != nil {
 			return nil, err
@@ -199,16 +199,16 @@ func mapInto(local, global environment.Environment, destination, function ilos.I
 		arguments := make([]ilos.Instance, int(max))
 		for _, seq := range sequences {
 			var err ilos.Instance
-			arguments[i], err = Elt(local, global, seq, instance.NewInteger(i))
+			arguments[i], err = Elt(local, seq, instance.NewInteger(i))
 			if err != nil {
 				return nil, err
 			}
 		}
-		ret, err := function.(instance.Applicable).Apply(local, global, arguments...)
+		ret, err := function.(instance.Applicable).Apply(local, arguments...)
 		if err != nil {
 			return nil, err
 		}
-		_, err = SetElt(local, global, ret, destination, instance.NewInteger(i))
+		_, err = SetElt(local, ret, destination, instance.NewInteger(i))
 		if err != nil {
 			return nil, err
 		}

@@ -104,7 +104,14 @@ func TestLabels(t *testing.T) {
 func TestFlet(t *testing.T) {
 	defun2("+", Add)
 	defspecial(Flet)
+	defspecial(Defun)
+	defspecial(Quote)
 	tests := []test{
+		{
+			exp:     `(defun f (x) 0)`,
+			want:    `'f`,
+			wantErr: false,
+		},
 		{
 			exp: `
 				(flet ((f (x) (+ x 3)))

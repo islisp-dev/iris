@@ -21,38 +21,38 @@ import (
 // setq can be used only for modifying bindings, and not for establishing a variable.
 // The setq special form must be contained in the scope of var , established by defglobal,
 // let, let*, for, or a lambda expression.
-func Setq(local, global environment.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Instance) {
-	ret, err := Eval(local, global, form)
+func Setq(local environment.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Instance) {
+	ret, err := Eval(local, form)
 	if err != nil {
 		return nil, err
 	}
 	if local.Variable.Set(var1, ret) {
 		return ret, nil
 	}
-	if global.Variable.Set(var1, ret) {
+	if local.Variable.Set(var1, ret) {
 		return ret, nil
 	}
 	return nil, instance.NewUndefinedVariable(var1)
 }
 
-func Setf(local, global environment.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Setf(local environment.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(class.Symbol, var1) {
-		val, err := Eval(local, global, form)
+		val, err := Eval(local, form)
 		if err != nil {
 			return nil, err
 		}
-		return Setq(local, global, var1, val)
+		return Setq(local, var1, val)
 	}
 	funcSpec := instance.NewSymbol(fmt.Sprintf("(SETF %v)", var1.(instance.List).Nth(0)))
-	fun, ok := global.Function.Get(funcSpec)
+	fun, ok := local.Function.Get(funcSpec)
 	if !ok {
 		return nil, instance.NewUndefinedFunction(funcSpec)
 	}
-	arguments, err := evalArguments(local, global, instance.NewCons(form, var1.(*instance.Cons).Cdr))
+	arguments, err := evalArguments(local, instance.NewCons(form, var1.(*instance.Cons).Cdr))
 	if err != nil {
 		return nil, err
 	}
-	return fun.(instance.Applicable).Apply(local, global, arguments.(instance.List).Slice()...)
+	return fun.(instance.Applicable).Apply(local, arguments.(instance.List).Slice()...)
 }
 
 // Let is used to define a scope for a group of identifiers
@@ -67,7 +67,7 @@ func Setf(local, global environment.Environment, var1, form ilos.Instance) (ilos
 // of the evaluation of the last body-form of its body (or nil if there is none).
 //
 // No var may appear more than once in let variable list.
-func Let(local, global environment.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Let(local environment.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	vfs := map[ilos.Instance]ilos.Instance{}
 	if err := ensure(class.List, varForm); err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ func Let(local, global environment.Environment, varForm ilos.Instance, bodyForm 
 		if cadr.(instance.List).Length() != 2 {
 			return nil, instance.NewArityError()
 		}
-		f, err := Eval(local, global, cadr.(instance.List).Nth(1))
+		f, err := Eval(local, cadr.(instance.List).Nth(1))
 		if err != nil {
 			return nil, err
 		}
@@ -90,7 +90,7 @@ func Let(local, global environment.Environment, varForm ilos.Instance, bodyForm 
 			return nil, instance.NewImmutableBinding()
 		}
 	}
-	return Progn(local, global, bodyForm...)
+	return Progn(local, bodyForm...)
 }
 
 // LetStar form is used to define a scope for a group of identifiers for a sequence
@@ -107,7 +107,7 @@ func Let(local, global environment.Environment, varForm ilos.Instance, bodyForm 
 // and in this enlarged or modified environment the body-forms are executed.
 // The returned value of let* is the result of the evaluation of the last form
 // of its body (or nil if there is none).
-func LetStar(local, global environment.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func LetStar(local environment.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.List, varForm); err != nil {
 		return nil, err
 	}
@@ -118,7 +118,7 @@ func LetStar(local, global environment.Environment, varForm ilos.Instance, bodyF
 		if cadr.(instance.List).Length() != 2 {
 			return nil, instance.NewArityError()
 		}
-		f, err := Eval(local, global, cadr.(instance.List).Nth(1))
+		f, err := Eval(local, cadr.(instance.List).Nth(1))
 		if err != nil {
 			return nil, err
 		}
@@ -126,5 +126,5 @@ func LetStar(local, global environment.Environment, varForm ilos.Instance, bodyF
 			return nil, instance.NewImmutableBinding()
 		}
 	}
-	return Progn(local, global, bodyForm...)
+	return Progn(local, bodyForm...)
 }

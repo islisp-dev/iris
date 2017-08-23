@@ -16,17 +16,17 @@ import (
 // instance
 //
 
-func Create(local, global environment.Environment, c ilos.Instance, i ...ilos.Instance) ilos.Instance {
+func Create(local environment.Environment, c ilos.Instance, i ...ilos.Instance) ilos.Instance {
 	p := []ilos.Instance{}
 	for _, q := range c.(ilos.Class).Supers() {
-		p = append(p, Create(local, global, q, i...))
+		p = append(p, Create(local, q, i...))
 	}
-	return InitializeObject(local, global, Instance{c.(ilos.Class), p, map[ilos.Instance]ilos.Instance{}}, i...)
+	return InitializeObject(local, Instance{c.(ilos.Class), p, map[ilos.Instance]ilos.Instance{}}, i...)
 }
 
-func InitializeObject(local, global environment.Environment, object ilos.Instance, inits ...ilos.Instance) ilos.Instance {
+func InitializeObject(local environment.Environment, object ilos.Instance, inits ...ilos.Instance) ilos.Instance {
 	for _, super := range object.(Instance).supers {
-		InitializeObject(local, global, super, inits...)
+		InitializeObject(local, super, inits...)
 	}
 	for i := 0; i < len(inits); i += 2 {
 		argName := inits[i]
@@ -43,7 +43,7 @@ func InitializeObject(local, global environment.Environment, object ilos.Instanc
 	for _, slotName := range object.Class().Slots() {
 		if _, ok := object.(Instance).GetSlotValue(slotName, object.Class()); !ok {
 			if form, ok := object.Class().Initform(slotName); ok {
-				value, _ := form.(Applicable).Apply(local, global)
+				value, _ := form.(Applicable).Apply(local)
 				object.(Instance).SetSlotValue(slotName, value, object.Class())
 			}
 		}

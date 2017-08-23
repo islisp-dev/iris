@@ -13,7 +13,7 @@ import (
 
 // BasicVectorP returns t if obj is a basic-vector (instance of class basic-vector);
 // otherwise, returns nil. obj may be any ISLISP object.
-func BasicVectorP(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func BasicVectorP(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(class.BasicVector, obj) {
 		return T, nil
 	}
@@ -22,7 +22,7 @@ func BasicVectorP(local, global environment.Environment, obj ilos.Instance) (ilo
 
 // GeneralVectorP returns t if obj is a general-vector (instance of class general-vector);
 // otherwise, returns nil. obj may be any ISLISP object.
-func GeneralVectorP(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func GeneralVectorP(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(class.GeneralVector, obj) {
 		return T, nil
 	}
@@ -35,7 +35,7 @@ func GeneralVectorP(local, global environment.Environment, obj ilos.Instance) (i
 // if the requested vector cannot be allocated (error-id. cannot-create-vector).
 // An error shall be signaled if i is not a non-negative integer (error-id. domain-error).
 // initial-element may be any ISLISP object.
-func CreateVector(local, global environment.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func CreateVector(local environment.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if !ilos.InstanceOf(class.Integer, i) || int(i.(instance.Integer)) < 0 {
 		return nil, instance.NewDomainError(i, class.Integer)
 	}
@@ -59,6 +59,6 @@ func CreateVector(local, global environment.Environment, i ilos.Instance, initia
 // The vector is indexed by integers ranging from 0 to dimension−1. An error shall be signaled
 // if the requested vector cannot be allocated (error-id. cannot-create-vector).
 // Each obj may be any ISLISP object.
-func Vector(local, global environment.Environment, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Vector(local environment.Environment, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	return instance.GeneralVector(obj), nil
 }

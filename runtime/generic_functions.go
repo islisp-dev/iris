@@ -11,7 +11,7 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func Defmethod(local, global environment.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Defmethod(local environment.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if len(arguments) < 2 {
 		return nil, instance.NewArityError()
 	}
@@ -30,7 +30,7 @@ func Defmethod(local, global environment.Environment, arguments ...ilos.Instance
 			parameterList = append(parameterList, pp.(instance.List).Nth(0))
 		}
 	}
-	lambdaList, err := List(local, global, parameterList...)
+	lambdaList, err := List(local, parameterList...)
 	if err != nil {
 		return nil, err
 	}
@@ -42,18 +42,18 @@ func Defmethod(local, global environment.Environment, arguments ...ilos.Instance
 		if ilos.InstanceOf(class.Symbol, pp) {
 			classList = append(classList, class.Object)
 		} else {
-			class, ok := global.Class.Get(pp.(instance.List).Nth(1))
+			class, ok := TopLevel.Class.Get(pp.(instance.List).Nth(1))
 			if !ok {
 				return nil, instance.NewUndefinedClass(pp.(instance.List).Nth(1))
 			}
 			classList = append(classList, class.(ilos.Class))
 		}
 	}
-	fun, err := newNamedFunction(local, global, name, lambdaList, arguments[i+2:]...)
+	fun, err := newNamedFunction(local, name, lambdaList, arguments[i+2:]...)
 	if err != nil {
 		return nil, err
 	}
-	gen, ok := global.Function.Get(name)
+	gen, ok := TopLevel.Function.Get(name)
 	if !ok {
 		return nil, instance.NewUndefinedFunction(name)
 	}
@@ -63,7 +63,7 @@ func Defmethod(local, global environment.Environment, arguments ...ilos.Instance
 	return name, nil
 }
 
-func Defgeneric(local, global environment.Environment, funcSpec, lambdaList ilos.Instance, optionsOrMethodDescs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Defgeneric(local environment.Environment, funcSpec, lambdaList ilos.Instance, optionsOrMethodDescs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var methodCombination ilos.Instance
 	genericFunctionClass := class.StandardGenericFunction
 	forms := []ilos.Instance{}
@@ -72,7 +72,7 @@ func Defgeneric(local, global environment.Environment, funcSpec, lambdaList ilos
 		case instance.NewSymbol(":METHOD-COMBINATION"):
 			methodCombination = optionOrMethodDesc.(instance.List).Nth(1)
 		case instance.NewSymbol(":GENERIC-FUNCTION-CLASS"):
-			class, ok := global.Class.Get(optionOrMethodDesc.(instance.List).Nth(1))
+			class, ok := TopLevel.Class.Get(optionOrMethodDesc.(instance.List).Nth(1))
 			if !ok {
 				return nil, instance.NewUndefinedClass(optionOrMethodDesc.(instance.List).Nth(1))
 			}
@@ -81,7 +81,7 @@ func Defgeneric(local, global environment.Environment, funcSpec, lambdaList ilos
 			forms = append(forms, instance.NewCons(instance.NewSymbol("DEFMETHOD"), optionOrMethodDesc.(instance.List).NthCdr(1)))
 		}
 	}
-	global.Function.Define(funcSpec, instance.NewGenericFunction(funcSpec, lambdaList, methodCombination, genericFunctionClass))
-	Progn(local, global, forms...)
+	TopLevel.Function.Define(funcSpec, instance.NewGenericFunction(funcSpec, lambdaList, methodCombination, genericFunctionClass))
+	Progn(local, forms...)
 	return funcSpec, nil
 }

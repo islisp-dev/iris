@@ -16,15 +16,15 @@ import (
 // must be an identifier whose scope is the current toplevel scope in which the
 // defmacro form appears. lambda-list is as defined in page 23. The definition
 // point of macro-name is the closing parenthesis of the lambda-list.
-func Defmacro(local, global environment.Environment, macroName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Defmacro(local environment.Environment, macroName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Symbol, macroName); err != nil {
 		return nil, err
 	}
-	ret, err := newNamedFunction(local, global, macroName, lambdaList, forms...)
+	ret, err := newNamedFunction(local, macroName, lambdaList, forms...)
 	if err != nil {
 		return nil, err
 	}
-	global.Macro.Define(macroName, ret)
+	local.Macro.Define(macroName, ret)
 	return macroName, nil
 }
 
@@ -45,11 +45,11 @@ func Defmacro(local, global environment.Environment, macroName, lambdaList ilos.
 // expressions appearing at the same nesting level, which increases by one
 // inside each successive quasiquotation and decreases by one inside each
 // unquotation.
-func Quasiquote(local, global environment.Environment, form ilos.Instance) (ilos.Instance, ilos.Instance) {
-	return expand(local, global, form, 0)
+func Quasiquote(local environment.Environment, form ilos.Instance) (ilos.Instance, ilos.Instance) {
+	return expand(local, form, 0)
 }
 
-func expand(local, global environment.Environment, form ilos.Instance, level int) (ilos.Instance, ilos.Instance) {
+func expand(local environment.Environment, form ilos.Instance, level int) (ilos.Instance, ilos.Instance) {
 	if !ilos.InstanceOf(class.Cons, form) {
 		return form, nil
 	} // If form is a instance of <cons> then,
@@ -61,7 +61,7 @@ func expand(local, global environment.Environment, form ilos.Instance, level int
 		// To expand `((foo ,(- 10 3)) ,@(cdr '(c)) . ,(car '(cons)))
 		if cadr == instance.NewSymbol("UNQUOTE") && level == 0 {
 			caddr := cddr.(*instance.Cons).Car
-			elt, err := Eval(local, global, caddr)
+			elt, err := Eval(local, caddr)
 			if err != nil {
 				return nil, err
 			}
@@ -69,7 +69,7 @@ func expand(local, global environment.Environment, form ilos.Instance, level int
 			break
 		}
 		if !ilos.InstanceOf(class.Cons, cadr) {
-			lst, err := List(local, global, cadr)
+			lst, err := List(local, cadr)
 			if err != nil {
 				return nil, err
 			}
@@ -83,11 +83,11 @@ func expand(local, global environment.Environment, form ilos.Instance, level int
 			cadadr := cdadr.(*instance.Cons).Car
 			var elt, err ilos.Instance
 			if level == 0 {
-				elt, err = Eval(local, global, cadadr)
+				elt, err = Eval(local, cadadr)
 				if err != nil {
 					return nil, err
 				}
-				lst, err := List(local, global, elt)
+				lst, err := List(local, elt)
 				if err != nil {
 					return nil, err
 				}
@@ -95,15 +95,15 @@ func expand(local, global environment.Environment, form ilos.Instance, level int
 				cdr = cdr.(*instance.Cons).Cdr
 				continue
 			} else {
-				elt, err = expand(local, global, cadadr, level-1)
+				elt, err = expand(local, cadadr, level-1)
 				if err != nil {
 					return nil, err
 				}
-				lst, err := List(local, global, caadr, elt)
+				lst, err := List(local, caadr, elt)
 				if err != nil {
 					return nil, err
 				}
-				lstlst, err := List(local, global, lst)
+				lstlst, err := List(local, lst)
 				if err != nil {
 					return nil, err
 				}
@@ -115,7 +115,7 @@ func expand(local, global environment.Environment, form ilos.Instance, level int
 		if caadr == instance.NewSymbol("UNQUOTE-SPLICING") {
 			cadadr := cdadr.(*instance.Cons).Car
 			if level == 0 {
-				elt, err := Eval(local, global, cadadr)
+				elt, err := Eval(local, cadadr)
 				if err != nil {
 					return nil, err
 				}
@@ -123,15 +123,15 @@ func expand(local, global environment.Environment, form ilos.Instance, level int
 				cdr = cdr.(*instance.Cons).Cdr
 				continue
 			} else {
-				elt, err := expand(local, global, cadadr, level-1)
+				elt, err := expand(local, cadadr, level-1)
 				if err != nil {
 					return nil, err
 				}
-				lst, err := List(local, global, caadr, elt)
+				lst, err := List(local, caadr, elt)
 				if err != nil {
 					return nil, err
 				}
-				lstlst, err := List(local, global, lst)
+				lstlst, err := List(local, lst)
 				if err != nil {
 					return nil, err
 				}
@@ -142,15 +142,15 @@ func expand(local, global environment.Environment, form ilos.Instance, level int
 		}
 		if caadr == instance.NewSymbol("QUASIQUOTE") {
 			cadadr := cdadr.(*instance.Cons).Car
-			elt, err := expand(local, global, cadadr, level+1)
+			elt, err := expand(local, cadadr, level+1)
 			if err != nil {
 				return nil, err
 			}
-			lst, err := List(local, global, caadr, elt)
+			lst, err := List(local, caadr, elt)
 			if err != nil {
 				return nil, err
 			}
-			lstlst, err := List(local, global, lst)
+			lstlst, err := List(local, lst)
 			if err != nil {
 				return nil, err
 			}
@@ -159,11 +159,11 @@ func expand(local, global environment.Environment, form ilos.Instance, level int
 			continue
 		}
 		// If the cadr is not special forms then,
-		elt, err := expand(local, global, cadr, level)
+		elt, err := expand(local, cadr, level)
 		if err != nil {
 			return nil, err
 		}
-		lst, err := List(local, global, elt)
+		lst, err := List(local, elt)
 		if err != nil {
 			return nil, err
 		}
@@ -178,7 +178,7 @@ func expand(local, global environment.Environment, form ilos.Instance, level int
 	for i := len(exp) - 2; i >= 0; i-- {
 		if ilos.InstanceOf(class.List, lst) {
 			var err ilos.Instance
-			lst, err = Append(local, global, exp[i], lst)
+			lst, err = Append(local, exp[i], lst)
 			if err != nil {
 				return nil, err
 			}

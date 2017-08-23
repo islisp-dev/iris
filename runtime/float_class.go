@@ -25,7 +25,7 @@ var (
 
 // Floatp returns t if obj is a ﬂoat (instance of class float);
 // otherwise, returns nil. The obj may be any ISLISP object.
-func Floatp(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Floatp(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(class.Float, obj) {
 		return T, nil
 	}
@@ -35,7 +35,7 @@ func Floatp(local, global environment.Environment, obj ilos.Instance) (ilos.Inst
 // Float returns x itself if it is an instance of the class float
 // and returns a ﬂoating-point approximation of x otherwise.
 // An error shall be signaled if x is not a number (error-id. domain-error).
-func Float(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Float(local environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	f, _, err := convFloat64(x)
 	if err != nil {
 		return nil, err
@@ -46,7 +46,7 @@ func Float(local, global environment.Environment, x ilos.Instance) (ilos.Instanc
 // Floor returns the greatest integer less than or equal to x .
 // That is, x is truncated towards negative infinity. An error
 // shall be signaled if x is not a number (error-id. domain-error).
-func Floor(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Floor(local environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	f, _, err := convFloat64(x)
 	if err != nil {
 		return nil, err
@@ -57,7 +57,7 @@ func Floor(local, global environment.Environment, x ilos.Instance) (ilos.Instanc
 // Ceiling Returns the smallest integer that is not smaller than x.
 // That is, x is truncated towards positive infinity. An error
 // shall be signaled if x is not a number (error-id. domain-error).
-func Ceiling(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Ceiling(local environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	f, _, err := convFloat64(x)
 	if err != nil {
 		return nil, err
@@ -68,7 +68,7 @@ func Ceiling(local, global environment.Environment, x ilos.Instance) (ilos.Insta
 // Truncate returns the integer between 0 and x (inclusive) that is nearest to x.
 // That is, x is truncated towards zero. An error shall be signaled
 // if x is not a number (error-id. domain-error).
-func Truncate(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Truncate(local environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	f, _, err := convFloat64(x)
 	if err != nil {
 		return nil, err
@@ -79,7 +79,7 @@ func Truncate(local, global environment.Environment, x ilos.Instance) (ilos.Inst
 // Round returns the integer nearest to x.
 // If x is exactly halfway between two integers, the even one is chosen.
 // An error shall be signaled if x is not a number (error-id. domain-error).
-func Round(local, global environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Round(local environment.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	f, _, err := convFloat64(x)
 	if err != nil {
 		return nil, err

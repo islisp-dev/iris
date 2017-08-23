@@ -10,7 +10,7 @@ import (
 )
 
 // Null returns t if obj is nil; otherwise, returns nil obj may be any ISLISP object.
-func Null(local, global environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Null(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if obj == Nil {
 		return T, nil
 	}
