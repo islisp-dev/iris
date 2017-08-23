@@ -7,7 +7,7 @@ package runtime
 import (
 	"strings"
 
-	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
@@ -15,7 +15,7 @@ import (
 
 // Stringp returns t if obj is a string (instance of class string);
 // otherwise, returns nil. obj may be any ISLISP object.
-func Stringp(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Stringp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(class.String, obj) {
 		return T, nil
 	}
@@ -26,7 +26,7 @@ func Stringp(local environment.Environment, obj ilos.Instance) (ilos.Instance, i
 // the new string are initialized with this character, otherwise the initialization is implementation defined.
 // An error shall be signaled if the requested string cannot be allocated (error-id. cannot-create-string).
 // An error shall be signaled if i is not a non-negative integer or if initial-character is not a character (error-id. domain-error).
-func CreateString(local environment.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func CreateString(e env.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if !ilos.InstanceOf(class.Integer, i) || int(i.(instance.Integer)) < 0 {
 		return nil, instance.NewDomainError(i, class.Integer)
 	}
@@ -49,7 +49,7 @@ func CreateString(local environment.Environment, i ilos.Instance, initialElement
 }
 
 // StringEqual tests whether string1 is the same string as string2.
-func StringEqual(local environment.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func StringEqual(e env.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.String, string1, string2); err != nil {
 		return nil, err
 	}
@@ -60,16 +60,16 @@ func StringEqual(local environment.Environment, string1, string2 ilos.Instance) 
 }
 
 // StringNotEqual tests whether string1 not is the same string as string2.
-func StringNotEqual(local environment.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	ret, err := StringEqual(local, string1, string2)
+func StringNotEqual(e env.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	ret, err := StringEqual(e, string1, string2)
 	if err != nil {
 		return nil, err
 	}
-	return Not(local, ret)
+	return Not(e, ret)
 }
 
 // StringGreaterThan tests whether string1 is greater than string2.
-func StringGreaterThan(local environment.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func StringGreaterThan(e env.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.String, string1, string2); err != nil {
 		return nil, err
 	}
@@ -80,12 +80,12 @@ func StringGreaterThan(local environment.Environment, string1, string2 ilos.Inst
 }
 
 // StringGreaterThanOrEqual tests whether string1 is greater than or equal to string2.
-func StringGreaterThanOrEqual(local environment.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := StringGreaterThan(local, string1, string2)
+func StringGreaterThanOrEqual(e env.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	gt, err := StringGreaterThan(e, string1, string2)
 	if err != nil {
 		return nil, err
 	}
-	eq, err := StringEqual(local, string1, string2)
+	eq, err := StringEqual(e, string1, string2)
 	if err != nil {
 		return nil, err
 	}
@@ -96,21 +96,21 @@ func StringGreaterThanOrEqual(local environment.Environment, string1, string2 il
 }
 
 // StringLessThan tests whether string1 is less than string2.
-func StringLessThan(local environment.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := StringGreaterThanOrEqual(local, string1, string2)
+func StringLessThan(e env.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	gt, err := StringGreaterThanOrEqual(e, string1, string2)
 	if err != nil {
 		return nil, err
 	}
-	return Not(local, gt)
+	return Not(e, gt)
 }
 
 // StringLessThanOrEqual tests whether string1 is less than or equal to string2.
-func StringLessThanOrEqual(local environment.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := StringGreaterThan(local, string1, string2)
+func StringLessThanOrEqual(e env.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	gt, err := StringGreaterThan(e, string1, string2)
 	if err != nil {
 		return nil, err
 	}
-	return Not(local, gt)
+	return Not(e, gt)
 }
 
 // CharIndex returns the position of char in string, The search starts from the position indicated
@@ -119,7 +119,7 @@ func StringLessThanOrEqual(local environment.Environment, string1, string2 ilos.
 // If the char does not occur in the string, nil is returned. The function char= is used for the comparisons.
 //
 // An error shall be signaled if char is not a character or if string is not a string (error-id. domain-error).
-func CharIndex(local environment.Environment, char, str ilos.Instance, startPosition ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func CharIndex(e env.Environment, char, str ilos.Instance, startPosition ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Character, char); err != nil {
 		return nil, err
 	}
@@ -152,7 +152,7 @@ func CharIndex(local environment.Environment, char, str ilos.Instance, startPosi
 // Presence of the substring is done by sequential use of char= on corresponding elements of the two strings.
 //
 // An error shall be signaled if either substring or string is not a string (error-id. domain-error).
-func StringIndex(local environment.Environment, sub, str ilos.Instance, startPosition ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func StringIndex(e env.Environment, sub, str ilos.Instance, startPosition ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.String, sub); err != nil {
 		return nil, err
 	}
@@ -186,7 +186,7 @@ func StringIndex(local environment.Environment, sub, str ilos.Instance, startPos
 // when the result shares structure with its string arguments.
 //
 // An error shall be signaled if the string cannot be allocated (error-id. cannot-create-string).
-func StringAppend(local environment.Environment, str ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func StringAppend(e env.Environment, str ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	ret := ""
 	for _, s := range str {
 		if err := ensure(class.String, s); err != nil {

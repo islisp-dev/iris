@@ -5,7 +5,7 @@
 package runtime
 
 import (
-	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
@@ -19,14 +19,14 @@ import (
 // returned that was established most recently and is still in effect. An
 // error shall be signaled if such a binding does not exist
 // (error-id. unbound-variable).
-func Dynamic(local environment.Environment, var1 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Dynamic(e env.Environment, var1 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Symbol, var1); err != nil {
 		return nil, err
 	}
-	if v, ok := local.DynamicVariable.Get(var1); ok {
+	if v, ok := e.DynamicVariable.Get(var1); ok {
 		return v, nil
 	}
-	if v, ok := local.DynamicVariable.Get(var1); ok {
+	if v, ok := e.DynamicVariable.Get(var1); ok {
 		return v, nil
 	}
 	return nil, instance.NewUndefinedVariable(var1)
@@ -41,18 +41,18 @@ func Dynamic(local environment.Environment, var1 ilos.Instance) (ilos.Instance, 
 // An error shall be signaled if var has no dynamic value
 // (error-id.  unbound-variable). setf of dynamic can be used only for
 // modifying bindings, and not for establishing them.
-func SetDynamic(local environment.Environment, form, var1 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func SetDynamic(e env.Environment, form, var1 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Symbol, var1); err != nil {
 		return nil, err
 	}
-	form, err := Eval(local, form)
+	form, err := Eval(e, form)
 	if err != nil {
 		return nil, form
 	}
-	if local.DynamicVariable.Set(var1, form) {
+	if e.DynamicVariable.Set(var1, form) {
 		return form, nil
 	}
-	if local.DynamicVariable.Set(var1, form) {
+	if e.DynamicVariable.Set(var1, form) {
 		return form, nil
 	}
 	return nil, instance.NewUndefinedVariable(var1)
@@ -75,7 +75,7 @@ func SetDynamic(local environment.Environment, form, var1 ilos.Instance) (ilos.I
 // returned value of dynamic-let is that of the last body-form of the body (or
 // nil if there is none). The bindings are undone when control leaves the
 // prepared dynamic-let special form.
-func DynamicLet(local environment.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func DynamicLet(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	vfs := map[ilos.Instance]ilos.Instance{}
 	if err := ensure(class.List, varForm); err != nil {
 		return nil, err
@@ -87,16 +87,16 @@ func DynamicLet(local environment.Environment, varForm ilos.Instance, bodyForm .
 		if cadr.(instance.List).Length() != 2 {
 			return nil, instance.NewArityError()
 		}
-		f, err := Eval(local, cadr.(instance.List).Nth(1))
+		f, err := Eval(e, cadr.(instance.List).Nth(1))
 		if err != nil {
 			return nil, err
 		}
 		vfs[cadr.(instance.List).Nth(0)] = f
 	}
 	for v, f := range vfs {
-		if !local.DynamicVariable.Define(v, f) {
+		if !e.DynamicVariable.Define(v, f) {
 			return nil, instance.NewImmutableBinding()
 		}
 	}
-	return Progn(local, bodyForm...)
+	return Progn(e, bodyForm...)
 }

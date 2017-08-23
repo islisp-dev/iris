@@ -5,12 +5,12 @@
 package runtime
 
 import (
-	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 )
 
 // Quote is used to include any object in an ISLisp text.
 // A quoted expression denotes a reference to an object.
-func Quote(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Quote(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	return obj, nil
 }

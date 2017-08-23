@@ -5,7 +5,7 @@
 package runtime
 
 import (
-	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
@@ -18,13 +18,13 @@ import (
 // is evaluated and its value is returned.
 //
 // If no else-form is provided, it defaults to nil.
-func If(local environment.Environment, testForm, thenForm ilos.Instance, elseForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	tf, err := Eval(local, testForm)
+func If(e env.Environment, testForm, thenForm ilos.Instance, elseForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	tf, err := Eval(e, testForm)
 	if err != nil {
 		return nil, err
 	}
 	if tf == T {
-		return Eval(local, thenForm)
+		return Eval(e, thenForm)
 	}
 	if len(elseForm) > 1 {
 		return nil, instance.NewArityError()
@@ -32,7 +32,7 @@ func If(local environment.Environment, testForm, thenForm ilos.Instance, elseFor
 	if len(elseForm) == 0 {
 		return Nil, nil
 	}
-	return Eval(local, elseForm[0])
+	return Eval(e, elseForm[0])
 }
 
 // Cond the clauses (test form*) are scanned sequentially
@@ -41,7 +41,7 @@ func If(local environment.Environment, testForm, thenForm ilos.Instance, elseFor
 //are sequentially evaluated and the value of the last one is returned.
 // If no test is true, then nil is returned.
 // If no form exists for the successful test then the value of this test is returned.
-func Cond(local environment.Environment, testFrom ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Cond(e env.Environment, testFrom ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	for _, tf := range testFrom {
 		if err := ensure(class.List, tf); err != nil {
 			return nil, err
@@ -50,12 +50,12 @@ func Cond(local environment.Environment, testFrom ...ilos.Instance) (ilos.Instan
 		if len(s) == 0 {
 			return nil, instance.NewArityError()
 		}
-		ret, err := Eval(local, s[0])
+		ret, err := Eval(e, s[0])
 		if err != nil {
 			return nil, err
 		}
 		if ret == T {
-			return Progn(local, s[1:]...)
+			return Progn(e, s[1:]...)
 		}
 	}
 	return Nil, nil
@@ -74,8 +74,8 @@ func Cond(local environment.Environment, testFrom ...ilos.Instance) (ilos.Instan
 // the value returned by keyform and key. If no form exists for a matching key, the case form evaluates to nil.
 // If the value of keyform is different from every key, and there is a default clause, its forms, if any,
 // are evaluated sequentially, and the value of the last one is the result of the case form.
-func Case(local environment.Environment, key ilos.Instance, pattern ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	key, err := Eval(local, key)
+func Case(e env.Environment, key ilos.Instance, pattern ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	key, err := Eval(e, key)
 	if err != nil {
 		return nil, err
 	}
@@ -88,14 +88,14 @@ func Case(local environment.Environment, key ilos.Instance, pattern ...ilos.Inst
 			return nil, instance.NewArityError()
 		}
 		if idx == len(pattern)-1 && form[0] == T {
-			return Progn(local, form[1:]...)
+			return Progn(e, form[1:]...)
 		}
 		if err := ensure(class.List, form[0]); err != nil {
 			return nil, err
 		}
 		for _, k := range form[0].(instance.List).Slice() {
 			if k == key {
-				return Progn(local, form[1:]...)
+				return Progn(e, form[1:]...)
 			}
 		}
 	}
@@ -117,8 +117,8 @@ func Case(local environment.Environment, key ilos.Instance, pattern ...ilos.Inst
 // the value returned by keyform and key. If no form exists for a matching key, the case form evaluates to nil.
 // If the value of keyform is different from every key, and there is a default clause, its forms, if any,
 // are evaluated sequentially, and the value of the last one is the result of the case form.
-func CaseUsing(local environment.Environment, key, pred ilos.Instance, pattern ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	key, err := Eval(local, key)
+func CaseUsing(e env.Environment, key, pred ilos.Instance, pattern ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	key, err := Eval(e, key)
 	if err != nil {
 		return nil, err
 	}
@@ -134,18 +134,18 @@ func CaseUsing(local environment.Environment, key, pred ilos.Instance, pattern .
 			return nil, instance.NewArityError()
 		}
 		if idx == len(pattern)-1 && form[0] == T {
-			return Progn(local, form[1:]...)
+			return Progn(e, form[1:]...)
 		}
 		if err := ensure(class.List, form[0]); err != nil {
 			return nil, err
 		}
 		for _, k := range form[0].(instance.List).Slice() {
-			ret, err := pred.(instance.Applicable).Apply(local, k, key)
+			ret, err := pred.(instance.Applicable).Apply(e, k, key)
 			if err != nil {
 				return nil, err
 			}
 			if ret != Nil {
-				return Progn(local, form[1:]...)
+				return Progn(e, form[1:]...)
 			}
 		}
 	}

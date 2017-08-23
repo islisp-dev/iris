@@ -5,7 +5,7 @@
 package runtime
 
 import (
-	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
@@ -13,7 +13,7 @@ import (
 
 // Characterp returns t if obj is a character (instance of class character);
 // otherwise, returns nil. obj may be any ISLISP object.
-func Characterp(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Characterp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(class.Character, obj) {
 		return T, nil
 	}
@@ -21,7 +21,7 @@ func Characterp(local environment.Environment, obj ilos.Instance) (ilos.Instance
 }
 
 // CharEqual tests whether char1 is the same character as char2.
-func CharEqual(local environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func CharEqual(e env.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Character, char1, char2); err != nil {
 		return nil, err
 	}
@@ -32,17 +32,17 @@ func CharEqual(local environment.Environment, char1, char2 ilos.Instance) (ilos.
 }
 
 // CharNotEqual if and only if they are not char=.
-func CharNotEqual(local environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	ret, err := CharEqual(local, char1, char2)
+func CharNotEqual(e env.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	ret, err := CharEqual(e, char1, char2)
 	if err != nil {
 		return nil, err
 	}
-	return Not(local, ret)
+	return Not(e, ret)
 }
 
 // CharGreaterThan tests whether char1 is greater than char2.
 // An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
-func CharGreaterThan(local environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func CharGreaterThan(e env.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Character, char1, char2); err != nil {
 		return nil, err
 	}
@@ -54,12 +54,12 @@ func CharGreaterThan(local environment.Environment, char1, char2 ilos.Instance) 
 
 // CharGreaterThanOrEqual tests whether char1 is greater than or equal to char2.
 // An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
-func CharGreaterThanOrEqual(local environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := CharGreaterThan(local, char1, char2)
+func CharGreaterThanOrEqual(e env.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	gt, err := CharGreaterThan(e, char1, char2)
 	if err != nil {
 		return nil, err
 	}
-	eq, err := CharEqual(local, char1, char2)
+	eq, err := CharEqual(e, char1, char2)
 	if err != nil {
 		return nil, err
 	}
@@ -71,20 +71,20 @@ func CharGreaterThanOrEqual(local environment.Environment, char1, char2 ilos.Ins
 
 // CharLessThan tests whether char1 is less than char2.
 // An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
-func CharLessThan(local environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := CharGreaterThanOrEqual(local, char1, char2)
+func CharLessThan(e env.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	gt, err := CharGreaterThanOrEqual(e, char1, char2)
 	if err != nil {
 		return nil, err
 	}
-	return Not(local, gt)
+	return Not(e, gt)
 }
 
 // CharLessThanOrEqual tests whether char1 is less than or equal to char2.
 // An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
-func CharLessThanOrEqual(local environment.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := CharGreaterThan(local, char1, char2)
+func CharLessThanOrEqual(e env.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+	gt, err := CharGreaterThan(e, char1, char2)
 	if err != nil {
 		return nil, err
 	}
-	return Not(local, gt)
+	return Not(e, gt)
 }

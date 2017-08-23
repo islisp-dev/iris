@@ -7,7 +7,7 @@ package runtime
 import (
 	"math"
 
-	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
@@ -15,7 +15,7 @@ import (
 
 // Listp returns t if obj is a list (instance of class list); otherwise, returns nil.
 // obj may be any ISLISP object.
-func Listp(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Listp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(class.Cons, obj) {
 		return T, nil
 	}
@@ -27,7 +27,7 @@ func Listp(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilo
 // error shall be signaled if the requested list cannot be allocated (error-id. cannot-create-list).
 // An error shall be signaled if i is not a non-negative integer (error-id. domain-error).
 //initial-element may be any ISLISP object.
-func CreateList(local environment.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func CreateList(e env.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.Integer, i); err != nil {
 		return nil, err
 	}
@@ -48,7 +48,7 @@ func CreateList(local environment.Environment, i ilos.Instance, initialElement .
 // List returns a new list whose length is the number of arguments and whose elements are the
 // arguments in the same order as in the list-form. An error shall be signaled if the requested list
 // cannot be allocated (error-id. cannot-create-list). Each obj may be any ISLISP object.
-func List(local environment.Environment, objs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func List(e env.Environment, objs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	cons := Nil
 	for i := len(objs) - 1; i >= 0; i-- {
 		cons = instance.NewCons(objs[i], cons)
@@ -61,7 +61,7 @@ func List(local environment.Environment, objs ...ilos.Instance) (ilos.Instance, 
 //
 // For reverse, no side-effect to the given list occurs. The resulting list is permitted but not
 // required to share structure with the input list.
-func Reverse(local environment.Environment, list ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Reverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.List, list); err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func Reverse(local environment.Environment, list ilos.Instance) (ilos.Instance, 
 // For nreverse, the conses which make up the top level of the given list are permitted, but not
 // required, to be side-effected in order to produce this new list. nreverse should never be called
 // on a literal object.
-func Nreverse(local environment.Environment, list ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Nreverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// TODO: tests literal object
 	if err := ensure(class.List, list); err != nil {
 		return nil, err
@@ -97,10 +97,10 @@ func Nreverse(local environment.Environment, list ilos.Instance) (ilos.Instance,
 // result shares structure with its list arguments.
 //
 // An error shall be signaled if the list cannot be allocated (error-id. cannot-create-list).
-func Append(local environment.Environment, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Append(e env.Environment, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// Ref: https://github.com/sbcl/sbcl/blob/fe4faef65315c6ad52b3b89b62b6c6497cb78d09/src/code/list.lisp#L364
 
-	result, err := List(local, Nil)
+	result, err := List(e, Nil)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func Append(local environment.Environment, lists ...ilos.Instance) (ilos.Instanc
 	}
 	for _, list := range lists {
 		for _, elt := range list.(instance.List).Slice() {
-			it, err := List(local, elt)
+			it, err := List(e, elt)
 			if err != nil {
 				return nil, err
 			}
@@ -124,7 +124,7 @@ func Append(local environment.Environment, lists ...ilos.Instance) (ilos.Instanc
 // Member returnes the first sublist of list whose car is obj  if list contains at least one
 // occurrence of obj (as determined by eql).  Otherwise, nil is returned. An error shall be signaled
 // if list is not a list (error-id. domain-error).
-func Member(local environment.Environment, obj, list ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Member(e env.Environment, obj, list ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.List, list); err != nil {
 		return nil, err
 	}
@@ -140,7 +140,7 @@ func Member(local environment.Environment, obj, list ilos.Instance) (ilos.Instan
 // each list, then to the second element of each list, and so on. The iteration terminates when the
 // shortest list runs out, and excess elements in other lists are ignored. The value returned by
 // mapcar is a list of the results of successive calls to function.
-func Mapcar(local environment.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Mapcar(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
 	if err := ensure(class.Function, function); err != nil {
 		return nil, err
@@ -158,18 +158,18 @@ func Mapcar(local environment.Environment, function, list1 ilos.Instance, lists 
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).Nth(i)
 		}
-		ret, err := function.(instance.Applicable).Apply(local, arguments...)
+		ret, err := function.(instance.Applicable).Apply(e, arguments...)
 		if err != nil {
 			return nil, err
 		}
 		result = append(result, ret)
 	}
-	return List(local, result...)
+	return List(e, result...)
 }
 
 // Mapc is like mapcar except that the results of applying function are not accumulated;
 // list1 is returned.
-func Mapc(local environment.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Mapc(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
 	if err := ensure(class.Function, function); err != nil {
 		return nil, err
@@ -186,7 +186,7 @@ func Mapc(local environment.Environment, function, list1 ilos.Instance, lists ..
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).Nth(i)
 		}
-		if _, err := function.(instance.Applicable).Apply(local, arguments...); err != nil {
+		if _, err := function.(instance.Applicable).Apply(e, arguments...); err != nil {
 			return nil, err
 		}
 	}
@@ -196,7 +196,7 @@ func Mapc(local environment.Environment, function, list1 ilos.Instance, lists ..
 // Mapcan is like mapcar respectively, except that the results of applying
 // function are combined into a list by the use of an operation that performs a destructive form of
 // append rather than list.
-func Mapcan(local environment.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Mapcan(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
 	if err := ensure(class.Function, function); err != nil {
 		return nil, err
@@ -214,19 +214,19 @@ func Mapcan(local environment.Environment, function, list1 ilos.Instance, lists 
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).Nth(i)
 		}
-		ret, err := function.(instance.Applicable).Apply(local, arguments...)
+		ret, err := function.(instance.Applicable).Apply(e, arguments...)
 		if err != nil {
 			return nil, err
 		}
 		result = append(result, ret)
 	}
-	return Append(local, result...)
+	return Append(e, result...)
 }
 
 // Maplist is like mapcar except that function is applied to successive sublists of the lists.
 // function is first applied to the lists themselves, and then to the cdr of each list, and then to
 // the cdr of the cdr of each list, and so on.
-func Maplist(local environment.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Maplist(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
 	if err := ensure(class.Function, function); err != nil {
 		return nil, err
@@ -244,18 +244,18 @@ func Maplist(local environment.Environment, function, list1 ilos.Instance, lists
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).NthCdr(i)
 		}
-		ret, err := function.(instance.Applicable).Apply(local, arguments...)
+		ret, err := function.(instance.Applicable).Apply(e, arguments...)
 		if err != nil {
 			return nil, err
 		}
 		result = append(result, ret)
 	}
-	return List(local, result...)
+	return List(e, result...)
 }
 
 // Mapl is like maplist except that the results of applying function are not accumulated;
 // list1 is returned.
-func Mapl(local environment.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Mapl(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
 	if err := ensure(class.Function, function); err != nil {
 		return nil, err
@@ -272,7 +272,7 @@ func Mapl(local environment.Environment, function, list1 ilos.Instance, lists ..
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).NthCdr(i)
 		}
-		if _, err := function.(instance.Applicable).Apply(local, arguments...); err != nil {
+		if _, err := function.(instance.Applicable).Apply(e, arguments...); err != nil {
 			return nil, err
 		}
 	}
@@ -282,7 +282,7 @@ func Mapl(local environment.Environment, function, list1 ilos.Instance, lists ..
 // Mapcon is like maplist respectively, except that the results of applying
 // function are combined into a list by the use of an operation that performs a destructive form of
 // append rather than list.
-func Mapcon(local environment.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Mapcon(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
 	if err := ensure(class.Function, function); err != nil {
 		return nil, err
@@ -300,19 +300,19 @@ func Mapcon(local environment.Environment, function, list1 ilos.Instance, lists 
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).NthCdr(i)
 		}
-		ret, err := function.(instance.Applicable).Apply(local, arguments...)
+		ret, err := function.(instance.Applicable).Apply(e, arguments...)
 		if err != nil {
 			return nil, err
 		}
 		result = append(result, ret)
 	}
-	return Append(local, result...)
+	return Append(e, result...)
 }
 
 // Assoc returns the first cons if assocation-list contains at least one cons whose car is
 // obj (as determined by eql). Otherwise, nil is returned. An error shall be signaled
 // if association-list is not a list of conses (error-id. domain-error).
-func Assoc(local environment.Environment, obj, associationList ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Assoc(e env.Environment, obj, associationList ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.List, associationList); err != nil {
 		return nil, err
 	}

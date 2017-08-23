@@ -5,12 +5,12 @@
 package runtime
 
 import (
-	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 )
 
 // Null returns t if obj is nil; otherwise, returns nil obj may be any ISLISP object.
-func Null(local environment.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Null(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if obj == Nil {
 		return T, nil
 	}

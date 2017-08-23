@@ -11,7 +11,7 @@ import (
 	"runtime"
 	"strings"
 
-	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/env"
 
 	"github.com/ta2gch/iris/reader/parser"
 	"github.com/ta2gch/iris/reader/tokenizer"
@@ -42,12 +42,12 @@ func convFloat64(x ilos.Instance) (float64, bool, ilos.Instance) {
 }
 
 func readFromString(s string) ilos.Instance {
-	e, _ := parser.Parse(tokenizer.New(strings.NewReader(s)))
-	return e
+	ret, _ := parser.Parse(tokenizer.New(strings.NewReader(s)))
+	return ret
 }
-func evalString(local environment.Environment, s string) ilos.Instance {
-	e, _ := Eval(local, readFromString(s))
-	return e
+func evalString(e env.Environment, s string) ilos.Instance {
+	ret, _ := Eval(e, readFromString(s))
+	return ret
 }
 
 func func2symbol(function interface{}) ilos.Instance {
@@ -87,4 +87,4 @@ func ensure(c ilos.Class, i ...ilos.Instance) ilos.Instance {
 	return nil
 }
 
-var TopLevel = environment.NewEnvironment(instance.NewStream(os.Stdin, nil), instance.NewStream(nil, os.Stdout), instance.NewStream(nil, os.Stderr))
+var TopLevel = env.NewEnvironment(instance.NewStream(os.Stdin, nil), instance.NewStream(nil, os.Stdout), instance.NewStream(nil, os.Stderr))

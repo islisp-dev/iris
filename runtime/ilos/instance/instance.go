@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/ta2gch/iris/runtime/environment"
+	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 )
 
@@ -16,17 +16,17 @@ import (
 // instance
 //
 
-func Create(local environment.Environment, c ilos.Instance, i ...ilos.Instance) ilos.Instance {
+func Create(e env.Environment, c ilos.Instance, i ...ilos.Instance) ilos.Instance {
 	p := []ilos.Instance{}
 	for _, q := range c.(ilos.Class).Supers() {
-		p = append(p, Create(local, q, i...))
+		p = append(p, Create(e, q, i...))
 	}
-	return InitializeObject(local, Instance{c.(ilos.Class), p, map[ilos.Instance]ilos.Instance{}}, i...)
+	return InitializeObject(e, Instance{c.(ilos.Class), p, map[ilos.Instance]ilos.Instance{}}, i...)
 }
 
-func InitializeObject(local environment.Environment, object ilos.Instance, inits ...ilos.Instance) ilos.Instance {
+func InitializeObject(e env.Environment, object ilos.Instance, inits ...ilos.Instance) ilos.Instance {
 	for _, super := range object.(Instance).supers {
-		InitializeObject(local, super, inits...)
+		InitializeObject(e, super, inits...)
 	}
 	for i := 0; i < len(inits); i += 2 {
 		argName := inits[i]
@@ -43,7 +43,7 @@ func InitializeObject(local environment.Environment, object ilos.Instance, inits
 	for _, slotName := range object.Class().Slots() {
 		if _, ok := object.(Instance).GetSlotValue(slotName, object.Class()); !ok {
 			if form, ok := object.Class().Initform(slotName); ok {
-				value, _ := form.(Applicable).Apply(local)
+				value, _ := form.(Applicable).Apply(e)
 				object.(Instance).SetSlotValue(slotName, value, object.Class())
 			}
 		}
