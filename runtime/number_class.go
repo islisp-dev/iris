@@ -125,8 +125,8 @@ func NumberLessThan(e env.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilo
 	return Not(e, ge)
 }
 
-// NumberLessThanOrEqulal returns t if x1 is less than or = x2
-func NumberLessThanOrEqulal(e env.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+// NumberLessThanOrEqual returns t if x1 is less than or = x2
+func NumberLessThanOrEqual(e env.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	gt, err := NumberGreaterThan(e, x1, x2)
 	if err != nil {
 		return nil, err

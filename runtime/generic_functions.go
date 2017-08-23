@@ -42,7 +42,7 @@ func Defmethod(e env.Environment, arguments ...ilos.Instance) (ilos.Instance, il
 		if ilos.InstanceOf(class.Symbol, pp) {
 			classList = append(classList, class.Object)
 		} else {
-			class, ok := TopLevel.Class.Get(pp.(instance.List).Nth(1))
+			class, ok := e.Class[:1].Get(pp.(instance.List).Nth(1))
 			if !ok {
 				return nil, instance.NewUndefinedClass(pp.(instance.List).Nth(1))
 			}
@@ -53,7 +53,7 @@ func Defmethod(e env.Environment, arguments ...ilos.Instance) (ilos.Instance, il
 	if err != nil {
 		return nil, err
 	}
-	gen, ok := TopLevel.Function.Get(name)
+	gen, ok := e.Function[:1].Get(name)
 	if !ok {
 		return nil, instance.NewUndefinedFunction(name)
 	}
@@ -72,7 +72,7 @@ func Defgeneric(e env.Environment, funcSpec, lambdaList ilos.Instance, optionsOr
 		case instance.NewSymbol(":METHOD-COMBINATION"):
 			methodCombination = optionOrMethodDesc.(instance.List).Nth(1)
 		case instance.NewSymbol(":GENERIC-FUNCTION-CLASS"):
-			class, ok := TopLevel.Class.Get(optionOrMethodDesc.(instance.List).Nth(1))
+			class, ok := e.Class[:1].Get(optionOrMethodDesc.(instance.List).Nth(1))
 			if !ok {
 				return nil, instance.NewUndefinedClass(optionOrMethodDesc.(instance.List).Nth(1))
 			}
@@ -81,7 +81,7 @@ func Defgeneric(e env.Environment, funcSpec, lambdaList ilos.Instance, optionsOr
 			forms = append(forms, instance.NewCons(instance.NewSymbol("DEFMETHOD"), optionOrMethodDesc.(instance.List).NthCdr(1)))
 		}
 	}
-	TopLevel.Function.Define(funcSpec, instance.NewGenericFunction(funcSpec, lambdaList, methodCombination, genericFunctionClass))
+	e.Function[:1].Define(funcSpec, instance.NewGenericFunction(funcSpec, lambdaList, methodCombination, genericFunctionClass))
 	Progn(e, forms...)
 	return funcSpec, nil
 }

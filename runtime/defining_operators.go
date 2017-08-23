@@ -24,14 +24,14 @@ func Defconstant(e env.Environment, name, form ilos.Instance) (ilos.Instance, il
 	if err := ensure(class.Symbol, name); err != nil {
 		return nil, err
 	}
-	if _, ok := TopLevel.Constant.Get(name); ok {
+	if _, ok := e.Constant[:1].Get(name); ok {
 		return nil, instance.NewImmutableBinding()
 	}
 	ret, err := Eval(e, form)
 	if err != nil {
 		return nil, err
 	}
-	TopLevel.Constant.Define(name, ret)
+	e.Constant[:1].Define(name, ret)
 	return name, nil
 }
 
@@ -48,14 +48,14 @@ func Defglobal(e env.Environment, name, form ilos.Instance) (ilos.Instance, ilos
 	if err := ensure(class.Symbol, name); err != nil {
 		return nil, err
 	}
-	if _, ok := TopLevel.Constant.Get(name); ok {
+	if _, ok := e.Constant[:1].Get(name); ok {
 		return nil, instance.NewImmutableBinding()
 	}
 	ret, err := Eval(e, form)
 	if err != nil {
 		return nil, err
 	}
-	TopLevel.Variable.Define(name, ret)
+	e.Variable[:1].Define(name, ret)
 	return name, nil
 }
 
@@ -67,14 +67,14 @@ func Defdynamic(e env.Environment, name, form ilos.Instance) (ilos.Instance, ilo
 	if err := ensure(class.Symbol, name); err != nil {
 		return nil, err
 	}
-	if _, ok := TopLevel.Constant.Get(name); ok {
+	if _, ok := e.Constant[:1].Get(name); ok {
 		return nil, instance.NewImmutableBinding()
 	}
 	ret, err := Eval(e, form)
 	if err != nil {
 		return nil, err
 	}
-	TopLevel.DynamicVariable.Define(name, ret)
+	e.DynamicVariable[:1].Define(name, ret)
 	return name, nil
 }
 
@@ -96,6 +96,6 @@ func Defun(e env.Environment, functionName, lambdaList ilos.Instance, forms ...i
 	if err != nil {
 		return nil, err
 	}
-	TopLevel.Function.Define(functionName, ret)
+	e.Function[:1].Define(functionName, ret)
 	return functionName, nil
 }

@@ -31,14 +31,14 @@ func OpenStreamP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Inst
 	return T, nil
 }
 
-func InputStreamp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func InputStreamP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if s, ok := obj.(instance.Stream); ok && s.Reader != nil {
 		return T, nil
 	}
 	return Nil, nil
 }
 
-func OutputStreamp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func OutputStreamP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if s, ok := obj.(instance.Stream); ok && s.Writer != nil {
 		return T, nil
 	}
@@ -213,7 +213,7 @@ func Read(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.Inst
 	if len(options) > 0 {
 		s = options[0]
 	}
-	if b, _ := InputStreamp(e, s); b == Nil {
+	if b, _ := InputStreamP(e, s); b == Nil {
 		return nil, nil // throw Error
 	}
 	eosErrorP := true
@@ -229,7 +229,7 @@ func Read(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.Inst
 		}
 	}
 	v, err := parser.Parse(tokenizer.New(s.(instance.Stream).Reader))
-	if ilos.InstanceOf(class.EndOfStream, err) {
+	if err != nil && ilos.InstanceOf(class.EndOfStream, err) {
 		if eosErrorP {
 			return nil, err
 		}
@@ -243,7 +243,7 @@ func ReadChar(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.
 	if len(options) > 0 {
 		s = options[0]
 	}
-	if b, _ := InputStreamp(e, s); b == Nil {
+	if b, _ := InputStreamP(e, s); b == Nil {
 		return nil, nil // throw Error
 	}
 	eosErrorP := true
@@ -273,7 +273,7 @@ func ReadLine(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.
 	if len(options) > 0 {
 		s = options[0]
 	}
-	if b, _ := InputStreamp(e, s); b == Nil {
+	if b, _ := InputStreamP(e, s); b == Nil {
 		return nil, nil // throw Error
 	}
 	eosErrorP := true
@@ -309,7 +309,7 @@ func Format(e env.Environment, stream, formatString ilos.Instance, objs ...ilos.
 	f := regexp.MustCompile("([^~])~A").ReplaceAllString(string(formatString.(instance.String)), "%1%v")
 	f = regexp.MustCompile(`\\`).ReplaceAllString(string(formatString.(instance.String)), `\\`)
 	f = regexp.MustCompile("([^~])~%").ReplaceAllString(string(formatString.(instance.String)), "%1\n")
-	if b, _ := OutputStreamp(e, stream); b == Nil {
+	if b, _ := OutputStreamP(e, stream); b == Nil {
 		return nil, nil // throw Error
 	}
 	args := []interface{}{}

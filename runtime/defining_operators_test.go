@@ -117,10 +117,19 @@ func TestDefun(t *testing.T) {
 	defspecial(Defconstant)
 	defspecial(Quote)
 	defspecial(Defun)
+	defspecial(If)
+	defun2("<", NumberLessThan)
+	defun2("+", Add)
+	defun2("-", Substruct)
 	tests := []test{
 		{
-			exp:     `(defun caar (x) (car (car x)))`,
-			want:    `'caar`,
+			exp:     `(defun fib (x) (if (< x 3) 1 (+ (fib (- x 1)) (fib (- x 2)))))`,
+			want:    `'fib`,
+			wantErr: false,
+		},
+		{
+			exp:     `(fib 10)`,
+			want:    `55`,
 			wantErr: false,
 		},
 	}
