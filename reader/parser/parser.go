@@ -154,6 +154,14 @@ func Parse(t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instance) {
 	if err != nil {
 		return nil, err
 	}
+	/*
+		for tok[:2] != "#|" || tok[:1] != ";" {
+			tok, err = t.Next()
+			if err != nil {
+				return nil, err
+			}
+		}
+	*/
 	if tok == "(" {
 		cons, err := parseCons(t)
 		if err != nil {

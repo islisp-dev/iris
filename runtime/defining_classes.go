@@ -95,7 +95,7 @@ func Defclass(e env.Environment, className, scNames, slotSpecs ilos.Instance, cl
 		}
 	}
 	classObject := instance.NewStandardClass(className, supers, slots, initforms, initargs, metaclass, abstractp)
-	TopLevel.Class.Define(className, classObject)
+	e.Class[:1].Define(className, classObject)
 	for _, slotSpec := range slotSpecs.(instance.List).Slice() {
 		if ilos.InstanceOf(class.Symbol, slotSpec) {
 			continue

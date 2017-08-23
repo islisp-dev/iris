@@ -175,7 +175,7 @@ func Subseq(e env.Environment, sequence, z1, z2 ilos.Instance) (ilos.Instance, i
 //
 // An error shall be signaled if any sequence is not a basic-vector or a list
 // (error-id. domain-error).
-func mapInto(e env.Environment, destination, function ilos.Instance, sequences ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func MapInto(e env.Environment, destination, function ilos.Instance, sequences ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(class.List, append(sequences, destination)...); err != nil {
 		if err := ensure(class.BasicVector, append(sequences, destination)...); err != nil {
 			return nil, err

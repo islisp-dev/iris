@@ -29,7 +29,7 @@ func Subclassp(e env.Environment, class1, class2 ilos.Class) (ilos.Instance, ilo
 }
 
 func Class(e env.Environment, className ilos.Instance) (ilos.Class, ilos.Instance) {
-	if v, ok := TopLevel.Class.Get(className); ok {
+	if v, ok := e.Class[:1].Get(className); ok {
 		return v.(ilos.Class), nil
 	}
 	return nil, instance.NewUndefinedClass(className)
