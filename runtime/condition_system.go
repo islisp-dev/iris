@@ -15,13 +15,13 @@ func SignalCondition(e env.Environment, condition, continuable ilos.Instance) (i
 	if err := ensure(class.SeriousCondition, condition); err != nil {
 		return nil, err
 	}
-	if handler, ok := e.Handler.Get(instance.NewSymbol("HANDLER")); ok {
-		if continuable != Nil {
-			handler.(instance.Applicable).Apply(e, condition)
-		}
-	}
 	condition.(instance.Instance).SetSlotValue(instance.NewSymbol("IRIS.CONTINUABLE"), continuable, class.SeriousCondition)
-	return nil, condition
+	_, c := e.Handler.(instance.Applicable).Apply(e, condition)
+	if ilos.InstanceOf(class.Continue, c) {
+		o, _ := c.(instance.Instance).GetSlotValue(instance.NewSymbol("IRIS.OBJECT"), class.Continue)
+		return o, nil
+	}
+	return nil, c
 }
 
 func Cerror(e env.Environment, continueString, errorString ilos.Instance, objs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
@@ -62,7 +62,7 @@ func IgnoreError(e env.Environment, forms ...ilos.Instance) (ilos.Instance, ilos
 }
 
 func ReportCondition(e env.Environment, condition, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
-	return nil, nil
+	return Format(e, e.StandardOutput, instance.NewString("~A"), condition)
 }
 
 func ConditionContinuable(e env.Environment, condition ilos.Instance) (ilos.Instance, ilos.Instance) {
@@ -72,9 +72,17 @@ func ConditionContinuable(e env.Environment, condition ilos.Instance) (ilos.Inst
 	return Nil, nil
 }
 
-func ContinueCondition(e env.Environment, condition, value ilos.Instance) (ilos.Instance, ilos.Instance) {
-	// TODO:
-	return nil, nil
+func ContinueCondition(e env.Environment, condition ilos.Instance, value ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	if b, ok := condition.(instance.Instance).GetSlotValue(instance.NewSymbol("IRIS.CONTINUABLE"), class.SeriousCondition); !ok || b == Nil {
+		return nil, instance.Create(e, class.ProgramError)
+	}
+	if len(value) == 1 {
+		return nil, instance.Create(e, class.Continue, instance.NewSymbol("IRIS.OBJECT"), value[0])
+	}
+	if len(value) == 0 {
+		return nil, instance.Create(e, class.Continue, instance.NewSymbol("IRIS.OBJECT"), Nil)
+	}
+	return nil, instance.Create(e, class.ProgramError)
 }
 
 func WithHandler(e env.Environment, handler ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
@@ -82,9 +90,10 @@ func WithHandler(e env.Environment, handler ilos.Instance, forms ...ilos.Instanc
 	if err != nil {
 		return nil, err
 	}
+	e.Handler = fun
 	ret, err := Progn(e, forms...)
 	if err != nil {
-		return fun.(instance.Applicable).Apply(e, err)
+		return nil, err
 	}
 	return ret, err
 }

@@ -30,11 +30,11 @@ type Environment struct {
 	StandardInput   ilos.Instance
 	StandardOutput  ilos.Instance
 	ErrorOutput     ilos.Instance
-	Handler         stack
+	Handler         ilos.Instance
 }
 
 // New creates new eironment
-func NewEnvironment(stdin, stdout, stderr ilos.Instance) Environment {
+func NewEnvironment(stdin, stdout, stderr, handler ilos.Instance) Environment {
 	e := new(Environment)
 
 	// Lexical
@@ -57,7 +57,7 @@ func NewEnvironment(stdin, stdout, stderr ilos.Instance) Environment {
 	e.StandardInput = stdin
 	e.StandardOutput = stdout
 	e.ErrorOutput = stderr
-	e.Handler = NewStack()
+	e.Handler = handler
 	return *e
 }
 
@@ -79,7 +79,7 @@ func (e *Environment) MergeLexical(before Environment) {
 	e.StandardInput = before.StandardInput
 	e.StandardOutput = before.StandardOutput
 	e.ErrorOutput = before.ErrorOutput
-	e.Handler = append(before.Handler, e.Handler[1:]...)
+	e.Handler = before.Handler
 }
 
 func (e *Environment) MergeDynamic(before Environment) {
@@ -100,11 +100,11 @@ func (e *Environment) MergeDynamic(before Environment) {
 	e.StandardInput = before.StandardInput
 	e.StandardOutput = before.StandardOutput
 	e.ErrorOutput = before.ErrorOutput
-	e.Handler = append(before.Handler, e.Handler[1:]...)
+	e.Handler = before.Handler
 }
 
 func (before *Environment) NewLexical() Environment {
-	e := NewEnvironment(before.StandardInput, before.StandardOutput, before.ErrorOutput)
+	e := NewEnvironment(before.StandardInput, before.StandardOutput, before.ErrorOutput, before.Handler)
 
 	e.BlockTag = append(before.BlockTag, e.BlockTag[0])
 	e.TagbodyTag = append(before.TagbodyTag, e.TagbodyTag[0])
@@ -123,13 +123,13 @@ func (before *Environment) NewLexical() Environment {
 	e.StandardInput = before.StandardInput
 	e.StandardOutput = before.StandardOutput
 	e.ErrorOutput = before.ErrorOutput
-	e.Handler = append(before.Handler, e.Handler[0])
+	e.Handler = before.Handler
 
 	return e
 }
 
 func (before *Environment) NewDynamic() Environment {
-	e := NewEnvironment(before.StandardInput, before.StandardOutput, before.ErrorOutput)
+	e := NewEnvironment(before.StandardInput, before.StandardOutput, before.ErrorOutput, before.Handler)
 
 	e.BlockTag = append(stack{before.BlockTag[0]}, e.BlockTag[0])
 	e.TagbodyTag = append(stack{before.TagbodyTag[0]}, e.TagbodyTag[0])
@@ -148,7 +148,7 @@ func (before *Environment) NewDynamic() Environment {
 	e.StandardInput = before.StandardInput
 	e.StandardOutput = before.StandardOutput
 	e.ErrorOutput = before.ErrorOutput
-	e.Handler = append(before.Handler, e.Handler[0])
+	e.Handler = before.Handler
 
 	return e
 }

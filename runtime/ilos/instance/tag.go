@@ -9,18 +9,23 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos"
 )
 
-func NewBlockTag(tag, object ilos.Instance) ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil),
+func NewBlockTag(tag, uid, object ilos.Instance) ilos.Instance {
+	return Create(env.NewEnvironment(nil, nil, nil, nil),
 		BlockTagClass,
-		NewSymbol("TAG"), tag,
-		NewSymbol("OBJECT"), object)
+		NewSymbol("IRIS.TAG"), tag,
+		NewSymbol("IRIS.UID"), uid,
+		NewSymbol("IRIS.OBJECT"), object)
 }
-func NewCatchTag(tag, object ilos.Instance) ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil),
+func NewCatchTag(tag, uid, object ilos.Instance) ilos.Instance {
+	return Create(env.NewEnvironment(nil, nil, nil, nil),
 		CatchTagClass,
-		NewSymbol("TAG"), tag,
-		NewSymbol("OBJECT"), object)
+		NewSymbol("IRIS.TAG"), tag,
+		NewSymbol("IRIS.UID"), uid,
+		NewSymbol("IRIS.OBJECT"), object)
 }
-func NewTagbodyTag(tag ilos.Instance) ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil), TagbodyTagClass, NewSymbol("TAG"), tag)
+func NewTagbodyTag(tag, uid ilos.Instance) ilos.Instance {
+	return Create(env.NewEnvironment(nil, nil, nil, nil),
+		TagbodyTagClass,
+		NewSymbol("IRIS.TAG"), tag,
+		NewSymbol("IRIS.UID"), uid)
 }
