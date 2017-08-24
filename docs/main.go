@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+	"html"
 	"strings"
 
 	"github.com/gopherjs/jquery"
@@ -21,12 +23,14 @@ func main() {
 		tokens := tokenizer.New(reader)
 		exp, err := parser.Parse(tokens)
 		if err != nil {
-			jQuery("#history").Append("<div>&gt; " + input + "</div>" + "<div>" + err.String() + "</div>")
+			jQuery("#history").Append(fmt.Sprintf("<code><pre>&gt; %v</pre></code><code><pre>%v</pre></code>", input, html.EscapeString(err.String())))
+		} else {
+			output, err := runtime.Eval(env, exp)
+			if err != nil {
+				jQuery("#history").Append(fmt.Sprintf("<code><pre>&gt; %v</pre></code><code><pre>%v</pre></code>", input, html.EscapeString(err.String())))
+			} else {
+				jQuery("#history").Append(fmt.Sprintf("<code><pre>&gt; %v</pre></code><code><pre>%v</pre></code>", input, html.EscapeString(output.String())))
+			}
 		}
-		output, err := runtime.Eval(env, exp)
-		if err != nil {
-			jQuery("#history").Append("<div>&gt; " + input + "</div>" + "<div>" + err.String() + "</div>")
-		}
-		jQuery("#history").Append("<div>&gt; " + input + "</div>" + "<div>" + output.String() + "</div>")
 	})
 }
