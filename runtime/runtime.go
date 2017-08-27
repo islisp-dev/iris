@@ -18,6 +18,8 @@ import (
 func New() env.Environment {
 	toplevel := env.NewEnvironment(instance.NewStream(os.Stdin, nil), instance.NewStream(nil, os.Stdout), instance.NewStream(nil, os.Stderr), nil)
 	defspecial2 := func(name string, function interface{}) {
+		name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
+		name = strings.ToUpper(name)
 		symbol := instance.NewSymbol(name)
 		toplevel.Special.Define(symbol, instance.NewFunction(func2symbol(function), function))
 	}
