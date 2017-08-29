@@ -46,4 +46,4 @@ $ go test ./...
 This software is licensed under the Mozilla Public License v2.0
 
 ## Copyright
-Copyright (c) 2017 TANIGUCHI Masaya
+Copyright (c) 2017 TANIGUCHI Masaya　All Rights Reserved.
