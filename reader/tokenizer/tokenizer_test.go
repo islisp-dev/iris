@@ -14,7 +14,7 @@ import (
 )
 
 func TestTokenizer_Next(t *testing.T) {
-	tokenizer := New(strings.NewReader("(default)"))
+	tokenizer := Tokenize(strings.NewReader("(default)"))
 	type fields struct {
 		sc *bufio.Scanner
 	}

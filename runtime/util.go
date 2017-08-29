@@ -5,7 +5,6 @@
 package runtime
 
 import (
-	"os"
 	"reflect"
 	"regexp"
 	"runtime"
@@ -42,7 +41,7 @@ func convFloat64(x ilos.Instance) (float64, bool, ilos.Instance) {
 }
 
 func readFromString(s string) ilos.Instance {
-	ret, _ := parser.Parse(tokenizer.New(strings.NewReader(s)))
+	ret, _ := parser.Parse(tokenizer.Tokenize(strings.NewReader(s)))
 	return ret
 }
 func evalString(e env.Environment, s string) ilos.Instance {
@@ -73,8 +72,6 @@ func func2symbol(function interface{}) ilos.Instance {
 	name = strings.ToUpper(name)
 	return instance.NewSymbol(name)
 }
-
-var TopLevel = env.NewEnvironment(instance.NewStream(os.Stdin, nil), instance.NewStream(nil, os.Stdout), instance.NewStream(nil, os.Stderr), nil)
 
 func defspecial(function interface{}) {
 	TopLevel.Special.Define(func2symbol(function), instance.NewFunction(func2symbol(function), function))

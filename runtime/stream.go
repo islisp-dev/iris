@@ -228,7 +228,7 @@ func Read(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.Inst
 			eosValue = options[2]
 		}
 	}
-	v, err := parser.Parse(tokenizer.New(s.(instance.Stream).Reader))
+	v, err := parser.Parse(tokenizer.Tokenize(s.(instance.Stream).Reader))
 	if err != nil && ilos.InstanceOf(class.EndOfStream, err) {
 		if eosErrorP {
 			return nil, err
