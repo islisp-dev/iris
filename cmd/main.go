@@ -11,10 +11,9 @@ import (
 )
 
 func main() {
-	env := runtime.New()
 	fmt.Print("> ")
-	for exp, err := runtime.Read(env); err == nil; exp, err = runtime.Read(env) {
-		ret, err := runtime.Eval(env, exp)
+	for exp, err := runtime.Read(runtime.TopLevel); err == nil; exp, err = runtime.Read(runtime.TopLevel) {
+		ret, err := runtime.Eval(runtime.TopLevel, exp)
 		if err != nil {
 			fmt.Println(err)
 		}

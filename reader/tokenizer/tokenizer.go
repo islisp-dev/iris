@@ -9,6 +9,7 @@ import (
 	"io"
 	"regexp"
 
+	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
@@ -22,7 +23,7 @@ type Tokenizer struct {
 
 var re *regexp.Regexp
 
-func New(r io.Reader) *Tokenizer {
+func Tokenize(r io.Reader) *Tokenizer {
 	str := ``
 	str += `[-+]?[[:digit:]]+\.[[:digit:]]+|`
 	str += `[-+]?[[:digit:]]+(?:\.[[:digit:]]+)?[eE][-+]?[[:digit:]]+|`
@@ -49,14 +50,14 @@ func (t *Tokenizer) Next() (string, ilos.Instance) {
 	if t.sc.Scan() {
 		return t.sc.Text(), nil
 	}
-	return "", instance.NewParseError(instance.NewString(t.sc.Text()), class.Object)
+	return "", instance.Create(env.NewEnvironment(nil, nil, nil, nil), class.EndOfStream)
 }
 
 func splitter(data []byte, atEOF bool) (advance int, token []byte, err error) {
 	if atEOF {
 		advance = len(data)
 		token = data
-		err = nil
+		err = io.EOF
 		return
 	}
 	if loc := re.FindIndex(data); loc != nil {
