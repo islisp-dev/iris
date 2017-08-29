@@ -35,7 +35,7 @@ func TestSignalCondition(t *testing.T) {
 				 (with-handler #'continue-condition-handler
 					(error "not cont")) 
 				`,
-			want:    ``,
+			want:    `nil`,
 			wantErr: true,
 		},
 	}
