@@ -12,7 +12,7 @@ ISLisp is a member of LISP family and standardized by ISO in 2007.
 As you know, Common Lisp is standardized by ANSI in 1994.
 Iris is a interpreter of ISLisp implemented with golang.
 
-Iris has webpage which has the online REPL. [islisp.js.org](islisp.js.org)
+Iris has the webpage and the online REPL. [islisp.js.org](islisp.js.org)
 
 ## Usage
 
@@ -29,7 +29,7 @@ $ go get github.com/ta2gch/iris
 You can update iris with `go get`
 
 ```bash
-$ go get github.com/ta2gch/iris
+$ go get -u github.com/ta2gch/iris
 ```
 
 ## Development
