@@ -33,9 +33,9 @@ func Tokenize(r io.Reader) *Tokenizer {
 	str += `#[xX][-+]?[[:xdigit:]]+|`
 	str += `#\\[[:alpha:]]+|`
 	str += `#\\[[:graph:]]|`
-	str += `"[^"]*"|` // TODO: support \"
+	str += `"(?:\\\\|\\"|[^"])*"|`
 	str += `[:&][a-zA-Z]+|`
-	str += `\|.*\||` // TODO: support \"
+	str += `\|(?:\\\\|\\\||[^|])*\||`
 	str += `\+|\-|1\+|1\-|`
 	str += `[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*|`
 	str += `[.()]|`

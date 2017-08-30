@@ -14,7 +14,7 @@ import (
 )
 
 func TestTokenizer_Next(t *testing.T) {
-	tokenizer := Tokenize(strings.NewReader("(default)"))
+	tokenizer := Tokenize(strings.NewReader(`("\\""\"foo\"" | foo \| bar |)`))
 	type fields struct {
 		sc *bufio.Scanner
 	}
@@ -31,9 +31,21 @@ func TestTokenizer_Next(t *testing.T) {
 			want1:  nil,
 		},
 		{
-			name:   "default",
+			name:   "back slash",
 			fields: fields{tokenizer.sc},
-			want:   "default",
+			want:   `"\\"`,
+			want1:  nil,
+		},
+		{
+			name:   `"\"foo\""`,
+			fields: fields{tokenizer.sc},
+			want:   `"\"foo\""`,
+			want1:  nil,
+		},
+		{
+			name:   `| foo \| bar |`,
+			fields: fields{tokenizer.sc},
+			want:   `| foo \| bar |`,
 			want1:  nil,
 		},
 		{
