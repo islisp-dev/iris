@@ -7,14 +7,6 @@ package runtime
 import "testing"
 
 func TestEq(t *testing.T) {
-	defun(Eq)
-	defspecial(Quote)
-	defglobal("T", T)
-	defglobal("NIL", Nil)
-	defun(Cons)
-	defun(Cdr)
-	defspecial(Let)
-	defspecial(Lambda)
 	tests := []test{
 		{
 			exp:     `(eq () ())`,
@@ -148,14 +140,6 @@ func TestEq(t *testing.T) {
 }
 
 func TestEql(t *testing.T) {
-	defun(Eql)
-	defspecial(Quote)
-	defglobal("T", T)
-	defglobal("NIL", Nil)
-	defun(Cons)
-	defun(Cdr)
-	defspecial(Let)
-	defspecial(Lambda)
 	tests := []test{
 		{
 			exp:     `(eql () ())`,
@@ -289,13 +273,6 @@ func TestEql(t *testing.T) {
 }
 
 func TestEqual(t *testing.T) {
-	defun(Equal)
-	defspecial(Quote)
-	defglobal("T", T)
-	defglobal("NIL", Nil)
-	defun(Cons)
-	defun(List)
-	defun(Vector)
 	tests := []test{
 		{
 			exp:     `(equal 'a 'a)`,

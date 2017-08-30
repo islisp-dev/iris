@@ -7,11 +7,6 @@ package runtime
 import "testing"
 
 func TestNot(t *testing.T) {
-	defun(Not)
-	defglobal("T", T)
-	defglobal("NIL", Nil)
-	defun(List)
-	defspecial(Quote)
 	tests := []test{
 		{
 			exp:     `(not t)`,
@@ -48,20 +43,6 @@ func TestNot(t *testing.T) {
 }
 
 func TestAnd(t *testing.T) {
-	defspecial(And)
-	defun2("=", NumberEqual)
-	defun2(">", NumberGreaterThan)
-	defun2("<", NumberLessThan)
-	defun(Eq)
-	defspecial(Quote)
-	defun(Not)
-	defspecial(Let)
-	defspecial(Setq)
-	defglobal("T", T)
-	defglobal("NIL", Nil)
-	defun2("-", Substruct)
-	defspecial(If)
-	defun(Eql)
 	tests := []test{
 		{
 			exp:     `(and (= 2 2) (> 2 1))`,
@@ -119,15 +100,6 @@ func TestAnd(t *testing.T) {
 }
 
 func TestOr(t *testing.T) {
-	defspecial(Or)
-	defun2("=", NumberEqual)
-	defun2(">", NumberGreaterThan)
-	defun2("<", NumberLessThan)
-	defspecial(Quote)
-	defspecial(Setq)
-	defspecial(Let)
-	defglobal("T", T)
-	defglobal("NIL", Nil)
 	tests := []test{
 		{
 			exp:     `(or (= 2 2) (> 2 1))`,

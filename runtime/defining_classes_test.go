@@ -7,20 +7,6 @@ package runtime
 import "testing"
 
 func TestDefclass(t *testing.T) {
-	defspecial(Defclass)
-	defspecial(Defgeneric)
-	defspecial(Defmethod)
-	defspecial(Quote)
-	defun(Sqrt)
-	defun2("+", Add)
-	defun2("-", Substruct)
-	defun2("*", Multiply)
-	defspecial(Let)
-	defun(List)
-	defspecial(defun)
-	defun(Create)
-	defglobal("NIL", Nil)
-	defspecial(Class)
 	tests := []test{
 		{
 			exp:     `(defclass Foo () (a))`,

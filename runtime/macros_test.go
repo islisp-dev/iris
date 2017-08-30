@@ -7,9 +7,6 @@ package runtime
 import "testing"
 
 func TestDefmacro(t *testing.T) {
-	defspecial(Defmacro)
-	defun(List)
-	defspecial(Quote)
 	tests := []test{
 		{
 			exp:     "(defmacro caar(x) (list ’car (list ’car x)))",
@@ -21,15 +18,6 @@ func TestDefmacro(t *testing.T) {
 }
 
 func TestQuasiquote(t *testing.T) {
-	defun(List)
-	defun2("+", Add)
-	defspecial(Let)
-	defspecial(Quasiquote)
-	defun(CreateList)
-	defun(Car)
-	defun(Cdr)
-	defun2("-", Substruct)
-	defspecial(Quote)
 	tests := []test{
 		{
 			exp:     "`(list ,(+ 1 2) 4)",

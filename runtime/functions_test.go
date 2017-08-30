@@ -9,10 +9,6 @@ import (
 )
 
 func TestFunctionp(t *testing.T) {
-	defun(Car)
-	defspecial(Function)
-	defun(Functionp)
-	defglobal("T", T)
 	tests := []test{
 		{
 			exp:     `(functionp (function car))`,
@@ -24,11 +20,6 @@ func TestFunctionp(t *testing.T) {
 }
 
 func TestFunction(t *testing.T) {
-	defun2("-", Substruct)
-	defspecial(Function)
-	defspecial(Quote)
-	defun(Funcall)
-	defun(Apply)
 	tests := []test{
 		{
 			exp:     `(funcall (function -) 3)`,
@@ -45,12 +36,6 @@ func TestFunction(t *testing.T) {
 }
 
 func TestLambda(t *testing.T) {
-	defun2("*", Multiply)
-	defun2("+", Add)
-	defspecial(Lambda)
-	defspecial(Quote)
-	defun(Funcall)
-	defun2("-", Substruct)
 	tests := []test{
 		{
 			exp:     `((lambda (x y) (+ (* x x) (* y y))) 3 4)`,
@@ -77,12 +62,6 @@ func TestLambda(t *testing.T) {
 }
 
 func TestLabels(t *testing.T) {
-	defspecial(If)
-	defspecial(Labels)
-	defglobal("NIL", Nil)
-	defglobal("T", T)
-	defun2("=", NumberEqual)
-	defun2("-", Substruct)
 	tests := []test{
 		{
 			exp: `(labels ((evenp (n)
@@ -102,10 +81,6 @@ func TestLabels(t *testing.T) {
 }
 
 func TestFlet(t *testing.T) {
-	defun2("+", Add)
-	defspecial(Flet)
-	defspecial(Defun)
-	defspecial(Quote)
 	tests := []test{
 		{
 			exp:     `(defun f (x) 0)`,
@@ -126,20 +101,6 @@ func TestFlet(t *testing.T) {
 }
 
 func TestApply(t *testing.T) {
-	defun2("+", Add)
-	defun(Apply)
-	defspecial(Quote)
-	defspecial(If)
-	defun2("<", NumberLessThan)
-	defun2("*", Multiply)
-	defun(Min)
-	defun(Max)
-	defun(List)
-	defspecial(Defun)
-	defspecial(Lambda)
-	defun(Funcall)
-	defspecial(Function)
-	defun(Sqrt)
 	tests := []test{
 		{
 			exp: `
@@ -168,15 +129,6 @@ func TestApply(t *testing.T) {
 }
 
 func TestFuncall(t *testing.T) {
-	defspecial(Let)
-	defspecial(Quote)
-	defun(Funcall)
-	defspecial(Cond)
-	defun(Car)
-	defspecial(Lambda)
-	defglobal("T", T)
-	defun(Listp)
-	defspecial(Function)
 	tests := []test{
 		{
 			exp: `
