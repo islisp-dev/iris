@@ -43,7 +43,7 @@ func InitializeObject(e env.Environment, object ilos.Instance, inits ...ilos.Ins
 	for _, slotName := range object.Class().Slots() {
 		if _, ok := object.(Instance).GetSlotValue(slotName, object.Class()); !ok {
 			if form, ok := object.Class().Initform(slotName); ok {
-				value, _ := form.(Applicable).Apply(e)
+				value, _ := form.(Applicable).Apply(e.NewDynamic())
 				object.(Instance).SetSlotValue(slotName, value, object.Class())
 			}
 		}
