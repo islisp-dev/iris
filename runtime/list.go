@@ -158,7 +158,7 @@ func Mapcar(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).Nth(i)
 		}
-		ret, err := function.(instance.Applicable).Apply(e, arguments...)
+		ret, err := function.(instance.Applicable).Apply(e.NewDynamic(), arguments...)
 		if err != nil {
 			return nil, err
 		}
@@ -186,7 +186,7 @@ func Mapc(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instan
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).Nth(i)
 		}
-		if _, err := function.(instance.Applicable).Apply(e, arguments...); err != nil {
+		if _, err := function.(instance.Applicable).Apply(e.NewDynamic(), arguments...); err != nil {
 			return nil, err
 		}
 	}
@@ -214,7 +214,7 @@ func Mapcan(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).Nth(i)
 		}
-		ret, err := function.(instance.Applicable).Apply(e, arguments...)
+		ret, err := function.(instance.Applicable).Apply(e.NewDynamic(), arguments...)
 		if err != nil {
 			return nil, err
 		}
@@ -244,7 +244,7 @@ func Maplist(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Ins
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).NthCdr(i)
 		}
-		ret, err := function.(instance.Applicable).Apply(e, arguments...)
+		ret, err := function.(instance.Applicable).Apply(e.NewDynamic(), arguments...)
 		if err != nil {
 			return nil, err
 		}
@@ -272,7 +272,7 @@ func Mapl(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instan
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).NthCdr(i)
 		}
-		if _, err := function.(instance.Applicable).Apply(e, arguments...); err != nil {
+		if _, err := function.(instance.Applicable).Apply(e.NewDynamic(), arguments...); err != nil {
 			return nil, err
 		}
 	}
@@ -300,7 +300,7 @@ func Mapcon(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 		for j, list := range lists {
 			arguments[j] = list.(instance.List).NthCdr(i)
 		}
-		ret, err := function.(instance.Applicable).Apply(e, arguments...)
+		ret, err := function.(instance.Applicable).Apply(e.NewDynamic(), arguments...)
 		if err != nil {
 			return nil, err
 		}
@@ -323,6 +323,14 @@ func Assoc(e env.Environment, obj, associationList ilos.Instance) (ilos.Instance
 		if pair.(*instance.Cons).Car == obj { // eql
 			return pair.(*instance.Cons).Cdr, nil
 		}
+	}
+	return Nil, nil
+}
+
+// Null returns t if obj is nil; otherwise, returns nil obj may be any ISLISP object.
+func Null(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+	if obj == Nil {
+		return T, nil
 	}
 	return Nil, nil
 }

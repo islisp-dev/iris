@@ -204,7 +204,7 @@ func MapInto(e env.Environment, destination, function ilos.Instance, sequences .
 				return nil, err
 			}
 		}
-		ret, err := function.(instance.Applicable).Apply(e, arguments...)
+		ret, err := function.(instance.Applicable).Apply(e.NewDynamic(), arguments...)
 		if err != nil {
 			return nil, err
 		}
