@@ -101,8 +101,11 @@ func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, for
 			case 2:
 			case 3:
 				var1 := is.(instance.List).Nth(0)
-				step := is.(instance.List).Nth(2)
-				if e.Variable.Set(var1, step) {
+				step, err := Eval(e, is.(instance.List).Nth(2))
+				if err != nil {
+					return nil, err
+				}
+				if !e.Variable.Set(var1, step) {
 					return nil, instance.NewImmutableBinding()
 				}
 			default:
