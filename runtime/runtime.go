@@ -18,25 +18,26 @@ import (
 var TopLevel = env.NewEnvironment(instance.NewStream(os.Stdin, nil), instance.NewStream(nil, os.Stdout), instance.NewStream(nil, os.Stderr), nil)
 var Version = "0.1.0"
 
+func defspecial2(name string, function interface{}) {
+	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
+	name = strings.ToUpper(name)
+	symbol := instance.NewSymbol(name)
+	TopLevel.Special.Define(symbol, instance.NewFunction(func2symbol(function), function))
+}
+
+func defun2(name string, function interface{}) {
+	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
+	name = strings.ToUpper(name)
+	symbol := instance.NewSymbol(name)
+	TopLevel.Function.Define(symbol, instance.NewFunction(symbol, function))
+}
+func defglobal(name string, value ilos.Instance) {
+	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
+	name = strings.ToUpper(name)
+	symbol := instance.NewSymbol(name)
+	TopLevel.Variable.Define(symbol, value)
+}
 func init() {
-	defspecial2 := func(name string, function interface{}) {
-		name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
-		name = strings.ToUpper(name)
-		symbol := instance.NewSymbol(name)
-		TopLevel.Special.Define(symbol, instance.NewFunction(func2symbol(function), function))
-	}
-	defun2 := func(name string, function interface{}) {
-		name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
-		name = strings.ToUpper(name)
-		symbol := instance.NewSymbol(name)
-		TopLevel.Function.Define(symbol, instance.NewFunction(symbol, function))
-	}
-	defglobal := func(name string, value ilos.Instance) {
-		name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
-		name = strings.ToUpper(name)
-		symbol := instance.NewSymbol(name)
-		TopLevel.Variable.Define(symbol, value)
-	}
 	defglobal("*pi*", instance.Float(math.Pi))
 	defglobal("*MostPositiveFloat*", MostPositiveFloat)
 	defglobal("*MostNegativeFloat*", MostNegativeFloat)
