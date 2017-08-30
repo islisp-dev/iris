@@ -5,6 +5,8 @@
 package runtime
 
 import (
+	"fmt"
+
 	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
@@ -64,6 +66,7 @@ func newNamedFunction(e env.Environment, functionName, lambdaList ilos.Instance,
 			}
 			value := arguments[idx]
 			if !e.Variable.Define(key, value) {
+				fmt.Print(key, value)
 				return nil, instance.NewImmutableBinding()
 			}
 		}

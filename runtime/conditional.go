@@ -140,7 +140,7 @@ func CaseUsing(e env.Environment, key, pred ilos.Instance, pattern ...ilos.Insta
 			return nil, err
 		}
 		for _, k := range form[0].(instance.List).Slice() {
-			ret, err := pred.(instance.Applicable).Apply(e, k, key)
+			ret, err := pred.(instance.Applicable).Apply(e.NewDynamic(), k, key)
 			if err != nil {
 				return nil, err
 			}

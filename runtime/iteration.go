@@ -50,7 +50,7 @@ func While(e env.Environment, testForm ilos.Instance, bodyForm ...ilos.Instance)
 // Then each value is used as the initial value of the variable denoted by the corresponding identifier var ,
 // and the iteration phase begins.
 //
-//Each iteration begins by evaluating end-test . If the result is nil, the forms in the body are
+// Each iteration begins by evaluating end-test . If the result is nil, the forms in the body are
 // evaluated sequentially (for side-effects). Afterwards, the step-forms are evaluated sequentially
 // order from left to right. Then their values are assigned to the corresponding variables and the next iteration begins.
 // If end-test returns a non-nil value, then the result * are evaluated sequentially and the value of the
