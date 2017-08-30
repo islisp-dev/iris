@@ -7,12 +7,6 @@ package runtime
 import "testing"
 
 func TestSignalCondition(t *testing.T) {
-	defspecial(Defun)
-	defun(Cerror)
-	defun(ContinueCondition)
-	defspecial(WithHandler)
-	defspecial(Function)
-	defspecial(Quote)
 	tests := []test{
 		{
 			exp: ` 

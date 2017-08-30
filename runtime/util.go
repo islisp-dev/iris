@@ -72,24 +72,3 @@ func func2symbol(function interface{}) ilos.Instance {
 	name = strings.ToUpper(name)
 	return instance.NewSymbol(name)
 }
-
-func defspecial(function interface{}) {
-	TopLevel.Special.Define(func2symbol(function), instance.NewFunction(func2symbol(function), function))
-}
-
-func defmacro(function interface{}) {
-	TopLevel.Macro.Define(func2symbol(function), instance.NewFunction(func2symbol(function), function))
-}
-
-func defun(function interface{}) {
-	TopLevel.Function.Define(func2symbol(function), instance.NewFunction(func2symbol(function), function))
-}
-
-func defun2(name string, function interface{}) {
-	symbol := instance.NewSymbol(name)
-	TopLevel.Function.Define(symbol, instance.NewFunction(symbol, function))
-}
-func defglobal(name string, value ilos.Instance) {
-	symbol := instance.NewSymbol(name)
-	TopLevel.Variable.Define(symbol, value)
-}

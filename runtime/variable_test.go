@@ -7,10 +7,6 @@ package runtime
 import "testing"
 
 func TestSetf(t *testing.T) {
-	defun2("(SETF CAR)", SetCar)
-	defspecial(Setf)
-	defspecial(Let)
-	defspecial(Quote)
 	tests := []test{
 		{
 			exp:     `(let ((c '(1 2))) (setf (car c) 3) c)`,

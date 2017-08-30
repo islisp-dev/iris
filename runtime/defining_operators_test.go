@@ -7,9 +7,6 @@ package runtime
 import "testing"
 
 func TestDefconstant(t *testing.T) {
-	defspecial(Defconstant)
-	defspecial(Quote)
-	defspecial(Defun)
 	tests := []test{
 		{
 			exp:     `(defconstant e 2.7182818284590451)`,
@@ -36,10 +33,6 @@ func TestDefconstant(t *testing.T) {
 }
 
 func TestDefglobal(t *testing.T) {
-	defspecial(Defglobal)
-	defspecial(Quote)
-	defspecial(Defun)
-	defspecial(Let)
 	tests := []test{
 		{
 			exp:     `(defglobal today 'wednesday)`,
@@ -78,11 +71,6 @@ func TestDefglobal(t *testing.T) {
 	execTests(t, Defglobal, tests)
 }
 func TestDefdynamic(t *testing.T) {
-	defspecial(Defdynamic)
-	defspecial(Quote)
-	defspecial(Defun)
-	defspecial(Dynamic)
-	defspecial(DynamicLet)
 	tests := []test{
 		{
 			exp:     `(defdynamic *color* 'red)`,
@@ -114,13 +102,6 @@ func TestDefdynamic(t *testing.T) {
 }
 
 func TestDefun(t *testing.T) {
-	defspecial(Defconstant)
-	defspecial(Quote)
-	defspecial(Defun)
-	defspecial(If)
-	defun2("<", NumberLessThan)
-	defun2("+", Add)
-	defun2("-", Substruct)
 	tests := []test{
 		{
 			exp:     `(defun fib (x) (if (< x 3) 1 (+ (fib (- x 1)) (fib (- x 2)))))`,
