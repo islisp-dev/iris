@@ -25,6 +25,7 @@ var re *regexp.Regexp
 
 func Tokenize(r io.Reader) *Tokenizer {
 	str := ``
+	str += `1\+|1-|`
 	str += `[-+]?[[:digit:]]+\.[[:digit:]]+|`
 	str += `[-+]?[[:digit:]]+(?:\.[[:digit:]]+)?[eE][-+]?[[:digit:]]+|`
 	str += `[-+]?[[:digit:]]+|`
@@ -35,9 +36,8 @@ func Tokenize(r io.Reader) *Tokenizer {
 	str += `#\\[[:graph:]]|`
 	str += `"(?:\\\\|\\"|[^"])*"|`
 	str += `[:&][a-zA-Z]+|`
+	str += `\+|-|[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*|`
 	str += `\|(?:\\\\|\\\||[^|])*\||`
-	str += `\+|\-|1\+|1\-|`
-	str += `[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*|`
 	str += `[.()]|`
 	str += "#'|,@?|'|`|#[[:digit:]]*[aA]|#" // TODO: hangs at #ab or #3
 	re = regexp.MustCompile(str)

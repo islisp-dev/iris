@@ -51,10 +51,23 @@ func InitializeObject(e env.Environment, object ilos.Instance, inits ...ilos.Ins
 	return object
 }
 
+type slots map[ilos.Instance]ilos.Instance
+
+func (s slots) String() string {
+	str := "{"
+	for k, v := range s {
+		str += fmt.Sprintf(`%v: %v, `, k, v)
+	}
+	if len(str) == 1 {
+		return ""
+	}
+	return str[:len(str)-2] + "}"
+}
+
 type Instance struct {
 	class  ilos.Class
 	supers []ilos.Instance
-	slots  map[ilos.Instance]ilos.Instance
+	slots  slots
 }
 
 func (i Instance) Class() ilos.Class {
@@ -86,14 +99,14 @@ func (i Instance) SetSlotValue(key ilos.Instance, value ilos.Instance, class ilo
 	return false
 }
 
-func (i Instance) Slots() map[ilos.Instance]ilos.Instance {
-	m := map[ilos.Instance]ilos.Instance{}
+func (i Instance) getAllSlots() slots {
+	m := slots{}
 	for k, v := range i.slots {
 		m[k] = v
 	}
 	for _, c := range i.supers {
 		if _, ok := c.(Instance); ok {
-			for k, v := range c.(Instance).Slots() {
+			for k, v := range c.(Instance).getAllSlots() {
 				m[k] = v
 			}
 		}
@@ -103,5 +116,5 @@ func (i Instance) Slots() map[ilos.Instance]ilos.Instance {
 
 func (i Instance) String() string {
 	c := i.Class().String()
-	return fmt.Sprintf("#%v %v>", c[:len(c)-1], i.Slots())
+	return fmt.Sprintf("#%v %v>", c[:len(c)-1], i.getAllSlots())
 }
