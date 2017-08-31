@@ -59,6 +59,7 @@ func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, for
 	if err := ensure(class.List, iterationSpecs); err != nil {
 		return nil, err
 	}
+	a := e.NewLexical()
 	for _, is := range iterationSpecs.(instance.List).Slice() {
 		if err := ensure(class.List, is); err != nil {
 			return nil, err
@@ -67,8 +68,11 @@ func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, for
 		switch len(i) {
 		case 2, 3:
 			var1 := i[0]
-			init := i[1]
-			if !e.Variable.Define(var1, init) {
+			init, err := Eval(e, i[1])
+			if err != nil {
+				return nil, err
+			}
+			if !a.Variable.Define(var1, init) {
 				return nil, instance.NewImmutableBinding()
 			}
 		default:
@@ -84,15 +88,16 @@ func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, for
 	}
 	endTest := ends[0]
 	results := ends[1:]
-	test, err := Eval(e, endTest)
+	test, err := Eval(a, endTest)
 	if err != nil {
 		return nil, err
 	}
 	for test == Nil {
-		_, err := Progn(e, forms...)
+		_, err := Progn(a, forms...)
 		if err != nil {
 			return nil, err
 		}
+		b := a.NewLexical()
 		for _, is := range iterationSpecs.(instance.List).Slice() {
 			if err := ensure(class.List, is); err != nil {
 				return nil, err
@@ -101,21 +106,22 @@ func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, for
 			case 2:
 			case 3:
 				var1 := is.(instance.List).Nth(0)
-				step, err := Eval(e, is.(instance.List).Nth(2))
+				step, err := Eval(a, is.(instance.List).Nth(2))
 				if err != nil {
 					return nil, err
 				}
-				if !e.Variable.Set(var1, step) {
+				if !b.Variable.Define(var1, step) {
 					return nil, instance.NewImmutableBinding()
 				}
 			default:
 				return nil, instance.NewArityError()
 			}
 		}
-		test, err = Eval(e, endTest)
+		test, err = Eval(b, endTest)
 		if err != nil {
 			return nil, err
 		}
+		a = b
 	}
-	return Progn(e, results...)
+	return Progn(a, results...)
 }
