@@ -78,7 +78,7 @@ func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	str := `^(`
 	str += `[:&][a-zA-Z]+|`
 	str += `\|.*\||`
-	str += `\+|\-|1\+|1\-|`
+	str += `\+|-|1\+|1-|`
 	str += `[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*|`
 	str += `)$`
 	if m, _ := regexp.MatchString(str, tok); m {
