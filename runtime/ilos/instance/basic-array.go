@@ -5,7 +5,8 @@
 package instance
 
 import (
-	"github.com/k0kubun/pp"
+	"fmt"
+
 	"github.com/ta2gch/iris/runtime/ilos"
 )
 
@@ -25,9 +26,30 @@ func NewGeneralArrayStar(vector []GeneralArrayStar, scalar ilos.Instance) ilos.I
 func (GeneralArrayStar) Class() ilos.Class {
 	return GeneralArrayStarClass
 }
+func countDim(a GeneralArrayStar) int {
+	if a.Vector != nil {
+		return 1 + countDim(a.Vector[0])
+	}
+	return 0
+}
 
 func (i GeneralArrayStar) String() string {
-	return ""
+	var stringify func(i GeneralArrayStar) string
+	stringify = func(i GeneralArrayStar) string {
+		if i.Vector != nil {
+			str := "("
+			for idx, elt := range i.Vector {
+				str += stringify(elt)
+				if idx != len(i.Vector)-1 {
+					str += " "
+				}
+			}
+			str += ")"
+			return str
+		}
+		return i.Scalar.String()
+	}
+	return fmt.Sprintf("#%vA%v", countDim(i), stringify(i))
 }
 
 //
@@ -45,7 +67,8 @@ func (GeneralVector) Class() ilos.Class {
 }
 
 func (i GeneralVector) String() string {
-	return pp.Sprint([]ilos.Instance(i))
+	str := fmt.Sprint([]ilos.Instance(i))
+	return fmt.Sprintf("#(%v)", str[1:len(str)-1])
 }
 
 //
