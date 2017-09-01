@@ -39,7 +39,7 @@ func Tokenize(r io.Reader) *Tokenizer {
 	str += `\+|-|[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*|`
 	str += `\|(?:\\\\|\\\||[^|])*\||`
 	str += `[.()]|`
-	str += "#'|,@?|'|`|#[[:digit:]]*[aA]|#" // TODO: hangs at #ab or #3
+	str += ";.*?\n|#\\|.*?\\|#|#'|,@?|'|`|#[[:digit:]]*[aA]|#" // TODO: hangs at #ab or #3
 	re = regexp.MustCompile(str)
 	sc := bufio.NewScanner(r)
 	sc.Split(splitter)
