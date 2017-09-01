@@ -56,12 +56,12 @@ func While(e env.Environment, testForm ilos.Instance, bodyForm ...ilos.Instance)
 // If end-test returns a non-nil value, then the result * are evaluated sequentially and the value of the
 // last one is returned as value of the whole for macro. If no result is present, then the value of the for macro is nil.
 func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.List, iterationSpecs); err != nil {
+	if err := ensure(e, class.List, iterationSpecs); err != nil {
 		return nil, err
 	}
 	a := e.NewLexical()
 	for _, is := range iterationSpecs.(instance.List).Slice() {
-		if err := ensure(class.List, is); err != nil {
+		if err := ensure(e, class.List, is); err != nil {
 			return nil, err
 		}
 		i := is.(instance.List).Slice()
@@ -79,7 +79,7 @@ func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, for
 			return nil, instance.NewArityError()
 		}
 	}
-	if err := ensure(class.List, endTestAndResults); err != nil {
+	if err := ensure(e, class.List, endTestAndResults); err != nil {
 		return nil, err
 	}
 	ends := endTestAndResults.(instance.List).Slice()
@@ -99,7 +99,7 @@ func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, for
 		}
 		b := a.NewLexical()
 		for _, is := range iterationSpecs.(instance.List).Slice() {
-			if err := ensure(class.List, is); err != nil {
+			if err := ensure(e, class.List, is); err != nil {
 				return nil, err
 			}
 			switch is.(instance.List).Length() {

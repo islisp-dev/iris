@@ -28,7 +28,7 @@ func Listp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) 
 // An error shall be signaled if i is not a non-negative integer (error-id. domain-error).
 //initial-element may be any ISLISP object.
 func CreateList(e env.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Integer, i); err != nil {
+	if err := ensure(e, class.Integer, i); err != nil {
 		return nil, err
 	}
 	if len(initialElement) > 1 {
@@ -62,7 +62,7 @@ func List(e env.Environment, objs ...ilos.Instance) (ilos.Instance, ilos.Instanc
 // For reverse, no side-effect to the given list occurs. The resulting list is permitted but not
 // required to share structure with the input list.
 func Reverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.List, list); err != nil {
+	if err := ensure(e, class.List, list); err != nil {
 		return nil, err
 	}
 	cons := Nil
@@ -80,7 +80,7 @@ func Reverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instanc
 // on a literal object.
 func Nreverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// TODO: tests literal object
-	if err := ensure(class.List, list); err != nil {
+	if err := ensure(e, class.List, list); err != nil {
 		return nil, err
 	}
 	cons := Nil
@@ -105,7 +105,7 @@ func Append(e env.Environment, lists ...ilos.Instance) (ilos.Instance, ilos.Inst
 		return nil, err
 	}
 	cdr := result
-	if err := ensure(class.List, lists...); err != nil {
+	if err := ensure(e, class.List, lists...); err != nil {
 		return nil, err
 	}
 	for _, list := range lists {
@@ -125,7 +125,7 @@ func Append(e env.Environment, lists ...ilos.Instance) (ilos.Instance, ilos.Inst
 // occurrence of obj (as determined by eql).  Otherwise, nil is returned. An error shall be signaled
 // if list is not a list (error-id. domain-error).
 func Member(e env.Environment, obj, list ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.List, list); err != nil {
+	if err := ensure(e, class.List, list); err != nil {
 		return nil, err
 	}
 	for idx, elt := range list.(instance.List).Slice() {
@@ -142,10 +142,10 @@ func Member(e env.Environment, obj, list ilos.Instance) (ilos.Instance, ilos.Ins
 // mapcar is a list of the results of successive calls to function.
 func Mapcar(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
-	if err := ensure(class.Function, function); err != nil {
+	if err := ensure(e, class.Function, function); err != nil {
 		return nil, err
 	}
-	if err := ensure(class.List, lists...); err != nil {
+	if err := ensure(e, class.List, lists...); err != nil {
 		return nil, err
 	}
 	max := 0.0
@@ -171,10 +171,10 @@ func Mapcar(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 // list1 is returned.
 func Mapc(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
-	if err := ensure(class.Function, function); err != nil {
+	if err := ensure(e, class.Function, function); err != nil {
 		return nil, err
 	}
-	if err := ensure(class.List, lists...); err != nil {
+	if err := ensure(e, class.List, lists...); err != nil {
 		return nil, err
 	}
 	max := 0.0
@@ -198,10 +198,10 @@ func Mapc(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instan
 // append rather than list.
 func Mapcan(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
-	if err := ensure(class.Function, function); err != nil {
+	if err := ensure(e, class.Function, function); err != nil {
 		return nil, err
 	}
-	if err := ensure(class.List, lists...); err != nil {
+	if err := ensure(e, class.List, lists...); err != nil {
 		return nil, err
 	}
 	max := 0.0
@@ -228,10 +228,10 @@ func Mapcan(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 // the cdr of the cdr of each list, and so on.
 func Maplist(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
-	if err := ensure(class.Function, function); err != nil {
+	if err := ensure(e, class.Function, function); err != nil {
 		return nil, err
 	}
-	if err := ensure(class.List, lists...); err != nil {
+	if err := ensure(e, class.List, lists...); err != nil {
 		return nil, err
 	}
 	max := 0.0
@@ -257,10 +257,10 @@ func Maplist(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Ins
 // list1 is returned.
 func Mapl(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
-	if err := ensure(class.Function, function); err != nil {
+	if err := ensure(e, class.Function, function); err != nil {
 		return nil, err
 	}
-	if err := ensure(class.List, lists...); err != nil {
+	if err := ensure(e, class.List, lists...); err != nil {
 		return nil, err
 	}
 	max := 0.0
@@ -284,10 +284,10 @@ func Mapl(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instan
 // append rather than list.
 func Mapcon(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
-	if err := ensure(class.Function, function); err != nil {
+	if err := ensure(e, class.Function, function); err != nil {
 		return nil, err
 	}
-	if err := ensure(class.List, lists...); err != nil {
+	if err := ensure(e, class.List, lists...); err != nil {
 		return nil, err
 	}
 	max := 0.0
@@ -313,11 +313,11 @@ func Mapcon(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 // obj (as determined by eql). Otherwise, nil is returned. An error shall be signaled
 // if association-list is not a list of conses (error-id. domain-error).
 func Assoc(e env.Environment, obj, associationList ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.List, associationList); err != nil {
+	if err := ensure(e, class.List, associationList); err != nil {
 		return nil, err
 	}
 	for _, pair := range associationList.(instance.List).Slice() {
-		if err := ensure(class.Cons, pair); err != nil {
+		if err := ensure(e, class.Cons, pair); err != nil {
 			return nil, err
 		}
 		if pair.(*instance.Cons).Car == obj { // eql

@@ -32,7 +32,7 @@ func Cons(e env.Environment, obj1, obj2 ilos.Instance) (ilos.Instance, ilos.Inst
 // Car returns the left component of the cons.
 // An error shall be signaled if cons is not a cons (error-id. domain-error).
 func Car(e env.Environment, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Cons, cons); err != nil {
+	if err := ensure(e, class.Cons, cons); err != nil {
 		return nil, err
 	}
 	return cons.(*instance.Cons).Car, nil // Checked at the top of this function
@@ -41,7 +41,7 @@ func Car(e env.Environment, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
 // Cdr returns the right component of the cons.
 // An error shall be signaled if cons is not a cons (error-id. domain-error).
 func Cdr(e env.Environment, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Cons, cons); err != nil {
+	if err := ensure(e, class.Cons, cons); err != nil {
 		return nil, err
 	}
 	return cons.(*instance.Cons).Cdr, nil // Checked at the top of this function
@@ -51,7 +51,7 @@ func Cdr(e env.Environment, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
 // An error shall be signaled if cons is not a cons (error-id. domain-error).
 // obj may be any ISLISP object.
 func SetCar(e env.Environment, obj, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Cons, cons); err != nil {
+	if err := ensure(e, class.Cons, cons); err != nil {
 		return nil, err
 	}
 	cons.(*instance.Cons).Car = obj
@@ -62,7 +62,7 @@ func SetCar(e env.Environment, obj, cons ilos.Instance) (ilos.Instance, ilos.Ins
 // An error shall be signaled if cons is not a cons (error-id. domain-error).
 // obj may be any ISLISP object.
 func SetCdr(e env.Environment, obj, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Cons, cons); err != nil {
+	if err := ensure(e, class.Cons, cons); err != nil {
 		return nil, err
 	}
 	cons.(*instance.Cons).Cdr = obj

@@ -60,10 +60,10 @@ func checkSuperClass(a, b ilos.Class) bool {
 }
 
 func Defclass(e env.Environment, className, scNames, slotSpecs ilos.Instance, classOpts ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Symbol, className); err != nil {
+	if err := ensure(e, class.Symbol, className); err != nil {
 		return nil, err
 	}
-	if err := ensure(class.List, scNames, slotSpecs); err != nil {
+	if err := ensure(e, class.List, scNames, slotSpecs); err != nil {
 		return nil, err
 	}
 	supers := []ilos.Class{class.StandardObject}
@@ -197,14 +197,14 @@ func Defclass(e env.Environment, className, scNames, slotSpecs ilos.Instance, cl
 }
 
 func Create(e env.Environment, c ilos.Instance, i ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.StandardClass, c); err != nil {
+	if err := ensure(e, class.StandardClass, c); err != nil {
 		return nil, err
 	}
 	return instance.Create(e, c, i...), nil
 }
 
 func InitializeObject(e env.Environment, object ilos.Instance, inits ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.StandardObject, object); err != nil {
+	if err := ensure(e, class.StandardObject, object); err != nil {
 		return nil, err
 	}
 	return instance.InitializeObject(e, object, inits...), nil

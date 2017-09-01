@@ -33,7 +33,7 @@ func Functionp(e env.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instan
 // The consequences are undefined if the function-name names a macro or special form
 func Function(e env.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// car must be a symbol
-	if err := ensure(class.Symbol, fun); err != nil {
+	if err := ensure(e, class.Symbol, fun); err != nil {
 		return nil, err
 	}
 	if f, ok := e.Function.Get(fun); ok {
@@ -70,7 +70,7 @@ func Function(e env.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instanc
 // to apply (or some subtail of L2), in which case it is implementation defined whether
 // L1 shares structure with L2 .
 func Lambda(e env.Environment, lambdaList ilos.Instance, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := checkLambdaList(lambdaList); err != nil {
+	if err := checkLambdaList(e, lambdaList); err != nil {
 		return nil, err
 	}
 	return newNamedFunction(e, instance.NewSymbol("ANONYMOUS-FUNCTION"), lambdaList, form...)
@@ -100,11 +100,11 @@ func Lambda(e env.Environment, lambdaList ilos.Instance, form ...ilos.Instance) 
 //
 // No function-name may appear more than once in the function bindings.
 func Labels(e env.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.List, functions); err != nil {
+	if err := ensure(e, class.List, functions); err != nil {
 		return nil, err
 	}
 	for _, function := range functions.(instance.List).Slice() {
-		if err := ensure(class.List, function); err != nil {
+		if err := ensure(e, class.List, function); err != nil {
 			return nil, err
 		}
 		definition := function.(instance.List).Slice()
@@ -128,12 +128,12 @@ func Labels(e env.Environment, functions ilos.Instance, bodyForm ...ilos.Instanc
 // Flet special form allow the definition of new identifiers in the function
 // namespace for function objects (see Labels).
 func Flet(e env.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.List, functions); err != nil {
+	if err := ensure(e, class.List, functions); err != nil {
 		return nil, err
 	}
 	newEnv := e.NewLexical()
 	for _, function := range functions.(instance.List).Slice() {
-		if err := ensure(class.List, function); err != nil {
+		if err := ensure(e, class.List, function); err != nil {
 			return nil, err
 		}
 		definition := function.(instance.List).Slice()
@@ -161,10 +161,10 @@ func Flet(e env.Environment, functions ilos.Instance, bodyForm ...ilos.Instance)
 // Each obj may be any ISLISP object. An error shall be signaled
 // if list is not a proper list (error-id. improper-argument-list).
 func Apply(e env.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Function, function); err != nil {
+	if err := ensure(e, class.Function, function); err != nil {
 		return nil, err
 	}
-	if err := ensure(class.List, obj[len(obj)-1]); err != nil {
+	if err := ensure(e, class.List, obj[len(obj)-1]); err != nil {
 		return nil, err
 	}
 	obj = append(obj[:len(obj)-1], obj[len(obj)-1].(instance.List).Slice()...)

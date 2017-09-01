@@ -29,14 +29,18 @@ func isProperList(i ilos.Instance) bool {
 	return false
 }
 
-func convFloat64(x ilos.Instance) (float64, bool, ilos.Instance) {
+func convFloat64(e env.Environment, x ilos.Instance) (float64, bool, ilos.Instance) {
 	switch {
 	case ilos.InstanceOf(class.Integer, x):
 		return float64(x.(instance.Integer)), false, nil
 	case ilos.InstanceOf(class.Float, x):
 		return float64(x.(instance.Float)), true, nil
 	default:
-		return 0.0, false, instance.NewDomainError(x, class.Number)
+		condition := instance.Create(e, class.Number,
+			instance.NewSymbol("OBJECT"), x,
+			instance.NewSymbol("EXPECTED-CLASS"), class.Number)
+		_, err := SignalCondition(e, condition, Nil)
+		return 0.0, false, err
 	}
 }
 
@@ -49,10 +53,14 @@ func evalString(e env.Environment, s string) ilos.Instance {
 	return ret
 }
 
-func ensure(c ilos.Class, i ...ilos.Instance) ilos.Instance {
+func ensure(e env.Environment, c ilos.Class, i ...ilos.Instance) ilos.Instance {
 	for _, o := range i {
 		if !ilos.InstanceOf(c, o) {
-			return instance.NewDomainError(o, c)
+			condition := instance.Create(e, class.DomainError,
+				instance.NewSymbol("OBJECT"), o,
+				instance.NewSymbol("EXPECTED-CLASS"), c)
+			_, err := SignalCondition(e, condition, Nil)
+			return err
 		}
 	}
 	return nil

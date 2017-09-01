@@ -46,7 +46,10 @@ func Block(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.In
 		return nil, err
 	}
 	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
-		return nil, instance.NewDomainError(tag, class.Object)
+		condition := instance.Create(e, class.DomainError,
+			instance.NewSymbol("OBJECT"), tag,
+			instance.NewSymbol("EXPECTED-CLASS"), class.Object)
+		return SignalCondition(e, condition, Nil)
 	}
 	if !e.BlockTag.Define(tag, uid) {
 		return nil, instance.NewImmutableBinding()
@@ -77,7 +80,10 @@ func ReturnFrom(e env.Environment, tag, object ilos.Instance) (ilos.Instance, il
 		return nil, err
 	}
 	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
-		return nil, instance.NewDomainError(tag, class.Object)
+		condition := instance.Create(e, class.DomainError,
+			instance.NewSymbol("OBJECT"), tag,
+			instance.NewSymbol("EXPECTED-CLASS"), class.Object)
+		return SignalCondition(e, condition, Nil)
 	}
 	object, err = Eval(e, object)
 	if err != nil {
@@ -98,7 +104,10 @@ func Catch(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.In
 		return nil, err
 	}
 	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
-		return nil, instance.NewDomainError(tag, class.Object)
+		condition := instance.Create(e, class.DomainError,
+			instance.NewSymbol("OBJECT"), tag,
+			instance.NewSymbol("EXPECTED-CLASS"), class.Object)
+		return SignalCondition(e, condition, Nil)
 	}
 	if !e.CatchTag.Define(tag, uid) {
 		return nil, instance.NewImmutableBinding()
@@ -129,7 +138,10 @@ func Throw(e env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.In
 		return nil, err
 	}
 	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
-		return nil, instance.NewDomainError(tag, class.Object)
+		condition := instance.Create(e, class.DomainError,
+			instance.NewSymbol("OBJECT"), tag,
+			instance.NewSymbol("EXPECTED-CLASS"), class.Object)
+		return SignalCondition(e, condition, Nil)
 	}
 	object, err = Eval(e, object)
 	if err != nil {

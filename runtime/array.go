@@ -53,10 +53,10 @@ func GeneralArrayStarP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilo
 // An error shall be signaled if dimensions is not a proper list of non-negative integers
 // (error-id. domain-error). initial-element may be any ISLISP object
 func CreateArray(e env.Environment, dimensions ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.List, dimensions); err != nil {
+	if err := ensure(e, class.List, dimensions); err != nil {
 		return nil, err
 	}
-	if err := ensure(class.Integer, dimensions.(instance.List).Slice()...); err != nil {
+	if err := ensure(e, class.Integer, dimensions.(instance.List).Slice()...); err != nil {
 		return nil, err
 	}
 	dim := dimensions.(instance.List).Slice()
@@ -94,10 +94,10 @@ func CreateArray(e env.Environment, dimensions ilos.Instance, initialElement ...
 // An error shall be signaled if basic-array is not a basic-array (error-id. domain-error).
 // An error shall be signaled if any z is not a non-negative integer (error-id. domain-error).
 func Aref(e env.Environment, basicArray ilos.Instance, dimensions ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.BasicArray, basicArray); err != nil {
+	if err := ensure(e, class.BasicArray, basicArray); err != nil {
 		return nil, err
 	}
-	if err := ensure(class.Integer, dimensions...); err != nil {
+	if err := ensure(e, class.Integer, dimensions...); err != nil {
 		return nil, err
 	}
 	switch {
@@ -127,10 +127,10 @@ func Aref(e env.Environment, basicArray ilos.Instance, dimensions ...ilos.Instan
 // Garef is like aref but an error shall be signaled if its first argument, general-array, is
 // not an object of class general-vector or of class <general-array*> (error-id. domain-error).
 func Garef(e env.Environment, generalArray ilos.Instance, dimensions ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.GeneralArrayStar, generalArray); err != nil {
+	if err := ensure(e, class.GeneralArrayStar, generalArray); err != nil {
 		return nil, err
 	}
-	if err := ensure(class.Integer, dimensions...); err != nil {
+	if err := ensure(e, class.Integer, dimensions...); err != nil {
 		return nil, err
 	}
 	var array instance.GeneralArrayStar
@@ -151,15 +151,15 @@ func Garef(e env.Environment, generalArray ilos.Instance, dimensions ...ilos.Ins
 // The constraints on the basic-array, the general-array, and the sequence of indices z is the
 // same as for aref and garef.
 func SetAref(e env.Environment, obj, basicArray ilos.Instance, dimensions ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.BasicArray, basicArray); err != nil {
+	if err := ensure(e, class.BasicArray, basicArray); err != nil {
 		return nil, err
 	}
-	if err := ensure(class.Integer, dimensions...); err != nil {
+	if err := ensure(e, class.Integer, dimensions...); err != nil {
 		return nil, err
 	}
 	switch {
 	case ilos.InstanceOf(class.String, basicArray):
-		if err := ensure(class.Character, obj); err != nil {
+		if err := ensure(e, class.Character, obj); err != nil {
 			return nil, err
 		}
 		if len(dimensions) != 1 {
@@ -190,10 +190,10 @@ func SetAref(e env.Environment, obj, basicArray ilos.Instance, dimensions ...ilo
 // The constraints on the basic-array, the general-array, and the sequence of indices z is the
 // same as for aref and garef.
 func SetGaref(e env.Environment, obj, generalArray ilos.Instance, dimensions ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.GeneralArrayStar, generalArray); err != nil {
+	if err := ensure(e, class.GeneralArrayStar, generalArray); err != nil {
 		return nil, err
 	}
-	if err := ensure(class.Integer, dimensions...); err != nil {
+	if err := ensure(e, class.Integer, dimensions...); err != nil {
 		return nil, err
 	}
 	var array instance.GeneralArrayStar
@@ -215,7 +215,7 @@ func SetGaref(e env.Environment, obj, generalArray ilos.Instance, dimensions ...
 // An error shall be signaled if basic-array is not a basic-array (error-id. domain-error).
 // The consequences are undefined if the returned list is modified.
 func ArrayDimensions(e env.Environment, basicArray ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.BasicArray, basicArray); err != nil {
+	if err := ensure(e, class.BasicArray, basicArray); err != nil {
 		return nil, err
 	}
 	switch {

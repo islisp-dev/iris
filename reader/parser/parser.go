@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/ta2gch/iris/reader/tokenizer"
+	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
@@ -84,7 +85,10 @@ func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	if m, _ := regexp.MatchString(str, tok); m {
 		return instance.NewSymbol(strings.ToUpper(tok)), nil
 	}
-	return nil, instance.NewParseError(instance.NewString(tok), class.Object)
+	return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil),
+		class.ParseError,
+		instance.NewSymbol("STRING"), instance.NewString(tok),
+		instance.NewSymbol("EXPECTED-CLASS"), class.Object)
 }
 
 func parseMacro(tok string, t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instance) {
@@ -100,7 +104,10 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instanc
 			var err error
 			v, err = strconv.ParseInt(tok[1:i], 10, 64)
 			if err != nil {
-				return nil, instance.NewParseError(instance.NewString(tok), class.Integer)
+				return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil),
+					class.ParseError,
+					instance.NewSymbol("STRING"), instance.NewString(tok),
+					instance.NewSymbol("EXPECTED-CLASS"), class.Integer)
 			}
 		}
 		return list2array(int(v), cdr)

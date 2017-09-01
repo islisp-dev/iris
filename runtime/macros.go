@@ -17,7 +17,7 @@ import (
 // defmacro form appears. lambda-list is as defined in page 23. The definition
 // point of macro-name is the closing parenthesis of the lambda-list.
 func Defmacro(e env.Environment, macroName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Symbol, macroName); err != nil {
+	if err := ensure(e, class.Symbol, macroName); err != nil {
 		return nil, err
 	}
 	ret, err := newNamedFunction(e, macroName, lambdaList, forms...)

@@ -69,11 +69,11 @@ func Setf(e env.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Inst
 // No var may appear more than once in let variable list.
 func Let(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	vfs := map[ilos.Instance]ilos.Instance{}
-	if err := ensure(class.List, varForm); err != nil {
+	if err := ensure(e, class.List, varForm); err != nil {
 		return nil, err
 	}
 	for _, cadr := range varForm.(instance.List).Slice() {
-		if err := ensure(class.List, cadr); err != nil {
+		if err := ensure(e, class.List, cadr); err != nil {
 			return nil, err
 		}
 		if cadr.(instance.List).Length() != 2 {
@@ -108,11 +108,11 @@ func Let(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (i
 // The returned value of let* is the result of the evaluation of the last form
 // of its body (or nil if there is none).
 func LetStar(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.List, varForm); err != nil {
+	if err := ensure(e, class.List, varForm); err != nil {
 		return nil, err
 	}
 	for _, cadr := range varForm.(instance.List).Slice() {
-		if err := ensure(class.List, cadr); err != nil {
+		if err := ensure(e, class.List, cadr); err != nil {
 			return nil, err
 		}
 		if cadr.(instance.List).Length() != 2 {

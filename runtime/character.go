@@ -22,7 +22,7 @@ func Characterp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Insta
 
 // CharEqual tests whether char1 is the same character as char2.
 func CharEqual(e env.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Character, char1, char2); err != nil {
+	if err := ensure(e, class.Character, char1, char2); err != nil {
 		return nil, err
 	}
 	if char1 == char2 {
@@ -43,7 +43,7 @@ func CharNotEqual(e env.Environment, char1, char2 ilos.Instance) (ilos.Instance,
 // CharGreaterThan tests whether char1 is greater than char2.
 // An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
 func CharGreaterThan(e env.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Character, char1, char2); err != nil {
+	if err := ensure(e, class.Character, char1, char2); err != nil {
 		return nil, err
 	}
 	if char1.(instance.Character) > char2.(instance.Character) {

@@ -36,7 +36,7 @@ func Floatp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance)
 // and returns a ﬂoating-point approximation of x otherwise.
 // An error shall be signaled if x is not a number (error-id. domain-error).
 func Float(e env.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
-	f, _, err := convFloat64(x)
+	f, _, err := convFloat64(e,x)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +47,7 @@ func Float(e env.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 // That is, x is truncated towards negative infinity. An error
 // shall be signaled if x is not a number (error-id. domain-error).
 func Floor(e env.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
-	f, _, err := convFloat64(x)
+	f, _, err := convFloat64(e,x)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func Floor(e env.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 // That is, x is truncated towards positive infinity. An error
 // shall be signaled if x is not a number (error-id. domain-error).
 func Ceiling(e env.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
-	f, _, err := convFloat64(x)
+	f, _, err := convFloat64(e,x)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func Ceiling(e env.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) 
 // That is, x is truncated towards zero. An error shall be signaled
 // if x is not a number (error-id. domain-error).
 func Truncate(e env.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
-	f, _, err := convFloat64(x)
+	f, _, err := convFloat64(e,x)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +80,7 @@ func Truncate(e env.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance)
 // If x is exactly halfway between two integers, the even one is chosen.
 // An error shall be signaled if x is not a number (error-id. domain-error).
 func Round(e env.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
-	f, _, err := convFloat64(x)
+	f, _, err := convFloat64(e,x)
 	if err != nil {
 		return nil, err
 	}

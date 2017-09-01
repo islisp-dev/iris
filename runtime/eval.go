@@ -16,7 +16,7 @@ func evalArguments(e env.Environment, arguments ilos.Instance) (ilos.Instance, i
 	if arguments == Nil {
 		return Nil, nil
 	}
-	if err := ensure(class.Cons, arguments); err != nil {
+	if err := ensure(e, class.Cons, arguments); err != nil {
 		return nil, err
 	}
 	car := arguments.(*instance.Cons).Car // Checked there
@@ -114,7 +114,7 @@ func evalFunction(e env.Environment, car, cdr ilos.Instance) (ilos.Instance, ilo
 }
 
 func evalCons(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Cons, obj); err != nil {
+	if err := ensure(e, class.Cons, obj); err != nil {
 		return nil, err
 	}
 	car := obj.(*instance.Cons).Car // Checked at the top of// This function

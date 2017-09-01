@@ -63,7 +63,7 @@ func WithStandardInput(e env.Environment, streamForm ilos.Instance, forms ...ilo
 	if err != nil {
 		return nil, err
 	}
-	if err := ensure(class.Stream, e.ErrorOutput); err != nil {
+	if err := ensure(e, class.Stream, e.ErrorOutput); err != nil {
 		return nil, err
 	}
 	return Progn(e, forms...)
@@ -75,7 +75,7 @@ func WithStandardOutput(e env.Environment, streamForm ilos.Instance, forms ...il
 	if err != nil {
 		return nil, err
 	}
-	if err := ensure(class.Stream, e.ErrorOutput); err != nil {
+	if err := ensure(e, class.Stream, e.ErrorOutput); err != nil {
 		return nil, err
 	}
 	return Progn(e, forms...)
@@ -87,7 +87,7 @@ func WithErrorOutput(e env.Environment, streamForm ilos.Instance, forms ...ilos.
 	if err != nil {
 		return nil, err
 	}
-	if err := ensure(class.Stream, e.ErrorOutput); err != nil {
+	if err := ensure(e, class.Stream, e.ErrorOutput); err != nil {
 		return nil, err
 	}
 	return Progn(e, forms...)
@@ -95,7 +95,7 @@ func WithErrorOutput(e env.Environment, streamForm ilos.Instance, forms ...ilos.
 
 func OpenInputFile(e env.Environment, filename ilos.Instance, elementClass ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// TODO: elementClass
-	if err := ensure(class.String, filename); err != nil {
+	if err := ensure(e, class.String, filename); err != nil {
 		return nil, err
 	}
 	file, err := os.Open(string(filename.(instance.String)))
@@ -107,7 +107,7 @@ func OpenInputFile(e env.Environment, filename ilos.Instance, elementClass ...il
 
 func OpenOutputFile(e env.Environment, filename ilos.Instance, elementClass ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// TODO: elementClass
-	if err := ensure(class.String, filename); err != nil {
+	if err := ensure(e, class.String, filename); err != nil {
 		return nil, err
 	}
 	file, err := os.Open(string(filename.(instance.String)))
@@ -119,7 +119,7 @@ func OpenOutputFile(e env.Environment, filename ilos.Instance, elementClass ...i
 
 func OpenIoFile(e env.Environment, filename ilos.Instance, elementClass ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// TODO: elementClass
-	if err := ensure(class.String, filename); err != nil {
+	if err := ensure(e, class.String, filename); err != nil {
 		return nil, err
 	}
 	file, err := os.Open(string(filename.(instance.String)))
@@ -130,7 +130,7 @@ func OpenIoFile(e env.Environment, filename ilos.Instance, elementClass ...ilos.
 }
 
 func WithOpenInputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Cons, fileSpec); err != nil {
+	if err := ensure(e, class.Cons, fileSpec); err != nil {
 		return nil, err
 	}
 	n := fileSpec.(*instance.Cons).Car
@@ -143,7 +143,7 @@ func WithOpenInputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.
 }
 
 func WithOpenOutputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Cons, fileSpec); err != nil {
+	if err := ensure(e, class.Cons, fileSpec); err != nil {
 		return nil, err
 	}
 	n := fileSpec.(*instance.Cons).Car
@@ -156,7 +156,7 @@ func WithOpenOutputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos
 }
 
 func WithOpenIoFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Cons, fileSpec); err != nil {
+	if err := ensure(e, class.Cons, fileSpec); err != nil {
 		return nil, err
 	}
 	n := fileSpec.(*instance.Cons).Car
@@ -170,7 +170,7 @@ func WithOpenIoFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Ins
 
 func Close(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// It works on file or std stream.
-	if err := ensure(class.Stream, stream); err != nil {
+	if err := ensure(e, class.Stream, stream); err != nil {
 		return nil, err
 	}
 	if stream.(instance.Stream).Reader != nil {
@@ -184,7 +184,7 @@ func Close(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instanc
 
 func FlushOutput(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// It works on file or std stream.
-	if err := ensure(class.Stream, stream); err != nil {
+	if err := ensure(e, class.Stream, stream); err != nil {
 		return nil, err
 	}
 	if stream.(instance.Stream).Writer != nil {
@@ -202,7 +202,7 @@ func CreateStringOutputStream(e env.Environment) (ilos.Instance, ilos.Instance) 
 }
 
 func GetOutputStreamString(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Stream, stream); err != nil {
+	if err := ensure(e, class.Stream, stream); err != nil {
 		return nil, err
 	}
 	return instance.NewString(stream.(instance.Stream).Writer.(*bytes.Buffer).String()), nil

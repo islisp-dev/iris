@@ -12,7 +12,7 @@ import (
 )
 
 func SignalCondition(e env.Environment, condition, continuable ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.SeriousCondition, condition); err != nil {
+	if err := ensure(e, class.SeriousCondition, condition); err != nil {
 		return nil, err
 	}
 	condition.(instance.Instance).SetSlotValue(instance.NewSymbol("IRIS.CONTINUABLE"), continuable, class.SeriousCondition)

@@ -13,14 +13,11 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func checkLambdaList(lambdaList ilos.Instance) ilos.Instance {
-	if err := ensure(class.List, lambdaList); err != nil {
+func checkLambdaList(e env.Environment, lambdaList ilos.Instance) ilos.Instance {
+	if err := ensure(e, class.List, lambdaList); err != nil {
 		return err
 	}
 	for i, cadr := range lambdaList.(instance.List).Slice() {
-		if err := ensure(class.Symbol, cadr); err != nil {
-			return err
-		}
 		if cadr == instance.NewSymbol(":REST") || cadr == instance.NewSymbol("&REST") {
 			if lambdaList.(instance.List).Length() != i+2 {
 				return instance.NewArityError()
@@ -32,10 +29,10 @@ func checkLambdaList(lambdaList ilos.Instance) ilos.Instance {
 
 func newNamedFunction(e env.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lexical := e
-	if err := ensure(class.Symbol, functionName); err != nil {
+	if err := ensure(e, class.Symbol, functionName); err != nil {
 		return nil, err
 	}
-	if err := checkLambdaList(lambdaList); err != nil {
+	if err := checkLambdaList(e, lambdaList); err != nil {
 		return nil, err
 	}
 	parameters := []ilos.Instance{}

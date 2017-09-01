@@ -20,7 +20,7 @@ import (
 // error shall be signaled if such a binding does not exist
 // (error-id. unbound-variable).
 func Dynamic(e env.Environment, var1 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Symbol, var1); err != nil {
+	if err := ensure(e, class.Symbol, var1); err != nil {
 		return nil, err
 	}
 	if v, ok := e.DynamicVariable.Get(var1); ok {
@@ -42,7 +42,7 @@ func Dynamic(e env.Environment, var1 ilos.Instance) (ilos.Instance, ilos.Instanc
 // (error-id.  unbound-variable). setf of dynamic can be used only for
 // modifying bindings, and not for establishing them.
 func SetDynamic(e env.Environment, form, var1 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(class.Symbol, var1); err != nil {
+	if err := ensure(e, class.Symbol, var1); err != nil {
 		return nil, err
 	}
 	form, err := Eval(e, form)
@@ -77,11 +77,11 @@ func SetDynamic(e env.Environment, form, var1 ilos.Instance) (ilos.Instance, ilo
 // prepared dynamic-let special form.
 func DynamicLet(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	vfs := map[ilos.Instance]ilos.Instance{}
-	if err := ensure(class.List, varForm); err != nil {
+	if err := ensure(e, class.List, varForm); err != nil {
 		return nil, err
 	}
 	for _, cadr := range varForm.(instance.List).Slice() {
-		if err := ensure(class.List, cadr); err != nil {
+		if err := ensure(e, class.List, cadr); err != nil {
 			return nil, err
 		}
 		if cadr.(instance.List).Length() != 2 {
