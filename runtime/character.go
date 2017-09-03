@@ -1,6 +1,6 @@
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is subject to the terms of the Mozilla Public License,
+// v. 2.0. If a copy of the MPL was not distributed with this file, You can
+// obtain one at http://mozilla.org/MPL/2.0/.
 
 package runtime
 
@@ -40,8 +40,8 @@ func CharNotEqual(e env.Environment, char1, char2 ilos.Instance) (ilos.Instance,
 	return Not(e, ret)
 }
 
-// CharGreaterThan tests whether char1 is greater than char2.
-// An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
+// CharGreaterThan tests whether char1 is greater than char2. An error shall be
+// signaled if either char1 or char2 is not a character (error-id. domain-error).
 func CharGreaterThan(e env.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, class.Character, char1, char2); err != nil {
 		return nil, err
@@ -53,7 +53,8 @@ func CharGreaterThan(e env.Environment, char1, char2 ilos.Instance) (ilos.Instan
 }
 
 // CharGreaterThanOrEqual tests whether char1 is greater than or equal to char2.
-// An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
+// An error shall be signaled if either char1 or char2 is not a character
+// (error-id. domain-error).
 func CharGreaterThanOrEqual(e env.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	gt, err := CharGreaterThan(e, char1, char2)
 	if err != nil {
@@ -69,8 +70,8 @@ func CharGreaterThanOrEqual(e env.Environment, char1, char2 ilos.Instance) (ilos
 	return T, nil
 }
 
-// CharLessThan tests whether char1 is less than char2.
-// An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
+// CharLessThan tests whether char1 is less than char2. An error shall be
+// signaled if either char1 or char2 is not a character (error-id. domain-error).
 func CharLessThan(e env.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	gt, err := CharGreaterThanOrEqual(e, char1, char2)
 	if err != nil {
@@ -79,8 +80,9 @@ func CharLessThan(e env.Environment, char1, char2 ilos.Instance) (ilos.Instance,
 	return Not(e, gt)
 }
 
-// CharLessThanOrEqual tests whether char1 is less than or equal to char2.
-// An error shall be signaled if either char1 or char2 is not a character (error-id. domain-error).
+// CharLessThanOrEqual tests whether char1 is less than or equal to char2. An
+// error shall be signaled if either char1 or char2 is not a character
+// (error-id. domain-error).
 func CharLessThanOrEqual(e env.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	gt, err := CharGreaterThan(e, char1, char2)
 	if err != nil {

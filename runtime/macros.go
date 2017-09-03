@@ -1,6 +1,6 @@
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is subject to the terms of the Mozilla Public License,
+// v. 2.0. If a copy of the MPL was not distributed with this file, You can
+// obtain one at http://mozilla.org/MPL/2.0/.
 
 package runtime
 
@@ -28,22 +28,18 @@ func Defmacro(e env.Environment, macroName, lambdaList ilos.Instance, forms ...i
 	return macroName, nil
 }
 
-// Quasiquote ` or quasiquote constructs a list structure. quasiquote, like quote, returns
-// its argument unevaluated if no commas or the syntax , (unquote) or ,@
-// (unquote-splicing) appear within the form.
-//
-// , (unquote) syntax is valid only within ` (quasiquote) expressions. When
-// appearing within a quasiquote the form is evaluated and its result is
-// inserted into the quasiquote structure instead of the unquote form.
-//
-// ,@ (unquote-splicing) is also syntax valid only within ` expressions. When
-// appearing within a quasiquote the expression form must evaluate to a list.
-// The elements of the list are spliced into the enclosing list in place of the
-// unquote-splicing form sequence.
-//
-// Quasiquote forms may be nested. Substitutions are made only for unquoted
-// expressions appearing at the same nesting level, which increases by one
-// inside each successive quasiquotation and decreases by one inside each
+// Quasiquote ` or quasiquote constructs a list structure. quasiquote, like
+// quote, returns its argument unevaluated if no commas or the syntax ,
+// (unquote) or ,@ (unquote-splicing) appear within the form. , (unquote) syntax
+// is valid only within ` (quasiquote) expressions. When appearing within a
+// quasiquote the form is evaluated and its result is inserted into the
+// quasiquote structure instead of the unquote form. ,@ (unquote-splicing) is
+// also syntax valid only within ` expressions. When appearing within a
+// quasiquote the expression form must evaluate to a list. The elements of the
+// list are spliced into the enclosing list in place of the unquote-splicing
+// form sequence. Quasiquote forms may be nested. Substitutions are made only
+// for unquoted expressions appearing at the same nesting level, which increases
+// by one inside each successive quasiquotation and decreases by one inside each
 // unquotation.
 func Quasiquote(e env.Environment, form ilos.Instance) (ilos.Instance, ilos.Instance) {
 	return expand(e, form, 0)

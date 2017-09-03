@@ -1,6 +1,6 @@
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is subject to the terms of the Mozilla Public License,
+// v. 2.0. If a copy of the MPL was not distributed with this file, You can
+// obtain one at http://mozilla.org/MPL/2.0/.
 
 package runtime
 
@@ -29,8 +29,8 @@ func Integerp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instanc
 	return Nil, nil
 }
 
-// Div returns the greatest integer less than or equal to the quotient of z1 and z2.
-// An error shall be signaled if z2 is zero (error-id. division-by-zero).
+// Div returns the greatest integer less than or equal to the quotient of z1 and
+// z2. An error shall be signaled if z2 is zero (error-id. division-by-zero).
 func Div(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, err := convInt(e, z1)
 	if err != nil {
@@ -51,12 +51,11 @@ func Div(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance)
 	return instance.NewInteger(a / b), nil
 }
 
-// Mod returns the remainder of the integer division of z1 by z2.
-// The sign of the result is the sign of z2. The result lies
-// between 0 (inclusive) and z2 (exclusive), and the difference of z1
-// and this result is divisible by z2 without remainder.
-//
-// An error shall be signaled if either z1 or z2 is not an integer (error-id. domain-error).
+// Mod returns the remainder of the integer division of z1 by z2. The sign of
+// the result is the sign of z2. The result lies between 0 (inclusive) and z2
+// (exclusive), and the difference of z1 and this result is divisible by z2
+// without remainder. An error shall be signaled if either z1 or z2 is not an
+// integer (error-id. domain-error).
 func Mod(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, err := convInt(e, z1)
 	if err != nil {
@@ -77,13 +76,11 @@ func Mod(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance)
 	return instance.NewInteger(a % b), nil
 }
 
-// Gcd returns the greatest common divisor of its integer arguments.
-// The result is a non-negative integer. For nonzero arguments
-// the greatest common divisor is the largest integer z such that
-// z1 and z2 are integral multiples of z.
-//
-// An error shall be signaled if either z1 or z2 is not an integer
-// (error-id. domain-error).
+// Gcd returns the greatest common divisor of its integer arguments. The result
+// is a non-negative integer. For nonzero arguments the greatest common divisor
+// is the largest integer z such that z1 and z2 are integral multiples of z. An
+// error shall be signaled if either z1 or z2 is not an integer (error-id.
+// domain-error).
 func Gcd(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	gcd := func(x, y int) int {
 		for y != 0 {
@@ -102,10 +99,9 @@ func Gcd(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance)
 	return instance.NewInteger(gcd(a, b)), nil
 }
 
-// Lcm returns the least common multiple of its integer arguments.
-//
-// An error shall be signaled if either z1 or z2 is not an integer
-// (error-id. domain-error).
+// Lcm returns the least common multiple of its integer arguments. An error
+// shall be signaled if either z1 or z2 is not an integer (error-id.
+// domain-error).
 func Lcm(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	gcd := func(x, y int) int {
 		for y != 0 {
@@ -124,9 +120,9 @@ func Lcm(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance)
 	return instance.NewInteger(a * b / gcd(a, b)), nil
 }
 
-// Isqrt Returns the greatest integer less than or equal to
-// the exact positive square root of z . An error shall be signaled
-// if z is not a non-negative integer (error-id. domain-error).
+// Isqrt Returns the greatest integer less than or equal to the exact positive
+// square root of z . An error shall be signaled if z is not a non-negative
+// integer (error-id. domain-error).
 func Isqrt(e env.Environment, z ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, err := convInt(e, z)
 	if err != nil {

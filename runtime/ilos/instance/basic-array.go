@@ -1,6 +1,6 @@
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is subject to the terms of the Mozilla Public License,
+// v. 2.0. If a copy of the MPL was not distributed with this file, You can
+// obtain one at http://mozilla.org/MPL/2.0/.
 
 package instance
 
@@ -10,9 +10,7 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos"
 )
 
-//
 // General Array *
-//
 
 type GeneralArrayStar struct {
 	Vector []GeneralArrayStar
@@ -52,9 +50,7 @@ func (i GeneralArrayStar) String() string {
 	return fmt.Sprintf("#%vA%v", countDim(i), stringify(i))
 }
 
-//
 // General Vector
-//
 
 type GeneralVector []ilos.Instance
 
@@ -71,9 +67,7 @@ func (i GeneralVector) String() string {
 	return fmt.Sprintf("#(%v)", str[1:len(str)-1])
 }
 
-//
 // String
-//
 
 type String []rune
 

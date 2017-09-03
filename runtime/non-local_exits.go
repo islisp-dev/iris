@@ -1,6 +1,6 @@
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is subject to the terms of the Mozilla Public License,
+// v. 2.0. If a copy of the MPL was not distributed with this file, You can
+// obtain one at http://mozilla.org/MPL/2.0/.
 
 package runtime
 
@@ -196,33 +196,24 @@ func Go(e env.Environment, tag ilos.Instance) (ilos.Instance, ilos.Instance) {
 }
 
 // UnwindProtect first evaluates form. Evaluation of the cleanup-forms always
-// occurs, regardless of whether the exit is normal or non-e.
-//
-// If the form exits normally yielding a value R, then if all of the
-// cleanup-forms exit normally the value R is returned by the
-// unwind-protect form.
-//
-// If a non-e exit from form occurs, then the cleanup-forms are executed as
-// part of that exit, and then if all of the cleanup-forms exit normally the
-// original non-e exit continues.
-//
-// The cleanup-forms are evaluated from left to right, discarding the resulting
+// occurs, regardless of whether the exit is normal or non-e. If the form exits
+// normally yielding a value R, then if all of the cleanup-forms exit normally
+// the value R is returned by the unwind-protect form. If a non-e exit from form
+// occurs, then the cleanup-forms are executed as part of that exit, and then if
+// all of the cleanup-forms exit normally the original non-e exit continues. The
+// cleanup-forms are evaluated from left to right, discarding the resulting
 // values. If execution of the cleanup-forms finishes normally, exit from the
 // unwind-protect form proceeds as described above. It is permissible for a
-// cleanup-form to contain a non-e exit from the unwind-protect form,
-// subject to the following constraint:
-//
-// An error shall be signaled if during execution of the cleanup-forms of an
-// unwind-protect form, a non-e exit is executed to a destination which has
-// been marked as invalid due to some other non-e exit that is already in
-// progress (error-id. control-error).
-//
-// Note: Because ISLISP does not specify an interactive debugger, it is
-// unspecified whether or how error recovery can occur interactively if
-// programmatic handling fails. The intent is that if the ISLISP processor does
-// not terminate abnormally, normal mechanisms for non-e exit (return-from,
-// throw, or go) would be used as necessary and would respect these
-// cleanup-forms.
+// cleanup-form to contain a non-e exit from the unwind-protect form, subject to
+// the following constraint: An error shall be signaled if during execution of
+// the cleanup-forms of an unwind-protect form, a non-e exit is executed to a
+// destination which has been marked as invalid due to some other non-e exit
+// that is already in progress (error-id. control-error). Note: Because ISLISP
+// does not specify an interactive debugger, it is unspecified whether or how
+// error recovery can occur interactively if programmatic handling fails. The
+// intent is that if the ISLISP processor does not terminate abnormally, normal
+// mechanisms for non-e exit (return-from, throw, or go) would be used as
+// necessary and would respect these cleanup-forms.
 func UnwindProtect(e env.Environment, form ilos.Instance, cleanupForms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	ret1, err1 := Eval(e, form)
 	ret2, err2 := Progn(e, cleanupForms...)

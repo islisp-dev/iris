@@ -1,6 +1,6 @@
-// This Source Code Form is subject to the terms of the Mozilla Public
-// License, v. 2.0. If a copy of the MPL was not distributed with this
-// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+// This Source Code Form is subject to the terms of the Mozilla Public License,
+// v. 2.0. If a copy of the MPL was not distributed with this file, You can
+// obtain one at http://mozilla.org/MPL/2.0/.
 
 package runtime
 
@@ -13,8 +13,8 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-// Listp returns t if obj is a list (instance of class list); otherwise, returns nil.
-// obj may be any ISLISP object.
+// Listp returns t if obj is a list (instance of class list); otherwise, returns
+// nil. obj may be any ISLISP object.
 func Listp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(class.Cons, obj) {
 		return T, nil
@@ -22,11 +22,12 @@ func Listp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) 
 	return Nil, nil
 }
 
-// CreateList returns a list of length i. If initial-element is given, the elements of the new list
-// are initialized with this object; otherwise, the initialization is implementation defined. An
-// error shall be signaled if the requested list cannot be allocated (error-id. cannot-create-list).
-// An error shall be signaled if i is not a non-negative integer (error-id. domain-error).
-//initial-element may be any ISLISP object.
+// CreateList returns a list of length i. If initial-element is given, the
+// elements of the new list are initialized with this object; otherwise, the
+// initialization is implementation defined. An error shall be signaled if the
+// requested list cannot be allocated (error-id. cannot-create-list). An error
+// shall be signaled if i is not a non-negative integer (error-id.
+// domain-error).initial-element may be any ISLISP object.
 func CreateList(e env.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, class.Integer, i); err != nil {
 		return nil, err
@@ -45,9 +46,10 @@ func CreateList(e env.Environment, i ilos.Instance, initialElement ...ilos.Insta
 	return cons, nil
 }
 
-// List returns a new list whose length is the number of arguments and whose elements are the
-// arguments in the same order as in the list-form. An error shall be signaled if the requested list
-// cannot be allocated (error-id. cannot-create-list). Each obj may be any ISLISP object.
+// List returns a new list whose length is the number of arguments and whose
+// elements are the arguments in the same order as in the list-form. An error
+// shall be signaled if the requested list cannot be allocated (error-id.
+// cannot-create-list). Each obj may be any ISLISP object.
 func List(e env.Environment, objs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	cons := Nil
 	for i := len(objs) - 1; i >= 0; i-- {
@@ -56,11 +58,11 @@ func List(e env.Environment, objs ...ilos.Instance) (ilos.Instance, ilos.Instanc
 	return cons, nil
 }
 
-// Reverse returns a list whose elements are those of the given list, but in reverse
-// order. An error shall be signaled if list is not a list (error-id. domain-error).
-//
-// For reverse, no side-effect to the given list occurs. The resulting list is permitted but not
-// required to share structure with the input list.
+// Reverse returns a list whose elements are those of the given list, but in
+// reverse order. An error shall be signaled if list is not a list (error-id.
+// domain-error). For reverse, no side-effect to the given list occurs. The
+// resulting list is permitted but not required to share structure with the
+// input list.
 func Reverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, class.List, list); err != nil {
 		return nil, err
@@ -72,12 +74,11 @@ func Reverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instanc
 	return cons, nil
 }
 
-// Nreverse returns a list whose elements are those of the given list, but in reverse
-// order. An error shall be signaled if list is not a list (error-id. domain-error).
-//
-// For nreverse, the conses which make up the top level of the given list are permitted, but not
-// required, to be side-effected in order to produce this new list. nreverse should never be called
-// on a literal object.
+// Nreverse returns a list whose elements are those of the given list, but in
+// reverse order. An error shall be signaled if list is not a list (error-id.
+// domain-error). For nreverse, the conses which make up the top level of the
+// given list are permitted, but not required, to be side-effected in order to
+// produce this new list. nreverse should never be called on a literal object.
 func Nreverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// TODO: tests literal object
 	if err := ensure(e, class.List, list); err != nil {
@@ -90,13 +91,12 @@ func Nreverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instan
 	return cons, nil
 }
 
-// Append returns the result of appending all of the lists, or () if given no lists. An error shall
-// be signaled if any list is not a list (error-id. domain-error).
-//
-// This function does not modify its arguments. It is implementation defined whether and when the
-// result shares structure with its list arguments.
-//
-// An error shall be signaled if the list cannot be allocated (error-id. cannot-create-list).
+// Append returns the result of appending all of the lists, or () if given no
+// lists. An error shall be signaled if any list is not a list (error-id.
+// domain-error). This function does not modify its arguments. It is
+// implementation defined whether and when the result shares structure with its
+// list arguments. An error shall be signaled if the list cannot be allocated
+// (error-id. cannot-create-list).
 func Append(e env.Environment, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// Ref: https://github.com/sbcl/sbcl/blob/fe4faef65315c6ad52b3b89b62b6c6497cb78d09/src/code/list.lisp#L364
 
@@ -121,9 +121,10 @@ func Append(e env.Environment, lists ...ilos.Instance) (ilos.Instance, ilos.Inst
 	return result.(*instance.Cons).Cdr, nil
 }
 
-// Member returnes the first sublist of list whose car is obj  if list contains at least one
-// occurrence of obj (as determined by eql).  Otherwise, nil is returned. An error shall be signaled
-// if list is not a list (error-id. domain-error).
+// Member returnes the first sublist of list whose car is obj  if list contains
+// at least one occurrence of obj (as determined by eql).  Otherwise, nil is
+// returned. An error shall be signaled if list is not a list (error-id.
+// domain-error).
 func Member(e env.Environment, obj, list ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, class.List, list); err != nil {
 		return nil, err
@@ -136,10 +137,11 @@ func Member(e env.Environment, obj, list ilos.Instance) (ilos.Instance, ilos.Ins
 	return Nil, nil
 }
 
-// Mapcar operates on successive elements of the lists. function is applied to the first element of
-// each list, then to the second element of each list, and so on. The iteration terminates when the
-// shortest list runs out, and excess elements in other lists are ignored. The value returned by
-// mapcar is a list of the results of successive calls to function.
+// Mapcar operates on successive elements of the lists. function is applied to
+// the first element of each list, then to the second element of each list, and
+// so on. The iteration terminates when the shortest list runs out, and excess
+// elements in other lists are ignored. The value returned by mapcar is a list
+// of the results of successive calls to function.
 func Mapcar(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
 	if err := ensure(e, class.Function, function); err != nil {
@@ -167,8 +169,8 @@ func Mapcar(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 	return List(e, result...)
 }
 
-// Mapc is like mapcar except that the results of applying function are not accumulated;
-// list1 is returned.
+// Mapc is like mapcar except that the results of applying function are not
+// accumulated; list1 is returned.
 func Mapc(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
 	if err := ensure(e, class.Function, function); err != nil {
@@ -194,8 +196,8 @@ func Mapc(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instan
 }
 
 // Mapcan is like mapcar respectively, except that the results of applying
-// function are combined into a list by the use of an operation that performs a destructive form of
-// append rather than list.
+// function are combined into a list by the use of an operation that performs a
+// destructive form of append rather than list.
 func Mapcan(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
 	if err := ensure(e, class.Function, function); err != nil {
@@ -223,9 +225,9 @@ func Mapcan(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 	return Append(e, result...)
 }
 
-// Maplist is like mapcar except that function is applied to successive sublists of the lists.
-// function is first applied to the lists themselves, and then to the cdr of each list, and then to
-// the cdr of the cdr of each list, and so on.
+// Maplist is like mapcar except that function is applied to successive sublists
+// of the lists. function is first applied to the lists themselves, and then to
+// the cdr of each list, and then to the cdr of the cdr of each list, and so on.
 func Maplist(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
 	if err := ensure(e, class.Function, function); err != nil {
@@ -253,8 +255,8 @@ func Maplist(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Ins
 	return List(e, result...)
 }
 
-// Mapl is like maplist except that the results of applying function are not accumulated;
-// list1 is returned.
+// Mapl is like maplist except that the results of applying function are not
+// accumulated; list1 is returned.
 func Mapl(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
 	if err := ensure(e, class.Function, function); err != nil {
@@ -280,8 +282,8 @@ func Mapl(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instan
 }
 
 // Mapcon is like maplist respectively, except that the results of applying
-// function are combined into a list by the use of an operation that performs a destructive form of
-// append rather than list.
+// function are combined into a list by the use of an operation that performs a
+// destructive form of append rather than list.
 func Mapcon(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
 	if err := ensure(e, class.Function, function); err != nil {
@@ -309,9 +311,10 @@ func Mapcon(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 	return Append(e, result...)
 }
 
-// Assoc returns the first cons if assocation-list contains at least one cons whose car is
-// obj (as determined by eql). Otherwise, nil is returned. An error shall be signaled
-// if association-list is not a list of conses (error-id. domain-error).
+// Assoc returns the first cons if assocation-list contains at least one cons
+// whose car is obj (as determined by eql). Otherwise, nil is returned. An error
+// shall be signaled if association-list is not a list of conses (error-id.
+// domain-error).
 func Assoc(e env.Environment, obj, associationList ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, class.List, associationList); err != nil {
 		return nil, err
@@ -327,7 +330,8 @@ func Assoc(e env.Environment, obj, associationList ilos.Instance) (ilos.Instance
 	return Nil, nil
 }
 
-// Null returns t if obj is nil; otherwise, returns nil obj may be any ISLISP object.
+// Null returns t if obj is nil; otherwise, returns nil obj may be any ISLISP
+// object.
 func Null(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if obj == Nil {
 		return T, nil
