@@ -15,7 +15,7 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func TopLevelHander(c ilos.Instance) (ilos.Instance, ilos.Instance) {
+func TopLevelHander(e env.Environment, c ilos.Instance) (ilos.Instance, ilos.Instance) {
 	return nil, c
 }
 
