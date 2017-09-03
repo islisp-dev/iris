@@ -9,75 +9,67 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos"
 )
 
-func NewArithmeticError(operation, operands ilos.Instance) ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil, nil),
-		ArithmeticErrorClass,
+func NewArithmeticError(e env.Environment, operation, operands ilos.Instance) ilos.Instance {
+	return Create(e, ArithmeticErrorClass,
 		NewSymbol("OPERATION"), operation,
 		NewSymbol("OPERANDS"), operands)
 }
 
-func NewDivisionByZero(operation, operands ilos.Instance) ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil, nil),
-		DivisionByZeroClass,
+func NewDivisionByZero(e env.Environment, operation, operands ilos.Instance) ilos.Instance {
+	return Create(e, DivisionByZeroClass,
 		NewSymbol("OPERATION"), operation,
 		NewSymbol("OPERANDS"), operands)
 }
 
-func NewParseError(str, expectedClass ilos.Instance) ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil, nil),
-		ParseErrorClass,
+func NewParseError(e env.Environment, str, expectedClass ilos.Instance) ilos.Instance {
+	return Create(e, ParseErrorClass,
 		NewSymbol("STRING"), str,
 		NewSymbol("EXPECTED-CLASS"), expectedClass)
 }
 
-func NewDomainError(object ilos.Instance, expectedClass ilos.Class) ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil, nil),
-		DomainErrorClass,
+func NewDomainError(e env.Environment, object ilos.Instance, expectedClass ilos.Class) ilos.Instance {
+	return Create(e, DomainErrorClass,
 		NewSymbol("CAUSE"), NewSymbol("DOMAIN-ERROR"),
 		NewSymbol("IRIS.OBJECT"), object,
 		NewSymbol("EXPECTED-CLASS"), expectedClass)
 }
 
-func NewUndefinedFunction(name ilos.Instance) ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil, nil),
-		UndefinedFunctionClass,
+func NewUndefinedFunction(e env.Environment, name ilos.Instance) ilos.Instance {
+	return Create(e, UndefinedFunctionClass,
 		NewSymbol("NAME"), name,
 		NewSymbol("NAMESPACE"), NewSymbol("FUNCTION"))
 }
 
-func NewUndefinedVariable(name ilos.Instance) ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil, nil),
-		UndefinedVariableClass,
+func NewUndefinedVariable(e env.Environment, name ilos.Instance) ilos.Instance {
+	return Create(e, UndefinedVariableClass,
 		NewSymbol("NAME"), name,
 		NewSymbol("NAMESPACE"), NewSymbol("VARIABLE"))
 }
 
-func NewUndefinedClass(name ilos.Instance) ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil, nil),
-		UndefinedEntityClass,
+func NewUndefinedClass(e env.Environment, name ilos.Instance) ilos.Instance {
+	return Create(e, UndefinedEntityClass,
 		NewSymbol("NAME"), name,
 		NewSymbol("NAMESPACE"), NewSymbol("CLASS"))
 }
 
-func NewArityError() ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil, nil), ProgramErrorClass)
+func NewArityError(e env.Environment) ilos.Instance {
+	return Create(e, ProgramErrorClass)
 }
 
-func NewIndexOutOfRange() ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil, nil), ProgramErrorClass)
+func NewIndexOutOfRange(e env.Environment) ilos.Instance {
+	return Create(e, ProgramErrorClass)
 }
 
-func NewImmutableBinding() ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil, nil), ProgramErrorClass)
+func NewImmutableBinding(e env.Environment) ilos.Instance {
+	return Create(e, ProgramErrorClass)
 }
 
-func NewSimpleError(formatString, formatArguments ilos.Instance) ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil, nil),
-		SimpleErrorClass,
+func NewSimpleError(e env.Environment, formatString, formatArguments ilos.Instance) ilos.Instance {
+	return Create(e, SimpleErrorClass,
 		NewSymbol("FORMAT-STRING"), formatString,
 		NewSymbol("FORMAT-ARGUMENTS"), formatArguments)
 }
 
-func NewControlError() ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil, nil), ControlErrorClass)
+func NewControlError(e env.Environment) ilos.Instance {
+	return Create(e, ControlErrorClass)
 }

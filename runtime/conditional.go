@@ -27,7 +27,7 @@ func If(e env.Environment, testForm, thenForm ilos.Instance, elseForm ...ilos.In
 		return Eval(e, thenForm)
 	}
 	if len(elseForm) > 1 {
-		return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 	}
 	if len(elseForm) == 0 {
 		return Nil, nil
@@ -48,7 +48,7 @@ func Cond(e env.Environment, testFrom ...ilos.Instance) (ilos.Instance, ilos.Ins
 		}
 		s := tf.(instance.List).Slice()
 		if len(s) == 0 {
-			return nil, instance.NewArityError()
+			return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 		ret, err := Eval(e, s[0])
 		if err != nil {
@@ -85,7 +85,7 @@ func Case(e env.Environment, key ilos.Instance, pattern ...ilos.Instance) (ilos.
 		}
 		form := pat.(instance.List).Slice()
 		if len(form) < 1 {
-			return nil, instance.NewArityError()
+			return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 		if idx == len(pattern)-1 && form[0] == T {
 			return Progn(e, form[1:]...)
@@ -131,7 +131,7 @@ func CaseUsing(e env.Environment, key, pred ilos.Instance, pattern ...ilos.Insta
 		}
 		form := pat.(instance.List).Slice()
 		if len(form) < 1 {
-			return nil, instance.NewArityError()
+			return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 		if idx == len(pattern)-1 && form[0] == T {
 			return Progn(e, form[1:]...)

@@ -42,7 +42,7 @@ func (f Function) Apply(e env.Environment, arguments ...ilos.Instance) (ilos.Ins
 		argv = append(argv, reflect.ValueOf(cadr))
 	}
 	if ft.NumIn() != len(argv) && (!ft.IsVariadic() || ft.NumIn()-2 >= len(argv)) {
-		return nil, NewArityError()
+		return nil, NewArityError(e)
 	}
 	rets := fv.Call(argv)
 	a, _ := rets[0].Interface().(ilos.Instance)
@@ -108,7 +108,7 @@ func (f *GenericFunction) Apply(e env.Environment, arguments ...ilos.Instance) (
 		}
 	}
 	if (variadic && len(parameters)-2 > len(arguments)) || (!variadic && len(parameters) != len(arguments)) {
-		return nil, NewArityError()
+		return nil, NewArityError(e)
 	}
 	methods := []method{}
 	for _, method := range f.methods {
@@ -311,7 +311,7 @@ func (f *GenericFunction) Apply(e env.Environment, arguments ...ilos.Instance) (
 			index := sort.Search(width, test)
 			e.DynamicVariable.Define(NewSymbol("IRIS/DEPTH"), NewInteger(index))
 			if index == len(methods) {
-				return nil, NewUndefinedFunction(f.funcSpec)
+				return nil, NewUndefinedFunction(e, f.funcSpec)
 			}
 		}
 		e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisNil)

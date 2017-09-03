@@ -37,13 +37,10 @@ func GeneralVectorP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.I
 // initial-element may be any ISLISP object.
 func CreateVector(e env.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if !ilos.InstanceOf(class.Integer, i) || int(i.(instance.Integer)) < 0 {
-		condition := instance.Create(e, class.DomainError,
-			instance.NewSymbol("OBJECT"), i,
-			instance.NewSymbol("EXPECTED-CLASS"), class.Integer)
-		return SignalCondition(e, condition, Nil)
+		return SignalCondition(e, instance.NewDomainError(e, i, class.Integer), Nil)
 	}
 	if len(initialElement) > 1 {
-		return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 	}
 	n := int(i.(instance.Integer))
 	v := make([]ilos.Instance, n)

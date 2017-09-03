@@ -36,10 +36,7 @@ func convFloat64(e env.Environment, x ilos.Instance) (float64, bool, ilos.Instan
 	case ilos.InstanceOf(class.Float, x):
 		return float64(x.(instance.Float)), true, nil
 	default:
-		condition := instance.Create(e, class.Number,
-			instance.NewSymbol("OBJECT"), x,
-			instance.NewSymbol("EXPECTED-CLASS"), class.Number)
-		_, err := SignalCondition(e, condition, Nil)
+		_, err := SignalCondition(e, instance.NewDomainError(e, x, class.Number), Nil)
 		return 0.0, false, err
 	}
 }
@@ -56,10 +53,7 @@ func evalString(e env.Environment, s string) ilos.Instance {
 func ensure(e env.Environment, c ilos.Class, i ...ilos.Instance) ilos.Instance {
 	for _, o := range i {
 		if !ilos.InstanceOf(c, o) {
-			condition := instance.Create(e, class.DomainError,
-				instance.NewSymbol("OBJECT"), o,
-				instance.NewSymbol("EXPECTED-CLASS"), c)
-			_, err := SignalCondition(e, condition, Nil)
+			_, err := SignalCondition(e, instance.NewDomainError(e, o, c), Nil)
 			return err
 		}
 	}

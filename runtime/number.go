@@ -35,10 +35,7 @@ func ParseNumber(e env.Environment, str ilos.Instance) (ilos.Instance, ilos.Inst
 	}
 	ret, err := parser.ParseAtom(string(str.(instance.String)))
 	if err != nil || !ilos.InstanceOf(class.Number, ret) {
-		condition := instance.Create(e, class.ParseError,
-			instance.NewSymbol("STRING"), str,
-			instance.NewSymbol("EXPECTED-CLASS"), class.Number)
-		return SignalCondition(e, condition, Nil)
+		return SignalCondition(e, instance.NewParseError(e, str, class.Number), Nil)
 	}
 	return ret, err
 }
@@ -227,11 +224,7 @@ func Quotient(e env.Environment, dividend, divisor1 ilos.Instance, divisor ...il
 			for i := len(divisor) - 1; i >= 0; i-- {
 				arguments = instance.NewCons(divisor[i], arguments)
 			}
-			condition := instance.Create(e, class.ArithmeticError,
-				instance.NewSymbol("OPERATION"), instance.NewSymbol("QUOTIENT"),
-				instance.NewSymbol("OPERANDS"), arguments,
-			)
-			return SignalCondition(e, condition, Nil)
+			return SignalCondition(e, instance.NewArithmeticError(e, instance.NewSymbol("QUOTIENT"), arguments), Nil)
 		}
 		if !flt && !b && int(quotient)%int(f) != 0 {
 			flt = true
@@ -313,10 +306,7 @@ func Log(e env.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 		return nil, err
 	}
 	if f <= 0.0 {
-		condition := instance.Create(e, class.DomainError,
-			instance.NewSymbol("OBJECT"), x,
-			instance.NewSymbol("EXPECTED-CLASS"), class.Number)
-		return SignalCondition(e, condition, Nil)
+		return SignalCondition(e, instance.NewDomainError(e, x, class.Number), Nil)
 	}
 	return instance.NewFloat(math.Log(f)), nil
 }
@@ -344,11 +334,7 @@ func Expt(e env.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance
 		if err != nil {
 			return nil, err
 		}
-		condition := instance.Create(e, class.ArithmeticError,
-			instance.NewSymbol("OPERATION"), operation,
-			instance.NewSymbol("OPERANDS"), operands,
-		)
-		return SignalCondition(e, condition, Nil)
+		return SignalCondition(e, instance.NewArithmeticError(e, operation, operands), Nil)
 	}
 	return instance.NewFloat(math.Pow(a, b)), nil
 }
@@ -361,10 +347,7 @@ func Sqrt(e env.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 		return nil, err
 	}
 	if a < 0.0 {
-		condition := instance.Create(e, class.DomainError,
-			instance.NewSymbol("OBJECT"), x,
-			instance.NewSymbol("EXPECTED-CLASS"), class.Number)
-		return SignalCondition(e, condition, Nil)
+		return SignalCondition(e, instance.NewDomainError(e, x, class.Number), Nil)
 	}
 	if math.Ceil(math.Sqrt(a)) == math.Sqrt(a) {
 		return instance.NewInteger(int(math.Sqrt(a))), nil
@@ -440,11 +423,7 @@ func Atan2(e env.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instanc
 		if err != nil {
 			return nil, err
 		}
-		condition := instance.Create(e, class.ArithmeticError,
-			instance.NewSymbol("OPERATION"), operation,
-			instance.NewSymbol("OPERANDS"), operands,
-		)
-		return SignalCondition(e, condition, Nil)
+		return SignalCondition(e, instance.NewArithmeticError(e, operation, operands), Nil)
 	}
 	return instance.NewFloat(math.Atan2(a, b)), nil
 }
@@ -487,10 +466,7 @@ func Atanh(e env.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 		return nil, err
 	}
 	if math.Abs(a) >= 1 {
-		condition := instance.Create(e, class.DomainError,
-			instance.NewSymbol("OBJECT"), x,
-			instance.NewSymbol("EXPECTED-CLASS"), class.Number)
-		return SignalCondition(e, condition, Nil)
+		return SignalCondition(e, instance.NewDomainError(e, x, class.Number), Nil)
 	}
 	return instance.NewFloat(math.Atanh(a)), nil
 }

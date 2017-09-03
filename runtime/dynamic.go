@@ -29,7 +29,7 @@ func Dynamic(e env.Environment, var1 ilos.Instance) (ilos.Instance, ilos.Instanc
 	if v, ok := e.DynamicVariable.Get(var1); ok {
 		return v, nil
 	}
-	return nil, instance.NewUndefinedVariable(var1)
+	return SignalCondition(e, instance.NewUndefinedVariable(e, var1), Nil)
 }
 
 // SetDynamic denotes an assignment to a dynamic variable. This
@@ -55,7 +55,7 @@ func SetDynamic(e env.Environment, form, var1 ilos.Instance) (ilos.Instance, ilo
 	if e.DynamicVariable.Set(var1, form) {
 		return form, nil
 	}
-	return nil, instance.NewUndefinedVariable(var1)
+	return SignalCondition(e, instance.NewUndefinedVariable(e, var1), Nil)
 }
 
 // DynamicLet is used to establish dynamic variable bindings.
@@ -85,7 +85,7 @@ func DynamicLet(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Insta
 			return nil, err
 		}
 		if cadr.(instance.List).Length() != 2 {
-			return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 		f, err := Eval(e, cadr.(instance.List).Nth(1))
 		if err != nil {
@@ -95,7 +95,7 @@ func DynamicLet(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Insta
 	}
 	for v, f := range vfs {
 		if !e.DynamicVariable.Define(v, f) {
-			return nil, instance.NewImmutableBinding()
+			return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 		}
 	}
 	return Progn(e, bodyForm...)

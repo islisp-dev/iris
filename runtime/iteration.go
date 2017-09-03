@@ -73,10 +73,10 @@ func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, for
 				return nil, err
 			}
 			if !a.Variable.Define(var1, init) {
-				return nil, instance.NewImmutableBinding()
+				return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 			}
 		default:
-			return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 	}
 	if err := ensure(e, class.List, endTestAndResults); err != nil {
@@ -84,7 +84,7 @@ func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, for
 	}
 	ends := endTestAndResults.(instance.List).Slice()
 	if len(ends) == 0 {
-		return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 	}
 	endTest := ends[0]
 	results := ends[1:]
@@ -111,10 +111,10 @@ func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, for
 					return nil, err
 				}
 				if !b.Variable.Define(var1, step) {
-					return nil, instance.NewImmutableBinding()
+					return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 				}
 			default:
-				return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 			}
 		}
 		test, err = Eval(b, endTest)

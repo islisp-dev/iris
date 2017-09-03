@@ -33,7 +33,7 @@ func Property(e env.Environment, symbol, propertyName ilos.Instance, obj ...ilos
 		return nil, err
 	}
 	if len(obj) > 1 {
-		return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 	}
 	ret, ok := e.Property.Get(symbol, propertyName)
 	if ok {

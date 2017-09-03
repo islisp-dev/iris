@@ -34,10 +34,7 @@ func Length(e env.Environment, sequence ilos.Instance) (ilos.Instance, ilos.Inst
 		return instance.NewInteger(sequence.(instance.List).Length()), nil
 	}
 	// TODO: class.Seq
-	condition := instance.Create(e, class.DomainError,
-		instance.NewSymbol("OBJECT"), sequence,
-		instance.NewSymbol("EXPECTED-CLASS"), class.Object)
-	return SignalCondition(e, condition, Nil)
+	return SignalCondition(e, instance.NewDomainError(e, sequence, class.Object), Nil)
 }
 
 // Elt returns the element of sequence that has index z. Indexing is 0-based; i.e., z = 0
@@ -56,28 +53,25 @@ func Elt(e env.Environment, sequence, z ilos.Instance) (ilos.Instance, ilos.Inst
 		seq := sequence.(instance.String)
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return nil, instance.NewIndexOutOfRange()
+			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 		}
 		return instance.NewCharacter(seq[idx]), nil
 	case ilos.InstanceOf(class.GeneralVector, sequence):
 		seq := sequence.(instance.GeneralVector)
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return nil, instance.NewIndexOutOfRange()
+			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 		}
 		return seq[idx], nil
 	case ilos.InstanceOf(class.List, sequence):
 		seq := sequence.(instance.List).Slice()
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return nil, instance.NewIndexOutOfRange()
+			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 		}
 		return seq[idx], nil
 	}
-	condition := instance.Create(e, class.DomainError,
-		instance.NewSymbol("OBJECT"), sequence,
-		instance.NewSymbol("EXPECTED-CLASS"), class.Object)
-	return SignalCondition(e, condition, Nil)
+	return SignalCondition(e, instance.NewDomainError(e, sequence, class.Object), Nil)
 
 }
 
@@ -95,7 +89,7 @@ func SetElt(e env.Environment, obj, sequence, z ilos.Instance) (ilos.Instance, i
 		seq := sequence.(instance.String)
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return nil, instance.NewIndexOutOfRange()
+			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 		}
 		if err := ensure(e, class.Character, obj); err != nil {
 			return nil, err
@@ -106,7 +100,7 @@ func SetElt(e env.Environment, obj, sequence, z ilos.Instance) (ilos.Instance, i
 		seq := sequence.(instance.GeneralVector)
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return nil, instance.NewIndexOutOfRange()
+			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 		}
 		seq[idx] = obj
 		return obj, nil
@@ -114,7 +108,7 @@ func SetElt(e env.Environment, obj, sequence, z ilos.Instance) (ilos.Instance, i
 		seq := sequence.(instance.List).Slice()
 		idx := int(z.(instance.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return nil, instance.NewIndexOutOfRange()
+			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 		}
 		for idx != 0 && ilos.InstanceOf(class.Cons, sequence) {
 			idx--
@@ -123,10 +117,7 @@ func SetElt(e env.Environment, obj, sequence, z ilos.Instance) (ilos.Instance, i
 		sequence.(*instance.Cons).Car = obj
 		return obj, nil
 	}
-	condition := instance.Create(e, class.DomainError,
-		instance.NewSymbol("OBJECT"), sequence,
-		instance.NewSymbol("EXPECTED-CLASS"), class.Object)
-	return SignalCondition(e, condition, Nil)
+	return SignalCondition(e, instance.NewDomainError(e, sequence, class.Object), Nil)
 }
 
 // Subseq returns the subsequence of length z2 − z1, containing the elements with indices from
@@ -149,26 +140,23 @@ func Subseq(e env.Environment, sequence, z1, z2 ilos.Instance) (ilos.Instance, i
 	case ilos.InstanceOf(class.String, sequence):
 		seq := sequence.(instance.String)
 		if !(0 <= start && start < len(seq) && 0 <= end && end < len(seq) && start <= end) {
-			return nil, instance.NewIndexOutOfRange()
+			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 		}
 		return seq[start:end], nil
 	case ilos.InstanceOf(class.GeneralVector, sequence):
 		seq := sequence.(instance.GeneralVector)
 		if !(0 <= start && start < len(seq) && 0 <= end && end < len(seq) && start <= end) {
-			return nil, instance.NewIndexOutOfRange()
+			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 		}
 		return seq[start:end], nil
 	case ilos.InstanceOf(class.List, sequence):
 		seq := sequence.(instance.List).Slice()
 		if !(0 < start && start < len(seq) && 0 < end && end < len(seq) && start <= end) {
-			return nil, instance.NewIndexOutOfRange()
+			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 		}
 		return List(e, seq[start:end]...)
 	}
-	condition := instance.Create(e, class.DomainError,
-		instance.NewSymbol("OBJECT"), sequence,
-		instance.NewSymbol("EXPECTED-CLASS"), class.Object)
-	return SignalCondition(e, condition, Nil)
+	return SignalCondition(e, instance.NewDomainError(e, sequence, class.Object), Nil)
 }
 
 // Destructively modifies destination to contain the results of applying function to

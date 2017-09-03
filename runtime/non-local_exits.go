@@ -46,13 +46,10 @@ func Block(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.In
 		return nil, err
 	}
 	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
-		condition := instance.Create(e, class.DomainError,
-			instance.NewSymbol("OBJECT"), tag,
-			instance.NewSymbol("EXPECTED-CLASS"), class.Object)
-		return SignalCondition(e, condition, Nil)
+		return SignalCondition(e, instance.NewDomainError(e, tag, class.Object), Nil)
 	}
 	if !e.BlockTag.Define(tag, uid) {
-		return nil, instance.NewImmutableBinding()
+		return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 	}
 	var fail ilos.Instance
 	sucess := Nil
@@ -80,10 +77,7 @@ func ReturnFrom(e env.Environment, tag, object ilos.Instance) (ilos.Instance, il
 		return nil, err
 	}
 	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
-		condition := instance.Create(e, class.DomainError,
-			instance.NewSymbol("OBJECT"), tag,
-			instance.NewSymbol("EXPECTED-CLASS"), class.Object)
-		return SignalCondition(e, condition, Nil)
+		return SignalCondition(e, instance.NewDomainError(e, tag, class.Object), Nil)
 	}
 	object, err = Eval(e, object)
 	if err != nil {
@@ -91,7 +85,7 @@ func ReturnFrom(e env.Environment, tag, object ilos.Instance) (ilos.Instance, il
 	}
 	uid, ok := e.BlockTag.Get(tag)
 	if !ok {
-		return nil, instance.NewSimpleError(instance.NewString("%v is not defined as the tag"), tag)
+		return SignalCondition(e, instance.NewControlError(e), Nil)
 	}
 	return nil, instance.NewBlockTag(tag, uid, object)
 }
@@ -104,13 +98,10 @@ func Catch(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.In
 		return nil, err
 	}
 	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
-		condition := instance.Create(e, class.DomainError,
-			instance.NewSymbol("OBJECT"), tag,
-			instance.NewSymbol("EXPECTED-CLASS"), class.Object)
-		return SignalCondition(e, condition, Nil)
+		return SignalCondition(e, instance.NewDomainError(e, tag, class.Object), Nil)
 	}
 	if !e.CatchTag.Define(tag, uid) {
-		return nil, instance.NewImmutableBinding()
+		return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 	}
 	var fail ilos.Instance
 	sucess := Nil
@@ -138,10 +129,7 @@ func Throw(e env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.In
 		return nil, err
 	}
 	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
-		condition := instance.Create(e, class.DomainError,
-			instance.NewSymbol("OBJECT"), tag,
-			instance.NewSymbol("EXPECTED-CLASS"), class.Object)
-		return SignalCondition(e, condition, Nil)
+		return SignalCondition(e, instance.NewDomainError(e, tag, class.Object), Nil)
 	}
 	object, err = Eval(e, object)
 	if err != nil {
@@ -149,7 +137,7 @@ func Throw(e env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.In
 	}
 	uid, ok := e.CatchTag.Get(tag)
 	if !ok {
-		return nil, instance.NewSimpleError(instance.NewString("%v is not defined as the tag"), tag)
+		return SignalCondition(e, instance.NewControlError(e), Nil)
 
 	}
 	return nil, instance.NewCatchTag(tag, uid, object)
@@ -160,7 +148,7 @@ func Tagbody(e env.Environment, body ...ilos.Instance) (ilos.Instance, ilos.Inst
 	for _, cadr := range body {
 		if !ilos.InstanceOf(class.Cons, cadr) {
 			if !e.TagbodyTag.Define(cadr, uid) { // ref cddr
-				return nil, instance.NewImmutableBinding()
+				return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 			}
 		}
 	}
@@ -202,7 +190,7 @@ func Tagbody(e env.Environment, body ...ilos.Instance) (ilos.Instance, ilos.Inst
 func Go(e env.Environment, tag ilos.Instance) (ilos.Instance, ilos.Instance) {
 	uid, ok := e.TagbodyTag.Get(tag)
 	if !ok {
-		return nil, instance.NewSimpleError(instance.NewString("%v is not defined as the tag"), tag)
+		return SignalCondition(e, instance.NewControlError(e), Nil)
 	}
 	return nil, instance.NewTagbodyTag(tag, uid)
 }
@@ -239,7 +227,7 @@ func UnwindProtect(e env.Environment, form ilos.Instance, cleanupForms ...ilos.I
 	ret1, err1 := Eval(e, form)
 	ret2, err2 := Progn(e, cleanupForms...)
 	if ilos.InstanceOf(class.Escape, err2) {
-		return nil, instance.NewControlError()
+		return SignalCondition(e, instance.NewControlError(e), Nil)
 	}
 	if err2 != nil {
 		return ret2, err2

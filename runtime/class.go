@@ -36,7 +36,8 @@ func Class(e env.Environment, className ilos.Instance) (ilos.Class, ilos.Instanc
 	if v, ok := e.Class[:1].Get(className); ok {
 		return v.(ilos.Class), nil
 	}
-	return nil, instance.NewUndefinedClass(className)
+	_, err := SignalCondition(e, instance.NewUndefinedClass(e, className), Nil)
+	return nil, err
 }
 
 func checkSuperClass(a, b ilos.Class) bool {
@@ -74,7 +75,7 @@ func Defclass(e env.Environment, className, scNames, slotSpecs ilos.Instance, cl
 		}
 		for _, before := range supers {
 			if checkSuperClass(before, super) {
-				return nil, instance.NewArityError()
+				return SignalCondition(e, instance.NewArityError(e), Nil)
 			}
 		}
 		supers = append(supers, super.(ilos.Class))
@@ -212,7 +213,7 @@ func InitializeObject(e env.Environment, object ilos.Instance, inits ...ilos.Ins
 
 func Defmethod(e env.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if len(arguments) < 2 {
-		return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 	}
 	name := arguments[0]
 	var qualifier ilos.Instance
@@ -243,7 +244,8 @@ func Defmethod(e env.Environment, arguments ...ilos.Instance) (ilos.Instance, il
 		} else {
 			class, ok := e.Class[:1].Get(pp.(instance.List).Nth(1))
 			if !ok {
-				return nil, instance.NewUndefinedClass(pp.(instance.List).Nth(1))
+				return SignalCondition(e, instance.NewUndefinedClass(e, pp.(instance.List).Nth(1)), Nil)
+
 			}
 			classList = append(classList, class.(ilos.Class))
 		}
@@ -254,10 +256,10 @@ func Defmethod(e env.Environment, arguments ...ilos.Instance) (ilos.Instance, il
 	}
 	gen, ok := e.Function[:1].Get(name)
 	if !ok {
-		return nil, instance.NewUndefinedFunction(name)
+		return SignalCondition(e, instance.NewUndefinedFunction(e, name), Nil)
 	}
 	if !gen.(*instance.GenericFunction).AddMethod(qualifier, lambdaList, classList, fun) {
-		return nil, instance.NewUndefinedFunction(name)
+		return SignalCondition(e, instance.NewUndefinedFunction(e, name), Nil)
 	}
 	return name, nil
 }
@@ -273,7 +275,8 @@ func Defgeneric(e env.Environment, funcSpec, lambdaList ilos.Instance, optionsOr
 		case instance.NewSymbol(":GENERIC-FUNCTION-CLASS"):
 			class, ok := e.Class[:1].Get(optionOrMethodDesc.(instance.List).Nth(1))
 			if !ok {
-				return nil, instance.NewUndefinedClass(optionOrMethodDesc.(instance.List).Nth(1))
+				return SignalCondition(e, instance.NewUndefinedClass(e, optionOrMethodDesc.(instance.List).Nth(1)), Nil)
+
 			}
 			genericFunctionClass = class.(ilos.Class)
 		case instance.NewSymbol(":METHOD"):

@@ -32,7 +32,7 @@ func Setq(e env.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Inst
 	if e.Variable.Set(var1, ret) {
 		return ret, nil
 	}
-	return nil, instance.NewUndefinedVariable(var1)
+	return SignalCondition(e, instance.NewUndefinedVariable(e, var1), Nil)
 }
 
 func Setf(e env.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Instance) {
@@ -46,7 +46,7 @@ func Setf(e env.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Inst
 	funcSpec := instance.NewSymbol(fmt.Sprintf("(SETF %v)", var1.(instance.List).Nth(0)))
 	fun, ok := e.Function.Get(funcSpec)
 	if !ok {
-		return nil, instance.NewUndefinedFunction(funcSpec)
+		return SignalCondition(e, instance.NewUndefinedFunction(e, funcSpec), Nil)
 	}
 	arguments, err := evalArguments(e, instance.NewCons(form, var1.(*instance.Cons).Cdr))
 	if err != nil {
@@ -77,7 +77,7 @@ func Let(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (i
 			return nil, err
 		}
 		if cadr.(instance.List).Length() != 2 {
-			return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 		f, err := Eval(e, cadr.(instance.List).Nth(1))
 		if err != nil {
@@ -87,7 +87,7 @@ func Let(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (i
 	}
 	for v, f := range vfs {
 		if !e.Variable.Define(v, f) {
-			return nil, instance.NewImmutableBinding()
+			return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 		}
 	}
 	return Progn(e, bodyForm...)
@@ -116,14 +116,14 @@ func LetStar(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance
 			return nil, err
 		}
 		if cadr.(instance.List).Length() != 2 {
-			return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 		f, err := Eval(e, cadr.(instance.List).Nth(1))
 		if err != nil {
 			return nil, err
 		}
 		if !e.Variable.Define(cadr.(instance.List).Nth(0), f) {
-			return nil, instance.NewImmutableBinding()
+			return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 		}
 	}
 	return Progn(e, bodyForm...)

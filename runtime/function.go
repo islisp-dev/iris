@@ -42,7 +42,7 @@ func Function(e env.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instanc
 	if f, ok := e.Function.Get(fun); ok {
 		return f, nil
 	}
-	return nil, instance.NewUndefinedFunction(fun)
+	return SignalCondition(e, instance.NewUndefinedFunction(e, fun), Nil)
 }
 
 // Lambda special form creates a function object.
@@ -109,7 +109,7 @@ func Labels(e env.Environment, functions ilos.Instance, bodyForm ...ilos.Instanc
 		}
 		definition := function.(instance.List).Slice()
 		if len(definition) < 2 {
-			return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 		functionName := definition[0]
 		lambdaList := definition[1]
@@ -119,7 +119,7 @@ func Labels(e env.Environment, functions ilos.Instance, bodyForm ...ilos.Instanc
 			return nil, err
 		}
 		if !e.Function.Define(functionName, fun) {
-			return nil, instance.NewImmutableBinding()
+			return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 		}
 	}
 	return Progn(e, bodyForm...)
@@ -138,7 +138,7 @@ func Flet(e env.Environment, functions ilos.Instance, bodyForm ...ilos.Instance)
 		}
 		definition := function.(instance.List).Slice()
 		if len(definition) < 2 {
-			return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 		functionName := definition[0]
 		lambdaList := definition[1]
@@ -148,7 +148,7 @@ func Flet(e env.Environment, functions ilos.Instance, bodyForm ...ilos.Instance)
 			return nil, err
 		}
 		if !newEnv.Function.Define(functionName, fun) {
-			return nil, instance.NewImmutableBinding()
+			return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 		}
 	}
 	return Progn(newEnv, bodyForm...)

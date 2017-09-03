@@ -46,11 +46,7 @@ func Div(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance)
 		if err != nil {
 			return nil, err
 		}
-		condition := instance.Create(e, class.ArithmeticError,
-			instance.NewSymbol("OPERATION"), operation,
-			instance.NewSymbol("OPERANDS"), operands,
-		)
-		return SignalCondition(e, condition, Nil)
+		return SignalCondition(e, instance.NewArithmeticError(e, operation, operands), Nil)
 	}
 	return instance.NewInteger(a / b), nil
 }
@@ -76,11 +72,7 @@ func Mod(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance)
 		if err != nil {
 			return nil, err
 		}
-		condition := instance.Create(e, class.ArithmeticError,
-			instance.NewSymbol("OPERATION"), operation,
-			instance.NewSymbol("OPERANDS"), operands,
-		)
-		return SignalCondition(e, condition, Nil)
+		return SignalCondition(e, instance.NewArithmeticError(e, operation, operands), Nil)
 	}
 	return instance.NewInteger(a % b), nil
 }
@@ -141,10 +133,7 @@ func Isqrt(e env.Environment, z ilos.Instance) (ilos.Instance, ilos.Instance) {
 		return nil, err
 	}
 	if a < 0 {
-		condition := instance.Create(e, class.DomainError,
-			instance.NewSymbol("OBJECT"), z,
-			instance.NewSymbol("EXPECTED-CLASS"), class.Number)
-		return SignalCondition(e, condition, Nil)
+		return SignalCondition(e, instance.NewDomainError(e, z, class.Number), Nil)
 	}
 	return instance.NewInteger(int(math.Sqrt(float64(a)))), nil
 }

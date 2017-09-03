@@ -32,7 +32,7 @@ func CreateList(e env.Environment, i ilos.Instance, initialElement ...ilos.Insta
 		return nil, err
 	}
 	if len(initialElement) > 1 {
-		return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 	}
 	elm := Nil
 	if len(initialElement) == 1 {

@@ -15,7 +15,15 @@ import (
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-var TopLevel = env.NewEnvironment(instance.NewStream(os.Stdin, nil), instance.NewStream(nil, os.Stdout), instance.NewStream(nil, os.Stderr), nil)
+func TopLevelHander(c ilos.Instance) (ilos.Instance, ilos.Instance) {
+	return nil, c
+}
+
+var TopLevel = env.NewEnvironment(
+	instance.NewStream(os.Stdin, nil),
+	instance.NewStream(nil, os.Stdout),
+	instance.NewStream(nil, os.Stderr),
+	instance.NewFunction(instance.NewSymbol("TOP-LEVEL-HANDLER"), TopLevelHander))
 var Version = "0.1.0"
 
 func defspecial2(name string, function interface{}) {

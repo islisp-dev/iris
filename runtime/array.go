@@ -62,7 +62,7 @@ func CreateArray(e env.Environment, dimensions ilos.Instance, initialElement ...
 	dim := dimensions.(instance.List).Slice()
 	elt := Nil
 	if len(initialElement) > 1 {
-		return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 	}
 	if len(initialElement) == 1 {
 		elt = initialElement[0]
@@ -103,20 +103,20 @@ func Aref(e env.Environment, basicArray ilos.Instance, dimensions ...ilos.Instan
 	switch {
 	case ilos.InstanceOf(class.String, basicArray):
 		if len(dimensions) != 1 {
-			return nil, instance.NewArityError()
+			return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 		index := int(dimensions[0].(instance.Integer))
 		if len(basicArray.(instance.String)) <= index {
-			return nil, instance.NewIndexOutOfRange()
+			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 		}
 		return instance.NewCharacter(basicArray.(instance.String)[index]), nil
 	case ilos.InstanceOf(class.GeneralVector, basicArray):
 		if len(dimensions) != 1 {
-			return nil, instance.NewArityError()
+			return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 		index := int(dimensions[0].(instance.Integer))
 		if len(basicArray.(instance.GeneralVector)) <= index {
-			return nil, instance.NewIndexOutOfRange()
+			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 		}
 		return basicArray.(instance.GeneralVector)[index], nil
 	default: // General Array*
@@ -137,12 +137,12 @@ func Garef(e env.Environment, generalArray ilos.Instance, dimensions ...ilos.Ins
 	for _, dim := range dimensions {
 		index := int(dim.(instance.Integer))
 		if array.Vector == nil || len(array.Vector) <= index {
-			return nil, instance.NewIndexOutOfRange()
+			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 		}
 		array = array.Vector[index]
 	}
 	if array.Scalar == nil {
-		return nil, instance.NewIndexOutOfRange()
+		return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 	}
 	return array.Scalar, nil
 }
@@ -163,21 +163,21 @@ func SetAref(e env.Environment, obj, basicArray ilos.Instance, dimensions ...ilo
 			return nil, err
 		}
 		if len(dimensions) != 1 {
-			return nil, instance.NewArityError()
+			return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 		index := int(dimensions[0].(instance.Integer))
 		if len(basicArray.(instance.String)) <= index {
-			return nil, instance.NewIndexOutOfRange()
+			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 		}
 		basicArray.(instance.String)[index] = rune(obj.(instance.Character))
 		return obj, nil
 	case ilos.InstanceOf(class.GeneralVector, basicArray):
 		if len(dimensions) != 1 {
-			return nil, instance.NewArityError()
+			return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 		index := int(dimensions[0].(instance.Integer))
 		if len(basicArray.(instance.GeneralVector)) <= index {
-			return nil, instance.NewIndexOutOfRange()
+			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 		}
 		basicArray.(instance.GeneralVector)[index] = obj
 		return obj, nil
@@ -200,12 +200,12 @@ func SetGaref(e env.Environment, obj, generalArray ilos.Instance, dimensions ...
 	for _, dim := range dimensions {
 		index := int(dim.(instance.Integer))
 		if array.Vector == nil || len(array.Vector) <= index {
-			return nil, instance.NewIndexOutOfRange()
+			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 		}
 		array = array.Vector[index]
 	}
 	if array.Scalar == nil {
-		return nil, instance.NewIndexOutOfRange()
+		return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 	}
 	array.Scalar = obj
 	return obj, nil

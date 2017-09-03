@@ -136,7 +136,7 @@ func evalCons(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instanc
 	if a, b, c := evalFunction(e, car, cdr); c {
 		return a, b
 	}
-	return nil, instance.NewUndefinedFunction(car)
+	return SignalCondition(e, instance.NewUndefinedFunction(e, car), Nil)
 }
 
 func evalVariable(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
@@ -146,7 +146,7 @@ func evalVariable(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Ins
 	if val, ok := e.Constant.Get(obj); ok {
 		return val, nil
 	}
-	return nil, instance.NewUndefinedVariable(obj)
+	return SignalCondition(e, instance.NewUndefinedVariable(e, obj), Nil)
 }
 
 // Eval evaluates any classs

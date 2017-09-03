@@ -25,7 +25,7 @@ func Defconstant(e env.Environment, name, form ilos.Instance) (ilos.Instance, il
 		return nil, err
 	}
 	if _, ok := e.Constant[:1].Get(name); ok {
-		return nil, instance.NewImmutableBinding()
+		return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 	}
 	ret, err := Eval(e, form)
 	if err != nil {
@@ -49,7 +49,7 @@ func Defglobal(e env.Environment, name, form ilos.Instance) (ilos.Instance, ilos
 		return nil, err
 	}
 	if _, ok := e.Constant[:1].Get(name); ok {
-		return nil, instance.NewImmutableBinding()
+		return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 	}
 	ret, err := Eval(e, form)
 	if err != nil {
@@ -68,7 +68,7 @@ func Defdynamic(e env.Environment, name, form ilos.Instance) (ilos.Instance, ilo
 		return nil, err
 	}
 	if _, ok := e.Constant[:1].Get(name); ok {
-		return nil, instance.NewImmutableBinding()
+		return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 	}
 	ret, err := Eval(e, form)
 	if err != nil {

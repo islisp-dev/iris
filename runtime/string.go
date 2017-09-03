@@ -28,13 +28,10 @@ func Stringp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance
 // An error shall be signaled if i is not a non-negative integer or if initial-character is not a character (error-id. domain-error).
 func CreateString(e env.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if !ilos.InstanceOf(class.Integer, i) || int(i.(instance.Integer)) < 0 {
-		condition := instance.Create(e, class.DomainError,
-			instance.NewSymbol("OBJECT"), i,
-			instance.NewSymbol("EXPECTED-CLASS"), class.Object)
-		return SignalCondition(e, condition, Nil)
+		return SignalCondition(e, instance.NewDomainError(e, i, class.Object), Nil)
 	}
 	if len(initialElement) > 1 {
-		return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 	}
 	n := int(i.(instance.Integer))
 	v := make([]ilos.Instance, n)
@@ -130,7 +127,7 @@ func CharIndex(e env.Environment, char, str ilos.Instance, startPosition ...ilos
 		return nil, err
 	}
 	if len(startPosition) > 1 {
-		return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 	}
 	n := 0
 	if len(startPosition) == 1 {
@@ -163,7 +160,7 @@ func StringIndex(e env.Environment, sub, str ilos.Instance, startPosition ...ilo
 		return nil, err
 	}
 	if len(startPosition) > 1 {
-		return nil, instance.NewArityError()
+		return SignalCondition(e, instance.NewArityError(e), Nil)
 	}
 	n := 0
 	if len(startPosition) == 1 {
