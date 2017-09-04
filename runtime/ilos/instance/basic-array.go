@@ -13,27 +13,28 @@ import (
 // General Array *
 
 type GeneralArrayStar struct {
-	Vector []GeneralArrayStar
+	Vector []*GeneralArrayStar
 	Scalar ilos.Instance
 }
 
-func NewGeneralArrayStar(vector []GeneralArrayStar, scalar ilos.Instance) ilos.Instance {
-	return GeneralArrayStar{vector, scalar}
+func NewGeneralArrayStar(vector []*GeneralArrayStar, scalar ilos.Instance) ilos.Instance {
+	return &GeneralArrayStar{vector, scalar}
 }
 
-func (GeneralArrayStar) Class() ilos.Class {
+func (*GeneralArrayStar) Class() ilos.Class {
 	return GeneralArrayStarClass
 }
-func countDim(a GeneralArrayStar) int {
-	if a.Vector != nil {
-		return 1 + countDim(a.Vector[0])
-	}
-	return 0
-}
 
-func (i GeneralArrayStar) String() string {
-	var stringify func(i GeneralArrayStar) string
-	stringify = func(i GeneralArrayStar) string {
+func (i *GeneralArrayStar) String() string {
+	var count func(i *GeneralArrayStar) int
+	count = func(i *GeneralArrayStar) int {
+		if i.Vector != nil {
+			return 1 + count(i.Vector[0])
+		}
+		return 0
+	}
+	var stringify func(i *GeneralArrayStar) string
+	stringify = func(i *GeneralArrayStar) string {
 		if i.Vector != nil {
 			str := "("
 			for idx, elt := range i.Vector {
@@ -47,7 +48,7 @@ func (i GeneralArrayStar) String() string {
 		}
 		return i.Scalar.String()
 	}
-	return fmt.Sprintf("#%vA%v", countDim(i), stringify(i))
+	return fmt.Sprintf("#%vA%v", count(i), stringify(i))
 }
 
 // General Vector

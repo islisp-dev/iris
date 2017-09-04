@@ -62,6 +62,7 @@ func init() {
 	defspecial2("And", And)
 	defun2("Append", Append)
 	defun2("Apply", Apply)
+	defun2("ArrayDimensions", ArrayDimensions)
 	defun2("Aref", Aref)
 	defun2("Assoc", Assoc)
 	// TODO: defspecial2("Assure", Assure)
