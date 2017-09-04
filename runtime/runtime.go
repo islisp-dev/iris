@@ -140,7 +140,7 @@ func init() {
 	defun2("Functionp", Functionp)
 	defun2("Garef", Garef)
 	defun2("Gcd", Gcd)
-	defun2("GENERAL-ARRAY*-P", GeneralArrayStarP)
+	defun2("GeneralArray*P", GeneralArrayStarP)
 	defun2("GeneralVectorP", GeneralVectorP)
 	// TODO defun2("GenericFunctionP", GenericFunctionP)
 	defun2("Gensym", Gensym)

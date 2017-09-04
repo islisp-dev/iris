@@ -6,6 +6,7 @@ package parser
 
 import (
 	"github.com/ta2gch/iris/runtime/ilos"
+	"github.com/ta2gch/iris/runtime/ilos/class"
 	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
@@ -13,14 +14,14 @@ func list2array(dim int, list ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if dim == 0 {
 		return instance.NewGeneralArrayStar(nil, list), nil
 	}
-	elements := list.(instance.List).Slice()
-	arrays := make([]instance.GeneralArrayStar, len(elements))
-	for idx, elt := range elements {
-		array, err := list2array(dim-1, elt)
+	cdr := list
+	arrays := []instance.GeneralArrayStar{}
+	for ilos.InstanceOf(class.Cons, cdr) {
+		array, err := list2array(dim-1, cdr.(*instance.Cons).Car)
 		if err != nil {
 			return nil, err
 		}
-		arrays[idx] = array.(instance.GeneralArrayStar)
+		arrays = append(arrays, array.(instance.GeneralArrayStar))
 	}
 	return instance.NewGeneralArrayStar(arrays, nil), nil
 }

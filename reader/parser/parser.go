@@ -110,6 +110,9 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instanc
 					instance.NewSymbol("EXPECTED-CLASS"), class.Integer)
 			}
 		}
+		if int(v) == 1 {
+			return list2vector(cdr)
+		}
 		return list2array(int(v), cdr)
 	}
 	if tok == "#" {

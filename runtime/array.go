@@ -48,13 +48,20 @@ func GeneralArrayStarP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilo
 // proper list of non-negative integers (error-id. domain-error).
 // initial-element may be any ISLISP object
 func CreateArray(e env.Environment, dimensions ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.List, dimensions); err != nil {
+	length, err := Length(e, dimensions)
+	if err != nil {
 		return nil, err
 	}
-	if err := ensure(e, class.Integer, dimensions.(instance.List).Slice()...); err != nil {
-		return nil, err
+	for i := 0; i < int(length.(instance.Integer)); i++ {
+		elt, err := Elt(e, dimensions, instance.NewInteger(i))
+		if err != nil {
+			return nil, err
+		}
+		if err := ensure(e, class.Integer, elt); err != nil {
+			return nil, err
+		}
 	}
-	dim := dimensions.(instance.List).Slice()
+	// set the initial element
 	elt := Nil
 	if len(initialElement) > 1 {
 		return SignalCondition(e, instance.NewArityError(e), Nil)
@@ -62,20 +69,51 @@ func CreateArray(e env.Environment, dimensions ilos.Instance, initialElement ...
 	if len(initialElement) == 1 {
 		elt = initialElement[0]
 	}
-	if len(dim) == 0 {
-		return instance.NewGeneralArrayStar(nil, elt), nil
+	// general-vector
+	if int(length.(instance.Integer)) == 1 {
+		return createGeneralVector(e, dimensions, elt)
 	}
-	array := make([]instance.GeneralArrayStar, int(dim[0].(instance.Integer)))
+	return createGeneralArrayStar(e, dimensions, elt)
+}
+
+func createGeneralVector(e env.Environment, dimensions ilos.Instance, initialElement ilos.Instance) (ilos.Instance, ilos.Instance) {
+	// N-dimensions array
+	dimension, err := Car(e, dimensions)
+	if err != nil {
+		return nil, err
+	}
+	array := make([]ilos.Instance, int(dimension.(instance.Integer)))
+	for i := 0; i < int(dimension.(instance.Integer)); i++ {
+		array[i] = initialElement
+	}
+	return instance.NewGeneralVector(array), nil
+}
+
+func createGeneralArrayStar(e env.Environment, dimensions ilos.Instance, initialElement ilos.Instance) (ilos.Instance, ilos.Instance) {
+	length, err := Length(e, dimensions)
+	if err != nil {
+		return nil, err
+	}
+	// 0-dimension array
+	if int(length.(instance.Integer)) == 0 {
+		return instance.NewGeneralArrayStar(nil, initialElement), nil
+	}
+	// N-dimensions array
+	dimension, err := Car(e, dimensions)
+	if err != nil {
+		return nil, err
+	}
+	array := make([]instance.GeneralArrayStar, int(dimension.(instance.Integer)))
 	for i := range array {
-		d, err := List(e, dim[1:]...)
+		cdr, err := Cdr(e, dimensions)
 		if err != nil {
 			return nil, err
 		}
-		a, err := CreateArray(e, d, elt)
+		arr, err := createGeneralArrayStar(e, cdr, initialElement)
 		if err != nil {
 			return nil, err
 		}
-		array[i] = a.(instance.GeneralArrayStar)
+		array[i] = arr.(instance.GeneralArrayStar)
 	}
 	return instance.NewGeneralArrayStar(array, nil), nil
 }
