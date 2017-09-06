@@ -115,8 +115,12 @@ func Case(e env.Environment, key ilos.Instance, pattern ...ilos.Instance) (ilos.
 // form evaluates to nil. If the value of keyform is different from every key,
 // and there is a default clause, its forms, if any, are evaluated sequentially,
 // and the value of the last one is the result of the case form.
-func CaseUsing(e env.Environment, key, pred ilos.Instance, pattern ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func CaseUsing(e env.Environment, pred, key ilos.Instance, pattern ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	key, err := Eval(e, key)
+	if err != nil {
+		return nil, err
+	}
+	pred, err = Eval(e, pred)
 	if err != nil {
 		return nil, err
 	}

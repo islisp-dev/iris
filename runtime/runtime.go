@@ -254,7 +254,7 @@ func init() {
 	// TODO defspecial2("The", The)
 	defspecial2("Throw", Throw)
 	defun2("Truncate", Truncate)
-	// TODO defun2("UndefinedEntityName", UndefinedEntityName)
+	// TODO defun1("UndefinedEntityName", UndefinedEntityName)
 	// TODO defun2("UndefinedEntityNamespace", UndefinedEntityNamespace)
 	defspecial2("UnwindProtect", UnwindProtect)
 	defun2("Vector", Vector)
