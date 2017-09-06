@@ -36,18 +36,18 @@ func CreateString(e env.Environment, i ilos.Instance, initialElement ...ilos.Ins
 		return SignalCondition(e, instance.NewArityError(e), Nil)
 	}
 	n := int(i.(instance.Integer))
-	v := make([]ilos.Instance, n)
+	v := make([]rune, n)
 	for i := 0; i < n; i++ {
 		if len(initialElement) == 0 {
-			v[i] = Nil
+			v[i] = 0
 		} else {
 			if err := ensure(e, class.Character, initialElement[0]); err != nil {
 				return nil, err
 			}
-			v[i] = initialElement[0]
+			v[i] = rune(initialElement[0].(instance.Character))
 		}
 	}
-	return instance.GeneralVector(v), nil
+	return instance.NewString(v), nil
 }
 
 // StringEqual tests whether string1 is the same string as string2.
@@ -198,5 +198,5 @@ func StringAppend(e env.Environment, str ...ilos.Instance) (ilos.Instance, ilos.
 		}
 		ret += string(s.(instance.String))
 	}
-	return instance.NewString(ret), nil
+	return instance.NewString([]rune(ret)), nil
 }

@@ -68,7 +68,7 @@ func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	// string
 	//
 	if r := regexp.MustCompile(`^"(.*)"$`).FindStringSubmatch(tok); len(r) >= 2 {
-		return instance.NewString(r[1]), nil
+		return instance.NewString([]rune(r[1])), nil
 	}
 	//
 	// symbol
@@ -87,7 +87,7 @@ func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	}
 	return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil),
 		class.ParseError,
-		instance.NewSymbol("STRING"), instance.NewString(tok),
+		instance.NewSymbol("STRING"), instance.NewString([]rune(tok)),
 		instance.NewSymbol("EXPECTED-CLASS"), class.Object)
 }
 
@@ -106,7 +106,7 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instanc
 			if err != nil {
 				return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil),
 					class.ParseError,
-					instance.NewSymbol("STRING"), instance.NewString(tok),
+					instance.NewSymbol("STRING"), instance.NewString([]rune(tok)),
 					instance.NewSymbol("EXPECTED-CLASS"), class.Integer)
 			}
 		}

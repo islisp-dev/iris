@@ -205,7 +205,7 @@ func GetOutputStreamString(e env.Environment, stream ilos.Instance) (ilos.Instan
 	if err := ensure(e, class.Stream, stream); err != nil {
 		return nil, err
 	}
-	return instance.NewString(stream.(instance.Stream).Writer.(*bytes.Buffer).String()), nil
+	return instance.NewString([]rune(stream.(instance.Stream).Writer.(*bytes.Buffer).String())), nil
 }
 
 func Read(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.Instance) {
@@ -295,7 +295,7 @@ func ReadLine(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.
 		}
 		return eosValue, nil
 	}
-	return instance.NewString(string(v)), nil
+	return instance.NewString([]rune(string(v))), nil
 }
 
 // TODO: preview-char (Hint: Bufio.Rreader)

@@ -5,8 +5,6 @@
 package runtime
 
 import (
-	"math"
-
 	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
@@ -173,22 +171,22 @@ func MapInto(e env.Environment, destination, function ilos.Instance, sequences .
 	if err := ensure(e, class.Function, function); err != nil {
 		return nil, err
 	}
-	max := 0.0
+	min, err := Length(e, destination)
+	if err != nil {
+		return nil, err
+	}
 	for _, seq := range sequences {
-		switch {
-		case ilos.InstanceOf(class.String, seq):
-			max = math.Max(max, float64(len(seq.(instance.String))))
-		case ilos.InstanceOf(class.GeneralVector, seq):
-			max = math.Max(max, float64(len(seq.(instance.GeneralVector))))
-		case ilos.InstanceOf(class.List, seq):
-			max = math.Max(max, float64(len(seq.(instance.List).Slice())))
+		len, err := Length(e, seq)
+		min, err = Min(e, min, len)
+		if err != nil {
+			return nil, err
 		}
 	}
-	for i := 0; i < int(max); i++ {
-		arguments := make([]ilos.Instance, int(max))
-		for _, seq := range sequences {
+	for i := 0; i < int(min.(instance.Integer)); i++ {
+		arguments := make([]ilos.Instance, len(sequences))
+		for j, seq := range sequences {
 			var err ilos.Instance
-			arguments[i], err = Elt(e, seq, instance.NewInteger(i))
+			arguments[j], err = Elt(e, seq, instance.NewInteger(i))
 			if err != nil {
 				return nil, err
 			}

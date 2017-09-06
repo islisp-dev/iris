@@ -72,7 +72,7 @@ func (i GeneralVector) String() string {
 
 type String []rune
 
-func NewString(s string) ilos.Instance {
+func NewString(s []rune) ilos.Instance {
 	return String(s)
 }
 

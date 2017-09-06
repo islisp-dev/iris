@@ -62,7 +62,7 @@ func IgnoreError(e env.Environment, forms ...ilos.Instance) (ilos.Instance, ilos
 }
 
 func ReportCondition(e env.Environment, condition, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
-	return Format(e, e.StandardOutput, instance.NewString("~A"), condition)
+	return Format(e, e.StandardOutput, instance.NewString([]rune("~A")), condition)
 }
 
 func ConditionContinuable(e env.Environment, condition ilos.Instance) (ilos.Instance, ilos.Instance) {
