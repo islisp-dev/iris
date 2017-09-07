@@ -23,8 +23,8 @@ var TopLevel = env.NewEnvironment(
 	instance.NewStream(os.Stdin, nil),
 	instance.NewStream(nil, os.Stdout),
 	instance.NewStream(nil, os.Stderr),
-	instance.NewFunction(instance.NewSymbol("TOP-LEVEL-HANDLER"), TopLevelHander))
-var Version = "0.1.0"
+	instance.NewFunction(instance.NewSymbol("TOP-LEVEL-HANDLER"), TopLevelHander),
+)
 
 func defspecial2(name string, function interface{}) {
 	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
