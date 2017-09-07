@@ -6,6 +6,7 @@ package runtime
 
 import (
 	"reflect"
+	"regexp"
 	"runtime"
 	"testing"
 )
@@ -18,8 +19,9 @@ type test struct {
 
 func execTests(t *testing.T, function interface{}, tests []test) {
 	name := runtime.FuncForPC(reflect.ValueOf(function).Pointer()).Name()
+	re := regexp.MustCompile(`\s+`)
 	for _, tt := range tests {
-		t.Run(tt.exp, func(t *testing.T) {
+		t.Run(re.ReplaceAllString(tt.exp, " "), func(t *testing.T) {
 			got, err := Eval(TopLevel, readFromString(tt.exp))
 			want, _ := Eval(TopLevel, readFromString(tt.want))
 			if !tt.wantErr && !reflect.DeepEqual(got, want) {
