@@ -20,7 +20,7 @@ func If(e env.Environment, testForm, thenForm ilos.Instance, elseForm ...ilos.In
 	if err != nil {
 		return nil, err
 	}
-	if tf == T {
+	if tf != Nil {
 		return Eval(e, thenForm)
 	}
 	if len(elseForm) > 1 {

@@ -5,8 +5,6 @@
 package runtime
 
 import (
-	"math"
-
 	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
@@ -16,7 +14,7 @@ import (
 // Listp returns t if obj is a list (instance of class list); otherwise, returns
 // nil. obj may be any ISLISP object.
 func Listp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(class.Cons, obj) {
+	if ilos.InstanceOf(class.List, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -129,12 +127,13 @@ func Member(e env.Environment, obj, list ilos.Instance) (ilos.Instance, ilos.Ins
 	if err := ensure(e, class.List, list); err != nil {
 		return nil, err
 	}
-	for idx, elt := range list.(instance.List).Slice() {
-		if obj == elt { // eql
-			return list.(instance.List).NthCdr(idx), nil
-		}
+	if !ilos.InstanceOf(class.Cons, list) || list.(*instance.Cons).Car == obj {
+		return list, nil
 	}
-	return Nil, nil
+	if !ilos.InstanceOf(class.Cons, list.(*instance.Cons).Cdr) {
+		return list.(*instance.Cons).Cdr, nil
+	}
+	return Member(e, obj, list.(*instance.Cons).Cdr)
 }
 
 // Mapcar operates on successive elements of the lists. function is applied to
@@ -150,48 +149,30 @@ func Mapcar(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 	if err := ensure(e, class.List, lists...); err != nil {
 		return nil, err
 	}
-	max := 0.0
+	arguments := []ilos.Instance{}
+	rests := []ilos.Instance{}
 	for _, list := range lists {
-		max = math.Max(max, float64(len(list.(instance.List).Slice())))
-	}
-	result := []ilos.Instance{}
-	for i := 0; i < int(max); i++ {
-		arguments := make([]ilos.Instance, len(lists))
-		for j, list := range lists {
-			arguments[j] = list.(instance.List).Nth(i)
+		if list == Nil {
+			return Nil, nil
 		}
-		ret, err := function.(instance.Applicable).Apply(e.NewDynamic(), arguments...)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, ret)
+		arguments = append(arguments, list.(*instance.Cons).Car)
+		rests = append(rests, list.(*instance.Cons).Cdr)
 	}
-	return List(e, result...)
+	car, err := function.(instance.Applicable).Apply(e.NewDynamic(), arguments...)
+	if err != nil {
+		return nil, err
+	}
+	cdr, err := Mapcar(e, function, rests[0], rests[1:]...)
+	if err != nil {
+		return nil, err
+	}
+	return Cons(e, car, cdr)
 }
 
 // Mapc is like mapcar except that the results of applying function are not
 // accumulated; list1 is returned.
 func Mapc(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	lists = append([]ilos.Instance{list1}, lists...)
-	if err := ensure(e, class.Function, function); err != nil {
-		return nil, err
-	}
-	if err := ensure(e, class.List, lists...); err != nil {
-		return nil, err
-	}
-	max := 0.0
-	for _, list := range lists {
-		max = math.Max(max, float64(len(list.(instance.List).Slice())))
-	}
-	for i := 0; i < int(max); i++ {
-		arguments := make([]ilos.Instance, len(lists))
-		for j, list := range lists {
-			arguments[j] = list.(instance.List).Nth(i)
-		}
-		if _, err := function.(instance.Applicable).Apply(e.NewDynamic(), arguments...); err != nil {
-			return nil, err
-		}
-	}
+	Mapcar(e, function, list1, lists...)
 	return list1, nil
 }
 
@@ -199,30 +180,12 @@ func Mapc(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instan
 // function are combined into a list by the use of an operation that performs a
 // destructive form of append rather than list.
 func Mapcan(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	lists = append([]ilos.Instance{list1}, lists...)
-	if err := ensure(e, class.Function, function); err != nil {
+	list, err := Mapcar(e, function, list1, lists...)
+	if err != nil {
 		return nil, err
 	}
-	if err := ensure(e, class.List, lists...); err != nil {
-		return nil, err
-	}
-	max := 0.0
-	for _, list := range lists {
-		max = math.Max(max, float64(len(list.(instance.List).Slice())))
-	}
-	result := []ilos.Instance{}
-	for i := 0; i < int(max); i++ {
-		arguments := make([]ilos.Instance, len(lists))
-		for j, list := range lists {
-			arguments[j] = list.(instance.List).Nth(i)
-		}
-		ret, err := function.(instance.Applicable).Apply(e.NewDynamic(), arguments...)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, ret)
-	}
-	return Append(e, result...)
+	append, _ := e.Function.Get(instance.NewSymbol("APPEND"))
+	return Apply(e, append, list)
 }
 
 // Maplist is like mapcar except that function is applied to successive sublists
@@ -236,48 +199,30 @@ func Maplist(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Ins
 	if err := ensure(e, class.List, lists...); err != nil {
 		return nil, err
 	}
-	max := 0.0
+	arguments := []ilos.Instance{}
+	rests := []ilos.Instance{}
 	for _, list := range lists {
-		max = math.Max(max, float64(len(list.(instance.List).Slice())))
-	}
-	result := []ilos.Instance{}
-	for i := 0; i < int(max); i++ {
-		arguments := make([]ilos.Instance, len(lists))
-		for j, list := range lists {
-			arguments[j] = list.(instance.List).NthCdr(i)
+		if list == Nil {
+			return Nil, nil
 		}
-		ret, err := function.(instance.Applicable).Apply(e.NewDynamic(), arguments...)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, ret)
+		arguments = append(arguments, list)
+		rests = append(rests, list.(*instance.Cons).Cdr)
 	}
-	return List(e, result...)
+	car, err := function.(instance.Applicable).Apply(e.NewDynamic(), arguments...)
+	if err != nil {
+		return nil, err
+	}
+	cdr, err := Maplist(e, function, rests[0], rests[1:]...)
+	if err != nil {
+		return nil, err
+	}
+	return Cons(e, car, cdr)
 }
 
 // Mapl is like maplist except that the results of applying function are not
 // accumulated; list1 is returned.
 func Mapl(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	lists = append([]ilos.Instance{list1}, lists...)
-	if err := ensure(e, class.Function, function); err != nil {
-		return nil, err
-	}
-	if err := ensure(e, class.List, lists...); err != nil {
-		return nil, err
-	}
-	max := 0.0
-	for _, list := range lists {
-		max = math.Max(max, float64(len(list.(instance.List).Slice())))
-	}
-	for i := 0; i < int(max); i++ {
-		arguments := make([]ilos.Instance, len(lists))
-		for j, list := range lists {
-			arguments[j] = list.(instance.List).NthCdr(i)
-		}
-		if _, err := function.(instance.Applicable).Apply(e.NewDynamic(), arguments...); err != nil {
-			return nil, err
-		}
-	}
+	Maplist(e, function, list1, lists...)
 	return list1, nil
 }
 
@@ -285,30 +230,12 @@ func Mapl(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instan
 // function are combined into a list by the use of an operation that performs a
 // destructive form of append rather than list.
 func Mapcon(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	lists = append([]ilos.Instance{list1}, lists...)
-	if err := ensure(e, class.Function, function); err != nil {
+	list, err := Maplist(e, function, list1, lists...)
+	if err != nil {
 		return nil, err
 	}
-	if err := ensure(e, class.List, lists...); err != nil {
-		return nil, err
-	}
-	max := 0.0
-	for _, list := range lists {
-		max = math.Max(max, float64(len(list.(instance.List).Slice())))
-	}
-	result := []ilos.Instance{}
-	for i := 0; i < int(max); i++ {
-		arguments := make([]ilos.Instance, len(lists))
-		for j, list := range lists {
-			arguments[j] = list.(instance.List).NthCdr(i)
-		}
-		ret, err := function.(instance.Applicable).Apply(e.NewDynamic(), arguments...)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, ret)
-	}
-	return Append(e, result...)
+	append, _ := e.Function.Get(instance.NewSymbol("APPEND"))
+	return Apply(e, append, list)
 }
 
 // Assoc returns the first cons if assocation-list contains at least one cons
@@ -319,15 +246,18 @@ func Assoc(e env.Environment, obj, associationList ilos.Instance) (ilos.Instance
 	if err := ensure(e, class.List, associationList); err != nil {
 		return nil, err
 	}
-	for _, pair := range associationList.(instance.List).Slice() {
-		if err := ensure(e, class.Cons, pair); err != nil {
-			return nil, err
-		}
-		if pair.(*instance.Cons).Car == obj { // eql
-			return pair.(*instance.Cons).Cdr, nil
-		}
+	if !ilos.InstanceOf(class.Cons, associationList) {
+		return Nil, nil
 	}
-	return Nil, nil
+	car := associationList.(*instance.Cons).Car
+	cdr := associationList.(*instance.Cons).Cdr
+	if err := ensure(e, class.Cons, car); err != nil {
+		return nil, err
+	}
+	if car.(*instance.Cons).Car == obj { // eql
+		return car, nil
+	}
+	return Assoc(e, obj, cdr)
 }
 
 // Null returns t if obj is nil; otherwise, returns nil obj may be any ISLISP
