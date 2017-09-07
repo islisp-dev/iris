@@ -84,36 +84,35 @@ func StringGreaterThan(e env.Environment, string1, string2 ilos.Instance) (ilos.
 // StringGreaterThanOrEqual tests whether string1 is greater than or equal to
 // string2.
 func StringGreaterThanOrEqual(e env.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := StringGreaterThan(e, string1, string2)
-	if err != nil {
+	if err := ensure(e, class.String, string1, string2); err != nil {
 		return nil, err
 	}
-	eq, err := StringEqual(e, string1, string2)
-	if err != nil {
-		return nil, err
+	if string(string1.(instance.String)) >= string(string2.(instance.String)) {
+		return T, nil
 	}
-	if gt == Nil && eq == Nil {
-		return Nil, nil
-	}
-	return T, nil
+	return Nil, nil
 }
 
 // StringLessThan tests whether string1 is less than string2.
 func StringLessThan(e env.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := StringGreaterThanOrEqual(e, string1, string2)
-	if err != nil {
+	if err := ensure(e, class.String, string1, string2); err != nil {
 		return nil, err
 	}
-	return Not(e, gt)
+	if string(string1.(instance.String)) < string(string2.(instance.String)) {
+		return T, nil
+	}
+	return Nil, nil
 }
 
 // StringLessThanOrEqual tests whether string1 is less than or equal to string2.
 func StringLessThanOrEqual(e env.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	gt, err := StringGreaterThan(e, string1, string2)
-	if err != nil {
+	if err := ensure(e, class.String, string1, string2); err != nil {
 		return nil, err
 	}
-	return Not(e, gt)
+	if string(string1.(instance.String)) <= string(string2.(instance.String)) {
+		return T, nil
+	}
+	return Nil, nil
 }
 
 // CharIndex returns the position of char in string, The search starts from the
@@ -146,7 +145,7 @@ func CharIndex(e env.Environment, char, str ilos.Instance, startPosition ...ilos
 	if i < 0 {
 		return Nil, nil
 	}
-	return instance.NewInteger(i), nil
+	return instance.NewInteger(i + n), nil
 }
 
 // StringIndex returns the position of the given substring within string. The
@@ -180,7 +179,7 @@ func StringIndex(e env.Environment, sub, str ilos.Instance, startPosition ...ilo
 	if i < 0 {
 		return Nil, nil
 	}
-	return instance.NewInteger(i), nil
+	return instance.NewInteger(i + n), nil
 }
 
 // StringAppend returns a single string containing a sequence of characters that
