@@ -21,5 +21,12 @@ func (Character) Class() ilos.Class {
 }
 
 func (i Character) String() string {
-	return string(i)
+	switch rune(i) {
+	case ' ':
+		return `#\SPACE`
+	case '\n':
+		return `#\NEWLINE`
+	default:
+		return `#\` + string(i)
+	}
 }

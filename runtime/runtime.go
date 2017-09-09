@@ -134,8 +134,13 @@ func init() {
 	defun2("Floatp", Floatp)
 	defun2("Floor", Floor)
 	defspecial2("For", For)
-	defun2("Format", Format) // TODO full syntax
-	// TODO other print function
+	defun2("Format", Format)
+	defun2("FormatChar", FormatChar)
+	defun2("FormatFloat", FormatFloat)
+	defun2("FormatFreshLine", FormatFreshLine)
+	defun2("FormatInteger", FormatInteger)
+	defun2("FormatObject", FormatObject)
+	defun2("FormatTab", FormatTab)
 	defun2("Funcall", Funcall)
 	defspecial2("Function", Function)
 	defun2("Functionp", Functionp)

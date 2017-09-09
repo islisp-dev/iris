@@ -7,9 +7,7 @@ package runtime
 import (
 	"bufio"
 	"bytes"
-	"fmt"
 	"os"
-	"regexp"
 	"strings"
 
 	"github.com/ta2gch/iris/reader/parser"
@@ -303,19 +301,4 @@ func ReadLine(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.
 func StreamReadyP(e env.Environment, inputStream ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// TODO: stream-ready-p
 	return T, nil
-}
-
-func Format(e env.Environment, stream, formatString ilos.Instance, objs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	f := regexp.MustCompile("([^~])~A").ReplaceAllString(string(formatString.(instance.String)), "%1%v")
-	f = regexp.MustCompile(`\\`).ReplaceAllString(string(formatString.(instance.String)), `\\`)
-	f = regexp.MustCompile("([^~])~%").ReplaceAllString(string(formatString.(instance.String)), "%1\n")
-	if b, _ := OutputStreamP(e, stream); b == Nil {
-		return nil, nil // throw Error
-	}
-	args := []interface{}{}
-	for _, obj := range objs {
-		args = append(args, obj)
-	}
-	fmt.Fprintf(stream.(instance.Stream).Writer, f, args...)
-	return Nil, nil
 }
