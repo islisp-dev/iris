@@ -81,126 +81,71 @@ func FormatFreshLine(e env.Environment, stream ilos.Instance) (ilos.Instance, il
 	return FormatChar(e, stream, instance.NewCharacter(rune("\n"[0])))
 }
 
-func Format(env env.Environment, stream, formatString ilos.Instance, formatArguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ok, _ := Stringp(env, formatString); ok == Nil {
-		return SignalCondition(env, instance.NewDomainError(env, formatString, class.String), Nil)
+func Format(e env.Environment, stream, formatString ilos.Instance, formatArguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	if ok, _ := Stringp(e, formatString); ok == Nil {
+		return SignalCondition(e, instance.NewDomainError(e, formatString, class.String), Nil)
 	}
 	str := string(formatString.(instance.String))
 	re := regexp.MustCompile(`~(?:[ABCDGOSX%&~]|[0-9]+[RT])`)
-	s, e, c := 0, 0, 0
-	for loc := re.FindStringIndex(str[s:]); loc != nil; loc = re.FindStringIndex(str[s:]) {
-		if c == len(formatArguments) {
-			return SignalCondition(env, instance.NewArityError(env), Nil)
+	start, end, index := 0, 0, 0
+	for loc := re.FindStringIndex(str[start:]); loc != nil; loc = re.FindStringIndex(str[start:]) {
+		if index == len(formatArguments) {
+			return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
-		b := s
-		s = b + 0
-		e = b + loc[0]
-		FormatObject(env, stream, instance.NewString([]rune(str[s:e])), Nil)
-		s = b + loc[0]
-		e = b + loc[1]
-		if str[s:e] == "~A" {
-			if _, err := FormatObject(env, stream, formatArguments[c], Nil); err != nil {
-				return nil, err
+		base := start
+		start = base + 0
+		end = base + loc[0]
+		FormatObject(e, stream, instance.NewString([]rune(str[start:end])), Nil)
+		start = base + loc[0]
+		end = base + loc[1]
+		var err ilos.Instance
+		switch str[start:end] {
+		case "~A":
+			_, err = FormatObject(e, stream, formatArguments[index], Nil)
+			index++
+		case "~B":
+			_, err = FormatInteger(e, stream, formatArguments[index], instance.NewInteger(2))
+			index++
+		case "~C":
+			_, err = FormatChar(e, stream, formatArguments[index])
+			index++
+		case "~D":
+			_, err = FormatInteger(e, stream, formatArguments[index], instance.NewInteger(10))
+			index++
+		case "~G":
+			_, err = FormatFloat(e, stream, formatArguments[index])
+			index++
+		case "~O":
+			_, err = FormatInteger(e, stream, formatArguments[index], instance.NewInteger(8))
+			index++
+		case "~S":
+			_, err = FormatObject(e, stream, formatArguments[index], T)
+			index++
+		case "~X":
+			_, err = FormatInteger(e, stream, formatArguments[index], instance.NewInteger(16))
+			index++
+		case "~%":
+			_, err = FormatChar(e, stream, instance.NewCharacter(rune("\n"[0])))
+		case "~&":
+			_, err = FormatFreshLine(e, stream)
+		case "~~":
+			_, err = FormatChar(e, stream, instance.NewCharacter('~'))
+		default:
+			if str[len(str)-1] == 'R' {
+				n, _ := strconv.Atoi(str[1 : len(str)-1])
+				_, err = FormatInteger(e, stream, formatArguments[index], instance.NewInteger(n))
+				index++
 			}
-			c++
-			s = e
-			continue
-		}
-		if str[s:e] == "~B" {
-			if _, err := FormatInteger(env, stream, formatArguments[c], instance.NewInteger(2)); err != nil {
-				return nil, err
+			if str[len(str)-1] == 'T' {
+				n, _ := strconv.Atoi(str[1 : len(str)-1])
+				_, err = FormatTab(e, stream, instance.NewInteger(n))
 			}
-			c++
-			s = e
-			continue
 		}
-		if str[s:e] == "~C" {
-			if _, err := FormatChar(env, stream, formatArguments[c]); err != nil {
-				return nil, err
-			}
-			c++
-			s = e
-			continue
+		if err != nil {
+			return nil, err
 		}
-		if str[s:e] == "~D" {
-			if _, err := FormatInteger(env, stream, formatArguments[c], instance.NewInteger(10)); err != nil {
-				return nil, err
-			}
-			c++
-			s = e
-			continue
-		}
-		if str[s:e] == "~G" {
-			if _, err := FormatFloat(env, stream, formatArguments[c]); err != nil {
-				return nil, err
-			}
-			c++
-			s = e
-			continue
-		}
-		if str[s:e] == "~O" {
-			if _, err := FormatInteger(env, stream, formatArguments[c], instance.NewInteger(8)); err != nil {
-				return nil, err
-			}
-			c++
-			s = e
-			continue
-		}
-		if str[s:e] == "~S" {
-			if _, err := FormatObject(env, stream, formatArguments[c], T); err != nil {
-				return nil, err
-			}
-			c++
-			s = e
-			continue
-		}
-		if str[s:e] == "~X" {
-			if _, err := FormatInteger(env, stream, formatArguments[c], instance.NewInteger(16)); err != nil {
-				return nil, err
-			}
-			c++
-			s = e
-			continue
-		}
-		if str[s:e] == "~%" {
-			if _, err := FormatChar(env, stream, instance.NewCharacter(rune("\n"[0]))); err != nil {
-				return nil, err
-			}
-			s = e
-			continue
-		}
-		if str[s:e] == "~&" {
-			if _, err := FormatFreshLine(env, stream); err != nil {
-				return nil, err
-			}
-			s = e
-			continue
-		}
-		if str[s:e] == "~~" {
-			if _, err := FormatChar(env, stream, instance.NewCharacter('~')); err != nil {
-				return nil, err
-			}
-			s = e
-			continue
-		}
-		if str[len(str)-1] == 'R' {
-			n, _ := strconv.Atoi(str[1 : len(str)-1])
-			if _, err := FormatInteger(env, stream, formatArguments[c], instance.NewInteger(n)); err != nil {
-				return nil, err
-			}
-			c++
-			s = e
-			continue
-		}
-		if str[len(str)-1] == 'T' {
-			n, _ := strconv.Atoi(str[1 : len(str)-1])
-			if _, err := FormatTab(env, stream, instance.NewInteger(n)); err != nil {
-				return nil, err
-			}
-			s = e
-			continue
-		}
+		start = end
 	}
-	fmt.Print(str[s:])
+	fmt.Print(str[start:])
 	return Nil, nil
 }
