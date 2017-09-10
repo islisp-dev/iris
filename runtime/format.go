@@ -196,6 +196,5 @@ func Format(e env.Environment, stream, formatString ilos.Instance, formatArgumen
 		}
 		start = end
 	}
-	fmt.Print(str[start:])
-	return Nil, nil
+	return FormatObject(e, stream, instance.NewString([]rune(str[start:])), Nil)
 }
