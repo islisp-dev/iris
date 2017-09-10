@@ -59,11 +59,12 @@ func ensure(e env.Environment, c ilos.Class, i ...ilos.Instance) ilos.Instance {
 	return nil
 }
 
-var uidsrc = 0
+var unique = 0
 
-func genUID() ilos.Instance {
-	uidsrc++
-	return instance.NewInteger(uidsrc)
+func uniqueInt() int {
+	i := unique
+	unique++
+	return i
 }
 
 func func2symbol(function interface{}) ilos.Instance {

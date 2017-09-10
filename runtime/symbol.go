@@ -7,7 +7,6 @@ package runtime
 import (
 	"fmt"
 
-	uuid "github.com/satori/go.uuid"
 	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
@@ -74,6 +73,6 @@ func RemoveProperty(e env.Environment, symbol, propertyName ilos.Instance) (ilos
 // Gensym returns an unnamed symbol. gensym is useful for writing macros. It is
 // impossible for an identifier to name an unnamed symbol.
 func Gensym(e env.Environment) (ilos.Instance, ilos.Instance) {
-	symbol := instance.NewSymbol(fmt.Sprintf("#:%v", uuid.NewV4()))
+	symbol := instance.NewSymbol(fmt.Sprintf("#:%v", uniqueInt()))
 	return symbol, nil
 }

@@ -41,7 +41,7 @@ is immediately considered invalid.
 func Block(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	tag, err = Eval(e, tag) // Checked at the top of// This function
-	uid := genUID()
+	uid := instance.NewInteger(uniqueInt())
 	if err != nil {
 		return nil, err
 	}
@@ -93,7 +93,7 @@ func ReturnFrom(e env.Environment, tag, object ilos.Instance) (ilos.Instance, il
 func Catch(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	tag, err = Eval(e, tag)
-	uid := genUID()
+	uid := instance.NewInteger(uniqueInt())
 	if err != nil {
 		return nil, err
 	}
@@ -144,7 +144,7 @@ func Throw(e env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.In
 }
 
 func Tagbody(e env.Environment, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	uid := genUID()
+	uid := instance.NewInteger(uniqueInt())
 	for _, cadr := range body {
 		if !ilos.InstanceOf(class.Cons, cadr) {
 			if !e.TagbodyTag.Define(cadr, uid) { // ref cddr
