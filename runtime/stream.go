@@ -235,7 +235,7 @@ func Read(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.Inst
 			eosValue = options[2]
 		}
 	}
-	v, err := parser.Parse(tokenizer.Tokenize(s.(instance.Stream).Reader))
+	v, err := parser.Parse(tokenizer.Tokenize(s.(instance.Stream)))
 	if err != nil && ilos.InstanceOf(class.EndOfStream, err) {
 		if eosErrorP {
 			return nil, err
@@ -265,7 +265,7 @@ func ReadChar(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.
 			eosValue = options[2]
 		}
 	}
-	v, _, err := bufio.NewReader(s.(instance.Stream).Reader).ReadRune()
+	v, _, err := bufio.NewReader(s.(instance.Stream)).ReadRune()
 	if err != nil {
 		if eosErrorP {
 			return nil, instance.Create(e, class.EndOfStream)
@@ -295,7 +295,7 @@ func ReadLine(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.
 			eosValue = options[2]
 		}
 	}
-	v, _, err := bufio.NewReader(s.(instance.Stream).Reader).ReadLine()
+	v, _, err := bufio.NewReader(s.(instance.Stream)).ReadLine()
 	if err != nil {
 		if eosErrorP {
 			return nil, instance.Create(e, class.EndOfStream)
