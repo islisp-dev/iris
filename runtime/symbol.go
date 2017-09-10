@@ -7,6 +7,7 @@ package runtime
 import (
 	"fmt"
 
+	uuid "github.com/satori/go.uuid"
 	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"

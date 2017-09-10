@@ -21,7 +21,6 @@ type Environment struct {
 	Macro    stack
 	Special  stack
 	Property map2
-	GensymID int
 	Constant stack
 
 	// Dynamic
@@ -49,7 +48,6 @@ func NewEnvironment(stdin, stdout, stderr, handler ilos.Instance) Environment {
 	e.Special = NewStack()
 	e.Constant = NewStack()
 	e.Property = NewMap2()
-	e.GensymID = 0
 
 	// Dynamic
 	e.CatchTag = NewStack()
@@ -72,7 +70,6 @@ func (e *Environment) MergeLexical(before Environment) {
 	e.Special = append(before.Special, e.Special[1:]...)
 	e.Constant = append(before.Constant, e.Constant[1:]...)
 	e.Property = before.Property
-	e.GensymID = before.GensymID
 
 	e.CatchTag = append(before.CatchTag, e.CatchTag[1:]...)
 	e.DynamicVariable = append(before.DynamicVariable, e.DynamicVariable[1:]...)
