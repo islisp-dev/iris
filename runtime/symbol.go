@@ -74,6 +74,6 @@ func RemoveProperty(e env.Environment, symbol, propertyName ilos.Instance) (ilos
 // Gensym returns an unnamed symbol. gensym is useful for writing macros. It is
 // impossible for an identifier to name an unnamed symbol.
 func Gensym(e env.Environment) (ilos.Instance, ilos.Instance) {
-	e.GensymID++
-	return instance.NewSymbol(fmt.Sprintf("IRIS/G#%v", e.GensymID)), nil
+	symbol := instance.NewSymbol(fmt.Sprintf("#:%v", uuid.NewV4()))
+	return symbol, nil
 }

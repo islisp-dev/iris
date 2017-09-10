@@ -90,7 +90,6 @@ func (e *Environment) MergeDynamic(before Environment) {
 	e.Special = append(stack{before.Special[0]}, e.Special[1:]...)
 	e.Constant = append(stack{before.Constant[0]}, e.Constant[1:]...)
 	e.Property = before.Property
-	e.GensymID = before.GensymID
 
 	e.CatchTag = append(before.CatchTag, e.CatchTag[1:]...)
 	e.DynamicVariable = append(before.DynamicVariable, e.DynamicVariable[1:]...)
@@ -113,7 +112,6 @@ func (before *Environment) NewLexical() Environment {
 	e.Special = append(before.Special, e.Special[0])
 	e.Constant = append(before.Constant, e.Constant[0])
 	e.Property = before.Property
-	e.GensymID = before.GensymID
 
 	e.CatchTag = append(before.CatchTag, e.CatchTag[0])
 	e.DynamicVariable = append(before.DynamicVariable, e.DynamicVariable[0])
@@ -138,7 +136,6 @@ func (before *Environment) NewDynamic() Environment {
 	e.Special = append(stack{before.Special[0]}, e.Special[0])
 	e.Constant = append(stack{before.Constant[0]}, e.Constant[0])
 	e.Property = before.Property
-	e.GensymID = before.GensymID
 
 	e.CatchTag = append(before.CatchTag, e.CatchTag[0])
 	e.DynamicVariable = append(before.DynamicVariable, e.DynamicVariable[0])
