@@ -73,3 +73,7 @@ func NewSimpleError(e env.Environment, formatString, formatArguments ilos.Instan
 func NewControlError(e env.Environment) ilos.Instance {
 	return Create(e, ControlErrorClass)
 }
+
+func NewStreamError(e env.Environment) ilos.Instance {
+	return Create(e, StreamErrorClass)
+}
