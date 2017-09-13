@@ -5,19 +5,70 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"os"
 
 	"github.com/ta2gch/iris/runtime"
+	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
-func main() {
-	fmt.Print("> ")
+func repl(quiet bool) {
+	if !quiet {
+		fmt.Print("> ")
+	}
+	runtime.TopLevel.StandardInput = instance.NewStream(os.Stdin, nil)
+	runtime.TopLevel.StandardOutput = instance.NewStream(nil, os.Stdout)
+	runtime.TopLevel.ErrorOutput = instance.NewStream(nil, os.Stderr)
 	for exp, err := runtime.Read(runtime.TopLevel); err == nil; exp, err = runtime.Read(runtime.TopLevel) {
 		ret, err := runtime.Eval(runtime.TopLevel, exp)
 		if err != nil {
 			fmt.Println(err)
 		}
-		fmt.Println(ret)
-		fmt.Print("> ")
+		if !quiet {
+			fmt.Println(ret)
+			fmt.Print("> ")
+		}
 	}
+}
+
+func script(path string) {
+	file, err := os.Open(path)
+	if err != nil {
+		return
+	}
+	defer file.Close()
+	runtime.TopLevel.StandardInput = instance.NewStream(file, nil)
+	runtime.TopLevel.StandardOutput = instance.NewStream(nil, os.Stdout)
+	runtime.TopLevel.ErrorOutput = instance.NewStream(nil, os.Stderr)
+	for {
+		exp, err := runtime.Read(runtime.TopLevel)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		_, err = runtime.Eval(runtime.TopLevel, exp)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	}
+}
+
+func main() {
+	flag.Parse()
+	if flag.NArg() > 0 {
+		script(flag.Arg(0))
+		return
+	}
+	info, err := os.Stdin.Stat()
+	if err != nil {
+		panic(err)
+	}
+	if (info.Mode() & os.ModeNamedPipe) == 0 {
+		repl(false)
+		return
+	}
+	repl(true)
+	return
 }
