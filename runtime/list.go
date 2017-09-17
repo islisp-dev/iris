@@ -27,8 +27,8 @@ func Listp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) 
 // shall be signaled if i is not a non-negative integer (error-id.
 // domain-error).initial-element may be any ISLISP object.
 func CreateList(e env.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.Integer, i); err != nil {
-		return nil, err
+	if ok, _ := Integerp(e, i); ok == Nil {
+		return nil, instance.NewDomainError(e, i, class.Integer)
 	}
 	if len(initialElement) > 1 {
 		return SignalCondition(e, instance.NewArityError(e), Nil)
@@ -62,8 +62,8 @@ func List(e env.Environment, objs ...ilos.Instance) (ilos.Instance, ilos.Instanc
 // resulting list is permitted but not required to share structure with the
 // input list.
 func Reverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.List, list); err != nil {
-		return nil, err
+	if ok, _ := Listp(e, list); ok == Nil {
+		return nil, instance.NewDomainError(e, list, class.List)
 	}
 	cons := Nil
 	for _, car := range list.(instance.List).Slice() {
@@ -79,8 +79,8 @@ func Reverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instanc
 // produce this new list. nreverse should never be called on a literal object.
 func Nreverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// TODO: tests literal object
-	if err := ensure(e, class.List, list); err != nil {
-		return nil, err
+	if ok, _ := Listp(e, list); ok == Nil {
+		return nil, instance.NewDomainError(e, list, class.List)
 	}
 	cons := Nil
 	for _, car := range list.(instance.List).Slice() {
@@ -103,8 +103,10 @@ func Append(e env.Environment, lists ...ilos.Instance) (ilos.Instance, ilos.Inst
 		return nil, err
 	}
 	cdr := result
-	if err := ensure(e, class.List, lists...); err != nil {
-		return nil, err
+	for _, list := range lists {
+		if ok, _ := Listp(e, list); ok == Nil {
+			return nil, instance.NewDomainError(e, list, class.List)
+		}
 	}
 	for _, list := range lists {
 		for _, elt := range list.(instance.List).Slice() {
@@ -124,8 +126,8 @@ func Append(e env.Environment, lists ...ilos.Instance) (ilos.Instance, ilos.Inst
 // returned. An error shall be signaled if list is not a list (error-id.
 // domain-error).
 func Member(e env.Environment, obj, list ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.List, list); err != nil {
-		return nil, err
+	if ok, _ := Listp(e, list); ok == Nil {
+		return nil, instance.NewDomainError(e, list, class.List)
 	}
 	if !ilos.InstanceOf(class.Cons, list) || list.(*instance.Cons).Car == obj {
 		return list, nil
@@ -143,11 +145,13 @@ func Member(e env.Environment, obj, list ilos.Instance) (ilos.Instance, ilos.Ins
 // of the results of successive calls to function.
 func Mapcar(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
-	if err := ensure(e, class.Function, function); err != nil {
-		return nil, err
+	if ok, _ := Functionp(e, function); ok == Nil {
+		return nil, instance.NewDomainError(e, function, class.Function)
 	}
-	if err := ensure(e, class.List, lists...); err != nil {
-		return nil, err
+	for _, list := range lists {
+		if ok, _ := Listp(e, list); ok == Nil {
+			return nil, instance.NewDomainError(e, list, class.List)
+		}
 	}
 	arguments := []ilos.Instance{}
 	rests := []ilos.Instance{}
@@ -163,9 +167,12 @@ func Mapcar(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 		return nil, err
 	}
 	var cdr ilos.Instance
-	if err := ensure(e, class.List, rests...); err != nil {
-		cdr = Nil
-	} else {
+	for _, list := range lists {
+		if ok, _ := Listp(e, list); ok == Nil {
+			cdr = Nil
+		}
+	}
+	if cdr == nil {
 		cdr, err = Mapcar(e, function, rests[0], rests[1:]...)
 		if err != nil {
 			return nil, err
@@ -198,11 +205,13 @@ func Mapcan(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 // the cdr of each list, and then to the cdr of the cdr of each list, and so on.
 func Maplist(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
-	if err := ensure(e, class.Function, function); err != nil {
-		return nil, err
+	if ok, _ := Functionp(e, function); ok == Nil {
+		return nil, instance.NewDomainError(e, function, class.Function)
 	}
-	if err := ensure(e, class.List, lists...); err != nil {
-		return nil, err
+	for _, list := range lists {
+		if ok, _ := Listp(e, list); ok == Nil {
+			return nil, instance.NewDomainError(e, list, class.List)
+		}
 	}
 	arguments := []ilos.Instance{}
 	rests := []ilos.Instance{}
@@ -218,9 +227,12 @@ func Maplist(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Ins
 		return nil, err
 	}
 	var cdr ilos.Instance
-	if err := ensure(e, class.List, rests...); err != nil {
-		cdr = Nil
-	} else {
+	for _, list := range lists {
+		if ok, _ := Listp(e, list); ok == Nil {
+			cdr = Nil
+		}
+	}
+	if cdr == nil {
 		cdr, err = Maplist(e, function, rests[0], rests[1:]...)
 		if err != nil {
 			return nil, err
@@ -253,16 +265,16 @@ func Mapcon(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 // shall be signaled if association-list is not a list of conses (error-id.
 // domain-error).
 func Assoc(e env.Environment, obj, associationList ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.List, associationList); err != nil {
-		return nil, err
+	if ok, _ := Listp(e, associationList); ok == Nil {
+		return nil, instance.NewDomainError(e, associationList, class.List)
 	}
 	if !ilos.InstanceOf(class.Cons, associationList) {
 		return Nil, nil
 	}
 	car := associationList.(*instance.Cons).Car
 	cdr := associationList.(*instance.Cons).Cdr
-	if err := ensure(e, class.Cons, car); err != nil {
-		return nil, err
+	if ok, _ := Consp(e, car); ok == Nil {
+		return nil, instance.NewDomainError(e, car, class.Cons)
 	}
 	if car.(*instance.Cons).Car == obj { // eql
 		return car, nil
