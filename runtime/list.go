@@ -162,9 +162,14 @@ func Mapcar(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 	if err != nil {
 		return nil, err
 	}
-	cdr, err := Mapcar(e, function, rests[0], rests[1:]...)
-	if err != nil {
-		return nil, err
+	var cdr ilos.Instance
+	if err := ensure(e, class.List, rests...); err != nil {
+		cdr = Nil
+	} else {
+		cdr, err = Mapcar(e, function, rests[0], rests[1:]...)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return Cons(e, car, cdr)
 }
@@ -212,9 +217,14 @@ func Maplist(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Ins
 	if err != nil {
 		return nil, err
 	}
-	cdr, err := Maplist(e, function, rests[0], rests[1:]...)
-	if err != nil {
-		return nil, err
+	var cdr ilos.Instance
+	if err := ensure(e, class.List, rests...); err != nil {
+		cdr = Nil
+	} else {
+		cdr, err = Maplist(e, function, rests[0], rests[1:]...)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return Cons(e, car, cdr)
 }
