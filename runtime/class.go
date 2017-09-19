@@ -276,14 +276,23 @@ func Defgeneric(e env.Environment, funcSpec, lambdaList ilos.Instance, optionsOr
 			class, ok := e.Class[:1].Get(optionOrMethodDesc.(instance.List).Nth(1))
 			if !ok {
 				return SignalCondition(e, instance.NewUndefinedClass(e, optionOrMethodDesc.(instance.List).Nth(1)), Nil)
-
 			}
 			genericFunctionClass = class.(ilos.Class)
 		case instance.NewSymbol(":METHOD"):
 			forms = append(forms, instance.NewCons(instance.NewSymbol("DEFMETHOD"), optionOrMethodDesc.(instance.List).NthCdr(1)))
 		}
 	}
-	e.Function[:1].Define(funcSpec, instance.NewGenericFunction(funcSpec, lambdaList, methodCombination, genericFunctionClass))
+	e.Function[:1].Define(
+		instance.NewSymbol(
+			fmt.Sprint(funcSpec),
+		),
+		instance.NewGenericFunction(
+			funcSpec,
+			lambdaList,
+			methodCombination,
+			genericFunctionClass,
+		),
+	)
 	Progn(e, forms...)
 	return funcSpec, nil
 }
