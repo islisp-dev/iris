@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/ta2gch/iris/reader/parser"
-	"github.com/ta2gch/iris/reader/tokenizer"
 	"github.com/ta2gch/iris/runtime/env"
 	"github.com/ta2gch/iris/runtime/ilos"
 	"github.com/ta2gch/iris/runtime/ilos/class"
@@ -180,12 +179,14 @@ func Close(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instanc
 	if ok, _ := Streamp(e, stream); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, stream, class.Stream), Nil)
 	}
+	/* TODO
 	if stream.(instance.Stream).Reader != nil {
 		stream.(instance.Stream).Reader.(*os.File).Close()
 	}
 	if stream.(instance.Stream).Writer != nil {
 		stream.(instance.Stream).Writer.(*os.File).Close()
 	}
+	*/
 	return Nil, nil
 }
 
@@ -235,7 +236,7 @@ func Read(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.Inst
 			eosValue = options[2]
 		}
 	}
-	v, err := parser.Parse(tokenizer.Tokenize(s.(instance.Stream)))
+	v, err := parser.Parse(s.(instance.Stream).Reader)
 	if err != nil && ilos.InstanceOf(class.EndOfStream, err) {
 		if eosErrorP {
 			return nil, err
@@ -265,7 +266,7 @@ func ReadChar(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.
 			eosValue = options[2]
 		}
 	}
-	v, _, err := bufio.NewReader(s.(instance.Stream)).ReadRune()
+	v, _, err := bufio.NewReader(s.(instance.Stream).Reader).ReadRune()
 	if err != nil {
 		if eosErrorP {
 			return nil, instance.Create(e, class.EndOfStream)
@@ -295,7 +296,7 @@ func ReadLine(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.
 			eosValue = options[2]
 		}
 	}
-	v, _, err := bufio.NewReader(s.(instance.Stream)).ReadLine()
+	v, _, err := bufio.NewReader(s.(instance.Stream).Reader).ReadLine()
 	if err != nil {
 		if eosErrorP {
 			return nil, instance.Create(e, class.EndOfStream)

@@ -5,20 +5,25 @@
 package instance
 
 import (
+	"bufio"
 	"io"
 	"strings"
 
+	"github.com/ta2gch/iris/reader/tokenizer"
 	"github.com/ta2gch/iris/runtime/ilos"
 )
 
 type Stream struct {
 	Column *int
-	Reader io.Reader
+	Reader *tokenizer.Reader
 	Writer io.Writer
 }
 
 func NewStream(r io.Reader, w io.Writer) ilos.Instance {
-	return Stream{new(int), r, w}
+	if r == nil {
+		return Stream{new(int), nil, w}
+	}
+	return Stream{new(int), tokenizer.NewReader(bufio.NewReader(r)), w}
 }
 
 func (Stream) Class() ilos.Class {

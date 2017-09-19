@@ -5,6 +5,7 @@
 package runtime
 
 import (
+	"fmt"
 	"reflect"
 	"regexp"
 	"runtime"
@@ -22,12 +23,23 @@ func execTests(t *testing.T, function interface{}, tests []test) {
 	re := regexp.MustCompile(`\s+`)
 	for _, tt := range tests {
 		t.Run(re.ReplaceAllString(tt.exp, " "), func(t *testing.T) {
-			got, err := Eval(TopLevel, readFromString(tt.exp))
-			want, _ := Eval(TopLevel, readFromString(tt.want))
+			obj, err1 := readFromString(tt.exp)
+			if err1 != nil {
+				t.Errorf("ParseError %v, want %v", err1, tt.exp)
+				return
+			}
+			got, err := Eval(TopLevel, obj)
+			wantObj, err1 := readFromString(tt.want)
+			if err1 != nil {
+				t.Errorf("ParseError %v, want %v", err1, tt.want)
+				return
+			}
+			want, _ := Eval(TopLevel, wantObj)
 			if !tt.wantErr && !reflect.DeepEqual(got, want) {
 				t.Errorf("%v() got = %v, want %v", name, got, want)
 			}
 			if (err != nil) != tt.wantErr {
+				fmt.Println(got, want)
 				t.Errorf("%v() err = %v, wantErr %v", name, err, tt.wantErr)
 			}
 		})

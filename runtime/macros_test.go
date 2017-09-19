@@ -9,7 +9,7 @@ import "testing"
 func TestDefmacro(t *testing.T) {
 	tests := []test{
 		{
-			exp:     "(defmacro caar(x) (list ’car (list ’car x)))",
+			exp:     `(defmacro caar (x) (list 'car (list 'car x)))`,
 			want:    "'caar",
 			wantErr: false,
 		},

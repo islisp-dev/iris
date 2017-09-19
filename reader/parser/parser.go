@@ -91,7 +91,7 @@ func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 		instance.NewSymbol("EXPECTED-CLASS"), class.Object)
 }
 
-func parseMacro(tok string, t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instance) {
+func parseMacro(tok string, t *tokenizer.Reader) (ilos.Instance, ilos.Instance) {
 	cdr, err := Parse(t)
 	if err != nil {
 		return nil, err
@@ -133,7 +133,7 @@ func parseMacro(tok string, t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instanc
 	m := instance.NewSymbol(n)
 	return instance.NewCons(m, instance.NewCons(cdr, instance.Nil)), nil
 }
-func parseCons(t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instance) {
+func parseCons(t *tokenizer.Reader) (ilos.Instance, ilos.Instance) {
 	car, err := Parse(t)
 	if err == eop {
 		return instance.Nil, nil
@@ -159,15 +159,15 @@ func parseCons(t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instance) {
 }
 
 // Parse builds a internal expression from tokens
-func Parse(t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instance) {
+func Parse(t *tokenizer.Reader) (ilos.Instance, ilos.Instance) {
 	tok, err := t.Next()
 	if err != nil {
-		return nil, err
+		return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil), class.EndOfStream)
 	}
 	for (len(tok) > 2 && tok[:2] == "#|") || tok[:1] == ";" {
 		tok, err = t.Next()
 		if err != nil {
-			return nil, err
+			return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil), class.EndOfStream)
 		}
 	}
 	if tok == "(" {
@@ -190,9 +190,9 @@ func Parse(t *tokenizer.Tokenizer) (ilos.Instance, ilos.Instance) {
 		}
 		return m, nil
 	}
-	atom, err := ParseAtom(tok)
-	if err != nil {
-		return nil, err
+	atom, err1 := ParseAtom(tok)
+	if err1 != nil {
+		return nil, err1
 	}
 	return atom, nil
 }

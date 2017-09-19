@@ -5,8 +5,6 @@
 package tokenizer
 
 import (
-	"bufio"
-	"reflect"
 	"strings"
 	"testing"
 
@@ -14,58 +12,38 @@ import (
 )
 
 func TestTokenizer_Next(t *testing.T) {
-	tokenizer := Tokenize(strings.NewReader(`("\\""\"foo\"" | foo \| bar |)`))
-	type fields struct {
-		sc *bufio.Scanner
-	}
+	tokenizer := NewReader(strings.NewReader(`("\\""\"foo\"" | foo \| bar |)`))
 	tests := []struct {
-		name   string
-		fields fields
-		want   string
-		want1  ilos.Instance
+		name  string
+		want  string
+		want1 ilos.Instance
 	}{
 		{
-			name:   "start",
-			fields: fields{tokenizer.sc},
-			want:   "(",
-			want1:  nil,
+			name: "start",
+			want: "(",
 		},
 		{
-			name:   "back slash",
-			fields: fields{tokenizer.sc},
-			want:   `"\\"`,
-			want1:  nil,
+			name: "back slash",
+			want: `"\\"`,
 		},
 		{
-			name:   `"\"foo\""`,
-			fields: fields{tokenizer.sc},
-			want:   `"\"foo\""`,
-			want1:  nil,
+			name: `"\"foo\""`,
+			want: `"\"foo\""`,
 		},
 		{
-			name:   `| foo \| bar |`,
-			fields: fields{tokenizer.sc},
-			want:   `| foo \| bar |`,
-			want1:  nil,
+			name: `| foo \| bar |`,
+			want: `| foo \| bar |`,
 		},
 		{
-			name:   "end",
-			fields: fields{tokenizer.sc},
-			want:   ")",
-			want1:  nil,
+			name: "end",
+			want: ")",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tok := &Tokenizer{
-				sc: tt.fields.sc,
-			}
-			got, got1 := tok.Next()
+			got, _ := tokenizer.Next()
 			if got != tt.want {
 				t.Errorf("Tokenizer.Next() got = %v, want %v", got, tt.want)
-			}
-			if !reflect.DeepEqual(got1, tt.want1) {
-				t.Errorf("Tokenizer.Next() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 	}

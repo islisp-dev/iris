@@ -24,7 +24,7 @@ func Defmacro(e env.Environment, macroName, lambdaList ilos.Instance, forms ...i
 	if err != nil {
 		return nil, err
 	}
-	e.Macro.Define(macroName, ret)
+	e.Macro[:1].Define(macroName, ret)
 	return macroName, nil
 }
 

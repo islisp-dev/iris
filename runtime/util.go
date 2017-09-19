@@ -40,13 +40,8 @@ func convFloat64(e env.Environment, x ilos.Instance) (float64, bool, ilos.Instan
 	}
 }
 
-func readFromString(s string) ilos.Instance {
-	ret, _ := parser.Parse(tokenizer.Tokenize(strings.NewReader(s)))
-	return ret
-}
-func evalString(e env.Environment, s string) ilos.Instance {
-	ret, _ := Eval(e, readFromString(s))
-	return ret
+func readFromString(s string) (ilos.Instance, ilos.Instance) {
+	return parser.Parse(tokenizer.NewReader(strings.NewReader(s)))
 }
 
 func ensure(e env.Environment, c ilos.Class, i ...ilos.Instance) ilos.Instance {

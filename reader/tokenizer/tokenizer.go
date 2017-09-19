@@ -1,71 +1,131 @@
-// This Source Code Form is subject to the terms of the Mozilla Public License,
-// v. 2.0. If a copy of the MPL was not distributed with this file, You can
-// obtain one at http://mozilla.org/MPL/2.0/.
-
 package tokenizer
 
 import (
-	"bufio"
 	"io"
 	"regexp"
-
-	"github.com/ta2gch/iris/runtime/env"
-	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/class"
-	"github.com/ta2gch/iris/runtime/ilos/instance"
+	"strings"
 )
 
-// Tokenizer interface type is the interface for reading string with every token
-type Tokenizer struct {
-	sc *bufio.Scanner
+// Reader interface type is the interface
+// for reading string with every token
+// Reader is like bufio.Reader but has PeekRune
+// which returns a rune without advancing pointer
+type Reader struct {
+	err error
+	ru  rune
+	sz  int
+	rr  io.RuneReader
 }
 
-var re *regexp.Regexp
-
-func Tokenize(r io.Reader) *Tokenizer {
-	str := ``
-	str += `1\+|1-|`
-	str += `[-+]?[[:digit:]]+\.[[:digit:]]+|`
-	str += `[-+]?[[:digit:]]+(?:\.[[:digit:]]+)?[eE][-+]?[[:digit:]]+|`
-	str += `[-+]?[[:digit:]]+|`
-	str += `#[bB][-+]?[01]+|`
-	str += `#[oO][-+]?[0-7]+|`
-	str += `#[xX][-+]?[[:xdigit:]]+|`
-	str += `#\\[[:alpha:]]+|`
-	str += `#\\[[:graph:]]|`
-	str += `"(?:\\\\|\\"|[^"])*"|`
-	str += `[:&][a-zA-Z]+|`
-	str += `\+|-|[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*|`
-	str += `\|[^|]*\||`
-	str += `[.()]|`
-	str += ";.*?\n|"
-	str += `#\|.*?\|#|`
-	str += "#'|,@?|'|`|#[[:digit:]]*[aA]|#" // TODO: hangs at #ab or #3
-	re = regexp.MustCompile(str)
-	sc := bufio.NewScanner(r)
-	sc.Split(splitter)
-	return &Tokenizer{sc}
+// NewReader creates interal reader from io.RuneReader
+func NewReader(r io.RuneReader) *Reader {
+	b := new(Reader)
+	b.rr = r
+	return b
 }
 
-func (t *Tokenizer) Next() (string, ilos.Instance) {
-	if t.sc.Scan() {
-		return t.sc.Text(), nil
+// PeekRune returns a rune without advancing pointer
+func (r *Reader) PeekRune() (rune, int, error) {
+	if r.ru == 0 {
+		r.ru, r.sz, r.err = r.rr.ReadRune()
 	}
-	return "", instance.Create(env.NewEnvironment(nil, nil, nil, nil), class.EndOfStream)
+	return r.ru, r.sz, r.err
 }
 
-func splitter(data []byte, atEOF bool) (advance int, token []byte, err error) {
-	if atEOF {
-		advance = len(data)
-		token = data
-		err = io.EOF
-		return
+// ReadRune returns a rune with advancing pointer
+func (r *Reader) ReadRune() (rune, int, error) {
+	if r.ru == 0 {
+		r.ru, r.sz, r.err = r.rr.ReadRune()
 	}
-	if loc := re.FindIndex(data); loc != nil {
-		advance = loc[1]
-		token = data[loc[0]:loc[1]]
-		err = nil
-		return
+	ru := r.ru
+	sz := r.sz
+	err := r.err
+	r.ru, r.sz, r.err = r.rr.ReadRune()
+	return ru, sz, err
+}
+func (r *Reader) Read(b []byte) (int, error) {
+	ru := r.ru
+	sz := r.sz
+	err := r.err
+	r.ru, r.sz, r.err = r.rr.ReadRune()
+	copy(b, []byte(string([]rune{ru})))
+	return sz, err
+}
+
+var str = `^1\+$|^1-$|` +
+	`^[-+]?[[:digit:]]+\.[[:digit:]]+$|` +
+	`^[-+]?[[:digit:]]+(?:\.[[:digit:]]+)?[eE][-+]?[[:digit:]]+$|` +
+	`^[-+]?[[:digit:]]+$|` +
+	`^#[bB][-+]?[01]+$|` +
+	`^#[oO][-+]?[0-7]+$|` +
+	`^#[xX][-+]?[[:xdigit:]]+$|` +
+	`^#\\[[:alpha:]]+$|` +
+	`^#\\[[:graph:]]$|` +
+	`^"(?:\\\\|\\"|[^\\"])*"$|` +
+	`^[:&][a-zA-Z]+$|` +
+	`^\+$|^-$|^[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*$|` +
+	`^\|(?:\\\\|\\\||[^\\|])*\|$|` +
+	`^[.()]$|` +
+	"^;.*?\n|$" +
+	`^#\|.*?\|#$|` +
+	"^#'$|^,@?$|^'$|^`$|^#[[:digit:]]*[aA]$|^#$" // TODO: hangs at #ab or #3
+var re = regexp.MustCompile(str)
+
+// ReadToken returns error or string as token
+func (r *Reader) Next() (string, error) {
+	for {
+		ru, _, err := r.PeekRune()
+		if err != nil {
+			return "", io.EOF
+		}
+		if !strings.ContainsRune(" \t\n\r", ru) {
+			break
+		}
+		r.ReadRune()
 	}
-	return
+	buf := ""
+	mat := false
+	num := false
+	shp := false
+	for {
+		ru, _, err := r.PeekRune()
+		if err != nil {
+			if mat {
+				return buf, nil
+			}
+			return "", io.EOF
+		}
+		if buf == "" && strings.ContainsRune("1234567890", ru) {
+			num = true
+		}
+		if buf == "" && '#' == ru {
+			shp = true
+		}
+		if mat && !re.MatchString(buf+string(ru)) {
+			if num && strings.ContainsRune(".Ee", ru) {
+				buf += string(ru)
+				r.ReadRune()
+				continue
+			}
+			if shp {
+				if len(buf) == 1 && ru == '\\' {
+					buf += string(ru)
+					r.ReadRune()
+					continue
+				}
+				if matched, _ := regexp.MatchString(`^#[0123456789]*$`, buf+string(ru)); matched {
+					buf += string(ru)
+					r.ReadRune()
+					continue
+				}
+			}
+			break
+		}
+		buf += string(ru)
+		if re.MatchString(buf) {
+			mat = true
+		}
+		r.ReadRune()
+	}
+	return buf, nil
 }
