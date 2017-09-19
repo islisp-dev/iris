@@ -53,7 +53,9 @@ func script(path string) {
 	for {
 		exp, err := runtime.Read(runtime.TopLevel)
 		if err != nil {
-			fmt.Println(err)
+			if fmt.Sprint(err) != "#<END-OF-STREAM >" {
+				fmt.Println(err)
+			}
 			return
 		}
 		_, err = runtime.Eval(runtime.TopLevel, exp)
