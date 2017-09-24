@@ -5,7 +5,6 @@
 package instance
 
 import (
-	"bufio"
 	"io"
 	"strings"
 
@@ -23,7 +22,7 @@ func NewStream(r io.Reader, w io.Writer) ilos.Instance {
 	if r == nil {
 		return Stream{new(int), nil, w}
 	}
-	return Stream{new(int), tokenizer.NewReader(bufio.NewReader(r)), w}
+	return Stream{new(int), tokenizer.NewReader(r), w}
 }
 
 func (Stream) Class() ilos.Class {

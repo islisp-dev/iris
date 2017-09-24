@@ -1,6 +1,7 @@
 package tokenizer
 
 import (
+	"bufio"
 	"io"
 	"regexp"
 	"strings"
@@ -14,13 +15,13 @@ type Reader struct {
 	err error
 	ru  rune
 	sz  int
-	rr  io.RuneReader
+	rr  *bufio.Reader
 }
 
 // NewReader creates interal reader from io.RuneReader
-func NewReader(r io.RuneReader) *Reader {
+func NewReader(r io.Reader) *Reader {
 	b := new(Reader)
-	b.rr = r
+	b.rr = bufio.NewReader(r)
 	return b
 }
 
@@ -43,6 +44,7 @@ func (r *Reader) ReadRune() (rune, int, error) {
 	r.ru, r.sz, r.err = r.rr.ReadRune()
 	return ru, sz, err
 }
+
 func (r *Reader) Read(b []byte) (int, error) {
 	ru := r.ru
 	sz := r.sz
@@ -75,7 +77,7 @@ var re = regexp.MustCompile(str)
 func (r *Reader) Next() (string, error) {
 	for {
 		ru, _, err := r.PeekRune()
-		if err != nil {
+		if ru == 0 || err != nil {
 			return "", io.EOF
 		}
 		if !strings.ContainsRune(" \t\n\r", ru) {
@@ -89,7 +91,7 @@ func (r *Reader) Next() (string, error) {
 	shp := false
 	for {
 		ru, _, err := r.PeekRune()
-		if err != nil {
+		if ru == 0 || err != nil {
 			if mat {
 				return buf, nil
 			}
