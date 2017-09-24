@@ -184,7 +184,10 @@ func Mapcar(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 // Mapc is like mapcar except that the results of applying function are not
 // accumulated; list1 is returned.
 func Mapc(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	Mapcar(e, function, list1, lists...)
+	_, err := Mapcar(e, function, list1, lists...)
+	if err != nil {
+		return nil, err
+	}
 	return list1, nil
 }
 
@@ -244,7 +247,10 @@ func Maplist(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Ins
 // Mapl is like maplist except that the results of applying function are not
 // accumulated; list1 is returned.
 func Mapl(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	Maplist(e, function, list1, lists...)
+	_, err := Maplist(e, function, list1, lists...)
+	if err != nil {
+		return nil, err
+	}
 	return list1, nil
 }
 
