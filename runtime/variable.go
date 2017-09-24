@@ -28,19 +28,12 @@ func Setq(e env.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Inst
 	if e.Variable.Set(var1, ret) {
 		return ret, nil
 	}
-	if e.Variable.Set(var1, ret) {
-		return ret, nil
-	}
 	return SignalCondition(e, instance.NewUndefinedVariable(e, var1), Nil)
 }
 
 func Setf(e env.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(class.Symbol, var1) {
-		val, err := Eval(e, form)
-		if err != nil {
-			return nil, err
-		}
-		return Setq(e, var1, val)
+		return Setq(e, var1, form)
 	}
 	funcSpec := instance.NewSymbol(fmt.Sprintf("(SETF %v)", var1.(instance.List).Nth(0)))
 	fun, ok := e.Function.Get(funcSpec)
@@ -74,7 +67,7 @@ func Let(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (i
 			return nil, err
 		}
 		if cadr.(instance.List).Length() != 2 {
-		return SignalCondition(e, instance.NewArityError(e), Nil)
+			return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 		f, err := Eval(e, cadr.(instance.List).Nth(1))
 		if err != nil {
@@ -112,7 +105,7 @@ func LetStar(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance
 			return nil, err
 		}
 		if cadr.(instance.List).Length() != 2 {
-		return SignalCondition(e, instance.NewArityError(e), Nil)
+			return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 		f, err := Eval(e, cadr.(instance.List).Nth(1))
 		if err != nil {
