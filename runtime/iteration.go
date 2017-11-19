@@ -74,7 +74,7 @@ func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, for
 				return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 			}
 		default:
-		return SignalCondition(e, instance.NewArityError(e), Nil)
+			return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 	}
 	if err := ensure(e, class.List, endTestAndResults); err != nil {
@@ -112,7 +112,7 @@ func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, for
 					return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 				}
 			default:
-		return SignalCondition(e, instance.NewArityError(e), Nil)
+				return SignalCondition(e, instance.NewArityError(e), Nil)
 			}
 		}
 		test, err = Eval(b, endTest)

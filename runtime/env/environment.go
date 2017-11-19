@@ -60,39 +60,19 @@ func NewEnvironment(stdin, stdout, stderr, handler ilos.Instance) Environment {
 }
 
 func (e *Environment) MergeLexical(before Environment) {
-	e.BlockTag = append(before.BlockTag, e.BlockTag[1:]...)
-	e.TagbodyTag = append(before.TagbodyTag, e.TagbodyTag[1:]...)
-	e.Variable = append(before.Variable, e.Variable[1:]...)
-	e.Function = append(before.Function, e.Function[1:]...)
+	e.BlockTag = before.BlockTag.Append(e.BlockTag[1:])
+	e.TagbodyTag = before.TagbodyTag.Append(e.TagbodyTag[1:])
+	e.Variable = before.Variable.Append(e.Variable[1:])
+	e.Function = before.Function.Append(e.Function[1:])
 
-	e.Macro = append(before.Macro, e.Macro[1:]...)
-	e.Class = append(before.Class, e.Class[1:]...)
-	e.Special = append(before.Special, e.Special[1:]...)
-	e.Constant = append(before.Constant, e.Constant[1:]...)
+	e.Macro = before.Macro.Append(e.Macro[1:])
+	e.Class = before.Class.Append(e.Class[1:])
+	e.Special = before.Special.Append(e.Special[1:])
+	e.Constant = before.Constant.Append(e.Constant[1:])
 	e.Property = before.Property
 
-	e.CatchTag = append(before.CatchTag, e.CatchTag[1:]...)
-	e.DynamicVariable = append(before.DynamicVariable, e.DynamicVariable[1:]...)
-	e.StandardInput = before.StandardInput
-	e.StandardOutput = before.StandardOutput
-	e.ErrorOutput = before.ErrorOutput
-	e.Handler = before.Handler
-}
-
-func (e *Environment) MergeDynamic(before Environment) {
-	e.BlockTag = append(stack{before.BlockTag[0]}, e.BlockTag[1:]...)
-	e.TagbodyTag = append(stack{before.TagbodyTag[0]}, e.TagbodyTag[1:]...)
-	e.Variable = append(stack{before.Variable[0]}, e.Variable[1:]...)
-	e.Function = append(stack{before.Function[0]}, e.Function[1:]...)
-
-	e.Macro = append(stack{before.Macro[0]}, e.Macro[1:]...)
-	e.Class = append(stack{before.Class[0]}, e.Class[1:]...)
-	e.Special = append(stack{before.Special[0]}, e.Special[1:]...)
-	e.Constant = append(stack{before.Constant[0]}, e.Constant[1:]...)
-	e.Property = before.Property
-
-	e.CatchTag = append(before.CatchTag, e.CatchTag[1:]...)
-	e.DynamicVariable = append(before.DynamicVariable, e.DynamicVariable[1:]...)
+	e.CatchTag = before.CatchTag.Append(e.CatchTag[1:])
+	e.DynamicVariable = before.DynamicVariable.Append(e.DynamicVariable[1:])
 	e.StandardInput = before.StandardInput
 	e.StandardOutput = before.StandardOutput
 	e.ErrorOutput = before.ErrorOutput
@@ -102,19 +82,19 @@ func (e *Environment) MergeDynamic(before Environment) {
 func (before *Environment) NewLexical() Environment {
 	e := NewEnvironment(before.StandardInput, before.StandardOutput, before.ErrorOutput, before.Handler)
 
-	e.BlockTag = append(before.BlockTag, e.BlockTag[0])
-	e.TagbodyTag = append(before.TagbodyTag, e.TagbodyTag[0])
-	e.Variable = append(before.Variable, e.Variable[0])
-	e.Function = append(before.Function, e.Function[0])
+	e.BlockTag = before.BlockTag.Append(e.BlockTag)
+	e.TagbodyTag = before.TagbodyTag.Append(e.TagbodyTag)
+	e.Variable = before.Variable.Append(e.Variable)
+	e.Function = before.Function.Append(e.Function)
 
-	e.Macro = append(before.Macro, e.Macro[0])
-	e.Class = append(before.Class, e.Class[0])
-	e.Special = append(before.Special, e.Special[0])
-	e.Constant = append(before.Constant, e.Constant[0])
+	e.Macro = before.Macro.Append(e.Macro)
+	e.Class = before.Class.Append(e.Class)
+	e.Special = before.Special.Append(e.Special)
+	e.Constant = before.Constant.Append(e.Constant)
 	e.Property = before.Property
 
-	e.CatchTag = append(before.CatchTag, e.CatchTag[0])
-	e.DynamicVariable = append(before.DynamicVariable, e.DynamicVariable[0])
+	e.CatchTag = before.CatchTag.Append(e.CatchTag)
+	e.DynamicVariable = before.DynamicVariable.Append(e.DynamicVariable)
 	e.StandardInput = before.StandardInput
 	e.StandardOutput = before.StandardOutput
 	e.ErrorOutput = before.ErrorOutput
@@ -126,19 +106,19 @@ func (before *Environment) NewLexical() Environment {
 func (before *Environment) NewDynamic() Environment {
 	e := NewEnvironment(before.StandardInput, before.StandardOutput, before.ErrorOutput, before.Handler)
 
-	e.BlockTag = append(stack{before.BlockTag[0]}, e.BlockTag[0])
-	e.TagbodyTag = append(stack{before.TagbodyTag[0]}, e.TagbodyTag[0])
-	e.Variable = append(stack{before.Variable[0]}, e.Variable[0])
-	e.Function = append(stack{before.Function[0]}, e.Function[0])
+	e.BlockTag = stack{before.BlockTag[0]}.Append(e.BlockTag)
+	e.TagbodyTag = stack{before.TagbodyTag[0]}.Append(e.TagbodyTag)
+	e.Variable = stack{before.Variable[0]}.Append(e.Variable)
+	e.Function = stack{before.Function[0]}.Append(e.Function)
 
-	e.Macro = append(stack{before.Macro[0]}, e.Macro[0])
-	e.Class = append(stack{before.Class[0]}, e.Class[0])
-	e.Special = append(stack{before.Special[0]}, e.Special[0])
-	e.Constant = append(stack{before.Constant[0]}, e.Constant[0])
+	e.Macro = stack{before.Macro[0]}.Append(e.Macro)
+	e.Class = stack{before.Class[0]}.Append(e.Class)
+	e.Special = stack{before.Special[0]}.Append(e.Special)
+	e.Constant = stack{before.Constant[0]}.Append(e.Constant)
 	e.Property = before.Property
 
-	e.CatchTag = append(before.CatchTag, e.CatchTag[0])
-	e.DynamicVariable = append(before.DynamicVariable, e.DynamicVariable[0])
+	e.CatchTag = before.CatchTag.Append(e.CatchTag)
+	e.DynamicVariable = before.DynamicVariable.Append(e.DynamicVariable)
 	e.StandardInput = before.StandardInput
 	e.StandardOutput = before.StandardOutput
 	e.ErrorOutput = before.ErrorOutput

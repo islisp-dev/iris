@@ -41,3 +41,10 @@ func (s stack) Define(key, value ilos.Instance) bool {
 	s[len(s)-1][key] = value
 	return false
 }
+
+func (s stack) Append(t stack) stack {
+	u := stack{}
+	u = append(u, s...)
+	u = append(u, t...)
+	return u
+}
