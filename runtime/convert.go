@@ -12,75 +12,84 @@ import (
 )
 
 func Convert(e env.Environment, object, class1 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	switch object.Class() {
-	case class.Character:
-		switch class1 {
-		case instance.NewSymbol("<CHARACTER>"):
+	object, err := Eval(e, object)
+	if err != nil {
+		return nil, err
+	}
+	class1, err = Class(e, class1)
+	if err != nil {
+		return nil, err
+	}
+	switch object.Class().String() {
+	case class.Character.String():
+		switch class1.(instance.BuiltInClass).String() {
+		case class.Character.String():
 			return object, nil
-		case instance.NewSymbol("<INTEGER>"):
+		case class.Integer.String():
 			return instance.NewInteger(int(rune(object.(instance.Character)))), nil
-		case instance.NewSymbol("<FLOAT>"):
-		case instance.NewSymbol("<SYMBOL>"):
-		case instance.NewSymbol("<STRING>"):
+		case class.Float.String():
+		case class.Symbol.String():
+		case class.String.String():
 			return instance.NewString([]rune(object.String()[2:])), nil
-		case instance.NewSymbol("<GENERAL-VECTOR>"):
-		case instance.NewSymbol("<LIST>"):
+		case class.GeneralVector.String():
+		case class.List.String():
 		}
-	case class.Integer:
-		switch class1 {
-		case instance.NewSymbol("<CHARACTER>"):
+	case class.Integer.String():
+		switch class1.String() {
+		case class.Character.String():
 			return instance.NewCharacter(rune(int(object.(instance.Integer)))), nil
-		case instance.NewSymbol("<INTEGER>"):
+		case class.Integer.String():
 			return object, nil
-		case instance.NewSymbol("<FLOAT>"):
+		case class.Float.String():
 			return instance.NewFloat(float64(int(object.(instance.Integer)))), nil
-		case instance.NewSymbol("<SYMBOL>"):
-		case instance.NewSymbol("<STRING>"):
+		case class.Symbol.String():
+		case class.String.String():
 			return instance.NewString([]rune(object.String())), nil
-		case instance.NewSymbol("<GENERAL-VECTOR>"):
-		case instance.NewSymbol("<LIST>"):
+		case class.GeneralVector.String():
+		case class.List.String():
 		}
-	case class.Float:
-		switch class1 {
-		case instance.NewSymbol("<CHARACTER>"):
-		case instance.NewSymbol("<INTEGER>"):
-		case instance.NewSymbol("<FLOAT>"):
+	case class.Float.String():
+		switch class1.String() {
+		case class.Character.String():
+		case class.Integer.String():
+			return instance.NewInteger(int(float64(object.(instance.Float)))), nil
+		case class.Float.String():
 			return object, nil
-		case instance.NewSymbol("<SYMBOL>"):
-		case instance.NewSymbol("<STRING>"):
+		case class.Symbol.String():
+		case class.String.String():
 			return instance.NewString([]rune(object.String())), nil
-		case instance.NewSymbol("<GENERAL-VECTOR>"):
-		case instance.NewSymbol("<LIST>"):
+		case class.GeneralVector.String():
+		case class.List.String():
 		}
-	case class.Symbol:
-		switch class1 {
-		case instance.NewSymbol("<CHARACTER>"):
-		case instance.NewSymbol("<INTEGER>"):
-		case instance.NewSymbol("<FLOAT>"):
-		case instance.NewSymbol("<SYMBOL>"):
+	case class.Symbol.String():
+		switch class1.String() {
+		case class.Character.String():
+		case class.Integer.String():
+		case class.Float.String():
+		case class.Symbol.String():
 			return object, nil
-		case instance.NewSymbol("<STRING>"):
+		case class.String.String():
 			return instance.NewString([]rune(object.String())), nil
-		case instance.NewSymbol("<GENERAL-VECTOR>"):
-		case instance.NewSymbol("<LIST>"):
+		case class.GeneralVector.String():
+		case class.List.String():
 		}
-	case class.String:
-		switch class1 {
-		case instance.NewSymbol("<CHARACTER>"):
-		case instance.NewSymbol("<INTEGER>"):
+	case class.String.String():
+		switch class1.String() {
+		case class.Character.String():
+		case class.Integer.String():
 			return ParseNumber(e, object)
-		case instance.NewSymbol("<FLOAT>"):
+		case class.Float.String():
 			return ParseNumber(e, object)
-		case instance.NewSymbol("<SYMBOL>"):
-		case instance.NewSymbol("<STRING>"):
+		case class.Symbol.String():
+		case class.String.String():
 			return object, nil
-		case instance.NewSymbol("<GENERAL-VECTOR>"):
+		case class.GeneralVector.String():
 			v := make([]ilos.Instance, len(object.(instance.String)))
 			for i, c := range object.(instance.String) {
 				v[i] = instance.NewCharacter(c)
 			}
 			return instance.NewGeneralVector(v), nil
-		case instance.NewSymbol("<LIST>"):
+		case class.List.String():
 			l := Nil
 			s := object.(instance.String)
 			for i := len(s) - 1; i >= 0; i-- {
@@ -88,26 +97,26 @@ func Convert(e env.Environment, object, class1 ilos.Instance) (ilos.Instance, il
 			}
 			return l, nil
 		}
-	case class.GeneralVector:
-		switch class1 {
-		case instance.NewSymbol("<CHARACTER>"):
-		case instance.NewSymbol("<INTEGER>"):
-		case instance.NewSymbol("<FLOAT>"):
-		case instance.NewSymbol("<SYMBOL>"):
-		case instance.NewSymbol("<STRING>"):
-		case instance.NewSymbol("<GENERAL-VECTOR>"):
+	case class.GeneralVector.String():
+		switch class1.String() {
+		case class.Character.String():
+		case class.Integer.String():
+		case class.Float.String():
+		case class.Symbol.String():
+		case class.String.String():
+		case class.GeneralVector.String():
 			return object, nil
-		case instance.NewSymbol("<LIST>"):
+		case class.List.String():
 			return List(e, object.(instance.GeneralVector)...)
 		}
-	case class.List:
-		switch class1 {
-		case instance.NewSymbol("<CHARACTER>"):
-		case instance.NewSymbol("<INTEGER>"):
-		case instance.NewSymbol("<FLOAT>"):
-		case instance.NewSymbol("<SYMBOL>"):
-		case instance.NewSymbol("<STRING>"):
-		case instance.NewSymbol("<GENERAL-VECTOR>"):
+	case class.List.String():
+		switch class1.String() {
+		case class.Character.String():
+		case class.Integer.String():
+		case class.Float.String():
+		case class.Symbol.String():
+		case class.String.String():
+		case class.GeneralVector.String():
 			v := instance.NewGeneralVector([]ilos.Instance{})
 			car, cdr, i := object.(*instance.Cons).Car, object.(*instance.Cons).Cdr, 0
 			for cdr != Nil {
@@ -115,7 +124,7 @@ func Convert(e env.Environment, object, class1 ilos.Instance) (ilos.Instance, il
 				car, cdr, i = cdr.(*instance.Cons).Car, cdr.(*instance.Cons).Cdr, i+1
 			}
 			return v, nil
-		case instance.NewSymbol("<LIST>"):
+		case class.List.String():
 			return object, nil
 		}
 	}

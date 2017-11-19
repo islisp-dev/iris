@@ -105,7 +105,7 @@ func init() {
 	defun("CONS", Cons)
 	defun("CONSP", Consp)
 	defun("CONTINUE-CONDITION", ContinueCondition)
-	defun("CONVERT", Convert)
+	defspecial("CONVERT", Convert)
 	defun("COS", Cos)
 	defun("COSH", Cosh)
 	defgeneric("CREATE", Create) //TODO Change to generic function
