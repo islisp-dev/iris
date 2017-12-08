@@ -5,8 +5,8 @@
 package instance
 
 import (
-	"github.com/ta2gch/iris/runtime/env"
-	"github.com/ta2gch/iris/runtime/ilos"
+	"github.com/asciian/iris/runtime/env"
+	"github.com/asciian/iris/runtime/ilos"
 )
 
 func NewArithmeticError(e env.Environment, operation, operands ilos.Instance) ilos.Instance {

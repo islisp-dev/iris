@@ -8,10 +8,10 @@ import (
 	"math"
 	"os"
 
-	"github.com/ta2gch/iris/runtime/env"
-	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/class"
-	"github.com/ta2gch/iris/runtime/ilos/instance"
+	"github.com/asciian/iris/runtime/env"
+	"github.com/asciian/iris/runtime/ilos"
+	"github.com/asciian/iris/runtime/ilos/class"
+	"github.com/asciian/iris/runtime/ilos/instance"
 )
 
 func TopLevelHander(e env.Environment, c ilos.Instance) (ilos.Instance, ilos.Instance) {

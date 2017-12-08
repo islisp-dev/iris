@@ -10,11 +10,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ta2gch/iris/reader/tokenizer"
-	"github.com/ta2gch/iris/runtime/env"
-	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/class"
-	"github.com/ta2gch/iris/runtime/ilos/instance"
+	"github.com/asciian/iris/reader/tokenizer"
+	"github.com/asciian/iris/runtime/env"
+	"github.com/asciian/iris/runtime/ilos"
+	"github.com/asciian/iris/runtime/ilos/class"
+	"github.com/asciian/iris/runtime/ilos/instance"
 )
 
 var eop = instance.NewSymbol("End Of Parentheses")

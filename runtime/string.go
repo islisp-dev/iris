@@ -7,10 +7,10 @@ package runtime
 import (
 	"strings"
 
-	"github.com/ta2gch/iris/runtime/env"
-	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/class"
-	"github.com/ta2gch/iris/runtime/ilos/instance"
+	"github.com/asciian/iris/runtime/env"
+	"github.com/asciian/iris/runtime/ilos"
+	"github.com/asciian/iris/runtime/ilos/class"
+	"github.com/asciian/iris/runtime/ilos/instance"
 )
 
 // Stringp returns t if obj is a string (instance of class string); otherwise,

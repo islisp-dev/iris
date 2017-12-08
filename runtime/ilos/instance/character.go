@@ -5,7 +5,7 @@
 package instance
 
 import (
-	"github.com/ta2gch/iris/runtime/ilos"
+	"github.com/asciian/iris/runtime/ilos"
 )
 
 // Character
