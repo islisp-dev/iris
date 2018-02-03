@@ -48,6 +48,9 @@ func Div(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance)
 		}
 		return SignalCondition(e, instance.NewArithmeticError(e, operation, operands), Nil)
 	}
+	if a*b < 0 { // Issue #2
+		return instance.NewInteger(a/b - 1), nil
+	}
 	return instance.NewInteger(a / b), nil
 }
 
@@ -57,23 +60,15 @@ func Div(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance)
 // without remainder. An error shall be signaled if either z1 or z2 is not an
 // integer (error-id. domain-error).
 func Mod(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	a, err := convInt(e, z1)
+	f, err := Div(e, z1, z2)
 	if err != nil {
 		return nil, err
 	}
-	b, err := convInt(e, z2)
+	g, err := Multiply(e, f, z2)
 	if err != nil {
 		return nil, err
 	}
-	if b == 0 {
-		operation := instance.NewSymbol("MOD")
-		operands, err := List(e, z1, z2)
-		if err != nil {
-			return nil, err
-		}
-		return SignalCondition(e, instance.NewArithmeticError(e, operation, operands), Nil)
-	}
-	return instance.NewInteger(a % b), nil
+	return Substruct(e, z1, g) // Issue #2
 }
 
 // Gcd returns the greatest common divisor of its integer arguments. The result
