@@ -7,9 +7,9 @@ package runtime
 import (
 	"reflect"
 
-	"github.com/asciian/iris/runtime/env"
-	"github.com/asciian/iris/runtime/ilos"
-	"github.com/asciian/iris/runtime/ilos/class"
+	"github.com/xtaniguchimasaya/iris/runtime/env"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos/class"
 )
 
 func isComparable(t reflect.Type) bool {

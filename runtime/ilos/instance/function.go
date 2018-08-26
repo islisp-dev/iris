@@ -9,8 +9,8 @@ import (
 	"reflect"
 	"sort"
 
-	"github.com/asciian/iris/runtime/env"
-	"github.com/asciian/iris/runtime/ilos"
+	"github.com/xtaniguchimasaya/iris/runtime/env"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos"
 )
 
 type Applicable interface {

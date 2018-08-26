@@ -2,7 +2,7 @@
 
 Iris is a interpreter of ISLisp implemented with golang
 
-[![Build Status](https://travis-ci.org/asciian/iris.svg?branch=master)](https://travis-ci.org/asciian/iris)
+[![Build Status](https://travis-ci.org/xtaniguchimasaya/iris.svg?branch=master)](https://travis-ci.org/xtaniguchimasaya/iris)
 
 ![logo](logo.png)
 
@@ -21,7 +21,7 @@ Iris has the webpage and the online REPL. [islisp.js.org](https://islisp.js.org)
 You can install iris with `go get`
 
 ```bash
-$ go get github.com/asciian/iris
+$ go get github.com/xtaniguchimasaya/iris
 ```
 
 ### Update
@@ -29,7 +29,7 @@ $ go get github.com/asciian/iris
 You can update iris with `go get`
 
 ```bash
-$ go get -u github.com/asciian/iris
+$ go get -u github.com/xtaniguchimasaya/iris
 ```
 
 ## Development
@@ -46,4 +46,4 @@ $ go test ./...
 This software is licensed under the Mozilla Public License v2.0
 
 ## Copyright
-Copyright (c) 2017 asciian　All Rights Reserved.
+Copyright (c) 2017 xtaniguchimasaya　All Rights Reserved.

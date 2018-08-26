@@ -5,7 +5,7 @@
 package runtime
 
 import (
-	"github.com/asciian/iris/runtime/ilos/instance"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos/instance"
 )
 
 // The values t and nil are called booleans. t denotes true, and nil is the only

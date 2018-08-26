@@ -7,10 +7,10 @@ package runtime
 import (
 	"fmt"
 
-	"github.com/asciian/iris/runtime/env"
-	"github.com/asciian/iris/runtime/ilos"
-	"github.com/asciian/iris/runtime/ilos/class"
-	"github.com/asciian/iris/runtime/ilos/instance"
+	"github.com/xtaniguchimasaya/iris/runtime/env"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos/class"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos/instance"
 )
 
 func checkLambdaList(e env.Environment, lambdaList ilos.Instance) ilos.Instance {

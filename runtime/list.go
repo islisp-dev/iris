@@ -5,10 +5,10 @@
 package runtime
 
 import (
-	"github.com/asciian/iris/runtime/env"
-	"github.com/asciian/iris/runtime/ilos"
-	"github.com/asciian/iris/runtime/ilos/class"
-	"github.com/asciian/iris/runtime/ilos/instance"
+	"github.com/xtaniguchimasaya/iris/runtime/env"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos/class"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos/instance"
 )
 
 // Listp returns t if obj is a list (instance of class list); otherwise, returns

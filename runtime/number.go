@@ -7,11 +7,11 @@ package runtime
 import (
 	"math"
 
-	"github.com/asciian/iris/reader/parser"
-	"github.com/asciian/iris/runtime/env"
-	"github.com/asciian/iris/runtime/ilos"
-	"github.com/asciian/iris/runtime/ilos/class"
-	"github.com/asciian/iris/runtime/ilos/instance"
+	"github.com/xtaniguchimasaya/iris/reader/parser"
+	"github.com/xtaniguchimasaya/iris/runtime/env"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos/class"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos/instance"
 )
 
 // Numberp returns t if obj is a number (instance of class number); otherwise,

@@ -5,10 +5,10 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/asciian/iris/runtime/env"
-	"github.com/asciian/iris/runtime/ilos"
-	"github.com/asciian/iris/runtime/ilos/class"
-	"github.com/asciian/iris/runtime/ilos/instance"
+	"github.com/xtaniguchimasaya/iris/runtime/env"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos/class"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos/instance"
 )
 
 func FormatObject(e env.Environment, stream, object, escapep ilos.Instance) (ilos.Instance, ilos.Instance) {

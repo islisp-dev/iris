@@ -5,8 +5,8 @@
 package runtime
 
 import (
-	"github.com/asciian/iris/runtime/env"
-	"github.com/asciian/iris/runtime/ilos"
+	"github.com/xtaniguchimasaya/iris/runtime/env"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos"
 )
 
 // Quote is used to include any object in an ISLisp text. A quoted expression

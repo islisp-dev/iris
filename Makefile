@@ -3,4 +3,4 @@ all: islisp.js.org
 	cd islisp.js.org && make
 
 islisp.js.org:
-	git clone https://github.com/asciian/islisp.js.org
+	git clone https://github.com/xtaniguchimasaya/islisp.js.org

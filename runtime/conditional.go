@@ -5,10 +5,10 @@
 package runtime
 
 import (
-	"github.com/asciian/iris/runtime/env"
-	"github.com/asciian/iris/runtime/ilos"
-	"github.com/asciian/iris/runtime/ilos/class"
-	"github.com/asciian/iris/runtime/ilos/instance"
+	"github.com/xtaniguchimasaya/iris/runtime/env"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos/class"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos/instance"
 )
 
 // If is conditional expression. The test-form is evaluated. If its result is

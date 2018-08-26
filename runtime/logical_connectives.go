@@ -5,8 +5,8 @@
 package runtime
 
 import (
-	"github.com/asciian/iris/runtime/env"
-	"github.com/asciian/iris/runtime/ilos"
+	"github.com/xtaniguchimasaya/iris/runtime/env"
+	"github.com/xtaniguchimasaya/iris/runtime/ilos"
 )
 
 // Not is the logical “not” (or “¬”). It returns t if obj is nil and nil
