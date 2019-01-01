@@ -5,8 +5,8 @@
 package runtime
 
 import (
-	"github.com/xtaniguchimasaya/iris/runtime/env"
-	"github.com/xtaniguchimasaya/iris/runtime/ilos"
+	"github.com/ta2gch/iris/runtime/env"
+	"github.com/ta2gch/iris/runtime/ilos"
 )
 
 // Not is the logical “not” (or “¬”). It returns t if obj is nil and nil

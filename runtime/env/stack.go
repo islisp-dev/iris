@@ -5,7 +5,7 @@
 package env
 
 import (
-	"github.com/xtaniguchimasaya/iris/runtime/ilos"
+	"github.com/ta2gch/iris/runtime/ilos"
 )
 
 type stack []map[ilos.Instance]ilos.Instance

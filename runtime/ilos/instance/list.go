@@ -7,7 +7,7 @@ package instance
 import (
 	"fmt"
 
-	"github.com/xtaniguchimasaya/iris/runtime/ilos"
+	"github.com/ta2gch/iris/runtime/ilos"
 )
 
 type List interface {

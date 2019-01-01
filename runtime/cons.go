@@ -5,10 +5,10 @@
 package runtime
 
 import (
-	"github.com/xtaniguchimasaya/iris/runtime/env"
-	"github.com/xtaniguchimasaya/iris/runtime/ilos"
-	"github.com/xtaniguchimasaya/iris/runtime/ilos/class"
-	"github.com/xtaniguchimasaya/iris/runtime/ilos/instance"
+	"github.com/ta2gch/iris/runtime/env"
+	"github.com/ta2gch/iris/runtime/ilos"
+	"github.com/ta2gch/iris/runtime/ilos/class"
+	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
 // Consp returns t if obj is a cons (instance of class cons); otherwise, returns

@@ -5,8 +5,8 @@
 package instance
 
 import (
-	"github.com/xtaniguchimasaya/iris/runtime/env"
-	"github.com/xtaniguchimasaya/iris/runtime/ilos"
+	"github.com/ta2gch/iris/runtime/env"
+	"github.com/ta2gch/iris/runtime/ilos"
 )
 
 func NewBlockTag(tag, uid, object ilos.Instance) ilos.Instance {

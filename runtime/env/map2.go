@@ -5,7 +5,7 @@
 package env
 
 import (
-	"github.com/xtaniguchimasaya/iris/runtime/ilos"
+	"github.com/ta2gch/iris/runtime/ilos"
 )
 
 type map2 map[[2]ilos.Instance]ilos.Instance

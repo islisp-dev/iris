@@ -5,7 +5,7 @@
 package instance
 
 import (
-	"github.com/xtaniguchimasaya/iris/runtime/ilos"
+	"github.com/ta2gch/iris/runtime/ilos"
 )
 
 var ObjectClass = BuiltInClass{NewSymbol("<OBJECT>"), []ilos.Class{}, []ilos.Instance{}}

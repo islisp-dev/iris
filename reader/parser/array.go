@@ -5,9 +5,9 @@
 package parser
 
 import (
-	"github.com/xtaniguchimasaya/iris/runtime/ilos"
-	"github.com/xtaniguchimasaya/iris/runtime/ilos/class"
-	"github.com/xtaniguchimasaya/iris/runtime/ilos/instance"
+	"github.com/ta2gch/iris/runtime/ilos"
+	"github.com/ta2gch/iris/runtime/ilos/class"
+	"github.com/ta2gch/iris/runtime/ilos/instance"
 )
 
 func list2array(dim int, list ilos.Instance) (ilos.Instance, ilos.Instance) {

@@ -5,7 +5,7 @@
 package instance
 
 import (
-	"github.com/xtaniguchimasaya/iris/runtime/ilos"
+	"github.com/ta2gch/iris/runtime/ilos"
 )
 
 // Symbol
