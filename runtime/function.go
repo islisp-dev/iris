@@ -5,10 +5,10 @@
 package runtime
 
 import (
-	"github.com/ta2gch/iris/runtime/env"
-	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/class"
-	"github.com/ta2gch/iris/runtime/ilos/instance"
+	"github.com/islisp-dev/iris/runtime/env"
+	"github.com/islisp-dev/iris/runtime/ilos"
+	"github.com/islisp-dev/iris/runtime/ilos/class"
+	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // Functionp returns t if obj is a (normal or generic) function; otherwise,

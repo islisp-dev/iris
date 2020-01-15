@@ -5,7 +5,7 @@
 package class
 
 import (
-	"github.com/ta2gch/iris/runtime/ilos/instance"
+	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 var Object = instance.ObjectClass

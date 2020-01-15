@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/ta2gch/iris/runtime/ilos"
+	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
 func TestTokenizer_Next(t *testing.T) {

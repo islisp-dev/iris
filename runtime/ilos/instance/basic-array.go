@@ -7,7 +7,7 @@ package instance
 import (
 	"fmt"
 
-	"github.com/ta2gch/iris/runtime/ilos"
+	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
 // General Array *

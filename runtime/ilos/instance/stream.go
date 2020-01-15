@@ -8,8 +8,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/ta2gch/iris/reader/tokenizer"
-	"github.com/ta2gch/iris/runtime/ilos"
+	"github.com/islisp-dev/iris/reader/tokenizer"
+	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
 type Stream struct {

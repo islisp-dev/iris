@@ -5,7 +5,7 @@
 package env
 
 import (
-	"github.com/ta2gch/iris/runtime/ilos"
+	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
 // Environment struct is the struct for keeping functions and variables

@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ta2gch/iris/runtime/ilos"
-	"github.com/ta2gch/iris/runtime/ilos/instance"
+	"github.com/islisp-dev/iris/runtime/ilos"
+	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 func Test_parseAtom(t *testing.T) {

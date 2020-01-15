@@ -10,8 +10,8 @@ import (
 	"os"
 	golang "runtime"
 
-	"github.com/ta2gch/iris/runtime"
-	"github.com/ta2gch/iris/runtime/ilos/instance"
+	"github.com/islisp-dev/iris/runtime"
+	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 var commit string
@@ -22,7 +22,7 @@ func repl(quiet bool) {
 			commit = "HEAD"
 		}
 		fmt.Printf("Iris ISLisp Interpreter Commit %v on %v\n", commit, golang.Version())
-		fmt.Printf("Copyright 2017 ta2gch All Rights Reserved.\n")
+		fmt.Printf("Copyright 2017 islisp-dev All Rights Reserved.\n")
 		fmt.Print(">>> ")
 	}
 	runtime.TopLevel.StandardInput = instance.NewStream(os.Stdin, nil)
