@@ -134,3 +134,33 @@ func TestGetOutputStreamString(t *testing.T) {
 		},
 	})
 }
+
+func TestRead(t *testing.T) {
+	execTests(t, Read, []test{
+		{
+			exp:     `(defglobal str (create-string-input-stream "hello #(1 2 3) 123 #\\A"))`,
+			want:    `'str`,
+			wantErr: false,
+		},
+		{
+			exp:     `(read str)`,
+			want:    `'hello`,
+			wantErr: false,
+		},
+		{
+			exp:     `(read str)`,
+			want:    `#(1 2 3)`,
+			wantErr: false,
+		},
+		{
+			exp:     `(read str)`,
+			want:    `123`,
+			wantErr: false,
+		},
+		{
+			exp:     `(read str)`,
+			want:    `#\\A`,
+			wantErr: false,
+		},
+	})
+}
