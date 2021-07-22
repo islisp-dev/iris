@@ -213,10 +213,10 @@ func Go(e env.Environment, tag ilos.Instance) (ilos.Instance, ilos.Instance) {
 func UnwindProtect(e env.Environment, form ilos.Instance, cleanupForms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	ret1, err1 := Eval(e, form)
 	ret2, err2 := Progn(e, cleanupForms...)
-	if ilos.InstanceOf(class.Escape, err2) {
-		return SignalCondition(e, instance.NewControlError(e), Nil)
-	}
 	if err2 != nil {
+		if ilos.InstanceOf(class.Escape, err2) {
+			return SignalCondition(e, instance.NewControlError(e), Nil)
+		}
 		return ret2, err2
 	}
 	return ret1, err1
