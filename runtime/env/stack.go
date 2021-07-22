@@ -42,6 +42,10 @@ func (s stack) Define(key, value ilos.Instance) bool {
 	return false
 }
 
+func (s stack) Delete(key ilos.Instance) {
+	delete(s[len(s)-1], key)
+}
+
 func (s stack) Append(t stack) stack {
 	u := stack{}
 	u = append(u, s...)

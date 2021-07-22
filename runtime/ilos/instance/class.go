@@ -50,7 +50,7 @@ var StandardObjectClass = NewBuiltInClass("<STANDARD-OBJECT>", ObjectClass)
 var StreamClass = NewBuiltInClass("<STREAM>", ObjectClass, "STREAM")
 
 // Implementation defined
-var EscapeClass = NewBuiltInClass("<ESCAPE>", ObjectClass, "IRIS.TAG")
+var EscapeClass = NewBuiltInClass("<ESCAPE>", ObjectClass, "IRIS.TAG", "IRIS.UID")
 var CatchTagClass = NewBuiltInClass("<THROW>", EscapeClass, "IRIS.OBJECT")
 var TagbodyTagClass = NewBuiltInClass("<TAGBODY-TAG>", EscapeClass)
 var BlockTagClass = NewBuiltInClass("<BLOCK-TAG>", EscapeClass, "IRIS.OBJECT")

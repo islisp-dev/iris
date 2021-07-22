@@ -39,12 +39,7 @@ is immediately considered invalid.
 */
 
 func Block(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	var err ilos.Instance
-	tag, err = Eval(e, tag) // Checked at the top of// This function
 	uid := instance.NewInteger(uniqueInt())
-	if err != nil {
-		return nil, err
-	}
 	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
 		return SignalCondition(e, instance.NewDomainError(e, tag, class.Object), Nil)
 	}
@@ -61,25 +56,23 @@ func Block(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.In
 				uid1, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("IRIS.UID"), class.Escape)
 				if tag == tag1 && uid == uid1 {
 					obj, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("IRIS.OBJECT"), class.BlockTag) // Checked at the head of// This condition
+					e.BlockTag.Delete(tag)
 					return obj, nil
 				}
 			}
+			e.BlockTag.Delete(tag)
 			return nil, fail
 		}
 	}
+	e.BlockTag.Delete(tag)
 	return sucess, nil
 }
 
 func ReturnFrom(e env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
-	var err ilos.Instance
-	tag, err = Eval(e, tag)
-	if err != nil {
-		return nil, err
-	}
 	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
 		return SignalCondition(e, instance.NewDomainError(e, tag, class.Object), Nil)
 	}
-	object, err = Eval(e, object)
+	object, err := Eval(e, object)
 	if err != nil {
 		return nil, err
 	}
@@ -113,12 +106,15 @@ func Catch(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.In
 				uid1, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("IRIS.UID"), class.Escape) // Checked at the head of// This condition
 				if tag == tag1 && uid == uid1 {
 					obj, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("IRIS.OBJECT"), class.CatchTag) // Checked at the head of// This condition
+					e.CatchTag.Delete(tag)
 					return obj, nil
 				}
 			}
+			e.CatchTag.Delete(tag)
 			return nil, fail
 		}
 	}
+	e.CatchTag.Delete(tag)
 	return sucess, nil
 }
 
