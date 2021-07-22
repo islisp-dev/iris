@@ -159,8 +159,33 @@ func TestRead(t *testing.T) {
 		},
 		{
 			exp:     `(read str)`,
-			want:    `#\\A`,
+			want:    `#\A`,
 			wantErr: false,
+		},
+	})
+}
+
+func TestReadChar(t *testing.T) {
+	execTests(t, ReadChar, []test{
+		{
+			exp:     `(defglobal str (create-string-input-stream "hi"))`,
+			want:    `'str`,
+			wantErr: false,
+		},
+		{
+			exp:     `(read-char str)`,
+			want:    `#\h`,
+			wantErr: false,
+		},
+		{
+			exp:     `(read-char str)`,
+			want:    `#\i`,
+			wantErr: false,
+		},
+		{
+			exp:     `(read str)`,
+			want:    `nil`,
+			wantErr: true,
 		},
 	})
 }
