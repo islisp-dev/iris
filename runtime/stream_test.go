@@ -91,3 +91,46 @@ func TestWithOpenIoFile(t *testing.T) {
 	})
 }
 
+func TestCreateStringInputStream(t *testing.T) {
+	execTests(t, CreateStringInputStream, []test{
+		{
+			exp: `
+			(let ((str (create-string-input-stream "this is a string")))
+				(list (read str) (read str) (read str)))
+			`,
+			want:    `'(this is a)`,
+			wantErr: false,
+		},
+	})
+}
+
+func TestCreateStringOutputStream(t *testing.T) {
+	execTests(t, CreateStringOutputStream, []test{
+		{
+			exp: `
+			(let ((str (create-string-output-stream)))
+			  (format str "hello")
+			  (format str "world")
+			  (get-output-stream-string str))
+			`,
+			want:    `"helloworld"`,
+			wantErr: false,
+		},
+	})
+}
+
+func TestGetOutputStreamString(t *testing.T) {
+	execTests(t, GetOutputStreamString, []test{
+		{
+			exp: `
+			(let ((out-str (create-string-output-stream)))
+			  (format out-str "This is a string")
+			  (let ((part1 (get-output-stream-string out-str)))
+			    (format out-str "right!")
+			    (list part1 (get-output-stream-string out-str))))
+			`,
+			want:    `'("This is a string" "right!")`,
+			wantErr: false,
+		},
+	})
+}
