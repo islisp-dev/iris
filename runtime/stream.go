@@ -107,9 +107,16 @@ func OpenOutputFile(e env.Environment, filename ilos.Instance, elementClass ...i
 	if ok, _ := Stringp(e, filename); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, filename, class.String), Nil)
 	}
-	file, err := os.Open(string(filename.(instance.String)))
-	if err != nil {
+	rawFilename := string(filename.(instance.String))
+	var file *os.File
+	if _, err := os.Stat(rawFilename); os.IsNotExist(err) {
+		if file, err = os.Create(rawFilename); err != nil {
 		return SignalCondition(e, instance.NewStreamError(e), Nil)
+	}
+	} else {
+		if file, err = os.Open(string(filename.(instance.String))); err != nil {
+			return SignalCondition(e, instance.NewStreamError(e), Nil)
+		}
 	}
 	return instance.NewStream(nil, file), nil
 }
@@ -147,7 +154,12 @@ func WithOpenInputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.
 		return nil, err
 	}
 	e.Variable.Define(car, s)
-	return Progn(e, forms...)
+	r, err := Progn(e, forms...)
+	e.Variable.Delete(car)
+	if _, err := Close(e, s); err != nil {
+		return nil, err
+	}
+	return r, err
 }
 
 func WithOpenOutputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
@@ -171,7 +183,12 @@ func WithOpenOutputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos
 		return nil, err
 	}
 	e.Variable.Define(car, s)
-	return Progn(e, forms...)
+	r, err := Progn(e, forms...)
+	e.Variable.Delete(car)
+	if _, err := Close(e, s); err != nil {
+		return nil, err
+	}
+	return r, err
 }
 
 func WithOpenIoFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
@@ -187,7 +204,12 @@ func WithOpenIoFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Ins
 		return nil, err
 	}
 	e.Variable.Define(n, s)
-	return Progn(e, forms...)
+	r, err := Progn(e, forms...)
+	e.Variable.Delete(n)
+	if _, err := Close(e, s); err != nil {
+		return nil, err
+	}
+	return r, err
 }
 
 func Close(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
