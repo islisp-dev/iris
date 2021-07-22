@@ -33,7 +33,7 @@ RUN rm -rf $GOROOT && \
         github.com/davidrjenni/reftools/cmd/fillstruct \
         github.com/godoctor/godoctor && \
     GO111MODULE=on go get -v \
-        golang.org/x/tools/gopls@v0.6.11 && \
+        golang.org/x/tools/gopls && \
     sudo rm -rf $GOPATH/src $GOPATH/pkg /home/gitpod/.cache/go /home/gitpod/.cache/go-build
 
 # user Go packages
