@@ -202,3 +202,39 @@ func TestPreviewChar(t *testing.T) {
 		},
 	})
 }
+
+func TestReadLine(t *testing.T) {
+	execTests(t, ReadLine, []test{
+		{
+			exp: `
+			(with-open-output-file (out "__newfile")
+			  (format out "This is an example")
+			  (format out "~%")
+			  (format out "look at the output file"))
+			`,
+			want:    `nil`,
+			wantErr: false,
+		},
+		{
+			exp: `
+			(defglobal str (open-input-file "__newfile"))
+			`,
+			want:    `'str`,
+			wantErr: false,
+		},
+		{
+			exp: `
+			(read-line str)
+			`,
+			want:    `"This is an example"`,
+			wantErr: false,
+		},
+		{
+			exp: `
+			(read-line str)
+			`,
+			want:    `"look at the output file"`,
+			wantErr: false,
+		},
+	})
+}
