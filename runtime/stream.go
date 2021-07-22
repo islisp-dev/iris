@@ -195,14 +195,12 @@ func Close(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instanc
 	if ok, _ := Streamp(e, stream); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, stream, class.Stream), Nil)
 	}
-	/* TODO
 	if stream.(instance.Stream).Reader != nil {
-		stream.(instance.Stream).Reader.(*os.File).Close()
+		stream.(instance.Stream).Reader.Raw.(*os.File).Close()
 	}
 	if stream.(instance.Stream).Writer != nil {
 		stream.(instance.Stream).Writer.(*os.File).Close()
 	}
-	*/
 	return Nil, nil
 }
 

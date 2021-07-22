@@ -15,20 +15,22 @@ type Reader struct {
 	err error
 	ru  rune
 	sz  int
-	rr  *bufio.Reader
+	Raw io.Reader
+	br  *bufio.Reader
 }
 
 // NewReader creates interal reader from io.RuneReader
 func NewReader(r io.Reader) *Reader {
 	b := new(Reader)
-	b.rr = bufio.NewReader(r)
+	b.Raw = r
+	b.br = bufio.NewReader(r)
 	return b
 }
 
 // PeekRune returns a rune without advancing pointer
 func (r *Reader) PeekRune() (rune, int, error) {
 	if r.ru == 0 {
-		r.ru, r.sz, r.err = r.rr.ReadRune()
+		r.ru, r.sz, r.err = r.br.ReadRune()
 	}
 	return r.ru, r.sz, r.err
 }
@@ -36,12 +38,12 @@ func (r *Reader) PeekRune() (rune, int, error) {
 // ReadRune returns a rune with advancing pointer
 func (r *Reader) ReadRune() (rune, int, error) {
 	if r.ru == 0 {
-		r.ru, r.sz, r.err = r.rr.ReadRune()
+		r.ru, r.sz, r.err = r.br.ReadRune()
 	}
 	ru := r.ru
 	sz := r.sz
 	err := r.err
-	r.ru, r.sz, r.err = r.rr.ReadRune()
+	r.ru, r.sz, r.err = r.br.ReadRune()
 	return ru, sz, err
 }
 
@@ -49,7 +51,7 @@ func (r *Reader) Read(b []byte) (int, error) {
 	ru := r.ru
 	sz := r.sz
 	err := r.err
-	r.ru, r.sz, r.err = r.rr.ReadRune()
+	r.ru, r.sz, r.err = r.br.ReadRune()
 	copy(b, []byte(string([]rune{ru})))
 	return sz, err
 }
