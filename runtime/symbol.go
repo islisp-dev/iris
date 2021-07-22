@@ -38,7 +38,10 @@ func Property(e env.Environment, symbol, propertyName ilos.Instance, obj ...ilos
 	if ok {
 		return ret, nil
 	}
-	return obj[1], nil
+	if len(obj) == 0 {
+		return Nil, nil
+	}
+	return obj[0], nil
 }
 
 // SetProperty causes obj to be the new value of the property named
