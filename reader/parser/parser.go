@@ -68,12 +68,13 @@ func ParseAtom(tok string) (ilos.Instance, ilos.Instance) {
 	// string
 	//
 	if r := regexp.MustCompile(`^"(.*)"$`).FindStringSubmatch(tok); len(r) >= 2 {
-		return instance.NewString([]rune(r[1])), nil
+		s := strings.Replace(r[1], "\\\\", "\\", -1)
+		return instance.NewString([]rune(s)), nil
 	}
 	//
 	// symbol
 	//
-	if "nil" == tok {
+	if tok == "nil" {
 		return instance.Nil, nil
 	}
 	str := `^(`
