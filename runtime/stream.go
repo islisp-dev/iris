@@ -130,15 +130,23 @@ func WithOpenInputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.
 	if ok, _ := Consp(e, fileSpec); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, fileSpec, class.Cons), Nil)
 	}
-	n, err := Car(e, fileSpec)
+	car, err := Car(e, fileSpec)
 	if err != nil {
 		return nil, err
 	}
-	s, err := OpenInputFile(e, n)
+	cdr, err := Cdr(e, fileSpec)
 	if err != nil {
 		return nil, err
 	}
-	e.Variable.Define(n, s)
+	cadr, err := Car(e, cdr)
+	if err != nil {
+		return nil, err
+	}
+	s, err := OpenInputFile(e, cadr)
+	if err != nil {
+		return nil, err
+	}
+	e.Variable.Define(car, s)
 	return Progn(e, forms...)
 }
 
@@ -146,15 +154,23 @@ func WithOpenOutputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos
 	if ok, _ := Consp(e, fileSpec); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, fileSpec, class.Cons), Nil)
 	}
-	n, err := Car(e, fileSpec)
+	car, err := Car(e, fileSpec)
 	if err != nil {
 		return nil, err
 	}
-	s, err := OpenOutputFile(e, n)
+	cdr, err := Cdr(e, fileSpec)
 	if err != nil {
 		return nil, err
 	}
-	e.Variable.Define(n, s)
+	cadr, err := Car(e, cdr)
+	if err != nil {
+		return nil, err
+	}
+	s, err := OpenOutputFile(e, cadr)
+	if err != nil {
+		return nil, err
+	}
+	e.Variable.Define(car, s)
 	return Progn(e, forms...)
 }
 
