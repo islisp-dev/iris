@@ -57,6 +57,19 @@ func TestOutputStreamP(t *testing.T) {
 	})
 }
 
+func TestWithStandardInput(t *testing.T) {
+	execTests(t, WithStandardInput, []test{
+		{
+			exp: `
+			(with-standard-input (create-string-input-stream "this is a string")
+ 				(list (read) (read)))
+			`,
+			want:    `'(this is)`,
+			wantErr: false,
+		},
+	})
+}
+
 func TestWithOpenIoFile(t *testing.T) {
 	execTests(t, WithOpenIoFile, []test{
 		{
