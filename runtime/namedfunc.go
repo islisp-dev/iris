@@ -5,8 +5,6 @@
 package runtime
 
 import (
-	"fmt"
-
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/class"
@@ -20,8 +18,8 @@ func checkLambdaList(e env.Environment, lambdaList ilos.Instance) ilos.Instance 
 	for i, cadr := range lambdaList.(instance.List).Slice() {
 		if cadr == instance.NewSymbol(":REST") || cadr == instance.NewSymbol("&REST") {
 			if lambdaList.(instance.List).Length() != i+2 {
-		_, err := SignalCondition(e, instance.NewArityError(e), Nil)
-		return err
+				_, err := SignalCondition(e, instance.NewArityError(e), Nil)
+				return err
 			}
 		}
 	}
@@ -47,7 +45,7 @@ func newNamedFunction(e env.Environment, functionName, lambdaList ilos.Instance,
 	return instance.NewFunction(functionName.(instance.Symbol), func(e env.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 		e.MergeLexical(lexical)
 		if (variadic && len(parameters)-2 > len(arguments)) || (!variadic && len(parameters) != len(arguments)) {
-		return SignalCondition(e, instance.NewArityError(e), Nil)
+			return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 		for idx := range parameters {
 			key := parameters[idx]
@@ -64,7 +62,6 @@ func newNamedFunction(e env.Environment, functionName, lambdaList ilos.Instance,
 			}
 			value := arguments[idx]
 			if !e.Variable.Define(key, value) {
-				fmt.Print(key, value)
 				return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 			}
 		}
