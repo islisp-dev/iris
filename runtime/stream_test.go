@@ -17,6 +17,46 @@ func TestStreamp(t *testing.T) {
 	})
 }
 
+func TestInputStreamP(t *testing.T) {
+	execTests(t, InputStreamP, []test{
+		{
+			exp:     `(input-stream-p (standard-input))`,
+			want:    `t`,
+			wantErr: false,
+		},
+		{
+			exp:     `(input-stream-p (standard-output))`,
+			want:    `nil`,
+			wantErr: false,
+		},
+		{
+			exp:     `(streamp '(a b c))`,
+			want:    `nil`,
+			wantErr: false,
+		},
+	})
+}
+
+func TestOutputStreamP(t *testing.T) {
+	execTests(t, OutputStreamP, []test{
+		{
+			exp:     `(output-stream-p (standard-input))`,
+			want:    `nil`,
+			wantErr: false,
+		},
+		{
+			exp:     `(output-stream-p (standard-output))`,
+			want:    `t`,
+			wantErr: false,
+		},
+		{
+			exp:     `(streamp "hello")`,
+			want:    `nil`,
+			wantErr: false,
+		},
+	})
+}
+
 func TestWithOpenIoFile(t *testing.T) {
 	execTests(t, WithOpenIoFile, []test{
 		{
