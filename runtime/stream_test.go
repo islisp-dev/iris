@@ -189,3 +189,16 @@ func TestReadChar(t *testing.T) {
 		},
 	})
 }
+
+func TestPreviewChar(t *testing.T) {
+	execTests(t, PreviewChar, []test{
+		{
+			exp: `
+			(let ((s (create-string-input-stream "foo")))
+				(list (preview-char s) (read-char s) (read-char s)))
+			`,
+			want:    `'(#\f #\f #\o)`,
+			wantErr: false,
+		},
+	})
+}
