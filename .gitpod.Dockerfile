@@ -10,7 +10,7 @@ RUN rm -rf $GOROOT && \
 # install VS Code Go tools from https://github.com/Microsoft/vscode-go/blob/0faec7e5a8a69d71093f08e035d33beb3ded8626/src/goInstallTools.ts#L19-L45
     go get -v \
         github.com/mdempsky/gocode \
-        github.com/uudashr/gopkgs/cmd/gopkgs@v2 \
+        github.com/uudashr/gopkgs/cmd/gopkgs \
         github.com/ramya-rao-a/go-outline \
         github.com/acroca/go-symbols \
         golang.org/x/tools/cmd/guru \
