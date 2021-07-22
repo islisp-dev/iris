@@ -390,8 +390,6 @@ func ReadLine(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.
 	return instance.NewString([]rune(string(v))), nil
 }
 
-// TODO: preview-char (Hint: Bufio.Rreader)
-
 func StreamReadyP(e env.Environment, inputStream ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// TODO: stream-ready-p
 	return T, nil
