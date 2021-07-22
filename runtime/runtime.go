@@ -163,7 +163,7 @@ func init() {
 	defun("GET-OUTPUT-STREAM-STRING", GetOutputStreamString)
 	// TODO defun2("GET-UNIVERSAL-TIME", GetUniversalTime)
 	defspecial("GO", Go)
-	// TODO defun2("IDENTITY", Identity)
+	defun("IDENTITY", Identity)
 	defspecial("IF", If)
 	// TODO defspecial2("IGNORE-ERRORS", IgnoreErrors)
 	defgeneric("INITIALIZE-OBJECT", InitializeObject) // TODO change generic function
