@@ -78,7 +78,7 @@ func Defclass(e env.Environment, className, scNames, slotSpecs ilos.Instance, cl
 				return SignalCondition(e, instance.NewArityError(e), Nil)
 			}
 		}
-		supers = append(supers, super.(ilos.Class))
+		supers = append(supers, super)
 	}
 	slots := []ilos.Instance{}
 	initforms := map[ilos.Instance]ilos.Instance{}

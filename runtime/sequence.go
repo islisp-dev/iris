@@ -177,6 +177,9 @@ func MapInto(e env.Environment, destination, function ilos.Instance, sequences .
 	}
 	for _, seq := range sequences {
 		len, err := Length(e, seq)
+		if err != nil {
+			return nil, err
+		}
 		min, err = Min(e, min, len)
 		if err != nil {
 			return nil, err
