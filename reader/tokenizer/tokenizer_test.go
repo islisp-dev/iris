@@ -12,12 +12,18 @@ import (
 )
 
 func TestTokenizer_Next(t *testing.T) {
-	tokenizer := NewReader(strings.NewReader(`("\\""\"foo\"" | foo \| bar |)`))
+	tokenizer := NewReader(strings.NewReader(`
+	;foo
+	("\\""\"foo\"" | foo \| bar |)`))
 	tests := []struct {
 		name  string
 		want  string
 		want1 ilos.Instance
 	}{
+		{
+			name: "comment",
+			want: ";foo\n",
+		},
 		{
 			name: "start",
 			want: "(",
