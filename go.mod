@@ -1,3 +1,3 @@
 module github.com/islisp-dev/iris
 
-go 1.15
+go 1.13
