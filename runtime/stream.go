@@ -5,7 +5,6 @@
 package runtime
 
 import (
-	"bufio"
 	"bytes"
 	"os"
 	"strings"
@@ -384,14 +383,14 @@ func PreviewChar(e env.Environment, options ...ilos.Instance) (ilos.Instance, il
 		}
 	}
 	//v, _, err := bufio.NewReader(s.(instance.Stream).Reader).ReadRune()
-	v, _, err := s.(instance.Stream).PeekRune()
+	bytes, err := s.(instance.Stream).Peek(1)
 	if err != nil {
 		if eosErrorP {
 			return nil, instance.Create(e, class.EndOfStream)
 		}
 		return eosValue, nil
 	}
-	return instance.NewCharacter(v), nil
+	return instance.NewCharacter(rune(bytes[0])), nil
 }
 
 func ReadLine(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.Instance) {
@@ -414,7 +413,7 @@ func ReadLine(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.
 			eosValue = options[2]
 		}
 	}
-	v, _, err := bufio.NewReader(s.(instance.Stream)).ReadLine()
+	v, _, err := s.(instance.Stream).ReadLine()
 	if err != nil {
 		if eosErrorP {
 			return nil, instance.Create(e, class.EndOfStream)

@@ -1,8 +1,6 @@
 package runtime
 
 import (
-	"fmt"
-
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/class"
@@ -33,9 +31,8 @@ func ReadByte(e env.Environment, args ...ilos.Instance) (ilos.Instance, ilos.Ins
 		return SignalCondition(e, instance.NewArityError(e), Nil)
 	}
 	buf := make([]byte, 1)
-	n, err := str.(instance.Stream).Reader.Raw.Read(buf)
+	n, err := str.(instance.Stream).Reader.Read(buf)
 
-	fmt.Printf("%v, %v|", n, err)
 	if n != 1 || err != nil {
 		if eosErrorP {
 			return nil, instance.Create(e, class.EndOfStream)
