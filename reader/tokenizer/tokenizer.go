@@ -117,6 +117,11 @@ func (r *Reader) Next() (string, error) {
 					r.ReadRune()
 					continue
 				}
+				if len(buf) == 1 && (ru == 'b' || ru == 'B' || ru == 'o' || ru == 'O' || ru == 'x' || ru == 'X') {
+					buf += string(ru)
+					r.ReadRune()
+					continue
+				}
 				if matched, _ := regexp.MatchString(`^#[0123456789]*$`, buf+string(ru)); matched {
 					buf += string(ru)
 					r.ReadRune()
