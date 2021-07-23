@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
@@ -65,7 +66,7 @@ func FormatInteger(e env.Environment, stream, object, radix ilos.Instance) (ilos
 	}
 	i := int(object.(instance.Integer))
 	r := int(radix.(instance.Integer))
-	fmt.Fprint(stream.(instance.Stream), strconv.FormatInt(int64(i), r))
+	fmt.Fprint(stream.(instance.Stream), strings.ToUpper(strconv.FormatInt(int64(i), r)))
 	return Nil, nil
 }
 

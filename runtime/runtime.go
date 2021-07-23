@@ -19,9 +19,9 @@ func TopLevelHander(e env.Environment, c ilos.Instance) (ilos.Instance, ilos.Ins
 }
 
 var TopLevel = env.NewEnvironment(
-	instance.NewStream(os.Stdin, nil),
-	instance.NewStream(nil, os.Stdout),
-	instance.NewStream(nil, os.Stderr),
+	instance.NewStream(os.Stdin, nil, class.Character),
+	instance.NewStream(nil, os.Stdout, class.Character),
+	instance.NewStream(nil, os.Stderr, class.Character),
 	instance.NewFunction(instance.NewSymbol("TOP-LEVEL-HANDLER"), TopLevelHander),
 )
 
@@ -212,7 +212,7 @@ func init() {
 	defspecial("QUOTE", Quote)
 	defun("QUOTIENT", Quotient)
 	defun("READ", Read)
-	// TODO defun2("READ-BYTE", ReadByte)
+	defun("READ-BYTE", ReadByte)
 	defun("READ-CHAR", ReadChar)
 	defun("READ-LINE", ReadLine)
 	defun("REMOVE-PROPERTY", RemoveProperty)
@@ -277,8 +277,7 @@ func init() {
 	defspecial("WITH-OPEN-OUTPUT-FILE", WithOpenOutputFile)
 	defspecial("WITH-STANDARD-INPUT", WithStandardInput)
 	defspecial("WITH-STANDARD-OUTPUT", WithStandardOutput)
-	// TODO defun2("WRITE-BYTE", WriteByte)
-
+	defun("WRITE-BYTE", WriteByte)
 	defclass("<OBJECT>", class.Object)
 	defclass("<BUILT-IN-CLASS>", class.BuiltInClass)
 	defclass("<STANDARD-CLASS>", class.StandardClass)

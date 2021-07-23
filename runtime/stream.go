@@ -91,7 +91,6 @@ func WithErrorOutput(e env.Environment, streamForm ilos.Instance, forms ...ilos.
 }
 
 func OpenInputFile(e env.Environment, filename ilos.Instance, elementClass ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	// TODO: elementClass
 	if ok, _ := Stringp(e, filename); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, filename, class.String), Nil)
 	}
@@ -99,11 +98,17 @@ func OpenInputFile(e env.Environment, filename ilos.Instance, elementClass ...il
 	if err != nil {
 		return SignalCondition(e, instance.NewStreamError(e), Nil)
 	}
-	return instance.NewStream(file, nil), nil
+	var ec ilos.Instance
+	if len(elementClass) == 0 {
+		ec = class.Character
+	}
+	if len(elementClass) == 1 {
+		ec = elementClass[0]
+	}
+	return instance.NewStream(file, nil, ec), nil
 }
 
 func OpenOutputFile(e env.Environment, filename ilos.Instance, elementClass ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	// TODO: elementClass
 	if ok, _ := Stringp(e, filename); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, filename, class.String), Nil)
 	}
@@ -118,11 +123,17 @@ func OpenOutputFile(e env.Environment, filename ilos.Instance, elementClass ...i
 			return SignalCondition(e, instance.NewStreamError(e), Nil)
 		}
 	}
-	return instance.NewStream(nil, file), nil
+	var ec ilos.Instance
+	if len(elementClass) == 0 {
+		ec = class.Character
+	}
+	if len(elementClass) == 1 {
+		ec = elementClass[0]
+	}
+	return instance.NewStream(nil, file, ec), nil
 }
 
 func OpenIoFile(e env.Environment, filename ilos.Instance, elementClass ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	// TODO: elementClass
 	if ok, _ := Stringp(e, filename); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, filename, class.String), Nil)
 	}
@@ -130,7 +141,14 @@ func OpenIoFile(e env.Environment, filename ilos.Instance, elementClass ...ilos.
 	if err != nil {
 		return SignalCondition(e, instance.NewStreamError(e), Nil)
 	}
-	return instance.NewStream(file, file), nil
+	var ec ilos.Instance
+	if len(elementClass) == 0 {
+		ec = class.Character
+	}
+	if len(elementClass) == 1 {
+		ec = elementClass[0]
+	}
+	return instance.NewStream(file, file, ec), nil
 }
 
 func WithOpenInputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
@@ -238,11 +256,11 @@ func FlushOutput(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.I
 }
 
 func CreateStringInputStream(e env.Environment, str ilos.Instance) (ilos.Instance, ilos.Instance) {
-	return instance.NewStream(strings.NewReader(string(str.(instance.String))), nil), nil
+	return instance.NewStream(strings.NewReader(string(str.(instance.String))), nil, class.Character), nil
 }
 
 func CreateStringOutputStream(e env.Environment) (ilos.Instance, ilos.Instance) {
-	return instance.NewStream(nil, new(bytes.Buffer)), nil
+	return instance.NewStream(nil, new(bytes.Buffer), class.Character), nil
 }
 
 func GetOutputStreamString(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instance) {

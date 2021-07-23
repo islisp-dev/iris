@@ -13,16 +13,17 @@ import (
 )
 
 type Stream struct {
-	Column *int
-	Reader *tokenizer.Reader
-	Writer io.Writer
+	Column       *int
+	ElementClass ilos.Instance
+	Reader       *tokenizer.Reader
+	Writer       io.Writer
 }
 
-func NewStream(r io.Reader, w io.Writer) ilos.Instance {
+func NewStream(r io.Reader, w io.Writer, e ilos.Instance) ilos.Instance {
 	if r == nil {
-		return Stream{new(int), nil, w}
+		return Stream{new(int), e, nil, w}
 	}
-	return Stream{new(int), tokenizer.NewReader(r), w}
+	return Stream{new(int), e, tokenizer.NewReader(r), w}
 }
 
 func (Stream) Class() ilos.Class {
