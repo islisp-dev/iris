@@ -5,6 +5,7 @@
 package instance
 
 import (
+	"bufio"
 	"io"
 	"strings"
 
@@ -12,18 +13,24 @@ import (
 	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
+type BufferedWriter struct {
+	Raw io.Writer
+	*bufio.Writer
+}
+
+func NewBufferedWriter(w io.Writer) *BufferedWriter {
+	return &BufferedWriter{w, bufio.NewWriter(w)}
+}
+
 type Stream struct {
 	Column       *int
 	ElementClass ilos.Instance
-	Reader       *tokenizer.Reader
-	Writer       io.Writer
+	*tokenizer.Reader
+	*BufferedWriter
 }
 
 func NewStream(r io.Reader, w io.Writer, e ilos.Instance) ilos.Instance {
-	if r == nil {
-		return Stream{new(int), e, nil, w}
-	}
-	return Stream{new(int), e, tokenizer.NewReader(r), w}
+	return Stream{new(int), e, tokenizer.NewReader(r), NewBufferedWriter(w)}
 }
 
 func (Stream) Class() ilos.Class {
@@ -40,10 +47,6 @@ func (s Stream) Write(p []byte) (n int, err error) {
 	return s.Writer.Write(p)
 }
 
-func (s Stream) Read(p []byte) (n int, err error) {
-	return s.Reader.Read(p)
-}
-
 func (Stream) String() string {
-	return "#<INPUT-STREAM>"
+	return "#<STREAM>"
 }

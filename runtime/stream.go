@@ -29,14 +29,14 @@ func OpenStreamP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Inst
 }
 
 func InputStreamP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if s, ok := obj.(instance.Stream); ok && s.Reader != nil {
+	if s, ok := obj.(instance.Stream); ok && s.Reader.Raw != nil {
 		return T, nil
 	}
 	return Nil, nil
 }
 
 func OutputStreamP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if s, ok := obj.(instance.Stream); ok && s.Writer != nil {
+	if s, ok := obj.(instance.Stream); ok && s.BufferedWriter.Raw != nil {
 		return T, nil
 	}
 	return Nil, nil
@@ -113,15 +113,9 @@ func OpenOutputFile(e env.Environment, filename ilos.Instance, elementClass ...i
 		return SignalCondition(e, instance.NewDomainError(e, filename, class.String), Nil)
 	}
 	rawFilename := string(filename.(instance.String))
-	var file *os.File
-	if _, err := os.Stat(rawFilename); os.IsNotExist(err) {
-		if file, err = os.Create(rawFilename); err != nil {
-			return SignalCondition(e, instance.NewStreamError(e), Nil)
-		}
-	} else {
-		if file, err = os.Open(string(filename.(instance.String))); err != nil {
-			return SignalCondition(e, instance.NewStreamError(e), Nil)
-		}
+	file, err := os.Create(rawFilename)
+	if err != nil {
+		return SignalCondition(e, instance.NewStreamError(e), Nil)
 	}
 	var ec ilos.Instance
 	if len(elementClass) == 0 {
@@ -213,17 +207,25 @@ func WithOpenIoFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Ins
 	if ok, _ := Consp(e, fileSpec); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, fileSpec, class.Cons), Nil)
 	}
-	n, err := Car(e, fileSpec)
+	car, err := Car(e, fileSpec)
 	if err != nil {
 		return nil, err
 	}
-	s, err := OpenIoFile(e, n)
+	cdr, err := Cdr(e, fileSpec)
 	if err != nil {
 		return nil, err
 	}
-	e.Variable.Define(n, s)
+	cadr, err := Car(e, cdr)
+	if err != nil {
+		return nil, err
+	}
+	s, err := OpenIoFile(e, cadr)
+	if err != nil {
+		return nil, err
+	}
+	e.Variable.Define(car, cadr)
 	r, err := Progn(e, forms...)
-	e.Variable.Delete(n)
+	e.Variable.Delete(car)
 	if _, err := Close(e, s); err != nil {
 		return nil, err
 	}
@@ -235,11 +237,24 @@ func Close(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instanc
 	if ok, _ := Streamp(e, stream); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, stream, class.Stream), Nil)
 	}
-	if stream.(instance.Stream).Reader != nil {
-		stream.(instance.Stream).Reader.Raw.(*os.File).Close()
+	if stream.(instance.Stream).Reader.Raw != nil {
+		file, ok := stream.(instance.Stream).Reader.Raw.(*os.File)
+		if ok {
+			file.Close()
+		} else {
+			// Close is only for file pointer
+			return SignalCondition(e, instance.NewStreamError(e), Nil)
+		}
 	}
-	if stream.(instance.Stream).Writer != nil {
-		stream.(instance.Stream).Writer.(*os.File).Close()
+	if stream.(instance.Stream).BufferedWriter.Raw != nil {
+		file, ok := stream.(instance.Stream).BufferedWriter.Raw.(*os.File)
+		if ok {
+			stream.(instance.Stream).Flush()
+			file.Close()
+		} else {
+			// Close is only for file pointer
+			return SignalCondition(e, instance.NewStreamError(e), Nil)
+		}
 	}
 	return Nil, nil
 }
@@ -250,7 +265,7 @@ func FlushOutput(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.I
 		return SignalCondition(e, instance.NewDomainError(e, stream, class.Stream), Nil)
 	}
 	if stream.(instance.Stream).Writer != nil {
-		// Go does not provide Flush(). We should use bufio
+		stream.(instance.Stream).Writer.Flush()
 	}
 	return Nil, nil
 }
@@ -267,8 +282,9 @@ func GetOutputStreamString(e env.Environment, stream ilos.Instance) (ilos.Instan
 	if ok, _ := OutputStreamP(e, stream); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, stream, class.Stream), Nil)
 	}
-	out := instance.NewString([]rune(stream.(instance.Stream).Writer.(*bytes.Buffer).String()))
-	stream.(instance.Stream).Writer.(*bytes.Buffer).Reset()
+	stream.(instance.Stream).Flush()
+	out := instance.NewString([]rune(stream.(instance.Stream).BufferedWriter.Raw.(*bytes.Buffer).String()))
+	stream.(instance.Stream).BufferedWriter.Raw.(*bytes.Buffer).Reset()
 	return out, nil
 }
 
@@ -323,7 +339,7 @@ func ReadChar(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.
 		}
 	}
 	//v, _, err := bufio.NewReader(s.(instance.Stream).Reader).ReadRune()
-	v, _, err := s.(instance.Stream).Reader.ReadRune()
+	v, _, err := s.(instance.Stream).ReadRune()
 	if err != nil {
 		if eosErrorP {
 			return nil, instance.Create(e, class.EndOfStream)
@@ -368,7 +384,7 @@ func PreviewChar(e env.Environment, options ...ilos.Instance) (ilos.Instance, il
 		}
 	}
 	//v, _, err := bufio.NewReader(s.(instance.Stream).Reader).ReadRune()
-	v, _, err := s.(instance.Stream).Reader.PeekRune()
+	v, _, err := s.(instance.Stream).PeekRune()
 	if err != nil {
 		if eosErrorP {
 			return nil, instance.Create(e, class.EndOfStream)
@@ -398,7 +414,7 @@ func ReadLine(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.
 			eosValue = options[2]
 		}
 	}
-	v, _, err := bufio.NewReader(s.(instance.Stream).Reader).ReadLine()
+	v, _, err := bufio.NewReader(s.(instance.Stream)).ReadLine()
 	if err != nil {
 		if eosErrorP {
 			return nil, instance.Create(e, class.EndOfStream)
