@@ -202,6 +202,7 @@ func init() {
 	defun("OPEN-OUTPUT-FILE", OpenOutputFile)
 	defun("OPEN-STREAM-P", OpenStreamP)
 	defspecial("OR", Or)
+	defun("FLUSH-OUTPUT", FlushOutput)
 	defun("OUTPUT-STREAM-P", OutputStreamP)
 	defun("PARSE-NUMBER", ParseNumber)
 	defun("PREVIEW-CHAR", PreviewChar)
