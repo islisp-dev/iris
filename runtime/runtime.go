@@ -7,12 +7,15 @@ package runtime
 import (
 	"math"
 	"os"
+	"time"
 
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
+
+var Time time.Time
 
 func TopLevelHander(e env.Environment, c ilos.Instance) (ilos.Instance, ilos.Instance) {
 	return nil, c
@@ -136,7 +139,7 @@ func init() {
 	defun("EXPT", Expt)
 	// TODO defun2("FILE-LENGTH", FileLength)
 	// TODO defun2("FILE-POSITION", FilePosition)
-	// TODO defun2("FINISH-OUTPUT", FinishOutput)
+	defun("FINISH-OUTPUT", FinishOutput)
 	defspecial("FLET", Flet)
 	defun("FLOAT", Float)
 	defun("FLOATP", Floatp)
@@ -156,12 +159,12 @@ func init() {
 	defun("GCD", Gcd)
 	defun("GENERAL-ARRAY*-P", GeneralArrayStarP)
 	defun("GENERAL-VECTOR-P", GeneralVectorP)
-	// TODO defun2("GENERIC-FUNCTION-P", GenericFunctionP)
+	defun("GENERIC-FUNCTION-P", GenericFunctionP)
 	defun("GENSYM", Gensym)
-	// TODO defun2("GET-INTERNAL-REAL-TIME", GetInternalRealTime)
-	// TODO defun2("GET-INTERNAL-RUN-TIME", GetInternalRunTime)
+	defun("GET-INTERNAL-REAL-TIME", GetInternalRealTime)
+	defun("GET-INTERNAL-RUN-TIME", GetInternalRunTime)
 	defun("GET-OUTPUT-STREAM-STRING", GetOutputStreamString)
-	// TODO defun2("GET-UNIVERSAL-TIME", GetUniversalTime)
+	defun("GET-UNIVERSAL-TIME", GetUniversalTime)
 	defspecial("GO", Go)
 	defun("IDENTITY", Identity)
 	defspecial("IF", If)
@@ -170,7 +173,7 @@ func init() {
 	defun("INPUT-STREAM-P", InputStreamP)
 	defun("INSTANCEP", Instancep)
 	defun("INTEGERP", Integerp)
-	// TODO defun2("INTERNAL-TIME-UNITS-PER-SECOND", InternalTimeUnitsPerSecond)
+	defun("INTERNAL-TIME-UNITS-PER-SECOND", InternalTimeUnitsPerSecond)
 	defun("ISQRT", Isqrt)
 	defspecial("LABELS", Labels)
 	defspecial("LAMBDA", Lambda)
@@ -202,7 +205,7 @@ func init() {
 	defun("OPEN-OUTPUT-FILE", OpenOutputFile)
 	defun("OPEN-STREAM-P", OpenStreamP)
 	defspecial("OR", Or)
-	defun("FLUSH-OUTPUT", FlushOutput)
+	// defun("FLUSH-OUTPUT", FlushOutput)
 	defun("OUTPUT-STREAM-P", OutputStreamP)
 	defun("PARSE-NUMBER", ParseNumber)
 	defun("PREVIEW-CHAR", PreviewChar)
@@ -318,4 +321,5 @@ func init() {
 	defclass("<STORAGE-EXHAUSTED>", class.StorageExhausted)
 	defclass("<STANDARD-OBJECT>", class.StandardObject)
 	defclass("<STREAM>", class.Stream)
+	Time = time.Now()
 }

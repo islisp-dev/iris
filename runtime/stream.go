@@ -258,7 +258,7 @@ func Close(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instanc
 	return Nil, nil
 }
 
-func FlushOutput(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
+func FinishOutput(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// It works on file or std stream.
 	if ok, _ := Streamp(e, stream); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, stream, class.Stream), Nil)
