@@ -1,6 +1,8 @@
 package runtime
 
 import (
+	"fmt"
+
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/class"
@@ -33,6 +35,7 @@ func ReadByte(e env.Environment, args ...ilos.Instance) (ilos.Instance, ilos.Ins
 	buf := make([]byte, 1)
 	n, err := str.(instance.Stream).Reader.Raw.Read(buf)
 
+	fmt.Printf("%v, %v|", n, err)
 	if n != 1 || err != nil {
 		if eosErrorP {
 			return nil, instance.Create(e, class.EndOfStream)
@@ -42,15 +45,20 @@ func ReadByte(e env.Environment, args ...ilos.Instance) (ilos.Instance, ilos.Ins
 	return instance.NewInteger(int(buf[0])), nil
 }
 
-func WriteByte(e env.Environment, args ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if len(args) != 2 {
-		return SignalCondition(e, instance.NewArityError(e), Nil)
+func WriteByte(e env.Environment, obj, str ilos.Instance) (ilos.Instance, ilos.Instance) {
+	s, ok := str.(instance.Stream)
+	if !ok {
+		return SignalCondition(e, instance.NewDomainError(e, s, class.Stream), Nil)
 	}
-	str := args[0].(instance.Stream).Writer
-	buf := []byte{byte(args[1].(instance.Integer))}
-	n, err := str.Write(buf)
-	if n != 1 || err != nil {
+
+	n, ok := obj.(instance.Integer)
+	if !ok {
+		return SignalCondition(e, instance.NewDomainError(e, s, class.Integer), Nil)
+	}
+
+	b := byte(n)
+	if err := s.WriteByte(b); err != nil {
 		return SignalCondition(e, instance.NewStreamError(e), Nil)
 	}
-	return instance.NewInteger(int(buf[0])), nil
+	return instance.NewInteger(int(b)), nil
 }
