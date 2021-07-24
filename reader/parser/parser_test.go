@@ -160,7 +160,7 @@ func Test_parseAtom(t *testing.T) {
 				t.Errorf("parseAtom() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if reflect.DeepEqual(got, tt.want) {
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("parseAtom() = %v, want %v", got, tt.want)
 			}
 		})

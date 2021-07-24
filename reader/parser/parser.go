@@ -85,7 +85,7 @@ func ParseAtom(tok *tokenizer.Token) (ilos.Instance, ilos.Instance) {
 	re += `[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*|`
 	re += `)$`
 	if m, _ := regexp.MatchString(re, str); m {
-		return instance.NewSymbol(strings.ToUpper(str), tok.Line, tok.Column), nil
+		return instance.NewSymbol(strings.ToUpper(str)), nil
 	}
 	return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil),
 		class.ParseError,
@@ -133,7 +133,7 @@ func parseMacro(tok *tokenizer.Token, t *tokenizer.Reader) (ilos.Instance, ilos.
 	case "`":
 		n = "QUASIQUOTE"
 	}
-	m := instance.NewSymbol(n, tok.Line, tok.Column)
+	m := instance.NewSymbol(n)
 	return instance.NewCons(m, instance.NewCons(cdr, instance.Nil)), nil
 }
 func parseCons(t *tokenizer.Reader) (ilos.Instance, ilos.Instance) {

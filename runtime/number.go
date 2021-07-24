@@ -8,6 +8,7 @@ import (
 	"math"
 
 	"github.com/islisp-dev/iris/reader/parser"
+	"github.com/islisp-dev/iris/reader/tokenizer"
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/class"
@@ -32,7 +33,7 @@ func ParseNumber(e env.Environment, str ilos.Instance) (ilos.Instance, ilos.Inst
 	if err := ensure(e, class.String, str); err != nil {
 		return nil, err
 	}
-	ret, err := parser.ParseAtom(string(str.(instance.String)))
+	ret, err := parser.ParseAtom(tokenizer.NewToken(string(str.(instance.String)), -1, -1))
 	if err != nil || !ilos.InstanceOf(class.Number, ret) {
 		return SignalCondition(e, instance.NewParseError(e, str, class.Number), Nil)
 	}
