@@ -39,7 +39,7 @@ func Cerror(e core.Environment, continueString, errorString core.Instance, objs 
 	return SignalCondition(e, condition, continuable)
 }
 
-func Error(e core.Environment, continueString, errorString core.Instance, objs ...core.Instance) (core.Instance, core.Instance) {
+func Error(e core.Environment, errorString core.Instance, objs ...core.Instance) (core.Instance, core.Instance) {
 	arguments, err := List(e, objs...)
 	if err != nil {
 		return nil, err
