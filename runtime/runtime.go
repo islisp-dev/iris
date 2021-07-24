@@ -168,7 +168,7 @@ func init() {
 	defspecial("GO", Go)
 	defun("IDENTITY", Identity)
 	defspecial("IF", If)
-	// TODO defspecial2("IGNORE-ERRORS", IgnoreErrors)
+	defspecial("IGNORE-ERRORS", IgnoreErrors)
 	defgeneric("INITIALIZE-OBJECT", InitializeObject) // TODO change generic function
 	defun("INPUT-STREAM-P", InputStreamP)
 	defun("INSTANCEP", Instancep)

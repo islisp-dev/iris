@@ -53,7 +53,7 @@ func Error(e env.Environment, continueString, errorString ilos.Instance, objs ..
 	return SignalCondition(e, condition, Nil)
 }
 
-func IgnoreError(e env.Environment, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func IgnoreErrors(e env.Environment, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	ret, err := Progn(e, forms...)
 	if err != nil && ilos.InstanceOf(class.Error, err) {
 		return Nil, nil
