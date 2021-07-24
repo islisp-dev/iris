@@ -147,9 +147,9 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 	if DeepEqual(f.methodCombination, Nil) {
 		var callNextMethod func(e Environment) (Instance, Instance) // To Recursive
 		callNextMethod = func(e Environment) (Instance, Instance) { // CALL-NEXT-METHOD
-			depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS/DEPTH"))           // Get previous depth
+			depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS.DEPTH"))           // Get previous depth
 			index := int(depth.(Integer)) + 1                                    // Get index of next method
-			e.DynamicVariable.Define(NewSymbol("IRIS/DEPTH"), NewInteger(index)) // Set current depth
+			e.DynamicVariable.Define(NewSymbol("IRIS.DEPTH"), NewInteger(index)) // Set current depth
 			// If Generic Function has no next-mehtods,  NEXT-METHOD-P e function returns nil
 			e.Function.Define(NewSymbol("NEXT-METHOD-P"), NewFunction(NewSymbol("NEXT-METHOD-P"), nextMethodPisNil))
 			if int(depth.(Integer))+1 < len(methods) { // If Generic Function has next method, set these functionss
@@ -158,7 +158,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 			}
 			return methods[index].function.Apply(e, arguments...) // Call next method
 		}
-		e.DynamicVariable.Define(NewSymbol("IRIS/DEPTH"), NewInteger(0)) // Set current depth
+		e.DynamicVariable.Define(NewSymbol("IRIS.DEPTH"), NewInteger(0)) // Set current depth
 		// If Generic Function has no next-mehtods,  NEXT-METHOD-P e function returns nil
 		e.Function.Define(NewSymbol("NEXT-METHOD-P"), NewFunction(NewSymbol("NEXT-METHOD-P"), nextMethodPisNil))
 		if 1 < len(methods) { // If Generic Function has next method, set these functionss
@@ -175,10 +175,10 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 			// This callNextMethod is called in :around methods
 			var callNextMethod func(e Environment) (Instance, Instance)
 			callNextMethod = func(e Environment) (Instance, Instance) {
-				depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS/DEPTH")) // Get previous depth
+				depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS.DEPTH")) // Get previous depth
 				for index, method := range methods[:int(depth.(Integer))+1] {
 					if DeepEqual(method.qualifier, around) { // If have :around method
-						e.DynamicVariable.Define(NewSymbol("IRIS/DEPTH"), NewInteger(index)) // Set Current depth
+						e.DynamicVariable.Define(NewSymbol("IRIS.DEPTH"), NewInteger(index)) // Set Current depth
 						// If Generic Function has no next-mehtods,  NEXT-METHOD-P e function returns nil
 						e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisNil)
 						{ // If Generic Function has next method, set these functionss
@@ -207,13 +207,13 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 				// this callNextMethod is called in primary methods
 				var callNextMethod func(e Environment) (Instance, Instance)
 				callNextMethod = func(e Environment) (Instance, Instance) {
-					depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS/DEPTH")) // Get previous depth
+					depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS.DEPTH")) // Get previous depth
 					index := int(depth.(Integer))                              // Convert depth to integer
 					{
 						width := len(methods) - index - 1
 						test := func(i int) bool { return DeepEqual(methods[index+i+1].qualifier, nil) }
 						index = sort.Search(width, test)                                     // Get index of next mehotd
-						e.DynamicVariable.Define(NewSymbol("IRIS/DEPTH"), NewInteger(index)) // Set current depth
+						e.DynamicVariable.Define(NewSymbol("IRIS.DEPTH"), NewInteger(index)) // Set current depth
 					}
 					// If Generic Function has no next-mehtods,  NEXT-METHOD-P e function returns nil
 					e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisNil)
@@ -232,7 +232,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 					width := len(methods) - index - 1
 					test := func(i int) bool { return DeepEqual(methods[index+i+1].qualifier, nil) }
 					index = sort.Search(width, test)
-					e.DynamicVariable.Define(NewSymbol("IRIS/DEPTH"), NewInteger(index))
+					e.DynamicVariable.Define(NewSymbol("IRIS.DEPTH"), NewInteger(index))
 				}
 				// If Generic Function has no next-mehtods,  NEXT-METHOD-P e function returns nil
 				e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisNil)
@@ -259,7 +259,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 				}
 				return ret, err
 			}
-			e.DynamicVariable.Define(NewSymbol("IRIS/DEPTH"), NewInteger(index)) // Set Current depth
+			e.DynamicVariable.Define(NewSymbol("IRIS.DEPTH"), NewInteger(index)) // Set Current depth
 			// If Generic Function has no next-mehtods,  NEXT-METHOD-P e function returns nil
 			e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisNil)
 			{ // If Generic Function has next method, set these functionss
@@ -277,14 +277,14 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 		// This callNextMethod is called in primary methods
 		var callNextMethod func(e Environment) (Instance, Instance)
 		callNextMethod = func(e Environment) (Instance, Instance) {
-			depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS/DEPTH")) // Get previous depth
+			depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS.DEPTH")) // Get previous depth
 			index := int(depth.(Integer))                              // Convert depth to integer
 			{
 				test := func(i int) bool { return DeepEqual(methods[index+i+1].qualifier, nil) }
 				width := len(methods) - index - 1
 				index = sort.Search(width, test)
 			}
-			e.DynamicVariable.Define(NewSymbol("IRIS/DEPTH"), NewInteger(index)) // Set Current depth
+			e.DynamicVariable.Define(NewSymbol("IRIS.DEPTH"), NewInteger(index)) // Set Current depth
 			// If Generic Function has no next-mehtods,  NEXT-METHOD-P e function returns nil
 			e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisNil)
 			{ // If Generic Function has next method, set these functionss
@@ -310,7 +310,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 			test := func(i int) bool { return DeepEqual(methods[i].qualifier, nil) }
 			width := len(methods)
 			index := sort.Search(width, test)
-			e.DynamicVariable.Define(NewSymbol("IRIS/DEPTH"), NewInteger(index))
+			e.DynamicVariable.Define(NewSymbol("IRIS.DEPTH"), NewInteger(index))
 			if index == len(methods) {
 				return nil, NewUndefinedFunction(e, f.funcSpec)
 			}
