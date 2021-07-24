@@ -194,5 +194,7 @@ func Format(e core.Environment, stream, formatString core.Instance, formatArgume
 		}
 		start = end
 	}
-	return FormatObject(e, stream, core.NewString([]rune(str[start:])), Nil)
+	r, err := FormatObject(e, stream, core.NewString([]rune(str[start:])), Nil)
+	stream.(core.Stream).Flush()
+	return r, err
 }

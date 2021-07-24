@@ -22,7 +22,7 @@ func Dynamic(e core.Environment, var1 core.Instance) (core.Instance, core.Instan
 	if v, ok := e.DynamicVariable.Get(var1); ok {
 		return v, nil
 	}
-	return SignalCondition(e, core.NewUndefinedVariable(e, var1), Nil)
+	return SignalCondition(e, core.NewUnboundVariable(e, var1), Nil)
 }
 
 // SetDynamic denotes an assignment to a dynamic variable. This form can appear
@@ -45,7 +45,7 @@ func SetDynamic(e core.Environment, form, var1 core.Instance) (core.Instance, co
 	if e.DynamicVariable.Set(var1, form) {
 		return form, nil
 	}
-	return SignalCondition(e, core.NewUndefinedVariable(e, var1), Nil)
+	return SignalCondition(e, core.NewUnboundVariable(e, var1), Nil)
 }
 
 // DynamicLet is used to establish dynamic variable bindings. The first subform

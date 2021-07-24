@@ -198,7 +198,7 @@ func evalVariable(e core.Environment, obj core.Instance) (core.Instance, core.In
 	if val, ok := e.Constant.Get(obj); ok {
 		return val, nil
 	}
-	err := core.NewUndefinedVariable(e, obj)
+	err := core.NewUnboundVariable(e, obj)
 	return SignalCondition(e, err, Nil)
 }
 

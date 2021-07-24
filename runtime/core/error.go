@@ -37,10 +37,10 @@ func NewUndefinedFunction(e Environment, name Instance) Instance {
 		NewSymbol("IRIS.STACKTRACE"), NewCons(loc, Nil))
 }
 
-func NewUndefinedVariable(e Environment, name Instance) Instance {
+func NewUnboundVariable(e Environment, name Instance) Instance {
 	l, c := name.(Symbol).Location()
 	loc := NewCons(NewInteger(l), NewInteger(c))
-	return Create(e, UndefinedVariableClass,
+	return Create(e, UnboundVariableClass,
 		NewSymbol("NAME"), name,
 		NewSymbol("NAMESPACE"), NewSymbol("VARIABLE"),
 		NewSymbol("IRIS.STACKTRACE"), NewCons(loc, Nil))

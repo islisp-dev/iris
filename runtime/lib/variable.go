@@ -25,7 +25,7 @@ func Setq(e core.Environment, var1, form core.Instance) (core.Instance, core.Ins
 	if e.Variable.Set(var1, ret) {
 		return ret, nil
 	}
-	return SignalCondition(e, core.NewUndefinedVariable(e, var1), Nil)
+	return SignalCondition(e, core.NewUnboundVariable(e, var1), Nil)
 }
 
 func Setf(e core.Environment, var1, form core.Instance) (core.Instance, core.Instance) {

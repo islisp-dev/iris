@@ -54,6 +54,7 @@ func defglobal(name string, value core.Instance) {
 }
 
 func init() {
+	defun("EVAL", Eval) // This function is for verificaiton. DO NOT USE.
 	defglobal("*PI*", core.Float(math.Pi))
 	defglobal("*MOST-POSITIVE-FLOAT*", MostPositiveFloat)
 	defglobal("*MOST-NEGATIVE-FLOAT*", MostNegativeFloat)
@@ -311,7 +312,7 @@ func init() {
 	defclass("<PROGRAM-ERROR>", core.ProgramErrorClass)
 	defclass("<DOMAIN-ERROR>", core.DomainErrorClass)
 	defclass("<UNDEFINED-ENTITY>", core.UndefinedEntityClass)
-	defclass("<UNDEFINED-VARIABLE>", core.UndefinedVariableClass)
+	defclass("<UNBOUND-VARIABLE>", core.UnboundVariableClass)
 	defclass("<UNDEFINED-FUNCTION>", core.UndefinedFunctionClass)
 	defclass("<SIMPLE-ERROR>", core.SimpleErrorClass)
 	defclass("<STREAM-ERROR>", core.StreamErrorClass)
