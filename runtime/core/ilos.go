@@ -24,7 +24,7 @@ type Instance interface {
 	String() string
 }
 
-func DeepEqual(x, y Instance) bool {
+func DeepEqual(x, y interface{}) bool {
 	return reflect.DeepEqual(x, y) || cmp.Equal(x, y, cmp.AllowUnexported(BuiltInClass{}, StandardClass{}, Function{}))
 }
 

@@ -78,7 +78,7 @@ func (f *GenericFunction) AddMethod(qualifier, lambdaList Instance, classList []
 		}
 	}
 	for i := range f.methods {
-		if f.methods[i].qualifier == qualifier && reflect.DeepEqual(f.methods[i].classList, classList) {
+		if f.methods[i].qualifier == qualifier && DeepEqual(f.methods[i].classList, classList) {
 			f.methods[i].function = function.(Function)
 			return true
 		}

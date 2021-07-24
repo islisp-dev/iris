@@ -6,7 +6,6 @@ package core
 
 import (
 	"fmt"
-	"reflect"
 )
 
 // instance
@@ -70,7 +69,7 @@ func (i BasicInstance) Class() Class {
 }
 
 func (i BasicInstance) GetSlotValue(key Instance, class Class) (Instance, bool) {
-	if v, ok := i.slots[key]; ok && reflect.DeepEqual(i.class, class) {
+	if v, ok := i.slots[key]; ok && DeepEqual(i.class, class) {
 		return v, ok
 	}
 	for _, s := range i.supers {
@@ -82,7 +81,7 @@ func (i BasicInstance) GetSlotValue(key Instance, class Class) (Instance, bool) 
 }
 
 func (i BasicInstance) SetSlotValue(key Instance, value Instance, class Class) bool {
-	if reflect.DeepEqual(i.class, class) {
+	if DeepEqual(i.class, class) {
 		i.slots[key] = value
 		return true
 	}
