@@ -11,7 +11,6 @@ import (
 
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
@@ -22,9 +21,9 @@ func TopLevelHander(e env.Environment, c ilos.Instance) (ilos.Instance, ilos.Ins
 }
 
 var TopLevel = env.NewEnvironment(
-	instance.NewStream(os.Stdin, nil, class.Character),
-	instance.NewStream(nil, os.Stdout, class.Character),
-	instance.NewStream(nil, os.Stderr, class.Character),
+	instance.NewStream(os.Stdin, nil, instance.CharacterClass),
+	instance.NewStream(nil, os.Stdout, instance.CharacterClass),
+	instance.NewStream(nil, os.Stderr, instance.CharacterClass),
 	instance.NewFunction(instance.NewSymbol("TOP-LEVEL-HANDLER"), TopLevelHander),
 )
 
@@ -46,8 +45,8 @@ func defun(name string, function interface{}) {
 func defgeneric(name string, function interface{}) {
 	symbol := instance.NewSymbol(name)
 	lambdaList, _ := List(TopLevel, instance.NewSymbol("FIRST"), instance.NewSymbol("&REST"), instance.NewSymbol("REST"))
-	generic := instance.NewGenericFunction(symbol, lambdaList, T, class.GenericFunction)
-	generic.(*instance.GenericFunction).AddMethod(nil, lambdaList, []ilos.Class{class.StandardClass}, instance.NewFunction(symbol, function))
+	generic := instance.NewGenericFunction(symbol, lambdaList, T, instance.GenericFunctionClass)
+	generic.(*instance.GenericFunction).AddMethod(nil, lambdaList, []ilos.Class{instance.StandardClassClass}, instance.NewFunction(symbol, function))
 	TopLevel.Function.Define(symbol, generic)
 }
 
@@ -282,44 +281,44 @@ func init() {
 	defspecial("WITH-STANDARD-INPUT", WithStandardInput)
 	defspecial("WITH-STANDARD-OUTPUT", WithStandardOutput)
 	defun("WRITE-BYTE", WriteByte)
-	defclass("<OBJECT>", class.Object)
-	defclass("<BUILT-IN-CLASS>", class.BuiltInClass)
-	defclass("<STANDARD-CLASS>", class.StandardClass)
-	defclass("<BASIC-ARRAY>", class.BasicArray)
-	defclass("<BASIC-ARRAY-STAR>", class.BasicArrayStar)
-	defclass("<GENERAL-ARRAY-STAR>", class.GeneralArrayStar)
-	defclass("<BASIC-VECTOR>", class.BasicVector)
-	defclass("<GENERAL-VECTOR>", class.GeneralVector)
-	defclass("<STRING>", class.String)
-	defclass("<CHARACTER>", class.Character)
-	defclass("<FUNCTION>", class.Function)
-	defclass("<GENERIC-FUNCTION>", class.GenericFunction)
-	defclass("<STANDARD-GENERIC-FUNCTION>", class.StandardGenericFunction)
-	defclass("<LIST>", class.List)
-	defclass("<CONS>", class.Cons)
-	defclass("<NULL>", class.Null)
-	defclass("<SYMBOL>", class.Symbol)
-	defclass("<NUMBER>", class.Number)
-	defclass("<INTEGER>", class.Integer)
-	defclass("<FLOAT>", class.Float)
-	defclass("<SERIOUS-CONDITION>", class.SeriousCondition)
-	defclass("<ERROR>", class.Error)
-	defclass("<ARITHMETIC-ERROR>", class.ArithmeticError)
-	defclass("<DIVISION-BY-ZERO>", class.DivisionByZero)
-	defclass("<FLOATING-POINT-ONDERFLOW>", class.FloatingPointOnderflow)
-	defclass("<FLOATING-POINT-UNDERFLOW>", class.FloatingPointUnderflow)
-	defclass("<CONTROL-ERROR>", class.ControlError)
-	defclass("<PARSE-ERROR>", class.ParseError)
-	defclass("<PROGRAM-ERROR>", class.ProgramError)
-	defclass("<DOMAIN-ERROR>", class.DomainError)
-	defclass("<UNDEFINED-ENTITY>", class.UndefinedEntity)
-	defclass("<UNDEFINED-VARIABLE>", class.UndefinedVariable)
-	defclass("<UNDEFINED-FUNCTION>", class.UndefinedFunction)
-	defclass("<SIMPLE-ERROR>", class.SimpleError)
-	defclass("<STREAM-ERROR>", class.StreamError)
-	defclass("<END-OF-STREAM>", class.EndOfStream)
-	defclass("<STORAGE-EXHAUSTED>", class.StorageExhausted)
-	defclass("<STANDARD-OBJECT>", class.StandardObject)
-	defclass("<STREAM>", class.Stream)
+	defclass("<OBJECT>", instance.ObjectClass)
+	defclass("<BUILT-IN-CLASS>", instance.BuiltInClassClass)
+	defclass("<STANDARD-CLASS>", instance.StandardClassClass)
+	defclass("<BASIC-ARRAY>", instance.BasicArrayClass)
+	defclass("<BASIC-ARRAY-STAR>", instance.BasicArrayStarClass)
+	defclass("<GENERAL-ARRAY-STAR>", instance.GeneralArrayStarClass)
+	defclass("<BASIC-VECTOR>", instance.BasicVectorClass)
+	defclass("<GENERAL-VECTOR>", instance.GeneralVectorClass)
+	defclass("<STRING>", instance.StringClass)
+	defclass("<CHARACTER>", instance.CharacterClass)
+	defclass("<FUNCTION>", instance.FunctionClass)
+	defclass("<GENERIC-FUNCTION>", instance.GenericFunctionClass)
+	defclass("<STANDARD-GENERIC-FUNCTION>", instance.StandardGenericFunctionClass)
+	defclass("<LIST>", instance.ListClass)
+	defclass("<CONS>", instance.ConsClass)
+	defclass("<NULL>", instance.NullClass)
+	defclass("<SYMBOL>", instance.SymbolClass)
+	defclass("<NUMBER>", instance.NumberClass)
+	defclass("<INTEGER>", instance.IntegerClass)
+	defclass("<FLOAT>", instance.FloatClass)
+	defclass("<SERIOUS-CONDITION>", instance.SeriousConditionClass)
+	defclass("<ERROR>", instance.ErrorClass)
+	defclass("<ARITHMETIC-ERROR>", instance.ArithmeticErrorClass)
+	defclass("<DIVISION-BY-ZERO>", instance.DivisionByZeroClass)
+	defclass("<FLOATING-POINT-ONDERFLOW>", instance.FloatingPointOnderflowClass)
+	defclass("<FLOATING-POINT-UNDERFLOW>", instance.FloatingPointUnderflowClass)
+	defclass("<CONTROL-ERROR>", instance.ControlErrorClass)
+	defclass("<PARSE-ERROR>", instance.ParseErrorClass)
+	defclass("<PROGRAM-ERROR>", instance.ProgramErrorClass)
+	defclass("<DOMAIN-ERROR>", instance.DomainErrorClass)
+	defclass("<UNDEFINED-ENTITY>", instance.UndefinedEntityClass)
+	defclass("<UNDEFINED-VARIABLE>", instance.UndefinedVariableClass)
+	defclass("<UNDEFINED-FUNCTION>", instance.UndefinedFunctionClass)
+	defclass("<SIMPLE-ERROR>", instance.SimpleErrorClass)
+	defclass("<STREAM-ERROR>", instance.StreamErrorClass)
+	defclass("<END-OF-STREAM>", instance.EndOfStreamClass)
+	defclass("<STORAGE-EXHAUSTED>", instance.StorageExhaustedClass)
+	defclass("<STANDARD-OBJECT>", instance.StandardObjectClass)
+	defclass("<STREAM>", instance.StreamClass)
 	Time = time.Now()
 }

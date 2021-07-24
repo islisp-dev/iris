@@ -3,7 +3,6 @@ package runtime
 import (
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
@@ -13,7 +12,7 @@ func ReadByte(e env.Environment, args ...ilos.Instance) (ilos.Instance, ilos.Ins
 		str = args[0]
 	}
 	if ok, _ := InputStreamP(e, str); ok == Nil {
-		return SignalCondition(e, instance.NewDomainError(e, str, class.Stream), Nil)
+		return SignalCondition(e, instance.NewDomainError(e, str, instance.StreamClass), Nil)
 	}
 	eosErrorP := true
 	if len(args) > 1 {
@@ -35,7 +34,7 @@ func ReadByte(e env.Environment, args ...ilos.Instance) (ilos.Instance, ilos.Ins
 
 	if n != 1 || err != nil {
 		if eosErrorP {
-			return nil, instance.Create(e, class.EndOfStream)
+			return nil, instance.Create(e, instance.EndOfStreamClass)
 		}
 		return eosValue, nil
 	}
@@ -45,12 +44,12 @@ func ReadByte(e env.Environment, args ...ilos.Instance) (ilos.Instance, ilos.Ins
 func WriteByte(e env.Environment, obj, str ilos.Instance) (ilos.Instance, ilos.Instance) {
 	s, ok := str.(instance.Stream)
 	if !ok {
-		return SignalCondition(e, instance.NewDomainError(e, s, class.Stream), Nil)
+		return SignalCondition(e, instance.NewDomainError(e, s, instance.StreamClass), Nil)
 	}
 
 	n, ok := obj.(instance.Integer)
 	if !ok {
-		return SignalCondition(e, instance.NewDomainError(e, s, class.Integer), Nil)
+		return SignalCondition(e, instance.NewDomainError(e, s, instance.IntegerClass), Nil)
 	}
 
 	b := byte(n)

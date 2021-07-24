@@ -9,7 +9,6 @@ import (
 
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
@@ -32,7 +31,7 @@ func Setq(e env.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Inst
 }
 
 func Setf(e env.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(class.Symbol, var1) {
+	if ilos.InstanceOf(instance.SymbolClass, var1) {
 		return Setq(e, var1, form)
 	}
 	funcSpec := instance.NewSymbol(fmt.Sprintf("(SETF %v)", var1.(instance.List).Nth(0)))
@@ -59,11 +58,11 @@ func Setf(e env.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Inst
 // variable list.
 func Let(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	vfs := map[ilos.Instance]ilos.Instance{}
-	if err := ensure(e, class.List, varForm); err != nil {
+	if err := ensure(e, instance.ListClass, varForm); err != nil {
 		return nil, err
 	}
 	for _, cadr := range varForm.(instance.List).Slice() {
-		if err := ensure(e, class.List, cadr); err != nil {
+		if err := ensure(e, instance.ListClass, cadr); err != nil {
 			return nil, err
 		}
 		if cadr.(instance.List).Length() != 2 {
@@ -97,11 +96,11 @@ func Let(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (i
 // value of let* is the result of the evaluation of the last form of its body
 // (or nil if there is none).
 func LetStar(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.List, varForm); err != nil {
+	if err := ensure(e, instance.ListClass, varForm); err != nil {
 		return nil, err
 	}
 	for _, cadr := range varForm.(instance.List).Slice() {
-		if err := ensure(e, class.List, cadr); err != nil {
+		if err := ensure(e, instance.ListClass, cadr); err != nil {
 			return nil, err
 		}
 		if cadr.(instance.List).Length() != 2 {

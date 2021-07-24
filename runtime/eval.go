@@ -7,7 +7,6 @@ package runtime
 import (
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
@@ -16,7 +15,7 @@ func evalArguments(e env.Environment, arguments ilos.Instance) (ilos.Instance, i
 	if arguments == Nil {
 		return Nil, nil
 	}
-	if err := ensure(e, class.Cons, arguments); err != nil {
+	if err := ensure(e, instance.ConsClass, arguments); err != nil {
 		return nil, err
 	}
 	car := arguments.(*instance.Cons).Car // Checked there
@@ -35,7 +34,7 @@ func evalArguments(e env.Environment, arguments ilos.Instance) (ilos.Instance, i
 
 func evalLambda(e env.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// eval if lambda form
-	if ilos.InstanceOf(class.Cons, car) {
+	if ilos.InstanceOf(instance.ConsClass, car) {
 		caar := car.(*instance.Cons).Car // Checked at the top of// This sentence
 		if caar == instance.NewSymbol("LAMBDA") {
 			fun, err := Eval(e, car)
@@ -114,7 +113,7 @@ func evalFunction(e env.Environment, car, cdr ilos.Instance) (ilos.Instance, ilo
 }
 
 func evalCons(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.Cons, obj); err != nil {
+	if err := ensure(e, instance.ConsClass, obj); err != nil {
 		return nil, err
 	}
 	car := obj.(*instance.Cons).Car // Checked at the top of// This function
@@ -154,14 +153,14 @@ func Eval(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if obj == Nil {
 		return Nil, nil
 	}
-	if ilos.InstanceOf(class.Symbol, obj) {
+	if ilos.InstanceOf(instance.SymbolClass, obj) {
 		ret, err := evalVariable(e, obj)
 		if err != nil {
 			return nil, err
 		}
 		return ret, nil
 	}
-	if ilos.InstanceOf(class.Cons, obj) {
+	if ilos.InstanceOf(instance.ConsClass, obj) {
 		ret, err := evalCons(e, obj)
 		if err != nil {
 			return nil, err

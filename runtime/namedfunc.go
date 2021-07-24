@@ -7,12 +7,11 @@ package runtime
 import (
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 func checkLambdaList(e env.Environment, lambdaList ilos.Instance) ilos.Instance {
-	if err := ensure(e, class.List, lambdaList); err != nil {
+	if err := ensure(e, instance.ListClass, lambdaList); err != nil {
 		return err
 	}
 	for i, cadr := range lambdaList.(instance.List).Slice() {
@@ -28,7 +27,7 @@ func checkLambdaList(e env.Environment, lambdaList ilos.Instance) ilos.Instance 
 
 func newNamedFunction(e env.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lexical := e
-	if err := ensure(e, class.Symbol, functionName); err != nil {
+	if err := ensure(e, instance.SymbolClass, functionName); err != nil {
 		return nil, err
 	}
 	if err := checkLambdaList(e, lambdaList); err != nil {

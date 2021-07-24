@@ -13,7 +13,6 @@ import (
 	"github.com/islisp-dev/iris/reader/tokenizer"
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
@@ -88,9 +87,9 @@ func ParseAtom(tok *tokenizer.Token) (ilos.Instance, ilos.Instance) {
 		return instance.NewSymbol(strings.ToUpper(str)), nil
 	}
 	return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil),
-		class.ParseError,
+		instance.ParseErrorClass,
 		instance.NewSymbol("STRING"), instance.NewString([]rune(str)),
-		instance.NewSymbol("EXPECTED-CLASS"), class.Object)
+		instance.NewSymbol("EXPECTED-CLASS"), instance.ObjectClass)
 }
 
 func parseMacro(tok *tokenizer.Token, t *tokenizer.Reader) (ilos.Instance, ilos.Instance) {
@@ -108,9 +107,9 @@ func parseMacro(tok *tokenizer.Token, t *tokenizer.Reader) (ilos.Instance, ilos.
 			v, err = strconv.ParseInt(str[1:i], 10, 64)
 			if err != nil {
 				return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil),
-					class.ParseError,
+					instance.ParseErrorClass,
 					instance.NewSymbol("STRING"), instance.NewString([]rune(str)),
-					instance.NewSymbol("EXPECTED-CLASS"), class.Integer)
+					instance.NewSymbol("EXPECTED-CLASS"), instance.IntegerClass)
 			}
 		}
 		if int(v) == 1 {
@@ -165,13 +164,13 @@ func parseCons(t *tokenizer.Reader) (ilos.Instance, ilos.Instance) {
 func Parse(t *tokenizer.Reader) (ilos.Instance, ilos.Instance) {
 	tok, err := t.Next()
 	if err != nil {
-		return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil), class.EndOfStream)
+		return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil), instance.EndOfStreamClass)
 	}
 	str := tok.Str
 	for (len(str) > 2 && str[:2] == "#|") || str[:1] == ";" {
 		tok, err = t.Next()
 		if err != nil {
-			return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil), class.EndOfStream)
+			return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil), instance.EndOfStreamClass)
 		}
 		str = tok.Str
 	}

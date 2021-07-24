@@ -11,14 +11,13 @@ import (
 	"github.com/islisp-dev/iris/reader/tokenizer"
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // Numberp returns t if obj is a number (instance of class number); otherwise,
 // returns nil. The obj may be any ISLISP object.
 func Numberp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(class.Number, obj) {
+	if ilos.InstanceOf(instance.NumberClass, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -30,12 +29,12 @@ func Numberp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance
 // error shall be signaled if string is not the textual representation of a
 // number (error-id. cannot-parse-number).
 func ParseNumber(e env.Environment, str ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.String, str); err != nil {
+	if err := ensure(e, instance.StringClass, str); err != nil {
 		return nil, err
 	}
 	ret, err := parser.ParseAtom(tokenizer.NewToken(string(str.(instance.String)), -1, -1))
-	if err != nil || !ilos.InstanceOf(class.Number, ret) {
-		return SignalCondition(e, instance.NewParseError(e, str, class.Number), Nil)
+	if err != nil || !ilos.InstanceOf(instance.NumberClass, ret) {
+		return SignalCondition(e, instance.NewParseError(e, str, instance.NumberClass), Nil)
 	}
 	return ret, err
 }
@@ -46,18 +45,18 @@ func ParseNumber(e env.Environment, str ilos.Instance) (ilos.Instance, ilos.Inst
 // compares only the mathematical values of its arguments, whereas eql also
 // compares the representations
 func NumberEqual(e env.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.Number, x1, x2); err != nil {
+	if err := ensure(e, instance.NumberClass, x1, x2); err != nil {
 		return nil, err
 	}
 	ret := false
 	switch {
-	case ilos.InstanceOf(class.Integer, x1) && ilos.InstanceOf(class.Integer, x2):
+	case ilos.InstanceOf(instance.IntegerClass, x1) && ilos.InstanceOf(instance.IntegerClass, x2):
 		ret = x1 == x2
-	case ilos.InstanceOf(class.Integer, x1) && ilos.InstanceOf(class.Float, x2):
+	case ilos.InstanceOf(instance.IntegerClass, x1) && ilos.InstanceOf(instance.FloatClass, x2):
 		ret = float64(x1.(instance.Integer)) == float64(x2.(instance.Float))
-	case ilos.InstanceOf(class.Float, x1) && ilos.InstanceOf(class.Integer, x2):
+	case ilos.InstanceOf(instance.FloatClass, x1) && ilos.InstanceOf(instance.IntegerClass, x2):
 		ret = float64(x1.(instance.Float)) == float64(x2.(instance.Integer))
-	case ilos.InstanceOf(class.Float, x1) && ilos.InstanceOf(class.Float, x2):
+	case ilos.InstanceOf(instance.FloatClass, x1) && ilos.InstanceOf(instance.FloatClass, x2):
 		ret = x1 == x2
 	}
 	if ret {
@@ -79,18 +78,18 @@ func NumberNotEqual(e env.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilo
 
 // NumberGreaterThan returns t if x1 is greater than x2
 func NumberGreaterThan(e env.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.Number, x1, x2); err != nil {
+	if err := ensure(e, instance.NumberClass, x1, x2); err != nil {
 		return nil, err
 	}
 	ret := false
 	switch {
-	case ilos.InstanceOf(class.Integer, x1) && ilos.InstanceOf(class.Integer, x2):
+	case ilos.InstanceOf(instance.IntegerClass, x1) && ilos.InstanceOf(instance.IntegerClass, x2):
 		ret = float64(x1.(instance.Integer)) > float64(x2.(instance.Integer))
-	case ilos.InstanceOf(class.Integer, x1) && ilos.InstanceOf(class.Float, x2):
+	case ilos.InstanceOf(instance.IntegerClass, x1) && ilos.InstanceOf(instance.FloatClass, x2):
 		ret = float64(x1.(instance.Integer)) > float64(x2.(instance.Float))
-	case ilos.InstanceOf(class.Float, x1) && ilos.InstanceOf(class.Integer, x2):
+	case ilos.InstanceOf(instance.FloatClass, x1) && ilos.InstanceOf(instance.IntegerClass, x2):
 		ret = float64(x1.(instance.Float)) > float64(x2.(instance.Integer))
-	case ilos.InstanceOf(class.Float, x1) && ilos.InstanceOf(class.Float, x2):
+	case ilos.InstanceOf(instance.FloatClass, x1) && ilos.InstanceOf(instance.FloatClass, x2):
 		ret = float64(x1.(instance.Float)) > float64(x2.(instance.Float))
 	}
 	if ret {
@@ -314,7 +313,7 @@ func Log(e env.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 		return nil, err
 	}
 	if f <= 0.0 {
-		return SignalCondition(e, instance.NewDomainError(e, x, class.Number), Nil)
+		return SignalCondition(e, instance.NewDomainError(e, x, instance.NumberClass), Nil)
 	}
 	return instance.NewFloat(math.Log(f)), nil
 }
@@ -354,7 +353,7 @@ func Sqrt(e env.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 		return nil, err
 	}
 	if a < 0.0 {
-		return SignalCondition(e, instance.NewDomainError(e, x, class.Number), Nil)
+		return SignalCondition(e, instance.NewDomainError(e, x, instance.NumberClass), Nil)
 	}
 	if math.Ceil(math.Sqrt(a)) == math.Sqrt(a) {
 		return instance.NewInteger(int(math.Sqrt(a))), nil
@@ -471,7 +470,7 @@ func Atanh(e env.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 		return nil, err
 	}
 	if math.Abs(a) >= 1 {
-		return SignalCondition(e, instance.NewDomainError(e, x, class.Number), Nil)
+		return SignalCondition(e, instance.NewDomainError(e, x, instance.NumberClass), Nil)
 	}
 	return instance.NewFloat(math.Atanh(a)), nil
 }

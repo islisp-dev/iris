@@ -9,14 +9,13 @@ import (
 
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // Symbolp returns t if obj is a symbol (instance of class symbol); otherwise,
 // returns nil. The obj may be any ISLISP object.
 func Symbolp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(class.Symbol, obj) {
+	if ilos.InstanceOf(instance.SymbolClass, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -28,7 +27,7 @@ func Symbolp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance
 // symbol or property-name is not a symbol (error-id. domain-error). obj may be
 // any ISLISP object
 func Property(e env.Environment, symbol, propertyName ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.Symbol, symbol); err != nil {
+	if err := ensure(e, instance.SymbolClass, symbol); err != nil {
 		return nil, err
 	}
 	if len(obj) > 1 {
@@ -51,7 +50,7 @@ func Property(e env.Environment, symbol, propertyName ilos.Instance, obj ...ilos
 // signaled if either symbol or property-name is not a symbol (error-id.
 // domain-error). obj may be any ISLISP object
 func SetProperty(e env.Environment, obj, symbol, propertyName ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.Symbol, symbol); err != nil {
+	if err := ensure(e, instance.SymbolClass, symbol); err != nil {
 		return nil, err
 	}
 	e.Property.Set(symbol, propertyName, obj)
@@ -64,7 +63,7 @@ func SetProperty(e env.Environment, obj, symbol, propertyName ilos.Instance) (il
 // signaled if either symbol or property-name is not a symbol (error-id.
 // domain-error).
 func RemoveProperty(e env.Environment, symbol, propertyName ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.Symbol, symbol); err != nil {
+	if err := ensure(e, instance.SymbolClass, symbol); err != nil {
 		return nil, err
 	}
 	if v, ok := e.Property.Delete(symbol, propertyName); ok {

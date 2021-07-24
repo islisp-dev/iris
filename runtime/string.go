@@ -9,14 +9,13 @@ import (
 
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // Stringp returns t if obj is a string (instance of class string); otherwise,
 // returns nil. obj may be any ISLISP object.
 func Stringp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(class.String, obj) {
+	if ilos.InstanceOf(instance.StringClass, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -29,8 +28,8 @@ func Stringp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance
 // cannot-create-string). An error shall be signaled if i is not a non-negative
 // integer or if initial-character is not a character (error-id. domain-error).
 func CreateString(e env.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if !ilos.InstanceOf(class.Integer, i) || int(i.(instance.Integer)) < 0 {
-		return SignalCondition(e, instance.NewDomainError(e, i, class.Object), Nil)
+	if !ilos.InstanceOf(instance.IntegerClass, i) || int(i.(instance.Integer)) < 0 {
+		return SignalCondition(e, instance.NewDomainError(e, i, instance.ObjectClass), Nil)
 	}
 	if len(initialElement) > 1 {
 		return SignalCondition(e, instance.NewArityError(e), Nil)
@@ -41,7 +40,7 @@ func CreateString(e env.Environment, i ilos.Instance, initialElement ...ilos.Ins
 		if len(initialElement) == 0 {
 			v[i] = 0
 		} else {
-			if err := ensure(e, class.Character, initialElement[0]); err != nil {
+			if err := ensure(e, instance.CharacterClass, initialElement[0]); err != nil {
 				return nil, err
 			}
 			v[i] = rune(initialElement[0].(instance.Character))
@@ -52,7 +51,7 @@ func CreateString(e env.Environment, i ilos.Instance, initialElement ...ilos.Ins
 
 // StringEqual tests whether string1 is the same string as string2.
 func StringEqual(e env.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.String, string1, string2); err != nil {
+	if err := ensure(e, instance.StringClass, string1, string2); err != nil {
 		return nil, err
 	}
 	if string(string1.(instance.String)) == string(string2.(instance.String)) {
@@ -72,7 +71,7 @@ func StringNotEqual(e env.Environment, string1, string2 ilos.Instance) (ilos.Ins
 
 // StringGreaterThan tests whether string1 is greater than string2.
 func StringGreaterThan(e env.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.String, string1, string2); err != nil {
+	if err := ensure(e, instance.StringClass, string1, string2); err != nil {
 		return nil, err
 	}
 	if string(string1.(instance.String)) > string(string2.(instance.String)) {
@@ -84,7 +83,7 @@ func StringGreaterThan(e env.Environment, string1, string2 ilos.Instance) (ilos.
 // StringGreaterThanOrEqual tests whether string1 is greater than or equal to
 // string2.
 func StringGreaterThanOrEqual(e env.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.String, string1, string2); err != nil {
+	if err := ensure(e, instance.StringClass, string1, string2); err != nil {
 		return nil, err
 	}
 	if string(string1.(instance.String)) >= string(string2.(instance.String)) {
@@ -95,7 +94,7 @@ func StringGreaterThanOrEqual(e env.Environment, string1, string2 ilos.Instance)
 
 // StringLessThan tests whether string1 is less than string2.
 func StringLessThan(e env.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.String, string1, string2); err != nil {
+	if err := ensure(e, instance.StringClass, string1, string2); err != nil {
 		return nil, err
 	}
 	if string(string1.(instance.String)) < string(string2.(instance.String)) {
@@ -106,7 +105,7 @@ func StringLessThan(e env.Environment, string1, string2 ilos.Instance) (ilos.Ins
 
 // StringLessThanOrEqual tests whether string1 is less than or equal to string2.
 func StringLessThanOrEqual(e env.Environment, string1, string2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.String, string1, string2); err != nil {
+	if err := ensure(e, instance.StringClass, string1, string2); err != nil {
 		return nil, err
 	}
 	if string(string1.(instance.String)) <= string(string2.(instance.String)) {
@@ -123,10 +122,10 @@ func StringLessThanOrEqual(e env.Environment, string1, string2 ilos.Instance) (i
 // error shall be signaled if char is not a character or if string is not a
 // string (error-id. domain-error).
 func CharIndex(e env.Environment, char, str ilos.Instance, startPosition ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.Character, char); err != nil {
+	if err := ensure(e, instance.CharacterClass, char); err != nil {
 		return nil, err
 	}
-	if err := ensure(e, class.String, str); err != nil {
+	if err := ensure(e, instance.StringClass, str); err != nil {
 		return nil, err
 	}
 	if len(startPosition) > 1 {
@@ -134,7 +133,7 @@ func CharIndex(e env.Environment, char, str ilos.Instance, startPosition ...ilos
 	}
 	n := 0
 	if len(startPosition) == 1 {
-		if err := ensure(e, class.Integer, startPosition[0]); err != nil {
+		if err := ensure(e, instance.IntegerClass, startPosition[0]); err != nil {
 			return nil, err
 		}
 		n = int(startPosition[0].(instance.Integer))
@@ -157,10 +156,10 @@ func CharIndex(e env.Environment, char, str ilos.Instance, startPosition ...ilos
 // two strings. An error shall be signaled if either substring or string is not
 // a string (error-id. domain-error).
 func StringIndex(e env.Environment, sub, str ilos.Instance, startPosition ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.String, sub); err != nil {
+	if err := ensure(e, instance.StringClass, sub); err != nil {
 		return nil, err
 	}
-	if err := ensure(e, class.String, str); err != nil {
+	if err := ensure(e, instance.StringClass, str); err != nil {
 		return nil, err
 	}
 	if len(startPosition) > 1 {
@@ -168,7 +167,7 @@ func StringIndex(e env.Environment, sub, str ilos.Instance, startPosition ...ilo
 	}
 	n := 0
 	if len(startPosition) == 1 {
-		if err := ensure(e, class.Integer, startPosition[0]); err != nil {
+		if err := ensure(e, instance.IntegerClass, startPosition[0]); err != nil {
 			return nil, err
 		}
 		n = int(startPosition[0].(instance.Integer))
@@ -192,7 +191,7 @@ func StringIndex(e env.Environment, sub, str ilos.Instance, startPosition ...ilo
 func StringAppend(e env.Environment, str ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	ret := ""
 	for _, s := range str {
-		if err := ensure(e, class.String, s); err != nil {
+		if err := ensure(e, instance.StringClass, s); err != nil {
 			return nil, err
 		}
 		ret += string(s.(instance.String))

@@ -6,7 +6,6 @@ package parser
 
 import (
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
@@ -15,7 +14,7 @@ func list2array(dim int, list ilos.Instance) (ilos.Instance, ilos.Instance) {
 		return instance.NewGeneralArrayStar(nil, list), nil
 	}
 	car, cdr, arrays := instance.Nil, list, []*instance.GeneralArrayStar{}
-	for ilos.InstanceOf(class.Cons, cdr) {
+	for ilos.InstanceOf(instance.ConsClass, cdr) {
 		car, cdr = cdr.(*instance.Cons).Car, cdr.(*instance.Cons).Cdr
 		array, err := list2array(dim-1, car)
 		if err != nil {

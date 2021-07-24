@@ -11,7 +11,6 @@ import (
 	golang "runtime"
 
 	"github.com/islisp-dev/iris/runtime"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
@@ -26,9 +25,9 @@ func repl(quiet bool) {
 		fmt.Printf("Copyright 2017 islisp-dev All Rights Reserved.\n")
 		fmt.Print(">>> ")
 	}
-	runtime.TopLevel.StandardInput = instance.NewStream(os.Stdin, nil, class.Character)
-	runtime.TopLevel.StandardOutput = instance.NewStream(nil, os.Stdout, class.Character)
-	runtime.TopLevel.ErrorOutput = instance.NewStream(nil, os.Stderr, class.Character)
+	runtime.TopLevel.StandardInput = instance.NewStream(os.Stdin, nil, instance.CharacterClass)
+	runtime.TopLevel.StandardOutput = instance.NewStream(nil, os.Stdout, instance.CharacterClass)
+	runtime.TopLevel.ErrorOutput = instance.NewStream(nil, os.Stderr, instance.CharacterClass)
 	for exp, err := runtime.Read(runtime.TopLevel); err == nil; exp, err = runtime.Read(runtime.TopLevel) {
 		ret, err := runtime.Eval(runtime.TopLevel, exp)
 		if err != nil {
@@ -48,9 +47,9 @@ func script(path string) {
 		return
 	}
 	defer file.Close()
-	runtime.TopLevel.StandardInput = instance.NewStream(file, nil, class.Character)
-	runtime.TopLevel.StandardOutput = instance.NewStream(nil, os.Stdout, class.Character)
-	runtime.TopLevel.ErrorOutput = instance.NewStream(nil, os.Stderr, class.Character)
+	runtime.TopLevel.StandardInput = instance.NewStream(file, nil, instance.CharacterClass)
+	runtime.TopLevel.StandardOutput = instance.NewStream(nil, os.Stdout, instance.CharacterClass)
+	runtime.TopLevel.ErrorOutput = instance.NewStream(nil, os.Stderr, instance.CharacterClass)
 	for {
 		exp, err := runtime.Read(runtime.TopLevel)
 		if err != nil {

@@ -14,12 +14,11 @@ import (
 	"github.com/islisp-dev/iris/reader/tokenizer"
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 func isProperList(i ilos.Instance) bool {
-	if ilos.InstanceOf(class.Cons, i) {
+	if ilos.InstanceOf(instance.ConsClass, i) {
 		return isProperList(i.(*instance.Cons).Cdr) // Checked at the top of this statements
 	}
 	if i == Nil {
@@ -30,12 +29,12 @@ func isProperList(i ilos.Instance) bool {
 
 func convFloat64(e env.Environment, x ilos.Instance) (float64, bool, ilos.Instance) {
 	switch {
-	case ilos.InstanceOf(class.Integer, x):
+	case ilos.InstanceOf(instance.IntegerClass, x):
 		return float64(x.(instance.Integer)), false, nil
-	case ilos.InstanceOf(class.Float, x):
+	case ilos.InstanceOf(instance.FloatClass, x):
 		return float64(x.(instance.Float)), true, nil
 	default:
-		_, err := SignalCondition(e, instance.NewDomainError(e, x, class.Number), Nil)
+		_, err := SignalCondition(e, instance.NewDomainError(e, x, instance.NumberClass), Nil)
 		return 0.0, false, err
 	}
 }

@@ -7,14 +7,13 @@ package runtime
 import (
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // BasicVectorP returns t if obj is a basic-vector (instance of class
 // basic-vector); otherwise, returns nil. obj may be any ISLISP object.
 func BasicVectorP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(class.BasicVector, obj) {
+	if ilos.InstanceOf(instance.BasicVectorClass, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -23,7 +22,7 @@ func BasicVectorP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Ins
 // GeneralVectorP returns t if obj is a general-vector (instance of class
 // general-vector); otherwise, returns nil. obj may be any ISLISP object.
 func GeneralVectorP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(class.GeneralVector, obj) {
+	if ilos.InstanceOf(instance.GeneralVectorClass, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -36,8 +35,8 @@ func GeneralVectorP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.I
 // cannot-create-vector). An error shall be signaled if i is not a non-negative
 // integer (error-id. domain-error). initial-element may be any ISLISP object.
 func CreateVector(e env.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if !ilos.InstanceOf(class.Integer, i) || int(i.(instance.Integer)) < 0 {
-		return SignalCondition(e, instance.NewDomainError(e, i, class.Integer), Nil)
+	if !ilos.InstanceOf(instance.IntegerClass, i) || int(i.(instance.Integer)) < 0 {
+		return SignalCondition(e, instance.NewDomainError(e, i, instance.IntegerClass), Nil)
 	}
 	if len(initialElement) > 1 {
 		return SignalCondition(e, instance.NewArityError(e), Nil)

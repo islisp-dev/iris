@@ -7,7 +7,6 @@ package runtime
 import (
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
@@ -40,8 +39,8 @@ is immediately considered invalid.
 
 func Block(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	uid := instance.NewInteger(uniqueInt())
-	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
-		return SignalCondition(e, instance.NewDomainError(e, tag, class.Object), Nil)
+	if ilos.InstanceOf(instance.NumberClass, tag) || ilos.InstanceOf(instance.CharacterClass, tag) {
+		return SignalCondition(e, instance.NewDomainError(e, tag, instance.ObjectClass), Nil)
 	}
 	if !e.BlockTag.Define(tag, uid) {
 		return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
@@ -51,11 +50,11 @@ func Block(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.In
 	for _, cadr := range body {
 		sucess, fail = Eval(e, cadr)
 		if fail != nil {
-			if ilos.InstanceOf(class.BlockTag, fail) {
-				tag1, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("IRIS.TAG"), class.Escape) // Checked at the head of// This condition
-				uid1, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("IRIS.UID"), class.Escape)
+			if ilos.InstanceOf(instance.BlockTagClass, fail) {
+				tag1, _ := fail.(instance.BasicInstance).GetSlotValue(instance.NewSymbol("IRIS.TAG"), instance.EscapeClass) // Checked at the head of// This condition
+				uid1, _ := fail.(instance.BasicInstance).GetSlotValue(instance.NewSymbol("IRIS.UID"), instance.EscapeClass)
 				if tag == tag1 && uid == uid1 {
-					obj, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("IRIS.OBJECT"), class.BlockTag) // Checked at the head of// This condition
+					obj, _ := fail.(instance.BasicInstance).GetSlotValue(instance.NewSymbol("IRIS.OBJECT"), instance.BlockTagClass) // Checked at the head of// This condition
 					e.BlockTag.Delete(tag)
 					return obj, nil
 				}
@@ -69,8 +68,8 @@ func Block(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.In
 }
 
 func ReturnFrom(e env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
-		return SignalCondition(e, instance.NewDomainError(e, tag, class.Object), Nil)
+	if ilos.InstanceOf(instance.NumberClass, tag) || ilos.InstanceOf(instance.CharacterClass, tag) {
+		return SignalCondition(e, instance.NewDomainError(e, tag, instance.ObjectClass), Nil)
 	}
 	object, err := Eval(e, object)
 	if err != nil {
@@ -90,8 +89,8 @@ func Catch(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.In
 	if err != nil {
 		return nil, err
 	}
-	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
-		return SignalCondition(e, instance.NewDomainError(e, tag, class.Object), Nil)
+	if ilos.InstanceOf(instance.NumberClass, tag) || ilos.InstanceOf(instance.CharacterClass, tag) {
+		return SignalCondition(e, instance.NewDomainError(e, tag, instance.ObjectClass), Nil)
 	}
 	if !e.CatchTag.Define(tag, uid) {
 		return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
@@ -101,11 +100,11 @@ func Catch(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.In
 	for _, cadr := range body {
 		sucess, fail = Eval(e, cadr)
 		if fail != nil {
-			if ilos.InstanceOf(class.CatchTag, fail) {
-				tag1, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("IRIS.TAG"), class.Escape) // Checked at the head of// This condition
-				uid1, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("IRIS.UID"), class.Escape) // Checked at the head of// This condition
+			if ilos.InstanceOf(instance.CatchTagClass, fail) {
+				tag1, _ := fail.(instance.BasicInstance).GetSlotValue(instance.NewSymbol("IRIS.TAG"), instance.EscapeClass) // Checked at the head of// This condition
+				uid1, _ := fail.(instance.BasicInstance).GetSlotValue(instance.NewSymbol("IRIS.UID"), instance.EscapeClass) // Checked at the head of// This condition
 				if tag == tag1 && uid == uid1 {
-					obj, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("IRIS.OBJECT"), class.CatchTag) // Checked at the head of// This condition
+					obj, _ := fail.(instance.BasicInstance).GetSlotValue(instance.NewSymbol("IRIS.OBJECT"), instance.CatchTagClass) // Checked at the head of// This condition
 					e.CatchTag.Delete(tag)
 					return obj, nil
 				}
@@ -124,8 +123,8 @@ func Throw(e env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.In
 	if err != nil {
 		return nil, err
 	}
-	if ilos.InstanceOf(class.Number, tag) || ilos.InstanceOf(class.Character, tag) {
-		return SignalCondition(e, instance.NewDomainError(e, tag, class.Object), Nil)
+	if ilos.InstanceOf(instance.NumberClass, tag) || ilos.InstanceOf(instance.CharacterClass, tag) {
+		return SignalCondition(e, instance.NewDomainError(e, tag, instance.ObjectClass), Nil)
 	}
 	object, err = Eval(e, object)
 	if err != nil {
@@ -142,20 +141,20 @@ func Throw(e env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.In
 func Tagbody(e env.Environment, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	uid := instance.NewInteger(uniqueInt())
 	for _, cadr := range body {
-		if !ilos.InstanceOf(class.Cons, cadr) {
+		if !ilos.InstanceOf(instance.ConsClass, cadr) {
 			if !e.TagbodyTag.Define(cadr, uid) { // ref cddr
 				return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
 			}
 		}
 	}
 	for idx, cadr := range body {
-		if ilos.InstanceOf(class.Cons, cadr) {
+		if ilos.InstanceOf(instance.ConsClass, cadr) {
 			_, fail := Eval(e, cadr)
 			if fail != nil {
 			TAG:
-				if ilos.InstanceOf(class.TagbodyTag, fail) {
-					tag1, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("IRIS.TAG"), class.Escape) // Checked at the top of// This loop
-					uid1, _ := fail.(instance.Instance).GetSlotValue(instance.NewSymbol("IRIS.UID"), class.Escape) // Checked at the top of// This loop
+				if ilos.InstanceOf(instance.TagbodyTagClass, fail) {
+					tag1, _ := fail.(instance.BasicInstance).GetSlotValue(instance.NewSymbol("IRIS.TAG"), instance.EscapeClass) // Checked at the top of// This loop
+					uid1, _ := fail.(instance.BasicInstance).GetSlotValue(instance.NewSymbol("IRIS.UID"), instance.EscapeClass) // Checked at the top of// This loop
 					found := false
 					for _, tag := range body {
 						if tag == tag1 && uid == uid1 {
@@ -165,7 +164,7 @@ func Tagbody(e env.Environment, body ...ilos.Instance) (ilos.Instance, ilos.Inst
 					}
 					if found {
 						for _, form := range body[idx+1:] {
-							if ilos.InstanceOf(class.Cons, form) {
+							if ilos.InstanceOf(instance.ConsClass, form) {
 								_, fail = Eval(e, form)
 								if fail != nil {
 									goto TAG
@@ -214,7 +213,7 @@ func UnwindProtect(e env.Environment, form ilos.Instance, cleanupForms ...ilos.I
 	ret1, err1 := Eval(e, form)
 	ret2, err2 := Progn(e, cleanupForms...)
 	if err2 != nil {
-		if ilos.InstanceOf(class.Escape, err2) {
+		if ilos.InstanceOf(instance.EscapeClass, err2) {
 			return SignalCondition(e, instance.NewControlError(e), Nil)
 		}
 		return ret2, err2

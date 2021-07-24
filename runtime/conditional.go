@@ -7,7 +7,6 @@ package runtime
 import (
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
@@ -40,7 +39,7 @@ func If(e env.Environment, testForm, thenForm ilos.Instance, elseForm ...ilos.In
 // this test is returned.
 func Cond(e env.Environment, testFrom ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	for _, tf := range testFrom {
-		if err := ensure(e, class.List, tf); err != nil {
+		if err := ensure(e, instance.ListClass, tf); err != nil {
 			return nil, err
 		}
 		s := tf.(instance.List).Slice()
@@ -78,7 +77,7 @@ func Case(e env.Environment, key ilos.Instance, pattern ...ilos.Instance) (ilos.
 		return nil, err
 	}
 	for idx, pat := range pattern {
-		if err := ensure(e, class.List, pat); err != nil {
+		if err := ensure(e, instance.ListClass, pat); err != nil {
 			return nil, err
 		}
 		form := pat.(instance.List).Slice()
@@ -88,7 +87,7 @@ func Case(e env.Environment, key ilos.Instance, pattern ...ilos.Instance) (ilos.
 		if idx == len(pattern)-1 && form[0] == T {
 			return Progn(e, form[1:]...)
 		}
-		if err := ensure(e, class.List, form[0]); err != nil {
+		if err := ensure(e, instance.ListClass, form[0]); err != nil {
 			return nil, err
 		}
 		for _, k := range form[0].(instance.List).Slice() {
@@ -124,11 +123,11 @@ func CaseUsing(e env.Environment, pred, key ilos.Instance, pattern ...ilos.Insta
 	if err != nil {
 		return nil, err
 	}
-	if err := ensure(e, class.Function, pred); err != nil {
+	if err := ensure(e, instance.FunctionClass, pred); err != nil {
 		return nil, err
 	}
 	for idx, pat := range pattern {
-		if err := ensure(e, class.List, pat); err != nil {
+		if err := ensure(e, instance.ListClass, pat); err != nil {
 			return nil, err
 		}
 		form := pat.(instance.List).Slice()
@@ -138,7 +137,7 @@ func CaseUsing(e env.Environment, pred, key ilos.Instance, pattern ...ilos.Insta
 		if idx == len(pattern)-1 && form[0] == T {
 			return Progn(e, form[1:]...)
 		}
-		if err := ensure(e, class.List, form[0]); err != nil {
+		if err := ensure(e, instance.ListClass, form[0]); err != nil {
 			return nil, err
 		}
 		for _, k := range form[0].(instance.List).Slice() {

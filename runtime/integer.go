@@ -9,12 +9,11 @@ import (
 
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 func convInt(e env.Environment, z ilos.Instance) (int, ilos.Instance) {
-	if err := ensure(e, class.Integer, z); err != nil {
+	if err := ensure(e, instance.IntegerClass, z); err != nil {
 		return 0, err
 	}
 	return int(z.(instance.Integer)), nil
@@ -23,7 +22,7 @@ func convInt(e env.Environment, z ilos.Instance) (int, ilos.Instance) {
 // Integerp returns t if obj is an integer (instance of class integer);
 // otherwise, returns nil. obj may be any ISLISP object.
 func Integerp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(class.Integer, obj) {
+	if ilos.InstanceOf(instance.IntegerClass, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -124,7 +123,7 @@ func Isqrt(e env.Environment, z ilos.Instance) (ilos.Instance, ilos.Instance) {
 		return nil, err
 	}
 	if a < 0 {
-		return SignalCondition(e, instance.NewDomainError(e, z, class.Number), Nil)
+		return SignalCondition(e, instance.NewDomainError(e, z, instance.NumberClass), Nil)
 	}
 	return instance.NewInteger(int(math.Sqrt(float64(a)))), nil
 }

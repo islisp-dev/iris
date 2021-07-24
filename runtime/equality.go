@@ -9,7 +9,7 @@ import (
 
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
+	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 func isComparable(t reflect.Type) bool {
@@ -35,7 +35,7 @@ func isComparable(t reflect.Type) bool {
 // them), and if modifying one would modify the other the same way.
 func Eq(e env.Environment, obj1, obj2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	v1, v2 := reflect.ValueOf(obj1), reflect.ValueOf(obj2)
-	if v1 == v2 || ilos.InstanceOf(class.Symbol, obj1) && ilos.InstanceOf(class.Symbol, obj2) && obj1 == obj2 {
+	if v1 == v2 || ilos.InstanceOf(instance.SymbolClass, obj1) && ilos.InstanceOf(instance.SymbolClass, obj2) && obj1 == obj2 {
 		return T, nil
 	}
 	return Nil, nil

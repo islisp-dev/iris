@@ -7,14 +7,13 @@ package runtime
 import (
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // Listp returns t if obj is a list (instance of class list); otherwise, returns
 // nil. obj may be any ISLISP object.
 func Listp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(class.List, obj) {
+	if ilos.InstanceOf(instance.ListClass, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -28,7 +27,7 @@ func Listp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) 
 // domain-error).initial-element may be any ISLISP object.
 func CreateList(e env.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := Integerp(e, i); ok == Nil {
-		return nil, instance.NewDomainError(e, i, class.Integer)
+		return nil, instance.NewDomainError(e, i, instance.IntegerClass)
 	}
 	if len(initialElement) > 1 {
 		return SignalCondition(e, instance.NewArityError(e), Nil)
@@ -63,7 +62,7 @@ func List(e env.Environment, objs ...ilos.Instance) (ilos.Instance, ilos.Instanc
 // input list.
 func Reverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := Listp(e, list); ok == Nil {
-		return nil, instance.NewDomainError(e, list, class.List)
+		return nil, instance.NewDomainError(e, list, instance.ListClass)
 	}
 	cons := Nil
 	for _, car := range list.(instance.List).Slice() {
@@ -80,7 +79,7 @@ func Reverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instanc
 func Nreverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// TODO: tests literal object
 	if ok, _ := Listp(e, list); ok == Nil {
-		return nil, instance.NewDomainError(e, list, class.List)
+		return nil, instance.NewDomainError(e, list, instance.ListClass)
 	}
 	cons := Nil
 	for _, car := range list.(instance.List).Slice() {
@@ -105,7 +104,7 @@ func Append(e env.Environment, lists ...ilos.Instance) (ilos.Instance, ilos.Inst
 	cdr := result
 	for _, list := range lists {
 		if ok, _ := Listp(e, list); ok == Nil {
-			return nil, instance.NewDomainError(e, list, class.List)
+			return nil, instance.NewDomainError(e, list, instance.ListClass)
 		}
 	}
 	for _, list := range lists {
@@ -127,12 +126,12 @@ func Append(e env.Environment, lists ...ilos.Instance) (ilos.Instance, ilos.Inst
 // domain-error).
 func Member(e env.Environment, obj, list ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := Listp(e, list); ok == Nil {
-		return nil, instance.NewDomainError(e, list, class.List)
+		return nil, instance.NewDomainError(e, list, instance.ListClass)
 	}
-	if !ilos.InstanceOf(class.Cons, list) || list.(*instance.Cons).Car == obj {
+	if !ilos.InstanceOf(instance.ConsClass, list) || list.(*instance.Cons).Car == obj {
 		return list, nil
 	}
-	if !ilos.InstanceOf(class.Cons, list.(*instance.Cons).Cdr) {
+	if !ilos.InstanceOf(instance.ConsClass, list.(*instance.Cons).Cdr) {
 		return list.(*instance.Cons).Cdr, nil
 	}
 	return Member(e, obj, list.(*instance.Cons).Cdr)
@@ -146,11 +145,11 @@ func Member(e env.Environment, obj, list ilos.Instance) (ilos.Instance, ilos.Ins
 func Mapcar(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
 	if ok, _ := Functionp(e, function); ok == Nil {
-		return nil, instance.NewDomainError(e, function, class.Function)
+		return nil, instance.NewDomainError(e, function, instance.FunctionClass)
 	}
 	for _, list := range lists {
 		if ok, _ := Listp(e, list); ok == Nil {
-			return nil, instance.NewDomainError(e, list, class.List)
+			return nil, instance.NewDomainError(e, list, instance.ListClass)
 		}
 	}
 	arguments := []ilos.Instance{}
@@ -209,11 +208,11 @@ func Mapcan(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 func Maplist(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
 	if ok, _ := Functionp(e, function); ok == Nil {
-		return nil, instance.NewDomainError(e, function, class.Function)
+		return nil, instance.NewDomainError(e, function, instance.FunctionClass)
 	}
 	for _, list := range lists {
 		if ok, _ := Listp(e, list); ok == Nil {
-			return nil, instance.NewDomainError(e, list, class.List)
+			return nil, instance.NewDomainError(e, list, instance.ListClass)
 		}
 	}
 	arguments := []ilos.Instance{}
@@ -272,15 +271,15 @@ func Mapcon(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 // domain-error).
 func Assoc(e env.Environment, obj, associationList ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := Listp(e, associationList); ok == Nil {
-		return nil, instance.NewDomainError(e, associationList, class.List)
+		return nil, instance.NewDomainError(e, associationList, instance.ListClass)
 	}
-	if !ilos.InstanceOf(class.Cons, associationList) {
+	if !ilos.InstanceOf(instance.ConsClass, associationList) {
 		return Nil, nil
 	}
 	car := associationList.(*instance.Cons).Car
 	cdr := associationList.(*instance.Cons).Cdr
 	if ok, _ := Consp(e, car); ok == Nil {
-		return nil, instance.NewDomainError(e, car, class.Cons)
+		return nil, instance.NewDomainError(e, car, instance.ConsClass)
 	}
 	if car.(*instance.Cons).Car == obj { // eql
 		return car, nil

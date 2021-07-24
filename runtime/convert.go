@@ -7,7 +7,6 @@ package runtime
 import (
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
@@ -21,75 +20,75 @@ func Convert(e env.Environment, object, class1 ilos.Instance) (ilos.Instance, il
 		return nil, err
 	}
 	switch object.Class().String() {
-	case class.Character.String():
+	case instance.CharacterClass.String():
 		switch class1.(instance.BuiltInClass).String() {
-		case class.Character.String():
+		case instance.CharacterClass.String():
 			return object, nil
-		case class.Integer.String():
+		case instance.IntegerClass.String():
 			return instance.NewInteger(int(rune(object.(instance.Character)))), nil
-		case class.Float.String():
-		case class.Symbol.String():
-		case class.String.String():
+		case instance.FloatClass.String():
+		case instance.SymbolClass.String():
+		case instance.StringClass.String():
 			return instance.NewString([]rune(object.String()[2:])), nil
-		case class.GeneralVector.String():
-		case class.List.String():
+		case instance.GeneralVectorClass.String():
+		case instance.ListClass.String():
 		}
-	case class.Integer.String():
+	case instance.IntegerClass.String():
 		switch class1.String() {
-		case class.Character.String():
+		case instance.CharacterClass.String():
 			return instance.NewCharacter(rune(int(object.(instance.Integer)))), nil
-		case class.Integer.String():
+		case instance.IntegerClass.String():
 			return object, nil
-		case class.Float.String():
+		case instance.FloatClass.String():
 			return instance.NewFloat(float64(int(object.(instance.Integer)))), nil
-		case class.Symbol.String():
-		case class.String.String():
+		case instance.SymbolClass.String():
+		case instance.StringClass.String():
 			return instance.NewString([]rune(object.String())), nil
-		case class.GeneralVector.String():
-		case class.List.String():
+		case instance.GeneralVectorClass.String():
+		case instance.ListClass.String():
 		}
-	case class.Float.String():
+	case instance.FloatClass.String():
 		switch class1.String() {
-		case class.Character.String():
-		case class.Integer.String():
+		case instance.CharacterClass.String():
+		case instance.IntegerClass.String():
 			return instance.NewInteger(int(float64(object.(instance.Float)))), nil
-		case class.Float.String():
+		case instance.FloatClass.String():
 			return object, nil
-		case class.Symbol.String():
-		case class.String.String():
+		case instance.SymbolClass.String():
+		case instance.StringClass.String():
 			return instance.NewString([]rune(object.String())), nil
-		case class.GeneralVector.String():
-		case class.List.String():
+		case instance.GeneralVectorClass.String():
+		case instance.ListClass.String():
 		}
-	case class.Symbol.String():
+	case instance.SymbolClass.String():
 		switch class1.String() {
-		case class.Character.String():
-		case class.Integer.String():
-		case class.Float.String():
-		case class.Symbol.String():
+		case instance.CharacterClass.String():
+		case instance.IntegerClass.String():
+		case instance.FloatClass.String():
+		case instance.SymbolClass.String():
 			return object, nil
-		case class.String.String():
+		case instance.StringClass.String():
 			return instance.NewString([]rune(object.String())), nil
-		case class.GeneralVector.String():
-		case class.List.String():
+		case instance.GeneralVectorClass.String():
+		case instance.ListClass.String():
 		}
-	case class.String.String():
+	case instance.StringClass.String():
 		switch class1.String() {
-		case class.Character.String():
-		case class.Integer.String():
+		case instance.CharacterClass.String():
+		case instance.IntegerClass.String():
 			return ParseNumber(e, object)
-		case class.Float.String():
+		case instance.FloatClass.String():
 			return ParseNumber(e, object)
-		case class.Symbol.String():
-		case class.String.String():
+		case instance.SymbolClass.String():
+		case instance.StringClass.String():
 			return object, nil
-		case class.GeneralVector.String():
+		case instance.GeneralVectorClass.String():
 			v := make([]ilos.Instance, len(object.(instance.String)))
 			for i, c := range object.(instance.String) {
 				v[i] = instance.NewCharacter(c)
 			}
 			return instance.NewGeneralVector(v), nil
-		case class.List.String():
+		case instance.ListClass.String():
 			l := Nil
 			s := object.(instance.String)
 			for i := len(s) - 1; i >= 0; i-- {
@@ -97,26 +96,26 @@ func Convert(e env.Environment, object, class1 ilos.Instance) (ilos.Instance, il
 			}
 			return l, nil
 		}
-	case class.GeneralVector.String():
+	case instance.GeneralVectorClass.String():
 		switch class1.String() {
-		case class.Character.String():
-		case class.Integer.String():
-		case class.Float.String():
-		case class.Symbol.String():
-		case class.String.String():
-		case class.GeneralVector.String():
+		case instance.CharacterClass.String():
+		case instance.IntegerClass.String():
+		case instance.FloatClass.String():
+		case instance.SymbolClass.String():
+		case instance.StringClass.String():
+		case instance.GeneralVectorClass.String():
 			return object, nil
-		case class.List.String():
+		case instance.ListClass.String():
 			return List(e, object.(instance.GeneralVector)...)
 		}
-	case class.List.String():
+	case instance.ListClass.String():
 		switch class1.String() {
-		case class.Character.String():
-		case class.Integer.String():
-		case class.Float.String():
-		case class.Symbol.String():
-		case class.String.String():
-		case class.GeneralVector.String():
+		case instance.CharacterClass.String():
+		case instance.IntegerClass.String():
+		case instance.FloatClass.String():
+		case instance.SymbolClass.String():
+		case instance.StringClass.String():
+		case instance.GeneralVectorClass.String():
 			v := instance.NewGeneralVector([]ilos.Instance{})
 			car, cdr, i := object.(*instance.Cons).Car, object.(*instance.Cons).Cdr, 0
 			for cdr != Nil {
@@ -124,9 +123,9 @@ func Convert(e env.Environment, object, class1 ilos.Instance) (ilos.Instance, il
 				car, cdr, i = cdr.(*instance.Cons).Car, cdr.(*instance.Cons).Cdr, i+1
 			}
 			return v, nil
-		case class.List.String():
+		case instance.ListClass.String():
 			return object, nil
 		}
 	}
-	return SignalCondition(e, instance.NewDomainError(e, object, class.Object), Nil)
+	return SignalCondition(e, instance.NewDomainError(e, object, instance.ObjectClass), Nil)
 }

@@ -7,7 +7,6 @@ package runtime
 import (
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
@@ -54,12 +53,12 @@ func While(e env.Environment, testForm ilos.Instance, bodyForm ...ilos.Instance)
 // returned as value of the whole for macro. If no result is present, then the
 // value of the for macro is nil.
 func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.List, iterationSpecs); err != nil {
+	if err := ensure(e, instance.ListClass, iterationSpecs); err != nil {
 		return nil, err
 	}
 	a := e.NewLexical()
 	for _, is := range iterationSpecs.(instance.List).Slice() {
-		if err := ensure(e, class.List, is); err != nil {
+		if err := ensure(e, instance.ListClass, is); err != nil {
 			return nil, err
 		}
 		i := is.(instance.List).Slice()
@@ -77,7 +76,7 @@ func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, for
 			return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
 	}
-	if err := ensure(e, class.List, endTestAndResults); err != nil {
+	if err := ensure(e, instance.ListClass, endTestAndResults); err != nil {
 		return nil, err
 	}
 	ends := endTestAndResults.(instance.List).Slice()
@@ -97,7 +96,7 @@ func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, for
 		}
 		b := a.NewLexical()
 		for _, is := range iterationSpecs.(instance.List).Slice() {
-			if err := ensure(e, class.List, is); err != nil {
+			if err := ensure(e, instance.ListClass, is); err != nil {
 				return nil, err
 			}
 			switch is.(instance.List).Length() {

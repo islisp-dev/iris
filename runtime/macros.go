@@ -7,7 +7,6 @@ package runtime
 import (
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
@@ -17,7 +16,7 @@ import (
 // defmacro form appears. lambda-list is as defined in page 23. The definition
 // point of macro-name is the closing parenthesis of the lambda-list.
 func Defmacro(e env.Environment, macroName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.Symbol, macroName); err != nil {
+	if err := ensure(e, instance.SymbolClass, macroName); err != nil {
 		return nil, err
 	}
 	ret, err := newNamedFunction(e, macroName, lambdaList, forms...)
@@ -46,12 +45,12 @@ func Quasiquote(e env.Environment, form ilos.Instance) (ilos.Instance, ilos.Inst
 }
 
 func expand(e env.Environment, form ilos.Instance, level int) (ilos.Instance, ilos.Instance) {
-	if !ilos.InstanceOf(class.Cons, form) {
+	if !ilos.InstanceOf(instance.ConsClass, form) {
 		return form, nil
 	} // If form is a instance of <cons> then,
 	exp := []ilos.Instance{}
 	cdr := form
-	for ilos.InstanceOf(class.Cons, cdr) {
+	for ilos.InstanceOf(instance.ConsClass, cdr) {
 		cadr := cdr.(*instance.Cons).Car
 		cddr := cdr.(*instance.Cons).Cdr
 		// To expand `((foo ,(- 10 3)) ,@(cdr '(c)) . ,(car '(cons)))
@@ -64,7 +63,7 @@ func expand(e env.Environment, form ilos.Instance, level int) (ilos.Instance, il
 			exp = append(exp, elt)
 			break
 		}
-		if !ilos.InstanceOf(class.Cons, cadr) {
+		if !ilos.InstanceOf(instance.ConsClass, cadr) {
 			lst, err := List(e, cadr)
 			if err != nil {
 				return nil, err
@@ -167,12 +166,12 @@ func expand(e env.Environment, form ilos.Instance, level int) (ilos.Instance, il
 		cdr = cddr
 		continue
 	}
-	if ilos.InstanceOf(class.Null, cdr) {
+	if ilos.InstanceOf(instance.NullClass, cdr) {
 		exp = append(exp, Nil)
 	}
 	lst := exp[len(exp)-1]
 	for i := len(exp) - 2; i >= 0; i-- {
-		if ilos.InstanceOf(class.List, lst) {
+		if ilos.InstanceOf(instance.ListClass, lst) {
 			var err ilos.Instance
 			lst, err = Append(e, exp[i], lst)
 			if err != nil {

@@ -8,13 +8,12 @@ import (
 
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 func FormatObject(e env.Environment, stream, object, escapep ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := OpenStreamP(e, stream); ok == Nil {
-		return SignalCondition(e, instance.NewDomainError(e, stream, class.Stream), Nil)
+		return SignalCondition(e, instance.NewDomainError(e, stream, instance.StreamClass), Nil)
 	}
 	if escapep == T {
 		fmt.Fprint(stream.(instance.Stream), object)
@@ -34,10 +33,10 @@ func FormatObject(e env.Environment, stream, object, escapep ilos.Instance) (ilo
 
 func FormatChar(e env.Environment, stream, object ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := OpenStreamP(e, stream); ok == Nil {
-		return SignalCondition(e, instance.NewDomainError(e, stream, class.Stream), Nil)
+		return SignalCondition(e, instance.NewDomainError(e, stream, instance.StreamClass), Nil)
 	}
 	if ok, _ := Characterp(e, object); ok == Nil {
-		return SignalCondition(e, instance.NewDomainError(e, object, class.Character), Nil)
+		return SignalCondition(e, instance.NewDomainError(e, object, instance.CharacterClass), Nil)
 	}
 	fmt.Fprint(stream.(instance.Stream), string(object.(instance.Character)))
 	return Nil, nil
@@ -45,10 +44,10 @@ func FormatChar(e env.Environment, stream, object ilos.Instance) (ilos.Instance,
 
 func FormatFloat(e env.Environment, stream, object ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := OpenStreamP(e, stream); ok == Nil {
-		return SignalCondition(e, instance.NewDomainError(e, stream, class.Stream), Nil)
+		return SignalCondition(e, instance.NewDomainError(e, stream, instance.StreamClass), Nil)
 	}
 	if ok, _ := Floatp(e, object); ok == Nil {
-		return SignalCondition(e, instance.NewDomainError(e, object, class.Float), Nil)
+		return SignalCondition(e, instance.NewDomainError(e, object, instance.FloatClass), Nil)
 	}
 	fmt.Fprint(stream.(instance.Stream), float64(object.(instance.Float)))
 	return Nil, nil
@@ -56,13 +55,13 @@ func FormatFloat(e env.Environment, stream, object ilos.Instance) (ilos.Instance
 
 func FormatInteger(e env.Environment, stream, object, radix ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := OpenStreamP(e, stream); ok == Nil {
-		return SignalCondition(e, instance.NewDomainError(e, stream, class.Stream), Nil)
+		return SignalCondition(e, instance.NewDomainError(e, stream, instance.StreamClass), Nil)
 	}
 	if ok, _ := Integerp(e, object); ok == Nil {
-		return SignalCondition(e, instance.NewDomainError(e, object, class.Integer), Nil)
+		return SignalCondition(e, instance.NewDomainError(e, object, instance.IntegerClass), Nil)
 	}
 	if ok, _ := Integerp(e, radix); ok == Nil {
-		return SignalCondition(e, instance.NewDomainError(e, radix, class.Integer), Nil)
+		return SignalCondition(e, instance.NewDomainError(e, radix, instance.IntegerClass), Nil)
 	}
 	i := int(object.(instance.Integer))
 	r := int(radix.(instance.Integer))
@@ -92,7 +91,7 @@ func FormatFreshLine(e env.Environment, stream ilos.Instance) (ilos.Instance, il
 
 func Format(e env.Environment, stream, formatString ilos.Instance, formatArguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := Stringp(e, formatString); ok == Nil {
-		return SignalCondition(e, instance.NewDomainError(e, formatString, class.String), Nil)
+		return SignalCondition(e, instance.NewDomainError(e, formatString, instance.StringClass), Nil)
 	}
 	str := string(formatString.(instance.String))
 	re := regexp.MustCompile(`~(?:[0-9]+[RT]|.)`)
@@ -179,7 +178,7 @@ func Format(e env.Environment, stream, formatString ilos.Instance, formatArgumen
 					} else {
 						n, _ := strconv.Atoi(s[1 : len(s)-1])
 						if n < 2 || 36 < n {
-							_, err = SignalCondition(e, instance.NewDomainError(e, instance.NewInteger(n), class.Integer), Nil)
+							_, err = SignalCondition(e, instance.NewDomainError(e, instance.NewInteger(n), instance.IntegerClass), Nil)
 						} else {
 							_, err = FormatInteger(e, stream, formatArguments[index], instance.NewInteger(n))
 							index++

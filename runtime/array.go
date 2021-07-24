@@ -7,14 +7,13 @@ package runtime
 import (
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/class"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // BasicArrayP returns t if obj is a basic-array (instance of class
 // basic-array); otherwise, returns nil. obj may be any ISLISP object.
 func BasicArrayP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.BasicArray, obj); err != nil {
+	if err := ensure(e, instance.BasicArrayClass, obj); err != nil {
 		return Nil, nil
 	}
 	return T, nil
@@ -23,7 +22,7 @@ func BasicArrayP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Inst
 // BasicArrayStarP returns t if obj is a basic-array* (instance of class
 // <basic-array*>); otherwise, returns nil. obj may be any ISLISP object.
 func BasicArrayStarP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.BasicArrayStar, obj); err != nil {
+	if err := ensure(e, instance.BasicArrayStarClass, obj); err != nil {
 		return Nil, nil
 	}
 	return T, nil
@@ -32,7 +31,7 @@ func BasicArrayStarP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.
 // GeneralArrayStarP returns t if obj is a general-array* (instance of class
 // <general-array*>); otherwise, returns nil. obj may be any ISLISP object.
 func GeneralArrayStarP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(class.GeneralArrayStar, obj) {
+	if ilos.InstanceOf(instance.GeneralArrayStarClass, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -57,7 +56,7 @@ func CreateArray(e env.Environment, dimensions ilos.Instance, initialElement ...
 		if err != nil {
 			return nil, err
 		}
-		if err := ensure(e, class.Integer, elt); err != nil {
+		if err := ensure(e, instance.IntegerClass, elt); err != nil {
 			return nil, err
 		}
 	}
@@ -127,14 +126,14 @@ func createGeneralArrayStar(e env.Environment, dimensions ilos.Instance, initial
 // (error-id. domain-error). An error shall be signaled if any z is not a
 // non-negative integer (error-id. domain-error).
 func Aref(e env.Environment, basicArray ilos.Instance, dimensions ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.BasicArray, basicArray); err != nil {
+	if err := ensure(e, instance.BasicArrayClass, basicArray); err != nil {
 		return nil, err
 	}
-	if err := ensure(e, class.Integer, dimensions...); err != nil {
+	if err := ensure(e, instance.IntegerClass, dimensions...); err != nil {
 		return nil, err
 	}
 	switch {
-	case ilos.InstanceOf(class.String, basicArray):
+	case ilos.InstanceOf(instance.StringClass, basicArray):
 		if len(dimensions) != 1 {
 			return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
@@ -143,7 +142,7 @@ func Aref(e env.Environment, basicArray ilos.Instance, dimensions ...ilos.Instan
 			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
 		}
 		return instance.NewCharacter(basicArray.(instance.String)[index]), nil
-	case ilos.InstanceOf(class.GeneralVector, basicArray):
+	case ilos.InstanceOf(instance.GeneralVectorClass, basicArray):
 		if len(dimensions) != 1 {
 			return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
@@ -161,10 +160,10 @@ func Aref(e env.Environment, basicArray ilos.Instance, dimensions ...ilos.Instan
 // general-array, is not an object of class general-vector or of class
 // <general-array*> (error-id. domain-error).
 func Garef(e env.Environment, generalArray ilos.Instance, dimensions ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.GeneralArrayStar, generalArray); err != nil {
+	if err := ensure(e, instance.GeneralArrayStarClass, generalArray); err != nil {
 		return nil, err
 	}
-	if err := ensure(e, class.Integer, dimensions...); err != nil {
+	if err := ensure(e, instance.IntegerClass, dimensions...); err != nil {
 		return nil, err
 	}
 	if len(dimensions) == 0 {
@@ -185,15 +184,15 @@ func Garef(e env.Environment, generalArray ilos.Instance, dimensions ...ilos.Ins
 // returned value is obj. The constraints on the basic-array, the general-array,
 // and the sequence of indices z is the same as for aref and garef.
 func SetAref(e env.Environment, obj, basicArray ilos.Instance, dimensions ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.BasicArray, basicArray); err != nil {
+	if err := ensure(e, instance.BasicArrayClass, basicArray); err != nil {
 		return nil, err
 	}
-	if err := ensure(e, class.Integer, dimensions...); err != nil {
+	if err := ensure(e, instance.IntegerClass, dimensions...); err != nil {
 		return nil, err
 	}
 	switch {
-	case ilos.InstanceOf(class.String, basicArray):
-		if err := ensure(e, class.Character, obj); err != nil {
+	case ilos.InstanceOf(instance.StringClass, basicArray):
+		if err := ensure(e, instance.CharacterClass, obj); err != nil {
 			return nil, err
 		}
 		if len(dimensions) != 1 {
@@ -205,7 +204,7 @@ func SetAref(e env.Environment, obj, basicArray ilos.Instance, dimensions ...ilo
 		}
 		basicArray.(instance.String)[index] = rune(obj.(instance.Character))
 		return obj, nil
-	case ilos.InstanceOf(class.GeneralVector, basicArray):
+	case ilos.InstanceOf(instance.GeneralVectorClass, basicArray):
 		if len(dimensions) != 1 {
 			return SignalCondition(e, instance.NewArityError(e), Nil)
 		}
@@ -224,10 +223,10 @@ func SetAref(e env.Environment, obj, basicArray ilos.Instance, dimensions ...ilo
 // returned value is obj. The constraints on the basic-array, the general-array,
 // and the sequence of indices z is the same as for aref and garef.
 func SetGaref(e env.Environment, obj, generalArray ilos.Instance, dimensions ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.GeneralArrayStar, generalArray); err != nil {
+	if err := ensure(e, instance.GeneralArrayStarClass, generalArray); err != nil {
 		return nil, err
 	}
-	if err := ensure(e, class.Integer, dimensions...); err != nil {
+	if err := ensure(e, instance.IntegerClass, dimensions...); err != nil {
 		return nil, err
 	}
 	if len(dimensions) == 0 {
@@ -250,13 +249,13 @@ func SetGaref(e env.Environment, obj, generalArray ilos.Instance, dimensions ...
 // domain-error). The consequences are undefined if the returned list is
 // modified.
 func ArrayDimensions(e env.Environment, basicArray ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, class.BasicArray, basicArray); err != nil {
+	if err := ensure(e, instance.BasicArrayClass, basicArray); err != nil {
 		return nil, err
 	}
 	switch {
-	case ilos.InstanceOf(class.String, basicArray):
+	case ilos.InstanceOf(instance.StringClass, basicArray):
 		return List(e, instance.NewInteger(len(basicArray.(instance.String))))
-	case ilos.InstanceOf(class.GeneralVector, basicArray):
+	case ilos.InstanceOf(instance.GeneralVectorClass, basicArray):
 		return List(e, instance.NewInteger(len(basicArray.(instance.GeneralVector))))
 	default: // General Array*
 		array := basicArray.(*instance.GeneralArrayStar)
