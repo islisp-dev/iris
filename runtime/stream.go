@@ -145,8 +145,8 @@ func OpenIoFile(e env.Environment, filename ilos.Instance, elementClass ...ilos.
 }
 
 func WithOpenInputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ok, _ := Consp(e, fileSpec); ok == Nil {
-		return SignalCondition(e, instance.NewDomainError(e, fileSpec, class.Cons), Nil)
+	if !ilos.InstanceOf(class.List, fileSpec) {
+		return SignalCondition(e, instance.NewDomainError(e, fileSpec, class.List), Nil)
 	}
 	car, err := Car(e, fileSpec)
 	if err != nil {
@@ -160,7 +160,11 @@ func WithOpenInputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.
 	if err != nil {
 		return nil, err
 	}
-	s, err := OpenInputFile(e, cadr)
+	p, err := Eval(e, cadr)
+	if err != nil {
+		return nil, err
+	}
+	s, err := OpenInputFile(e, p)
 	if err != nil {
 		return nil, err
 	}
@@ -174,8 +178,8 @@ func WithOpenInputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.
 }
 
 func WithOpenOutputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ok, _ := Consp(e, fileSpec); ok == Nil {
-		return SignalCondition(e, instance.NewDomainError(e, fileSpec, class.Cons), Nil)
+	if !ilos.InstanceOf(class.List, fileSpec) {
+		return SignalCondition(e, instance.NewDomainError(e, fileSpec, class.List), Nil)
 	}
 	car, err := Car(e, fileSpec)
 	if err != nil {
@@ -189,7 +193,11 @@ func WithOpenOutputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos
 	if err != nil {
 		return nil, err
 	}
-	s, err := OpenOutputFile(e, cadr)
+	p, err := Eval(e, cadr)
+	if err != nil {
+		return nil, err
+	}
+	s, err := OpenOutputFile(e, p)
 	if err != nil {
 		return nil, err
 	}
@@ -203,8 +211,8 @@ func WithOpenOutputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos
 }
 
 func WithOpenIoFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ok, _ := Consp(e, fileSpec); ok == Nil {
-		return SignalCondition(e, instance.NewDomainError(e, fileSpec, class.Cons), Nil)
+	if !ilos.InstanceOf(class.List, fileSpec) {
+		return SignalCondition(e, instance.NewDomainError(e, fileSpec, class.List), Nil)
 	}
 	car, err := Car(e, fileSpec)
 	if err != nil {
@@ -218,7 +226,11 @@ func WithOpenIoFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Ins
 	if err != nil {
 		return nil, err
 	}
-	s, err := OpenIoFile(e, cadr)
+	p, err := Eval(e, cadr)
+	if err != nil {
+		return nil, err
+	}
+	s, err := OpenOutputFile(e, p)
 	if err != nil {
 		return nil, err
 	}
