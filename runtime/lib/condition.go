@@ -24,7 +24,7 @@ func Cerror(e core.Environment, continueString, errorString core.Instance, objs 
 	if err != nil {
 		return nil, err
 	}
-	condition := core.Create(e, core.SimpleErrorClass, core.NewSymbol("FORMAT-STRING"), errorString, core.NewSymbol("FORAMT-OBJECTS"), arguments)
+	condition := core.NewSimpleError(e, errorString, arguments)
 	ss, err := CreateStringOutputStream(e)
 	if err != nil {
 		return nil, err
@@ -44,7 +44,7 @@ func Error(e core.Environment, continueString, errorString core.Instance, objs .
 	if err != nil {
 		return nil, err
 	}
-	condition := core.Create(e, core.SimpleErrorClass, core.NewSymbol("FORMAT-STRING"), errorString, core.NewSymbol("FORAMT-OBJECTS"), arguments)
+	condition := core.NewSimpleError(e, errorString, arguments)
 	return SignalCondition(e, condition, Nil)
 }
 
