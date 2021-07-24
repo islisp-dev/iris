@@ -6,7 +6,6 @@ package lib
 
 import (
 	"fmt"
-	"reflect"
 
 	"github.com/islisp-dev/iris/runtime/core"
 )
@@ -38,7 +37,7 @@ func Class(e core.Environment, className core.Instance) (core.Class, core.Instan
 }
 
 func checkSuperClass(a, b core.Class) bool {
-	if reflect.DeepEqual(a, core.StandardObjectClass) || reflect.DeepEqual(b, core.StandardObjectClass) {
+	if core.DeepEqual(a, core.StandardObjectClass) || core.DeepEqual(b, core.StandardObjectClass) {
 		return false
 	}
 	if core.SubclassOf(a, b) || core.SubclassOf(b, a) {

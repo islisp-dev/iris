@@ -10,6 +10,8 @@ import (
 	"regexp"
 	"runtime"
 	"testing"
+
+	"github.com/islisp-dev/iris/runtime/core"
 )
 
 type test struct {
@@ -35,7 +37,7 @@ func execTests(t *testing.T, function interface{}, tests []test) {
 				return
 			}
 			want, _ := Eval(TopLevel, wantObj)
-			if !tt.wantErr && !reflect.DeepEqual(got, want) {
+			if !tt.wantErr && !core.DeepEqual(got, want) {
 				t.Errorf("%v() got = %v, want %v", name, got, want)
 			}
 			if (err != nil) != tt.wantErr {

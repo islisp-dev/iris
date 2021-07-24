@@ -6,6 +6,8 @@ package core
 
 import (
 	"reflect"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 type Class interface {
@@ -22,10 +24,14 @@ type Instance interface {
 	String() string
 }
 
+func DeepEqual(x, y Instance) bool {
+	return reflect.DeepEqual(x, y) || cmp.Equal(x, y, cmp.AllowUnexported(BuiltInClass{}, StandardClass{}, Function{}))
+}
+
 func SubclassOf(super, sub Class) bool {
 	var subclassof func(p, c Class) bool
 	subclassof = func(p, c Class) bool {
-		if reflect.DeepEqual(c, p) {
+		if DeepEqual(p, c) {
 			return true
 		}
 		for _, d := range c.Supers() {
@@ -43,9 +49,9 @@ func SubclassOf(super, sub Class) bool {
 	return false
 }
 
-func InstanceOf(p Class, i Instance) bool {
-	if reflect.DeepEqual(i.Class(), p) {
+func InstanceOf(c Class, i Instance) bool {
+	if DeepEqual(c, i.Class()) {
 		return true
 	}
-	return SubclassOf(p, i.Class())
+	return SubclassOf(c, i.Class())
 }

@@ -63,7 +63,7 @@ func Eql(e core.Environment, obj1, obj2 core.Instance) (core.Instance, core.Inst
 // was satisfied, and nil if not. Specifically: If obj1 and obj2 are direct
 // instances of the same class, equal returns t if they are eql.
 func Equal(e core.Environment, obj1, obj2 core.Instance) (core.Instance, core.Instance) {
-	if reflect.DeepEqual(obj1, obj2) {
+	if core.DeepEqual(obj1, obj2) {
 		return T, nil
 	}
 	return Nil, nil
