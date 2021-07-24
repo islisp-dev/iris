@@ -26,6 +26,7 @@ type Instance interface {
 
 func DeepEqual(x, y interface{}) bool {
 	return reflect.DeepEqual(x, y) || cmp.Equal(x, y, cmp.AllowUnexported(BuiltInClass{}, StandardClass{}, Function{}))
+	//, cmpopts.IgnoreUnexported(Symbol{}))
 }
 
 func SubclassOf(super, sub Class) bool {

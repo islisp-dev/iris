@@ -49,7 +49,7 @@ func Block(e core.Environment, tag core.Instance, body ...core.Instance) (core.I
 			if core.InstanceOf(core.BlockTagClass, fail) {
 				tag1, _ := fail.(core.BasicInstance).GetSlotValue(core.NewSymbol("IRIS.TAG"), core.EscapeClass) // Checked at the head of// This condition
 				uid1, _ := fail.(core.BasicInstance).GetSlotValue(core.NewSymbol("IRIS.UID"), core.EscapeClass)
-				if tag == tag1 && uid == uid1 {
+				if core.DeepEqual(tag, tag1) && core.DeepEqual(uid, uid1) {
 					obj, _ := fail.(core.BasicInstance).GetSlotValue(core.NewSymbol("IRIS.OBJECT"), core.BlockTagClass) // Checked at the head of// This condition
 					e.BlockTag.Delete(tag)
 					return obj, nil
@@ -99,7 +99,7 @@ func Catch(e core.Environment, tag core.Instance, body ...core.Instance) (core.I
 			if core.InstanceOf(core.CatchTagClass, fail) {
 				tag1, _ := fail.(core.BasicInstance).GetSlotValue(core.NewSymbol("IRIS.TAG"), core.EscapeClass) // Checked at the head of// This condition
 				uid1, _ := fail.(core.BasicInstance).GetSlotValue(core.NewSymbol("IRIS.UID"), core.EscapeClass) // Checked at the head of// This condition
-				if tag == tag1 && uid == uid1 {
+				if core.DeepEqual(tag, tag1) && core.DeepEqual(uid, uid1) {
 					obj, _ := fail.(core.BasicInstance).GetSlotValue(core.NewSymbol("IRIS.OBJECT"), core.CatchTagClass) // Checked at the head of// This condition
 					e.CatchTag.Delete(tag)
 					return obj, nil
@@ -153,7 +153,7 @@ func Tagbody(e core.Environment, body ...core.Instance) (core.Instance, core.Ins
 					uid1, _ := fail.(core.BasicInstance).GetSlotValue(core.NewSymbol("IRIS.UID"), core.EscapeClass) // Checked at the top of// This loop
 					found := false
 					for _, tag := range body {
-						if tag == tag1 && uid == uid1 {
+						if core.DeepEqual(tag, tag1) && core.DeepEqual(uid, uid1) {
 							found = true
 							break
 						}

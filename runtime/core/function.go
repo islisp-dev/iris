@@ -71,14 +71,14 @@ func (f *GenericFunction) AddMethod(qualifier, lambdaList Instance, classList []
 		return false
 	}
 	for i, param := range f.lambdaList.(List).Slice() {
-		if param == NewSymbol(":REST") || param == NewSymbol("&REST") {
+		if DeepEqual(param, NewSymbol(":REST")) || DeepEqual(param, NewSymbol("&REST")) {
 			if lambdaList.(List).Nth(i) != NewSymbol(":REST") && lambdaList.(List).Nth(i) != NewSymbol("&REST") {
 				return false
 			}
 		}
 	}
 	for i := range f.methods {
-		if f.methods[i].qualifier == qualifier && DeepEqual(f.methods[i].classList, classList) {
+		if DeepEqual(f.methods[i].qualifier, qualifier) && DeepEqual(f.methods[i].classList, classList) {
 			f.methods[i].function = function.(Function)
 			return true
 		}
@@ -99,7 +99,9 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 	parameters := f.lambdaList.(List).Slice()
 	variadic := false
 	{
-		test := func(i int) bool { return parameters[i] == NewSymbol(":REST") || parameters[i] == NewSymbol("&REST") }
+		test := func(i int) bool {
+			return DeepEqual(parameters[i], NewSymbol(":REST")) || DeepEqual(parameters[i], NewSymbol("&REST"))
+		}
 		if sort.Search(len(parameters), test) < len(parameters) {
 			variadic = true
 		}
@@ -142,7 +144,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 	nextMethodPisT := NewFunction(NewSymbol("NEXT-METHOD-P"), func(e Environment) (Instance, Instance) {
 		return T, nil
 	})
-	if f.methodCombination == NewSymbol("NIL") {
+	if DeepEqual(f.methodCombination, Nil) {
 		var callNextMethod func(e Environment) (Instance, Instance) // To Recursive
 		callNextMethod = func(e Environment) (Instance, Instance) { // CALL-NEXT-METHOD
 			depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS/DEPTH"))           // Get previous depth
@@ -165,9 +167,9 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 		}
 		return methods[0].function.Apply(e, arguments...) //Call first of method
 	}
-	// if f.methodCombination == NewSymbol("STANDARD")
+	// if DeepEqual(f.methodCombination, NewSymbol("STANDARD"))
 	{
-		test := func(i int) bool { return methods[i].qualifier == around }
+		test := func(i int) bool { return DeepEqual(methods[i].qualifier, around) }
 		width := len(methods)
 		if index := sort.Search(width, test); index < width { // if has :around methods
 			// This callNextMethod is called in :around methods
@@ -175,13 +177,15 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 			callNextMethod = func(e Environment) (Instance, Instance) {
 				depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS/DEPTH")) // Get previous depth
 				for index, method := range methods[:int(depth.(Integer))+1] {
-					if method.qualifier == around { // If have :around method
+					if DeepEqual(method.qualifier, around) { // If have :around method
 						e.DynamicVariable.Define(NewSymbol("IRIS/DEPTH"), NewInteger(index)) // Set Current depth
 						// If Generic Function has no next-mehtods,  NEXT-METHOD-P e function returns nil
 						e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisNil)
 						{ // If Generic Function has next method, set these functionss
 							width := len(methods) - index - 1
-							test := func(i int) bool { return methods[index+i+1].qualifier == nil || methods[index+i+1].qualifier == around }
+							test := func(i int) bool {
+								return DeepEqual(methods[index+i+1].qualifier, nil) || DeepEqual(methods[index+i+1].qualifier, around)
+							}
 							if sort.Search(width, test) < width {
 								e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisT)
 								e.Function.Define(NewSymbol("CALL-NEXT-METHOD"), NewFunction(NewSymbol("CALL-NEXT-METHOD"), callNextMethod))
@@ -193,7 +197,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 				// If has no :around method then,
 				// Do All :before mehtods
 				for _, method := range methods {
-					if method.qualifier == before {
+					if DeepEqual(method.qualifier, before) {
 						if _, err := method.function.Apply(e, arguments...); err != nil {
 							return nil, err
 						}
@@ -207,7 +211,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 					index := int(depth.(Integer))                              // Convert depth to integer
 					{
 						width := len(methods) - index - 1
-						test := func(i int) bool { return methods[index+i+1].qualifier == nil }
+						test := func(i int) bool { return DeepEqual(methods[index+i+1].qualifier, nil) }
 						index = sort.Search(width, test)                                     // Get index of next mehotd
 						e.DynamicVariable.Define(NewSymbol("IRIS/DEPTH"), NewInteger(index)) // Set current depth
 					}
@@ -215,7 +219,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 					e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisNil)
 					{ // If Generic Function has next method, set these functionss
 						width := len(methods) - index - 1
-						test := func(i int) bool { return methods[index+i+1].qualifier == nil }
+						test := func(i int) bool { return DeepEqual(methods[index+i+1].qualifier, nil) }
 						if sort.Search(width, test) < width {
 							e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisT)
 							e.Function.Define(NewSymbol("CALL-NEXT-METHOD"), NewFunction(NewSymbol("CALL-NEXT-METHOD"), callNextMethod))
@@ -226,14 +230,14 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 				index := 0 // index of the first primary method
 				{          // index != 0 is always true because this function has :around methods
 					width := len(methods) - index - 1
-					test := func(i int) bool { return methods[index+i+1].qualifier == nil }
+					test := func(i int) bool { return DeepEqual(methods[index+i+1].qualifier, nil) }
 					index = sort.Search(width, test)
 					e.DynamicVariable.Define(NewSymbol("IRIS/DEPTH"), NewInteger(index))
 				}
 				// If Generic Function has no next-mehtods,  NEXT-METHOD-P e function returns nil
 				e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisNil)
 				{ // If Generic Function has next method, set these functionss
-					test := func(i int) bool { return methods[index+i+1].qualifier == nil }
+					test := func(i int) bool { return DeepEqual(methods[index+i+1].qualifier, nil) }
 					width := len(methods) - index - 1
 					if sort.Search(width, test) < width {
 						e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisT)
@@ -247,7 +251,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 				}
 				// Do all :after methods
 				for i := len(methods) - 1; i >= 0; i-- {
-					if methods[i].qualifier == after {
+					if DeepEqual(methods[i].qualifier, after) {
 						if _, err := methods[i].function.Apply(e, arguments...); err != nil {
 							return nil, err
 						}
@@ -259,7 +263,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 			// If Generic Function has no next-mehtods,  NEXT-METHOD-P e function returns nil
 			e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisNil)
 			{ // If Generic Function has next method, set these functionss
-				test := func(i int) bool { return methods[index+i+1].qualifier == nil }
+				test := func(i int) bool { return DeepEqual(methods[index+i+1].qualifier, nil) }
 				width := len(methods) - index - 1
 				if sort.Search(width, test) < width {
 					e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisT)
@@ -276,7 +280,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 			depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS/DEPTH")) // Get previous depth
 			index := int(depth.(Integer))                              // Convert depth to integer
 			{
-				test := func(i int) bool { return methods[index+i+1].qualifier == nil }
+				test := func(i int) bool { return DeepEqual(methods[index+i+1].qualifier, nil) }
 				width := len(methods) - index - 1
 				index = sort.Search(width, test)
 			}
@@ -284,7 +288,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 			// If Generic Function has no next-mehtods,  NEXT-METHOD-P e function returns nil
 			e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisNil)
 			{ // If Generic Function has next method, set these functionss
-				test := func(i int) bool { return methods[index+i+1].qualifier == nil }
+				test := func(i int) bool { return DeepEqual(methods[index+i+1].qualifier, nil) }
 				width := len(methods) - index - 1
 				if sort.Search(width, test) < width {
 					e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisT)
@@ -295,7 +299,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 		} // callNextMethod ends here
 		// Do All :before mehtods
 		for _, method := range methods {
-			if method.qualifier == before {
+			if DeepEqual(method.qualifier, before) {
 				if _, err := method.function.Apply(e, arguments...); err != nil {
 					return nil, err
 				}
@@ -303,7 +307,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 		}
 		index := 0 // index of the first primary method
 		{
-			test := func(i int) bool { return methods[i].qualifier == nil }
+			test := func(i int) bool { return DeepEqual(methods[i].qualifier, nil) }
 			width := len(methods)
 			index := sort.Search(width, test)
 			e.DynamicVariable.Define(NewSymbol("IRIS/DEPTH"), NewInteger(index))
@@ -313,7 +317,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 		}
 		e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisNil)
 		{ // If Generic Function has next method, set these functions
-			test := func(i int) bool { return methods[index+i+1].qualifier == nil }
+			test := func(i int) bool { return DeepEqual(methods[index+i+1].qualifier, nil) }
 			width := len(methods) - index - 1
 			if sort.Search(width, test) < width {
 				e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisT)
@@ -323,7 +327,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 		ret, err := methods[index].function.Apply(e, arguments...)
 		// Do all :after methods
 		for i := len(methods) - 1; i >= 0; i-- {
-			if methods[i].qualifier == after {
+			if DeepEqual(methods[i].qualifier, after) {
 				if _, err := methods[i].function.Apply(e, arguments...); err != nil {
 					return nil, err
 				}

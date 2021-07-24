@@ -56,7 +56,7 @@ func WithStandardInput(e core.Environment, streamForm core.Instance, forms ...co
 	if err != nil {
 		return nil, err
 	}
-	if ok, _ := InputStreamP(e, e.StandardInput); ok == Nil {
+	if ok, _ := InputStreamP(e, e.StandardInput); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, e.StandardInput, core.StreamClass), Nil)
 	}
 	return Progn(e, forms...)
@@ -68,7 +68,7 @@ func WithStandardOutput(e core.Environment, streamForm core.Instance, forms ...c
 	if err != nil {
 		return nil, err
 	}
-	if ok, _ := OutputStreamP(e, e.StandardOutput); ok == Nil {
+	if ok, _ := OutputStreamP(e, e.StandardOutput); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, e.StandardOutput, core.StreamClass), Nil)
 	}
 	return Progn(e, forms...)
@@ -80,14 +80,14 @@ func WithErrorOutput(e core.Environment, streamForm core.Instance, forms ...core
 	if err != nil {
 		return nil, err
 	}
-	if ok, _ := OutputStreamP(e, e.ErrorOutput); ok == Nil {
+	if ok, _ := OutputStreamP(e, e.ErrorOutput); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, e.ErrorOutput, core.StreamClass), Nil)
 	}
 	return Progn(e, forms...)
 }
 
 func OpenInputFile(e core.Environment, filename core.Instance, elementClass ...core.Instance) (core.Instance, core.Instance) {
-	if ok, _ := Stringp(e, filename); ok == Nil {
+	if ok, _ := Stringp(e, filename); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, filename, core.StringClass), Nil)
 	}
 	file, err := os.Open(string(filename.(core.String)))
@@ -105,7 +105,7 @@ func OpenInputFile(e core.Environment, filename core.Instance, elementClass ...c
 }
 
 func OpenOutputFile(e core.Environment, filename core.Instance, elementClass ...core.Instance) (core.Instance, core.Instance) {
-	if ok, _ := Stringp(e, filename); ok == Nil {
+	if ok, _ := Stringp(e, filename); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, filename, core.StringClass), Nil)
 	}
 	rawFilename := string(filename.(core.String))
@@ -124,7 +124,7 @@ func OpenOutputFile(e core.Environment, filename core.Instance, elementClass ...
 }
 
 func OpenIoFile(e core.Environment, filename core.Instance, elementClass ...core.Instance) (core.Instance, core.Instance) {
-	if ok, _ := Stringp(e, filename); ok == Nil {
+	if ok, _ := Stringp(e, filename); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, filename, core.StringClass), Nil)
 	}
 	file, err := os.Open(string(filename.(core.String)))
@@ -242,7 +242,7 @@ func WithOpenIoFile(e core.Environment, fileSpec core.Instance, forms ...core.In
 
 func Close(e core.Environment, stream core.Instance) (core.Instance, core.Instance) {
 	// It works on file or std stream.
-	if ok, _ := Streamp(e, stream); ok == Nil {
+	if ok, _ := Streamp(e, stream); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, stream, core.StreamClass), Nil)
 	}
 	if stream.(core.Stream).Reader.Raw != nil {
@@ -269,7 +269,7 @@ func Close(e core.Environment, stream core.Instance) (core.Instance, core.Instan
 
 func FinishOutput(e core.Environment, stream core.Instance) (core.Instance, core.Instance) {
 	// It works on file or std stream.
-	if ok, _ := Streamp(e, stream); ok == Nil {
+	if ok, _ := Streamp(e, stream); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, stream, core.StreamClass), Nil)
 	}
 	if stream.(core.Stream).Writer != nil {
@@ -287,7 +287,7 @@ func CreateStringOutputStream(e core.Environment) (core.Instance, core.Instance)
 }
 
 func GetOutputStreamString(e core.Environment, stream core.Instance) (core.Instance, core.Instance) {
-	if ok, _ := OutputStreamP(e, stream); ok == Nil {
+	if ok, _ := OutputStreamP(e, stream); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, stream, core.StreamClass), Nil)
 	}
 	stream.(core.Stream).Flush()
@@ -301,18 +301,18 @@ func Read(e core.Environment, options ...core.Instance) (core.Instance, core.Ins
 	if len(options) > 0 {
 		s = options[0]
 	}
-	if b, _ := InputStreamP(e, s); b == Nil {
+	if b, _ := InputStreamP(e, s); core.DeepEqual(b, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, s, core.StreamClass), Nil)
 	}
 	eosErrorP := true
 	if len(options) > 1 {
-		if options[1] == Nil {
+		if core.DeepEqual(options[1], Nil) {
 			eosErrorP = false
 		}
 	}
 	eosValue := Nil
 	if len(options) > 2 {
-		if options[2] == Nil {
+		if core.DeepEqual(options[2], Nil) {
 			eosValue = options[2]
 		}
 	}
@@ -331,18 +331,18 @@ func ReadChar(e core.Environment, options ...core.Instance) (core.Instance, core
 	if len(options) > 0 {
 		s = options[0]
 	}
-	if ok, _ := InputStreamP(e, s); ok == Nil {
+	if ok, _ := InputStreamP(e, s); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, s, core.StreamClass), Nil)
 	}
 	eosErrorP := true
 	if len(options) > 1 {
-		if options[1] == Nil {
+		if core.DeepEqual(options[1], Nil) {
 			eosErrorP = false
 		}
 	}
 	eosValue := Nil
 	if len(options) > 2 {
-		if options[2] == Nil {
+		if core.DeepEqual(options[2], Nil) {
 			eosValue = options[2]
 		}
 	}
@@ -361,7 +361,7 @@ func ProbeFile(e core.Environment, fs ...core.Instance) (core.Instance, core.Ins
 	if len(fs) != 1 {
 		return SignalCondition(e, core.NewArityError(e), Nil)
 	}
-	if t, err := Stringp(e, fs[0]); err != nil || t == Nil {
+	if t, err := Stringp(e, fs[0]); err != nil || core.DeepEqual(t, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, fs[0], core.StringClass), Nil)
 	}
 	if _, err := os.Stat(string(fs[0].(core.String))); os.IsNotExist(err) {
@@ -376,18 +376,18 @@ func PreviewChar(e core.Environment, options ...core.Instance) (core.Instance, c
 	if len(options) > 0 {
 		s = options[0]
 	}
-	if ok, _ := InputStreamP(e, s); ok == Nil {
+	if ok, _ := InputStreamP(e, s); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, s, core.StreamClass), Nil)
 	}
 	eosErrorP := true
 	if len(options) > 1 {
-		if options[1] == Nil {
+		if core.DeepEqual(options[1], Nil) {
 			eosErrorP = false
 		}
 	}
 	eosValue := Nil
 	if len(options) > 2 {
-		if options[2] == Nil {
+		if core.DeepEqual(options[2], Nil) {
 			eosValue = options[2]
 		}
 	}
@@ -407,18 +407,18 @@ func ReadLine(e core.Environment, options ...core.Instance) (core.Instance, core
 	if len(options) > 0 {
 		s = options[0]
 	}
-	if ok, _ := InputStreamP(e, s); ok == Nil {
+	if ok, _ := InputStreamP(e, s); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, s, core.StreamClass), Nil)
 	}
 	eosErrorP := true
 	if len(options) > 1 {
-		if options[1] == Nil {
+		if core.DeepEqual(options[1], Nil) {
 			eosErrorP = false
 		}
 	}
 	eosValue := Nil
 	if len(options) > 2 {
-		if options[2] == Nil {
+		if core.DeepEqual(options[2], Nil) {
 			eosValue = options[2]
 		}
 	}

@@ -82,7 +82,7 @@ func ParseAtom(tok *tokenizer.Token) (core.Instance, core.Instance) {
 	re += `[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*|`
 	re += `)$`
 	if m, _ := regexp.MatchString(re, str); m {
-		return core.NewSymbol(strings.ToUpper(str)), nil
+		return core.NewSymbol(strings.ToUpper(str), tok.Line, tok.Column), nil
 	}
 	return nil, core.Create(core.NewEnvironment(nil, nil, nil, nil),
 		core.ParseErrorClass,
@@ -130,7 +130,7 @@ func parseMacro(tok *tokenizer.Token, t *tokenizer.Reader) (core.Instance, core.
 	case "`":
 		n = "QUASIQUOTE"
 	}
-	m := core.NewSymbol(n)
+	m := core.NewSymbol(n, tok.Line, tok.Line)
 	return core.NewCons(m, core.NewCons(cdr, core.Nil)), nil
 }
 func parseCons(t *tokenizer.Reader) (core.Instance, core.Instance) {

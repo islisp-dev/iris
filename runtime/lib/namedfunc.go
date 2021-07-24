@@ -11,7 +11,7 @@ func checkLambdaList(e core.Environment, lambdaList core.Instance) core.Instance
 		return err
 	}
 	for i, cadr := range lambdaList.(core.List).Slice() {
-		if cadr == core.NewSymbol(":REST") || cadr == core.NewSymbol("&REST") {
+		if core.DeepEqual(cadr, core.NewSymbol(":REST")) || core.DeepEqual(cadr, core.NewSymbol("&REST")) {
 			if lambdaList.(core.List).Length() != i+2 {
 				_, err := SignalCondition(e, core.NewArityError(e), Nil)
 				return err
@@ -32,7 +32,7 @@ func newNamedFunction(e core.Environment, functionName, lambdaList core.Instance
 	parameters := []core.Instance{}
 	variadic := false
 	for _, cadr := range lambdaList.(core.List).Slice() {
-		if cadr == core.NewSymbol(":REST") || cadr == core.NewSymbol("&REST") {
+		if core.DeepEqual(cadr, core.NewSymbol(":REST")) || core.DeepEqual(cadr, core.NewSymbol("&REST")) {
 			variadic = true
 		}
 		parameters = append(parameters, cadr)
@@ -44,7 +44,7 @@ func newNamedFunction(e core.Environment, functionName, lambdaList core.Instance
 		}
 		for idx := range parameters {
 			key := parameters[idx]
-			if key == core.NewSymbol(":REST") || key == core.NewSymbol("&REST") {
+			if core.DeepEqual(key, core.NewSymbol(":REST")) || core.DeepEqual(key, core.NewSymbol("&REST")) {
 				key := parameters[idx+1]
 				value, err := List(e, arguments[idx:]...)
 				if err != nil {

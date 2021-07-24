@@ -4,15 +4,15 @@
 
 package core
 
-type stack []map[Instance]Instance
+type stack []map[string]Instance
 
 func NewStack() stack {
-	return []map[Instance]Instance{map[Instance]Instance{}}
+	return []map[string]Instance{map[string]Instance{}}
 }
 
 func (s stack) Get(key Instance) (Instance, bool) {
 	for i := len(s) - 1; i >= 0; i-- {
-		if v, ok := s[i][key]; ok {
+		if v, ok := s[i][key.String()]; ok {
 			return v, true
 		}
 	}
@@ -21,8 +21,8 @@ func (s stack) Get(key Instance) (Instance, bool) {
 
 func (s stack) Set(key, value Instance) bool {
 	for i := len(s) - 1; i >= 0; i-- {
-		if _, ok := s[i][key]; ok {
-			s[i][key] = value
+		if _, ok := s[i][key.String()]; ok {
+			s[i][key.String()] = value
 			return true
 		}
 	}
@@ -30,16 +30,16 @@ func (s stack) Set(key, value Instance) bool {
 }
 
 func (s stack) Define(key, value Instance) bool {
-	if _, ok := s[len(s)-1][key]; !ok {
-		s[len(s)-1][key] = value
+	if _, ok := s[len(s)-1][key.String()]; !ok {
+		s[len(s)-1][key.String()] = value
 		return true
 	}
-	s[len(s)-1][key] = value
+	s[len(s)-1][key.String()] = value
 	return false
 }
 
 func (s stack) Delete(key Instance) {
-	delete(s[len(s)-1], key)
+	delete(s[len(s)-1], key.String())
 }
 
 func (s stack) Append(t stack) stack {

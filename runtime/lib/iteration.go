@@ -16,7 +16,7 @@ func While(e core.Environment, testForm core.Instance, bodyForm ...core.Instance
 	if err != nil {
 		return nil, err
 	}
-	for test == T {
+	for core.DeepEqual(test, T) {
 		_, err := Progn(e, bodyForm...)
 		if err != nil {
 			return nil, err
@@ -85,7 +85,7 @@ func For(e core.Environment, iterationSpecs, endTestAndResults core.Instance, fo
 	if err != nil {
 		return nil, err
 	}
-	for test == Nil {
+	for core.DeepEqual(test, Nil) {
 		_, err := Progn(a, forms...)
 		if err != nil {
 			return nil, err

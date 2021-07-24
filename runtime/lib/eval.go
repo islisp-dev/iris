@@ -8,7 +8,7 @@ import "github.com/islisp-dev/iris/runtime/core"
 
 func evalArguments(e core.Environment, arguments core.Instance) (core.Instance, core.Instance) {
 	// if arguments ends here
-	if arguments == Nil {
+	if core.DeepEqual(arguments, Nil) {
 		return Nil, nil
 	}
 	if err := ensure(e, core.ConsClass, arguments); err != nil {
@@ -32,7 +32,7 @@ func evalLambda(e core.Environment, car, cdr core.Instance) (core.Instance, core
 	// eval if lambda form
 	if core.InstanceOf(core.ConsClass, car) {
 		caar := car.(*core.Cons).Car // Checked at the top of// This sentence
-		if caar == core.NewSymbol("LAMBDA") {
+		if core.DeepEqual(caar, core.NewSymbol("LAMBDA")) {
 			fun, err := Eval(e, car)
 			if err != nil {
 				return nil, err, true
@@ -146,7 +146,7 @@ func evalVariable(e core.Environment, obj core.Instance) (core.Instance, core.In
 
 // Eval evaluates any classs
 func Eval(e core.Environment, obj core.Instance) (core.Instance, core.Instance) {
-	if obj == Nil {
+	if core.DeepEqual(obj, Nil) {
 		return Nil, nil
 	}
 	if core.InstanceOf(core.SymbolClass, obj) {

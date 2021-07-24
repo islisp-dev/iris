@@ -77,8 +77,8 @@ func Defclass(e core.Environment, className, scNames, slotSpecs core.Instance, c
 		supers = append(supers, super)
 	}
 	slots := []core.Instance{}
-	initforms := map[core.Instance]core.Instance{}
-	initargs := map[core.Instance]core.Instance{}
+	initforms := core.NewAssociateList()
+	initargs := core.NewAssociateList()
 	for _, slotSpec := range slotSpecs.(core.List).Slice() {
 		if core.InstanceOf(core.SymbolClass, slotSpec) {
 			slotName := slotSpec
@@ -89,15 +89,15 @@ func Defclass(e core.Environment, className, scNames, slotSpecs core.Instance, c
 		slots = append(slots, slotName)
 		slotOpts := slotSpec.(*core.Cons).Cdr.(core.List).Slice()
 		for i := 0; i < len(slotOpts); i += 2 {
-			switch slotOpts[i] {
-			case core.NewSymbol(":INITFORM"):
+			switch {
+			case core.DeepEqual(slotOpts[i], core.NewSymbol(":INITFORM")):
 				closure, err := newNamedFunction(e, core.NewSymbol("CLOSURE"), Nil, slotOpts[i+1])
 				if err != nil {
 					return nil, err
 				}
-				initforms[slotName] = closure
-			case core.NewSymbol(":INITARG"):
-				initargs[slotOpts[i+1]] = slotName
+				initforms.Set(slotName, closure)
+			case core.DeepEqual(slotOpts[i], core.NewSymbol(":INITARG")):
+				initargs.Set(slotOpts[i+1], slotName)
 			}
 		}
 	}
@@ -105,12 +105,12 @@ func Defclass(e core.Environment, className, scNames, slotSpecs core.Instance, c
 	abstractp := Nil
 	for _, classOpt := range classOpts {
 		var err core.Instance
-		switch classOpt.(*core.Cons).Car {
-		case core.NewSymbol(":METACLASS"):
+		switch {
+		case core.DeepEqual(classOpt.(*core.Cons).Car, core.NewSymbol(":METACLASS")):
 			if metaclass, err = Class(e, classOpt.(core.List).Nth(1)); err != nil {
 				return nil, err
 			}
-		case core.NewSymbol(":ABSTRACTP"):
+		case core.DeepEqual(classOpt.(*core.Cons).Car, core.NewSymbol(":ABSTRACTP")):
 			if abstractp, err = Eval(e, classOpt.(core.List).Nth(1)); err != nil {
 				return nil, err
 			}
@@ -126,15 +126,15 @@ func Defclass(e core.Environment, className, scNames, slotSpecs core.Instance, c
 		slotOpts := slotSpec.(*core.Cons).Cdr.(core.List).Slice()
 		var readerFunctionName, writerFunctionName, boundpFunctionName core.Instance
 		for i := 0; i < len(slotOpts); i += 2 {
-			switch slotOpts[i] {
-			case core.NewSymbol(":READER"):
+			switch {
+			case core.DeepEqual(slotOpts[i], core.NewSymbol(":READER")):
 				readerFunctionName = slotOpts[i+1]
-			case core.NewSymbol(":WRITER"):
+			case core.DeepEqual(slotOpts[i], core.NewSymbol(":WRITER")):
 				writerFunctionName = slotOpts[i+1]
-			case core.NewSymbol(":ACCESSOR"):
+			case core.DeepEqual(slotOpts[i], core.NewSymbol(":ACCESSOR")):
 				readerFunctionName = slotOpts[i+1]
 				writerFunctionName = core.NewSymbol(fmt.Sprintf("(SETF %v)", slotOpts[i+1]))
-			case core.NewSymbol(":BOUNDP"):
+			case core.DeepEqual(slotOpts[i], core.NewSymbol(":BOUNDP")):
 				boundpFunctionName = slotOpts[i+1]
 			}
 		}
@@ -214,7 +214,7 @@ func Defmethod(e core.Environment, arguments ...core.Instance) (core.Instance, c
 	name := arguments[0]
 	var qualifier core.Instance
 	i := 0
-	if arguments[1] == core.NewSymbol(":AROUND") || arguments[1] == core.NewSymbol(":BEFORE") || arguments[1] == core.NewSymbol(":AFTER") {
+	if core.DeepEqual(arguments[1], core.NewSymbol(":AROUND")) || core.DeepEqual(arguments[1], core.NewSymbol(":BEFORE")) || core.DeepEqual(arguments[1], core.NewSymbol(":AFTER")) {
 		qualifier = arguments[1]
 		i++
 	}
@@ -232,7 +232,7 @@ func Defmethod(e core.Environment, arguments ...core.Instance) (core.Instance, c
 	}
 	classList := []core.Class{}
 	for _, pp := range arguments[i+1].(core.List).Slice() {
-		if pp == core.NewSymbol(":REST") && pp == core.NewSymbol("&REST") {
+		if core.DeepEqual(pp, core.NewSymbol(":REST")) && core.DeepEqual(pp, core.NewSymbol("&REST")) {
 			break
 		}
 		if core.InstanceOf(core.SymbolClass, pp) {
@@ -265,16 +265,16 @@ func Defgeneric(e core.Environment, funcSpec, lambdaList core.Instance, optionsO
 	genericFunctionClass := core.StandardGenericFunctionClass
 	forms := []core.Instance{}
 	for _, optionOrMethodDesc := range optionsOrMethodDescs {
-		switch optionOrMethodDesc.(core.List).Nth(0) {
-		case core.NewSymbol(":METHOD-COMBINATION"):
+		switch {
+		case core.DeepEqual(optionOrMethodDesc.(core.List).Nth(0), core.NewSymbol(":METHOD-COMBINATION")):
 			methodCombination = optionOrMethodDesc.(core.List).Nth(1)
-		case core.NewSymbol(":GENERIC-FUNCTION-CLASS"):
+		case core.DeepEqual(optionOrMethodDesc.(core.List).Nth(0), core.NewSymbol(":GENERIC-FUNCTION-CLASS")):
 			class, ok := e.Class[:1].Get(optionOrMethodDesc.(core.List).Nth(1))
 			if !ok {
 				return SignalCondition(e, core.NewUndefinedClass(e, optionOrMethodDesc.(core.List).Nth(1)), Nil)
 			}
 			genericFunctionClass = class.(core.Class)
-		case core.NewSymbol(":METHOD"):
+		case core.DeepEqual(optionOrMethodDesc.(core.List).Nth(0), core.NewSymbol(":METHOD")):
 			forms = append(forms, core.NewCons(core.NewSymbol("DEFMETHOD"), optionOrMethodDesc.(core.List).NthCdr(1)))
 		}
 	}

@@ -9,7 +9,7 @@ import "github.com/islisp-dev/iris/runtime/core"
 // Not is the logical “not” (or “¬”). It returns t if obj is nil and nil
 // otherwise. obj may be any ISLISP object.
 func Not(e core.Environment, obj core.Instance) (core.Instance, core.Instance) {
-	if obj == Nil {
+	if core.DeepEqual(obj, Nil) {
 		return T, nil
 	}
 	return Nil, nil
@@ -28,7 +28,7 @@ func And(e core.Environment, forms ...core.Instance) (core.Instance, core.Instan
 		if err != nil {
 			return nil, err
 		}
-		if ret == Nil {
+		if core.DeepEqual(ret, Nil) {
 			return Nil, nil
 		}
 	}

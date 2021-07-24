@@ -46,7 +46,7 @@ func Cond(e core.Environment, testFrom ...core.Instance) (core.Instance, core.In
 		if err != nil {
 			return nil, err
 		}
-		if ret == T {
+		if core.DeepEqual(ret, T) {
 			return Progn(e, s[1:]...)
 		}
 	}
@@ -80,14 +80,14 @@ func Case(e core.Environment, key core.Instance, pattern ...core.Instance) (core
 		if len(form) < 1 {
 			return SignalCondition(e, core.NewArityError(e), Nil)
 		}
-		if idx == len(pattern)-1 && form[0] == T {
+		if idx == len(pattern)-1 && core.DeepEqual(form[0], T) {
 			return Progn(e, form[1:]...)
 		}
 		if err := ensure(e, core.ListClass, form[0]); err != nil {
 			return nil, err
 		}
 		for _, k := range form[0].(core.List).Slice() {
-			if k == key {
+			if core.DeepEqual(k, key) {
 				return Progn(e, form[1:]...)
 			}
 		}
@@ -130,7 +130,7 @@ func CaseUsing(e core.Environment, pred, key core.Instance, pattern ...core.Inst
 		if len(form) < 1 {
 			return SignalCondition(e, core.NewArityError(e), Nil)
 		}
-		if idx == len(pattern)-1 && form[0] == T {
+		if idx == len(pattern)-1 && core.DeepEqual(form[0], T) {
 			return Progn(e, form[1:]...)
 		}
 		if err := ensure(e, core.ListClass, form[0]); err != nil {

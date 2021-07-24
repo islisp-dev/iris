@@ -20,7 +20,7 @@ func CharEqual(e core.Environment, char1, char2 core.Instance) (core.Instance, c
 	if err := ensure(e, core.CharacterClass, char1, char2); err != nil {
 		return nil, err
 	}
-	if char1 == char2 {
+	if core.DeepEqual(char1, char2) {
 		return T, nil
 	}
 	return Nil, nil
@@ -59,7 +59,7 @@ func CharGreaterThanOrEqual(e core.Environment, char1, char2 core.Instance) (cor
 	if err != nil {
 		return nil, err
 	}
-	if gt == Nil && eq == Nil {
+	if core.DeepEqual(gt, Nil) && core.DeepEqual(eq, Nil) {
 		return Nil, nil
 	}
 	return T, nil

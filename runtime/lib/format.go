@@ -13,15 +13,15 @@ func FormatObject(e core.Environment, stream, object, escapep core.Instance) (co
 	if ok, _ := OpenStreamP(e, stream); ok == Nil {
 		return SignalCondition(e, core.NewDomainError(e, stream, core.StreamClass), Nil)
 	}
-	if escapep == T {
+	if core.DeepEqual(escapep, T) {
 		fmt.Fprint(stream.(core.Stream), object)
 		return Nil, nil
 	}
-	if ok, _ := Stringp(e, object); ok == T {
+	if ok, _ := Stringp(e, object); core.DeepEqual(ok, T) {
 		fmt.Fprint(stream.(core.Stream), string(object.(core.String)))
 		return Nil, nil
 	}
-	if ok, _ := Characterp(e, object); ok == T {
+	if ok, _ := Characterp(e, object); core.DeepEqual(ok, T) {
 		fmt.Fprint(stream.(core.Stream), string(object.(core.Character)))
 		return Nil, nil
 	}
@@ -30,10 +30,10 @@ func FormatObject(e core.Environment, stream, object, escapep core.Instance) (co
 }
 
 func FormatChar(e core.Environment, stream, object core.Instance) (core.Instance, core.Instance) {
-	if ok, _ := OpenStreamP(e, stream); ok == Nil {
+	if ok, _ := OpenStreamP(e, stream); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, stream, core.StreamClass), Nil)
 	}
-	if ok, _ := Characterp(e, object); ok == Nil {
+	if ok, _ := Characterp(e, object); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, object, core.CharacterClass), Nil)
 	}
 	fmt.Fprint(stream.(core.Stream), string(object.(core.Character)))
@@ -41,10 +41,10 @@ func FormatChar(e core.Environment, stream, object core.Instance) (core.Instance
 }
 
 func FormatFloat(e core.Environment, stream, object core.Instance) (core.Instance, core.Instance) {
-	if ok, _ := OpenStreamP(e, stream); ok == Nil {
+	if ok, _ := OpenStreamP(e, stream); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, stream, core.StreamClass), Nil)
 	}
-	if ok, _ := Floatp(e, object); ok == Nil {
+	if ok, _ := Floatp(e, object); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, object, core.FloatClass), Nil)
 	}
 	fmt.Fprint(stream.(core.Stream), float64(object.(core.Float)))
@@ -52,13 +52,13 @@ func FormatFloat(e core.Environment, stream, object core.Instance) (core.Instanc
 }
 
 func FormatInteger(e core.Environment, stream, object, radix core.Instance) (core.Instance, core.Instance) {
-	if ok, _ := OpenStreamP(e, stream); ok == Nil {
+	if ok, _ := OpenStreamP(e, stream); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, stream, core.StreamClass), Nil)
 	}
-	if ok, _ := Integerp(e, object); ok == Nil {
+	if ok, _ := Integerp(e, object); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, object, core.IntegerClass), Nil)
 	}
-	if ok, _ := Integerp(e, radix); ok == Nil {
+	if ok, _ := Integerp(e, radix); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, radix, core.IntegerClass), Nil)
 	}
 	i := int(object.(core.Integer))
@@ -88,7 +88,7 @@ func FormatFreshLine(e core.Environment, stream core.Instance) (core.Instance, c
 }
 
 func Format(e core.Environment, stream, formatString core.Instance, formatArguments ...core.Instance) (core.Instance, core.Instance) {
-	if ok, _ := Stringp(e, formatString); ok == Nil {
+	if ok, _ := Stringp(e, formatString); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, formatString, core.StringClass), Nil)
 	}
 	str := string(formatString.(core.String))

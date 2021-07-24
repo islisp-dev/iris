@@ -7,18 +7,18 @@ func ReadByte(e core.Environment, args ...core.Instance) (core.Instance, core.In
 	if len(args) > 0 {
 		str = args[0]
 	}
-	if ok, _ := InputStreamP(e, str); ok == Nil {
+	if ok, _ := InputStreamP(e, str); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, str, core.StreamClass), Nil)
 	}
 	eosErrorP := true
 	if len(args) > 1 {
-		if args[1] == Nil {
+		if core.DeepEqual(args[1], Nil) {
 			eosErrorP = false
 		}
 	}
 	eosValue := Nil
 	if len(args) > 2 {
-		if args[2] == Nil {
+		if core.DeepEqual(args[2], Nil) {
 			eosValue = args[2]
 		}
 	}

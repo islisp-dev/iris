@@ -40,7 +40,7 @@ func TestEq(t *testing.T) {
 		},
 		{
 			exp:     `(eq 2 2)`,
-			want:    `nil`,
+			want:    `T`,
 			wantErr: false,
 		},
 		{
@@ -122,17 +122,17 @@ func TestEq(t *testing.T) {
 		},
 		{
 			exp:     `(eq #\a #\a)`,
-			want:    `nil`,
+			want:    `T`,
 			wantErr: false,
 		},
 		{
 			exp:     `(eq #\space #\Space)`,
-			want:    `nil`,
+			want:    `T`,
 			wantErr: false,
 		},
 		{
 			exp:     `(eq #\space #\space)`,
-			want:    `nil`,
+			want:    `T`,
 			wantErr: false,
 		},
 	}
@@ -193,7 +193,7 @@ func TestEql(t *testing.T) {
 		},
 		{
 			exp:     `(eql (cons 1 2) (cons 1 2))`,
-			want:    `nil`,
+			want:    `T`,
 			wantErr: false,
 		},
 		{
@@ -203,7 +203,7 @@ func TestEql(t *testing.T) {
 		},
 		{
 			exp:     `(eql '(a) '(a))`,
-			want:    `nil`,
+			want:    `T`,
 			wantErr: false,
 		},
 		{
@@ -212,12 +212,12 @@ func TestEql(t *testing.T) {
 					  (y '(a b)))
 					(eql x (cdr y)))
 			`,
-			want:    `nil`,
+			want:    `T`,
 			wantErr: false,
 		},
 		{
 			exp:     `(eql '(b) (cdr '(a b)))`,
-			want:    `nil`,
+			want:    `T`,
 			wantErr: false,
 		},
 		{

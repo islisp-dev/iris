@@ -49,13 +49,13 @@ func NumberEqual(e core.Environment, x1, x2 core.Instance) (core.Instance, core.
 	ret := false
 	switch {
 	case core.InstanceOf(core.IntegerClass, x1) && core.InstanceOf(core.IntegerClass, x2):
-		ret = x1 == x2
+		ret = core.DeepEqual(x1, x2)
 	case core.InstanceOf(core.IntegerClass, x1) && core.InstanceOf(core.FloatClass, x2):
-		ret = float64(x1.(core.Integer)) == float64(x2.(core.Float))
+		ret = core.DeepEqual(float64(x1.(core.Integer)), float64(x2.(core.Float)))
 	case core.InstanceOf(core.FloatClass, x1) && core.InstanceOf(core.IntegerClass, x2):
 		ret = float64(x1.(core.Float)) == float64(x2.(core.Integer))
 	case core.InstanceOf(core.FloatClass, x1) && core.InstanceOf(core.FloatClass, x2):
-		ret = x1 == x2
+		ret = core.DeepEqual(x1, x2)
 	}
 	if ret {
 		return T, nil
@@ -106,7 +106,7 @@ func NumberGreaterThanOrEqual(e core.Environment, x1, x2 core.Instance) (core.In
 	if err != nil {
 		return nil, err
 	}
-	if gt == Nil && eq == Nil {
+	if core.DeepEqual(gt, Nil) && core.DeepEqual(eq, Nil) {
 		return Nil, nil
 	}
 	return T, nil
@@ -255,7 +255,7 @@ func Max(e core.Environment, x core.Instance, xs ...core.Instance) (core.Instanc
 		if err != nil {
 			return nil, err
 		}
-		if ret == T {
+		if core.DeepEqual(ret, T) {
 			max = y
 		}
 	}
@@ -272,7 +272,7 @@ func Min(e core.Environment, x core.Instance, xs ...core.Instance) (core.Instanc
 		if err != nil {
 			return nil, err
 		}
-		if ret == T {
+		if core.DeepEqual(ret, T) {
 			min = y
 		}
 	}
@@ -286,7 +286,7 @@ func Abs(e core.Environment, x core.Instance) (core.Instance, core.Instance) {
 	if err != nil {
 		return nil, err
 	}
-	if ret == T {
+	if core.DeepEqual(ret, T) {
 		return Substruct(e, x)
 	}
 	return x, nil

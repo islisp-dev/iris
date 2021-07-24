@@ -33,7 +33,7 @@ func isComparable(t reflect.Type) bool {
 // them), and if modifying one would modify the other the same way.
 func Eq(e core.Environment, obj1, obj2 core.Instance) (core.Instance, core.Instance) {
 	v1, v2 := reflect.ValueOf(obj1), reflect.ValueOf(obj2)
-	if v1 == v2 || core.InstanceOf(core.SymbolClass, obj1) && core.InstanceOf(core.SymbolClass, obj2) && obj1 == obj2 {
+	if v1 == v2 || core.InstanceOf(core.SymbolClass, obj1) && core.InstanceOf(core.SymbolClass, obj2) && core.DeepEqual(obj1, obj2) {
 		return T, nil
 	}
 	return Nil, nil
@@ -46,7 +46,7 @@ func Eq(e core.Environment, obj1, obj2 core.Instance) (core.Instance, core.Insta
 func Eql(e core.Environment, obj1, obj2 core.Instance) (core.Instance, core.Instance) {
 	t1, t2 := reflect.TypeOf(obj1), reflect.TypeOf(obj2)
 	if isComparable(t1) || isComparable(t2) {
-		if obj1 == obj2 {
+		if core.DeepEqual(obj1, obj2) {
 			return T, nil
 		}
 		return Nil, nil

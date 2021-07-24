@@ -165,14 +165,14 @@ func Garef(e core.Environment, generalArray core.Instance, dimensions ...core.In
 		return nil, err
 	}
 	if len(dimensions) == 0 {
-		if generalArray.(*core.GeneralArrayStar).Scalar == nil {
+		if core.DeepEqual(generalArray.(*core.GeneralArrayStar).Scalar, nil) {
 			return SignalCondition(e, core.NewIndexOutOfRange(e), Nil)
 		}
 		return generalArray.(*core.GeneralArrayStar).Scalar, nil
 	}
 	array := generalArray.(*core.GeneralArrayStar)
 	index := int(dimensions[0].(core.Integer))
-	if array.Vector == nil || len(array.Vector) <= index {
+	if core.DeepEqual(array.Vector, nil) || len(array.Vector) <= index {
 		return SignalCondition(e, core.NewIndexOutOfRange(e), Nil)
 	}
 	return Garef(e, array.Vector[index], dimensions[1:]...)
@@ -228,7 +228,7 @@ func SetGaref(e core.Environment, obj, generalArray core.Instance, dimensions ..
 		return nil, err
 	}
 	if len(dimensions) == 0 {
-		if generalArray.(*core.GeneralArrayStar).Scalar == nil {
+		if core.DeepEqual(generalArray.(*core.GeneralArrayStar).Scalar, nil) {
 			return SignalCondition(e, core.NewIndexOutOfRange(e), Nil)
 		}
 		generalArray.(*core.GeneralArrayStar).Scalar = obj
@@ -236,7 +236,7 @@ func SetGaref(e core.Environment, obj, generalArray core.Instance, dimensions ..
 	}
 	array := generalArray.(*core.GeneralArrayStar)
 	index := int(dimensions[0].(core.Integer))
-	if array.Vector == nil || len(array.Vector) <= index {
+	if core.DeepEqual(array.Vector, nil) || len(array.Vector) <= index {
 		return SignalCondition(e, core.NewIndexOutOfRange(e), Nil)
 	}
 	return SetGaref(e, obj, array.Vector[index], dimensions[1:]...)

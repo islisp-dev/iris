@@ -19,7 +19,7 @@ func isProperList(i core.Instance) bool {
 	if core.InstanceOf(core.ConsClass, i) {
 		return isProperList(i.(*core.Cons).Cdr) // Checked at the top of this statements
 	}
-	if i == Nil {
+	if core.DeepEqual(i, Nil) {
 		return true
 	}
 	return false

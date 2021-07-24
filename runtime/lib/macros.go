@@ -50,7 +50,7 @@ func expand(e core.Environment, form core.Instance, level int) (core.Instance, c
 		cadr := cdr.(*core.Cons).Car
 		cddr := cdr.(*core.Cons).Cdr
 		// To expand `((foo ,(- 10 3)) ,@(cdr '(c)) . ,(car '(cons)))
-		if cadr == core.NewSymbol("UNQUOTE") && level == 0 {
+		if core.DeepEqual(cadr, core.NewSymbol("UNQUOTE")) && level == 0 {
 			caddr := cddr.(*core.Cons).Car
 			elt, err := Eval(e, caddr)
 			if err != nil {
@@ -70,7 +70,7 @@ func expand(e core.Environment, form core.Instance, level int) (core.Instance, c
 		} // If cadr is a instance of <cons> then,
 		caadr := cadr.(*core.Cons).Car
 		cdadr := cadr.(*core.Cons).Cdr
-		if caadr == core.NewSymbol("UNQUOTE") {
+		if core.DeepEqual(caadr, core.NewSymbol("UNQUOTE")) {
 			cadadr := cdadr.(*core.Cons).Car
 			var elt, err core.Instance
 			if level == 0 {
@@ -103,7 +103,7 @@ func expand(e core.Environment, form core.Instance, level int) (core.Instance, c
 				continue
 			}
 		}
-		if caadr == core.NewSymbol("UNQUOTE-SPLICING") {
+		if core.DeepEqual(caadr, core.NewSymbol("UNQUOTE-SPLICING")) {
 			cadadr := cdadr.(*core.Cons).Car
 			if level == 0 {
 				elt, err := Eval(e, cadadr)
@@ -131,7 +131,7 @@ func expand(e core.Environment, form core.Instance, level int) (core.Instance, c
 				continue
 			}
 		}
-		if caadr == core.NewSymbol("QUASIQUOTE") {
+		if core.DeepEqual(caadr, core.NewSymbol("QUASIQUOTE")) {
 			cadadr := cdadr.(*core.Cons).Car
 			elt, err := expand(e, cadadr, level+1)
 			if err != nil {
