@@ -52,7 +52,7 @@ func TestTokenizer_Next(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			got, _ := tokenizer.Next()
-			if got != tt.want {
+			if got.Str != tt.want {
 				t.Errorf("Tokenizer.Next() got = %v, want %v", got, tt.want)
 			}
 		})

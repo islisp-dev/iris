@@ -12,13 +12,25 @@ import (
 // Reader is like bufio.Reader but has PeekRune
 // which returns a rune without advancing pointer
 type Reader struct {
-	Raw io.Reader
+	line, column int
+	Raw          io.Reader
 	*bufio.Reader
 }
 
 // NewReader creates interal reader from io.RuneReader
 func NewReader(r io.Reader) *Reader {
-	return &Reader{r, bufio.NewReader(r)}
+	return &Reader{1, 0, r, bufio.NewReader(r)}
+}
+
+func (t *Reader) ReadRune() (r rune, size int, err error) {
+	r, size, err = t.Reader.ReadRune()
+	if r == '\n' {
+		t.line++
+		t.column = 0
+	} else {
+		t.column++
+	}
+	return
 }
 
 var str = `^1\+$|^1-$|` +
@@ -40,16 +52,25 @@ var str = `^1\+$|^1-$|` +
 	"^#'$|^,@?$|^'$|^`$|^#[[:digit:]]*[aA]$|^#$" // TODO: hangs at #ab or #3
 var re = regexp.MustCompile(str)
 
+type Token struct {
+	Str          string
+	Line, Column int
+}
+
+func NewToken(Str string, Line, Column int) *Token {
+	return &Token{Str, Line, Column}
+}
+
 // ReadToken returns error or string as token
-func (r *Reader) Next() (string, error) {
+func (r *Reader) Next() (*Token, error) {
 	for {
 		bytes, err := r.Peek(1)
 		if err != nil {
-			return "", io.EOF
+			return NewToken("", r.line, r.column), io.EOF
 		}
 		ru := rune(bytes[0])
 		if ru == 0 {
-			return "", io.EOF
+			return NewToken("", r.line, r.column), io.EOF
 		}
 		if !strings.ContainsRune(" \t\n\r", ru) {
 			break
@@ -64,16 +85,16 @@ func (r *Reader) Next() (string, error) {
 		bytes, err := r.Peek(1)
 		if err != nil {
 			if mat {
-				return buf, nil
+				return NewToken(buf, r.line, r.column), nil
 			}
-			return "", io.EOF
+			return NewToken("", r.line, r.column), nil
 		}
 		ru := rune(bytes[0])
 		if ru == 0 {
 			if mat {
-				return buf, nil
+				return NewToken(buf, r.line, r.column), nil
 			}
-			return "", io.EOF
+			return NewToken("", r.line, r.column), nil
 		}
 		if buf == "" && strings.ContainsRune("1234567890", ru) {
 			num = true
@@ -112,5 +133,5 @@ func (r *Reader) Next() (string, error) {
 		}
 		r.ReadRune()
 	}
-	return buf, nil
+	return NewToken(buf, r.line, r.column), nil
 }

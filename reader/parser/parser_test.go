@@ -8,6 +8,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/islisp-dev/iris/reader/tokenizer"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
@@ -154,12 +155,12 @@ func Test_parseAtom(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := ParseAtom(tt.arguments.tok)
+			got, err := ParseAtom(tokenizer.NewToken(tt.arguments.tok, -1, -1))
 			if (err != nil) != tt.wantErr {
 				t.Errorf("parseAtom() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(got, tt.want) {
+			if reflect.DeepEqual(got, tt.want) {
 				t.Errorf("parseAtom() = %v, want %v", got, tt.want)
 			}
 		})
