@@ -25,7 +25,7 @@ var NumberClass = NewBuiltInClass("<NUMBER>", ObjectClass)
 var IntegerClass = NewBuiltInClass("<INTEGER>", NumberClass)
 var FloatClass = NewBuiltInClass("<FLOAT>", NumberClass)
 
-var SeriousConditionClass = NewBuiltInClass("<SERIOUS-CONDITION>", ObjectClass)
+var SeriousConditionClass = NewBuiltInClass("<SERIOUS-CONDITION>", ObjectClass, "IRIS.STACKTRACE")
 var ErrorClass = NewBuiltInClass("<ERROR>", SeriousConditionClass)
 var ArithmeticErrorClass = NewBuiltInClass("<ARITHMETIC-ERROR>", ErrorClass, "OPERATION", "OPERANDS")
 var DivisionByZeroClass = NewBuiltInClass("<DIVISION-BY-ZERO>", ArithmeticErrorClass)

@@ -30,11 +30,11 @@ func (p BuiltInClass) Slots() []Instance {
 	return p.slots
 }
 
-func (p BuiltInClass) Initform(arg Instance) (Instance, bool) {
+func (p BuiltInClass) Initform(arg Instance) (v Instance, ok bool) {
 	return nil, false
 }
 
-func (p BuiltInClass) Initarg(arg Instance) (Instance, bool) {
+func (p BuiltInClass) Initarg(arg Instance) (v Instance, ok bool) {
 	return arg, true
 }
 

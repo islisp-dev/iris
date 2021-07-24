@@ -24,27 +24,35 @@ func NewParseError(e Environment, str, expectedClass Instance) Instance {
 
 func NewDomainError(e Environment, object Instance, expectedClass Class) Instance {
 	return Create(e, DomainErrorClass,
-		NewSymbol("CAUSE"), NewSymbol("DOMAIN-ERROR"),
 		NewSymbol("IRIS.OBJECT"), object,
 		NewSymbol("EXPECTED-CLASS"), expectedClass)
 }
 
 func NewUndefinedFunction(e Environment, name Instance) Instance {
+	l, c := name.(Symbol).Location()
+	loc := NewCons(NewInteger(l), NewInteger(c))
 	return Create(e, UndefinedFunctionClass,
 		NewSymbol("NAME"), name,
-		NewSymbol("NAMESPACE"), NewSymbol("FUNCTION"))
+		NewSymbol("NAMESPACE"), NewSymbol("FUNCTION"),
+		NewSymbol("IRIS.STACKTRACE"), NewCons(loc, Nil))
 }
 
 func NewUndefinedVariable(e Environment, name Instance) Instance {
+	l, c := name.(Symbol).Location()
+	loc := NewCons(NewInteger(l), NewInteger(c))
 	return Create(e, UndefinedVariableClass,
 		NewSymbol("NAME"), name,
-		NewSymbol("NAMESPACE"), NewSymbol("VARIABLE"))
+		NewSymbol("NAMESPACE"), NewSymbol("VARIABLE"),
+		NewSymbol("IRIS.STACKTRACE"), NewCons(loc, Nil))
 }
 
 func NewUndefinedClass(e Environment, name Instance) Instance {
+	l, c := name.(Symbol).Location()
+	loc := NewCons(NewInteger(l), NewInteger(c))
 	return Create(e, UndefinedEntityClass,
 		NewSymbol("NAME"), name,
-		NewSymbol("NAMESPACE"), NewSymbol("CLASS"))
+		NewSymbol("NAMESPACE"), NewSymbol("CLASS"),
+		NewSymbol("IRIS.STACKTRACE"), NewCons(loc, Nil))
 }
 
 func NewArityError(e Environment) Instance {

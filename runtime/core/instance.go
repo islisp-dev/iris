@@ -56,12 +56,19 @@ func (i BasicInstance) Class() Class {
 }
 
 func (i BasicInstance) GetSlotValue(key Instance, class Class) (Instance, bool) {
-	if v, ok := i.slots.Find(key); ok && DeepEqual(i.class, class) {
-		return v, ok
+	if DeepEqual(i.class, class) {
+		if v, ok := i.slots.Find(key); ok {
+			return v, true
+		}
+		for _, s := range class.Slots() {
+			if DeepEqual(s, key) {
+				return Nil, false
+			}
+		}
 	}
 	for _, s := range i.supers {
 		if v, ok := s.(BasicInstance).GetSlotValue(key, class); ok {
-			return v, ok
+			return v, true
 		}
 	}
 	return nil, false

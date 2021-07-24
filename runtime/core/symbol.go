@@ -11,6 +11,10 @@ type Symbol struct {
 	line, column int
 }
 
+func (x Symbol) Location() (line, column int) {
+	return x.line, x.column
+}
+
 func (x Symbol) Equal(y Instance) bool {
 	z, ok := y.(Symbol)
 	if !ok {

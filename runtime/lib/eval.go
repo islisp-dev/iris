@@ -35,15 +35,36 @@ func evalLambda(e core.Environment, car, cdr core.Instance) (core.Instance, core
 		if core.DeepEqual(caar, core.NewSymbol("LAMBDA")) {
 			fun, err := Eval(e, car)
 			if err != nil {
+				st, ok := err.(core.BasicInstance).GetSlotValue(core.NewSymbol("IRIS.STACKTRACE"), core.SeriousConditionClass)
+				if !ok {
+					st = Nil
+				}
+				l, c := caar.(core.Symbol).Location()
+				loc := core.NewCons(core.NewCons(core.NewInteger(l), core.NewInteger(c)), st)
+				err.(core.BasicInstance).SetSlotValue(core.NewSymbol("IRIS.STACKTRACE"), loc, core.SeriousConditionClass)
 				return nil, err, true
 			}
 
 			arguments, err := evalArguments(e, cdr)
 			if err != nil {
+				st, ok := err.(core.BasicInstance).GetSlotValue(core.NewSymbol("IRIS.STACKTRACE"), core.SeriousConditionClass)
+				if !ok {
+					st = Nil
+				}
+				l, c := caar.(core.Symbol).Location()
+				loc := core.NewCons(core.NewCons(core.NewInteger(l), core.NewInteger(c)), st)
+				err.(core.BasicInstance).SetSlotValue(core.NewSymbol("IRIS.STACKTRACE"), loc, core.SeriousConditionClass)
 				return nil, err, true
 			}
 			ret, err := fun.(core.Applicable).Apply(e.NewDynamic(), arguments.(core.List).Slice()...)
 			if err != nil {
+				st, ok := err.(core.BasicInstance).GetSlotValue(core.NewSymbol("IRIS.STACKTRACE"), core.SeriousConditionClass)
+				if !ok {
+					st = Nil
+				}
+				l, c := caar.(core.Symbol).Location()
+				loc := core.NewCons(core.NewCons(core.NewInteger(l), core.NewInteger(c)), st)
+				err.(core.BasicInstance).SetSlotValue(core.NewSymbol("IRIS.STACKTRACE"), loc, core.SeriousConditionClass)
 				return nil, err, true
 			}
 			return ret, nil, true
@@ -61,6 +82,13 @@ func evalSpecial(e core.Environment, car, cdr core.Instance) (core.Instance, cor
 	if spl != nil {
 		ret, err := spl.(core.Applicable).Apply(e.NewLexical(), cdr.(core.List).Slice()...)
 		if err != nil {
+			st, ok := err.(core.BasicInstance).GetSlotValue(core.NewSymbol("IRIS.STACKTRACE"), core.SeriousConditionClass)
+			if !ok {
+				st = Nil
+			}
+			l, c := car.(core.Symbol).Location()
+			loc := core.NewCons(core.NewCons(core.NewInteger(l), core.NewInteger(c)), st)
+			err.(core.BasicInstance).SetSlotValue(core.NewSymbol("IRIS.STACKTRACE"), loc, core.SeriousConditionClass)
 			return nil, err, true
 		}
 		return ret, nil, true
@@ -77,10 +105,24 @@ func evalMacro(e core.Environment, car, cdr core.Instance) (core.Instance, core.
 	if mac != nil {
 		ret, err := mac.(core.Applicable).Apply(e.NewDynamic(), cdr.(core.List).Slice()...)
 		if err != nil {
+			st, ok := err.(core.BasicInstance).GetSlotValue(core.NewSymbol("IRIS.STACKTRACE"), core.SeriousConditionClass)
+			if !ok {
+				st = Nil
+			}
+			l, c := car.(core.Symbol).Location()
+			loc := core.NewCons(core.NewCons(core.NewInteger(l), core.NewInteger(c)), st)
+			err.(core.BasicInstance).SetSlotValue(core.NewSymbol("IRIS.STACKTRACE"), loc, core.SeriousConditionClass)
 			return nil, err, true
 		}
 		ret, err = Eval(e, ret)
 		if err != nil {
+			st, ok := err.(core.BasicInstance).GetSlotValue(core.NewSymbol("IRIS.STACKTRACE"), core.SeriousConditionClass)
+			if !ok {
+				st = Nil
+			}
+			l, c := car.(core.Symbol).Location()
+			loc := core.NewCons(core.NewCons(core.NewInteger(l), core.NewInteger(c)), st)
+			err.(core.BasicInstance).SetSlotValue(core.NewSymbol("IRIS.STACKTRACE"), loc, core.SeriousConditionClass)
 			return nil, err, true
 		}
 		return ret, nil, true
@@ -97,10 +139,24 @@ func evalFunction(e core.Environment, car, cdr core.Instance) (core.Instance, co
 	if fun != nil {
 		arguments, err := evalArguments(e, cdr)
 		if err != nil {
+			st, ok := err.(core.BasicInstance).GetSlotValue(core.NewSymbol("IRIS.STACKTRACE"), core.SeriousConditionClass)
+			if !ok {
+				st = Nil
+			}
+			l, c := car.(core.Symbol).Location()
+			loc := core.NewCons(core.NewCons(core.NewInteger(l), core.NewInteger(c)), st)
+			err.(core.BasicInstance).SetSlotValue(core.NewSymbol("IRIS.STACKTRACE"), loc, core.SeriousConditionClass)
 			return nil, err, true
 		}
 		ret, err := fun.(core.Applicable).Apply(e.NewDynamic(), arguments.(core.List).Slice()...)
 		if err != nil {
+			st, ok := err.(core.BasicInstance).GetSlotValue(core.NewSymbol("IRIS.STACKTRACE"), core.SeriousConditionClass)
+			if !ok {
+				st = Nil
+			}
+			l, c := car.(core.Symbol).Location()
+			loc := core.NewCons(core.NewCons(core.NewInteger(l), core.NewInteger(c)), st)
+			err.(core.BasicInstance).SetSlotValue(core.NewSymbol("IRIS.STACKTRACE"), loc, core.SeriousConditionClass)
 			return nil, err, true
 		}
 		return ret, nil, true
@@ -131,7 +187,8 @@ func evalCons(e core.Environment, obj core.Instance) (core.Instance, core.Instan
 	if a, b, c := evalFunction(e, car, cdr); c {
 		return a, b
 	}
-	return SignalCondition(e, core.NewUndefinedFunction(e, car), Nil)
+	err := core.NewUndefinedFunction(e, car)
+	return SignalCondition(e, err, Nil)
 }
 
 func evalVariable(e core.Environment, obj core.Instance) (core.Instance, core.Instance) {
@@ -141,7 +198,8 @@ func evalVariable(e core.Environment, obj core.Instance) (core.Instance, core.In
 	if val, ok := e.Constant.Get(obj); ok {
 		return val, nil
 	}
-	return SignalCondition(e, core.NewUndefinedVariable(e, obj), Nil)
+	err := core.NewUndefinedVariable(e, obj)
+	return SignalCondition(e, err, Nil)
 }
 
 // Eval evaluates any classs

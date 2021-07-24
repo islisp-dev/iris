@@ -85,14 +85,14 @@ func (r *Reader) Next() (*Token, error) {
 		bytes, err := r.Peek(1)
 		if err != nil {
 			if mat {
-				return NewToken(buf, r.line, r.column), nil
+				return NewToken(buf, r.line, r.column-len(buf)+1), nil
 			}
 			return NewToken("", r.line, r.column), nil
 		}
 		ru := rune(bytes[0])
 		if ru == 0 {
 			if mat {
-				return NewToken(buf, r.line, r.column), nil
+				return NewToken(buf, r.line, r.column-len(buf)+1), nil
 			}
 			return NewToken("", r.line, r.column), nil
 		}
@@ -133,5 +133,5 @@ func (r *Reader) Next() (*Token, error) {
 		}
 		r.ReadRune()
 	}
-	return NewToken(buf, r.line, r.column), nil
+	return NewToken(buf, r.line, r.column-len(buf)+1), nil
 }
