@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/islisp-dev/iris/reader/tokenizer"
-	"github.com/islisp-dev/iris/runtime/ilos"
+	"github.com/islisp-dev/iris/runtime/core"
 )
 
 func Test_parseAtom(t *testing.T) {
@@ -19,7 +19,7 @@ func Test_parseAtom(t *testing.T) {
 	tests := []struct {
 		name      string
 		arguments arguments
-		want      ilos.Instance
+		want      core.Instance
 		wantErr   bool
 	}{
 		//
@@ -28,31 +28,31 @@ func Test_parseAtom(t *testing.T) {
 		{
 			name:      "default",
 			arguments: arguments{"3.14"},
-			want:      ilos.NewFloat(3.14),
+			want:      core.NewFloat(3.14),
 			wantErr:   false,
 		},
 		{
 			name:      "signed",
 			arguments: arguments{"-5.0"},
-			want:      ilos.NewFloat(-5.0),
+			want:      core.NewFloat(-5.0),
 			wantErr:   false,
 		},
 		{
 			name:      "exponential",
 			arguments: arguments{"-5.0E3"},
-			want:      ilos.NewFloat(-5.0 * 1000),
+			want:      core.NewFloat(-5.0 * 1000),
 			wantErr:   false,
 		},
 		{
 			name:      "signed exponential",
 			arguments: arguments{"5.0E-3"},
-			want:      ilos.NewFloat(5.0 * 1.0 / 1000.0),
+			want:      core.NewFloat(5.0 * 1.0 / 1000.0),
 			wantErr:   false,
 		},
 		{
 			name:      "without point",
 			arguments: arguments{"5E-3"},
-			want:      ilos.NewFloat(5.0 * 1.0 / 1000.0),
+			want:      core.NewFloat(5.0 * 1.0 / 1000.0),
 			wantErr:   false,
 		},
 		{
@@ -73,49 +73,49 @@ func Test_parseAtom(t *testing.T) {
 		{
 			name:      "default",
 			arguments: arguments{"5"},
-			want:      ilos.NewInteger(5),
+			want:      core.NewInteger(5),
 			wantErr:   false,
 		},
 		{
 			name:      "signed",
 			arguments: arguments{"-5"},
-			want:      ilos.NewInteger(-5),
+			want:      core.NewInteger(-5),
 			wantErr:   false,
 		},
 		{
 			name:      "binary",
 			arguments: arguments{"#B00101"},
-			want:      ilos.NewInteger(5),
+			want:      core.NewInteger(5),
 			wantErr:   false,
 		},
 		{
 			name:      "signed binary",
 			arguments: arguments{"#b+00101"},
-			want:      ilos.NewInteger(5),
+			want:      core.NewInteger(5),
 			wantErr:   false,
 		},
 		{
 			name:      "octal",
 			arguments: arguments{"#o00101"},
-			want:      ilos.NewInteger(65),
+			want:      core.NewInteger(65),
 			wantErr:   false,
 		},
 		{
 			name:      "signed octal",
 			arguments: arguments{"#O-00101"},
-			want:      ilos.NewInteger(-65),
+			want:      core.NewInteger(-65),
 			wantErr:   false,
 		},
 		{
 			name:      "hexadecimal",
 			arguments: arguments{"#X00101"},
-			want:      ilos.NewInteger(257),
+			want:      core.NewInteger(257),
 			wantErr:   false,
 		},
 		{
 			name:      "signed hexadecimal",
 			arguments: arguments{"#x-00101"},
-			want:      ilos.NewInteger(-257),
+			want:      core.NewInteger(-257),
 			wantErr:   false,
 		},
 		{
@@ -130,19 +130,19 @@ func Test_parseAtom(t *testing.T) {
 		{
 			name:      "default",
 			arguments: arguments{"#\\a"},
-			want:      ilos.NewCharacter('a'),
+			want:      core.NewCharacter('a'),
 			wantErr:   false,
 		},
 		{
 			name:      "newline",
 			arguments: arguments{"#\\newline"},
-			want:      ilos.NewCharacter('\n'),
+			want:      core.NewCharacter('\n'),
 			wantErr:   false,
 		},
 		{
 			name:      "space",
 			arguments: arguments{"#\\space"},
-			want:      ilos.NewCharacter(' '),
+			want:      core.NewCharacter(' '),
 			wantErr:   false,
 		},
 		{

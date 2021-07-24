@@ -10,8 +10,8 @@ import (
 	"os"
 	golang "runtime"
 
-	"github.com/islisp-dev/iris/runtime"
-	"github.com/islisp-dev/iris/runtime/ilos"
+	"github.com/islisp-dev/iris/runtime/core"
+	"github.com/islisp-dev/iris/runtime/lib"
 )
 
 var commit string
@@ -25,11 +25,11 @@ func repl(quiet bool) {
 		fmt.Printf("Copyright 2017 islisp-dev All Rights Reserved.\n")
 		fmt.Print(">>> ")
 	}
-	runtime.TopLevel.StandardInput = ilos.NewStream(os.Stdin, nil, ilos.CharacterClass)
-	runtime.TopLevel.StandardOutput = ilos.NewStream(nil, os.Stdout, ilos.CharacterClass)
-	runtime.TopLevel.ErrorOutput = ilos.NewStream(nil, os.Stderr, ilos.CharacterClass)
-	for exp, err := runtime.Read(runtime.TopLevel); err == nil; exp, err = runtime.Read(runtime.TopLevel) {
-		ret, err := runtime.Eval(runtime.TopLevel, exp)
+	lib.TopLevel.StandardInput = core.NewStream(os.Stdin, nil, core.CharacterClass)
+	lib.TopLevel.StandardOutput = core.NewStream(nil, os.Stdout, core.CharacterClass)
+	lib.TopLevel.ErrorOutput = core.NewStream(nil, os.Stderr, core.CharacterClass)
+	for exp, err := lib.Read(lib.TopLevel); err == nil; exp, err = lib.Read(lib.TopLevel) {
+		ret, err := lib.Eval(lib.TopLevel, exp)
 		if err != nil {
 			fmt.Println(err)
 		} else {
@@ -47,18 +47,18 @@ func script(path string) {
 		return
 	}
 	defer file.Close()
-	runtime.TopLevel.StandardInput = ilos.NewStream(file, nil, ilos.CharacterClass)
-	runtime.TopLevel.StandardOutput = ilos.NewStream(nil, os.Stdout, ilos.CharacterClass)
-	runtime.TopLevel.ErrorOutput = ilos.NewStream(nil, os.Stderr, ilos.CharacterClass)
+	lib.TopLevel.StandardInput = core.NewStream(file, nil, core.CharacterClass)
+	lib.TopLevel.StandardOutput = core.NewStream(nil, os.Stdout, core.CharacterClass)
+	lib.TopLevel.ErrorOutput = core.NewStream(nil, os.Stderr, core.CharacterClass)
 	for {
-		exp, err := runtime.Read(runtime.TopLevel)
+		exp, err := lib.Read(lib.TopLevel)
 		if err != nil {
 			if fmt.Sprint(err) != "#<END-OF-STREAM >" {
 				fmt.Println(err)
 			}
 			return
 		}
-		_, err = runtime.Eval(runtime.TopLevel, exp)
+		_, err = lib.Eval(lib.TopLevel, exp)
 		if err != nil {
 			fmt.Println(err)
 			return
