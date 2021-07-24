@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/islisp-dev/iris/reader/tokenizer"
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
@@ -86,7 +85,7 @@ func ParseAtom(tok *tokenizer.Token) (ilos.Instance, ilos.Instance) {
 	if m, _ := regexp.MatchString(re, str); m {
 		return instance.NewSymbol(strings.ToUpper(str)), nil
 	}
-	return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil),
+	return nil, instance.Create(ilos.NewEnvironment(nil, nil, nil, nil),
 		instance.ParseErrorClass,
 		instance.NewSymbol("STRING"), instance.NewString([]rune(str)),
 		instance.NewSymbol("EXPECTED-CLASS"), instance.ObjectClass)
@@ -106,7 +105,7 @@ func parseMacro(tok *tokenizer.Token, t *tokenizer.Reader) (ilos.Instance, ilos.
 			var err error
 			v, err = strconv.ParseInt(str[1:i], 10, 64)
 			if err != nil {
-				return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil),
+				return nil, instance.Create(ilos.NewEnvironment(nil, nil, nil, nil),
 					instance.ParseErrorClass,
 					instance.NewSymbol("STRING"), instance.NewString([]rune(str)),
 					instance.NewSymbol("EXPECTED-CLASS"), instance.IntegerClass)
@@ -164,13 +163,13 @@ func parseCons(t *tokenizer.Reader) (ilos.Instance, ilos.Instance) {
 func Parse(t *tokenizer.Reader) (ilos.Instance, ilos.Instance) {
 	tok, err := t.Next()
 	if err != nil {
-		return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil), instance.EndOfStreamClass)
+		return nil, instance.Create(ilos.NewEnvironment(nil, nil, nil, nil), instance.EndOfStreamClass)
 	}
 	str := tok.Str
 	for (len(str) > 2 && str[:2] == "#|") || str[:1] == ";" {
 		tok, err = t.Next()
 		if err != nil {
-			return nil, instance.Create(env.NewEnvironment(nil, nil, nil, nil), instance.EndOfStreamClass)
+			return nil, instance.Create(ilos.NewEnvironment(nil, nil, nil, nil), instance.EndOfStreamClass)
 		}
 		str = tok.Str
 	}

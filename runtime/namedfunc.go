@@ -5,12 +5,11 @@
 package runtime
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
-func checkLambdaList(e env.Environment, lambdaList ilos.Instance) ilos.Instance {
+func checkLambdaList(e ilos.Environment, lambdaList ilos.Instance) ilos.Instance {
 	if err := ensure(e, instance.ListClass, lambdaList); err != nil {
 		return err
 	}
@@ -25,7 +24,7 @@ func checkLambdaList(e env.Environment, lambdaList ilos.Instance) ilos.Instance 
 	return nil
 }
 
-func newNamedFunction(e env.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func newNamedFunction(e ilos.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lexical := e
 	if err := ensure(e, instance.SymbolClass, functionName); err != nil {
 		return nil, err
@@ -41,7 +40,7 @@ func newNamedFunction(e env.Environment, functionName, lambdaList ilos.Instance,
 		}
 		parameters = append(parameters, cadr)
 	}
-	return instance.NewFunction(functionName.(instance.Symbol), func(e env.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+	return instance.NewFunction(functionName.(instance.Symbol), func(e ilos.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 		e.MergeLexical(lexical)
 		if (variadic && len(parameters)-2 > len(arguments)) || (!variadic && len(parameters) != len(arguments)) {
 			return SignalCondition(e, instance.NewArityError(e), Nil)

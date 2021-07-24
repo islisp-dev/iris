@@ -7,7 +7,6 @@ package runtime
 import (
 	"fmt"
 
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
@@ -19,7 +18,7 @@ import (
 // is mutable). setq can be used only for modifying bindings, and not for
 // establishing a variable. The setq special form must be contained in the scope
 // of var , established by defglobal, let, let*, for, or a lambda expression.
-func Setq(e env.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Setq(e ilos.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Instance) {
 	ret, err := Eval(e, form)
 	if err != nil {
 		return nil, err
@@ -30,7 +29,7 @@ func Setq(e env.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Inst
 	return SignalCondition(e, instance.NewUndefinedVariable(e, var1), Nil)
 }
 
-func Setf(e env.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Setf(e ilos.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(instance.SymbolClass, var1) {
 		return Setq(e, var1, form)
 	}
@@ -56,7 +55,7 @@ func Setf(e env.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Inst
 // value of let is the result of the evaluation of the last body-form of its
 // body (or nil if there is none). No var may appear more than once in let
 // variable list.
-func Let(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Let(e ilos.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	vfs := map[ilos.Instance]ilos.Instance{}
 	if err := ensure(e, instance.ListClass, varForm); err != nil {
 		return nil, err
@@ -95,7 +94,7 @@ func Let(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (i
 // enlarged or modified eironment the body-forms are executed. The returned
 // value of let* is the result of the evaluation of the last form of its body
 // (or nil if there is none).
-func LetStar(e env.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func LetStar(e ilos.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.ListClass, varForm); err != nil {
 		return nil, err
 	}

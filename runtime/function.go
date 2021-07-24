@@ -5,7 +5,6 @@
 package runtime
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
@@ -17,7 +16,7 @@ import (
 // identifier, function-name, and a function object that is denoted by
 // function-name—if in operator position—or by (function function-name)
 // elsewhere.
-func Functionp(e env.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Functionp(e ilos.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(instance.FunctionClass, fun) {
 		return T, nil
 	}
@@ -29,7 +28,7 @@ func Functionp(e env.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instan
 // function namespace of current lexical eironment (error-id.
 // undefined-function). The consequences are undefined if the function-name
 // names a macro or special form
-func Function(e env.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Function(e ilos.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// car must be a symbol
 	if err := ensure(e, instance.SymbolClass, fun); err != nil {
 		return nil, err
@@ -62,7 +61,7 @@ func Function(e env.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instanc
 // corresponds to the final argument, L2 , to that call to apply (or some
 // subtail of L2), in which case it is implementation defined whether L1 shares
 // structure with L2 .
-func Lambda(e env.Environment, lambdaList ilos.Instance, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Lambda(e ilos.Environment, lambdaList ilos.Instance, form ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := checkLambdaList(e, lambdaList); err != nil {
 		return nil, err
 	}
@@ -87,7 +86,7 @@ func Lambda(e env.Environment, lambdaList ilos.Instance, form ...ilos.Instance) 
 // body-form in the body sequentially; the value of the last one (or nil if
 // there is none) is the value returned by the special form activation. No
 // function-name may appear more than once in the function bindings.
-func Labels(e env.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Labels(e ilos.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.ListClass, functions); err != nil {
 		return nil, err
 	}
@@ -115,7 +114,7 @@ func Labels(e env.Environment, functions ilos.Instance, bodyForm ...ilos.Instanc
 
 // Flet special form allow the definition of new identifiers in the function
 // namespace for function objects (see Labels).
-func Flet(e env.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Flet(e ilos.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.ListClass, functions); err != nil {
 		return nil, err
 	}
@@ -147,7 +146,7 @@ func Flet(e env.Environment, functions ilos.Instance, bodyForm ...ilos.Instance)
 // signaled if function is not a function (error-id. domain-error). Each obj may
 // be any ISLISP object. An error shall be signaled if list is not a proper list
 // (error-id. improper-argument-list).
-func Apply(e env.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Apply(e ilos.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.FunctionClass, function); err != nil {
 		return nil, err
 	}
@@ -162,7 +161,7 @@ func Apply(e env.Environment, function ilos.Instance, obj ...ilos.Instance) (ilo
 // the function returns. The ith argument (2 ≤ i) of funcall becomes the (i −
 // 1)th argument of the function. An error shall be signaled if function is not
 // a function (error-id. domain-error). Each obj may be any ISLISP object.
-func Funcall(e env.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Funcall(e ilos.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	obj = append(obj, Nil)
 	return Apply(e, function, obj...)
 }

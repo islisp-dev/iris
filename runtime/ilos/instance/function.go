@@ -9,12 +9,11 @@ import (
 	"reflect"
 	"sort"
 
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
 type Applicable interface {
-	Apply(env.Environment, ...ilos.Instance) (ilos.Instance, ilos.Instance)
+	Apply(ilos.Environment, ...ilos.Instance) (ilos.Instance, ilos.Instance)
 }
 
 type Function struct {
@@ -34,7 +33,7 @@ func (f Function) String() string {
 	return fmt.Sprintf("#%v", f.Class())
 }
 
-func (f Function) Apply(e env.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func (f Function) Apply(e ilos.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	fv := reflect.ValueOf(f.function)
 	ft := reflect.TypeOf(f.function)
 	argv := []reflect.Value{reflect.ValueOf(e)}
@@ -98,7 +97,7 @@ func (f *GenericFunction) String() string {
 	return fmt.Sprintf("#%v", f.Class())
 }
 
-func (f *GenericFunction) Apply(e env.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func (f *GenericFunction) Apply(e ilos.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	parameters := f.lambdaList.(List).Slice()
 	variadic := false
 	{
@@ -139,15 +138,15 @@ func (f *GenericFunction) Apply(e env.Environment, arguments ...ilos.Instance) (
 		return t[methods[a].qualifier] > t[methods[b].qualifier]
 	})
 
-	nextMethodPisNil := NewFunction(NewSymbol("NEXT-METHOD-P"), func(e env.Environment) (ilos.Instance, ilos.Instance) {
+	nextMethodPisNil := NewFunction(NewSymbol("NEXT-METHOD-P"), func(e ilos.Environment) (ilos.Instance, ilos.Instance) {
 		return Nil, nil
 	})
-	nextMethodPisT := NewFunction(NewSymbol("NEXT-METHOD-P"), func(e env.Environment) (ilos.Instance, ilos.Instance) {
+	nextMethodPisT := NewFunction(NewSymbol("NEXT-METHOD-P"), func(e ilos.Environment) (ilos.Instance, ilos.Instance) {
 		return T, nil
 	})
 	if f.methodCombination == NewSymbol("NIL") {
-		var callNextMethod func(e env.Environment) (ilos.Instance, ilos.Instance) // To Recursive
-		callNextMethod = func(e env.Environment) (ilos.Instance, ilos.Instance) { // CALL-NEXT-METHOD
+		var callNextMethod func(e ilos.Environment) (ilos.Instance, ilos.Instance) // To Recursive
+		callNextMethod = func(e ilos.Environment) (ilos.Instance, ilos.Instance) { // CALL-NEXT-METHOD
 			depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS/DEPTH"))           // Get previous depth
 			index := int(depth.(Integer)) + 1                                    // Get index of next method
 			e.DynamicVariable.Define(NewSymbol("IRIS/DEPTH"), NewInteger(index)) // Set current depth
@@ -174,8 +173,8 @@ func (f *GenericFunction) Apply(e env.Environment, arguments ...ilos.Instance) (
 		width := len(methods)
 		if index := sort.Search(width, test); index < width { // if has :around methods
 			// This callNextMethod is called in :around methods
-			var callNextMethod func(e env.Environment) (ilos.Instance, ilos.Instance)
-			callNextMethod = func(e env.Environment) (ilos.Instance, ilos.Instance) {
+			var callNextMethod func(e ilos.Environment) (ilos.Instance, ilos.Instance)
+			callNextMethod = func(e ilos.Environment) (ilos.Instance, ilos.Instance) {
 				depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS/DEPTH")) // Get previous depth
 				for index, method := range methods[:int(depth.(Integer))+1] {
 					if method.qualifier == around { // If have :around method
@@ -204,8 +203,8 @@ func (f *GenericFunction) Apply(e env.Environment, arguments ...ilos.Instance) (
 				}
 				// Do the first of primary methods
 				// this callNextMethod is called in primary methods
-				var callNextMethod func(e env.Environment) (ilos.Instance, ilos.Instance)
-				callNextMethod = func(e env.Environment) (ilos.Instance, ilos.Instance) {
+				var callNextMethod func(e ilos.Environment) (ilos.Instance, ilos.Instance)
+				callNextMethod = func(e ilos.Environment) (ilos.Instance, ilos.Instance) {
 					depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS/DEPTH")) // Get previous depth
 					index := int(depth.(Integer))                              // Convert depth to integer
 					{
@@ -274,8 +273,8 @@ func (f *GenericFunction) Apply(e env.Environment, arguments ...ilos.Instance) (
 	}
 	{ // Function has no :around methods
 		// This callNextMethod is called in primary methods
-		var callNextMethod func(e env.Environment) (ilos.Instance, ilos.Instance)
-		callNextMethod = func(e env.Environment) (ilos.Instance, ilos.Instance) {
+		var callNextMethod func(e ilos.Environment) (ilos.Instance, ilos.Instance)
+		callNextMethod = func(e ilos.Environment) (ilos.Instance, ilos.Instance) {
 			depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS/DEPTH")) // Get previous depth
 			index := int(depth.(Integer))                              // Convert depth to integer
 			{

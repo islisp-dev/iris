@@ -5,7 +5,6 @@
 package runtime
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
@@ -14,7 +13,7 @@ import (
 // anything non-nil, the then-form is evaluated and its value is returned;
 // otherwise (if the test-form returned nil), the else-form is evaluated and its
 // value is returned. If no else-form is provided, it defaults to nil.
-func If(e env.Environment, testForm, thenForm ilos.Instance, elseForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func If(e ilos.Environment, testForm, thenForm ilos.Instance, elseForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	tf, err := Eval(e, testForm)
 	if err != nil {
 		return nil, err
@@ -37,7 +36,7 @@ func If(e env.Environment, testForm, thenForm ilos.Instance, elseForm ...ilos.In
 // evaluated and the value of the last one is returned. If no test is true, then
 // nil is returned. If no form exists for the successful test then the value of
 // this test is returned.
-func Cond(e env.Environment, testFrom ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Cond(e ilos.Environment, testFrom ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	for _, tf := range testFrom {
 		if err := ensure(e, instance.ListClass, tf); err != nil {
 			return nil, err
@@ -71,7 +70,7 @@ func Cond(e env.Environment, testFrom ...ilos.Instance) (ilos.Instance, ilos.Ins
 // keyform is different from every key, and there is a default clause, its
 // forms, if any, are evaluated sequentially, and the value of the last one is
 // the result of the case form.
-func Case(e env.Environment, key ilos.Instance, pattern ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Case(e ilos.Environment, key ilos.Instance, pattern ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	key, err := Eval(e, key)
 	if err != nil {
 		return nil, err
@@ -114,7 +113,7 @@ func Case(e env.Environment, key ilos.Instance, pattern ...ilos.Instance) (ilos.
 // form evaluates to nil. If the value of keyform is different from every key,
 // and there is a default clause, its forms, if any, are evaluated sequentially,
 // and the value of the last one is the result of the case form.
-func CaseUsing(e env.Environment, pred, key ilos.Instance, pattern ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func CaseUsing(e ilos.Environment, pred, key ilos.Instance, pattern ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	key, err := Eval(e, key)
 	if err != nil {
 		return nil, err

@@ -5,75 +5,74 @@
 package instance
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
-func NewArithmeticError(e env.Environment, operation, operands ilos.Instance) ilos.Instance {
+func NewArithmeticError(e ilos.Environment, operation, operands ilos.Instance) ilos.Instance {
 	return Create(e, ArithmeticErrorClass,
 		NewSymbol("OPERATION"), operation,
 		NewSymbol("OPERANDS"), operands)
 }
 
-func NewDivisionByZero(e env.Environment, operation, operands ilos.Instance) ilos.Instance {
+func NewDivisionByZero(e ilos.Environment, operation, operands ilos.Instance) ilos.Instance {
 	return Create(e, DivisionByZeroClass,
 		NewSymbol("OPERATION"), operation,
 		NewSymbol("OPERANDS"), operands)
 }
 
-func NewParseError(e env.Environment, str, expectedClass ilos.Instance) ilos.Instance {
+func NewParseError(e ilos.Environment, str, expectedClass ilos.Instance) ilos.Instance {
 	return Create(e, ParseErrorClass,
 		NewSymbol("STRING"), str,
 		NewSymbol("EXPECTED-CLASS"), expectedClass)
 }
 
-func NewDomainError(e env.Environment, object ilos.Instance, expectedClass ilos.Class) ilos.Instance {
+func NewDomainError(e ilos.Environment, object ilos.Instance, expectedClass ilos.Class) ilos.Instance {
 	return Create(e, DomainErrorClass,
 		NewSymbol("CAUSE"), NewSymbol("DOMAIN-ERROR"),
 		NewSymbol("IRIS.OBJECT"), object,
 		NewSymbol("EXPECTED-CLASS"), expectedClass)
 }
 
-func NewUndefinedFunction(e env.Environment, name ilos.Instance) ilos.Instance {
+func NewUndefinedFunction(e ilos.Environment, name ilos.Instance) ilos.Instance {
 	return Create(e, UndefinedFunctionClass,
 		NewSymbol("NAME"), name,
 		NewSymbol("NAMESPACE"), NewSymbol("FUNCTION"))
 }
 
-func NewUndefinedVariable(e env.Environment, name ilos.Instance) ilos.Instance {
+func NewUndefinedVariable(e ilos.Environment, name ilos.Instance) ilos.Instance {
 	return Create(e, UndefinedVariableClass,
 		NewSymbol("NAME"), name,
 		NewSymbol("NAMESPACE"), NewSymbol("VARIABLE"))
 }
 
-func NewUndefinedClass(e env.Environment, name ilos.Instance) ilos.Instance {
+func NewUndefinedClass(e ilos.Environment, name ilos.Instance) ilos.Instance {
 	return Create(e, UndefinedEntityClass,
 		NewSymbol("NAME"), name,
 		NewSymbol("NAMESPACE"), NewSymbol("CLASS"))
 }
 
-func NewArityError(e env.Environment) ilos.Instance {
+func NewArityError(e ilos.Environment) ilos.Instance {
 	return Create(e, ProgramErrorClass)
 }
 
-func NewIndexOutOfRange(e env.Environment) ilos.Instance {
+func NewIndexOutOfRange(e ilos.Environment) ilos.Instance {
 	return Create(e, ProgramErrorClass)
 }
 
-func NewImmutableBinding(e env.Environment) ilos.Instance {
+func NewImmutableBinding(e ilos.Environment) ilos.Instance {
 	return Create(e, ProgramErrorClass)
 }
 
-func NewSimpleError(e env.Environment, formatString, formatArguments ilos.Instance) ilos.Instance {
+func NewSimpleError(e ilos.Environment, formatString, formatArguments ilos.Instance) ilos.Instance {
 	return Create(e, SimpleErrorClass,
 		NewSymbol("FORMAT-STRING"), formatString,
 		NewSymbol("FORMAT-ARGUMENTS"), formatArguments)
 }
 
-func NewControlError(e env.Environment) ilos.Instance {
+func NewControlError(e ilos.Environment) ilos.Instance {
 	return Create(e, ControlErrorClass)
 }
 
-func NewStreamError(e env.Environment) ilos.Instance {
+func NewStreamError(e ilos.Environment) ilos.Instance {
 	return Create(e, StreamErrorClass)
 }

@@ -5,12 +5,11 @@
 package runtime
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
-func SignalCondition(e env.Environment, condition, continuable ilos.Instance) (ilos.Instance, ilos.Instance) {
+func SignalCondition(e ilos.Environment, condition, continuable ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.SeriousConditionClass, condition); err != nil {
 		return nil, err
 	}
@@ -23,7 +22,7 @@ func SignalCondition(e env.Environment, condition, continuable ilos.Instance) (i
 	return nil, c
 }
 
-func Cerror(e env.Environment, continueString, errorString ilos.Instance, objs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Cerror(e ilos.Environment, continueString, errorString ilos.Instance, objs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	arguments, err := List(e, objs...)
 	if err != nil {
 		return nil, err
@@ -43,7 +42,7 @@ func Cerror(e env.Environment, continueString, errorString ilos.Instance, objs .
 	return SignalCondition(e, condition, continuable)
 }
 
-func Error(e env.Environment, continueString, errorString ilos.Instance, objs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Error(e ilos.Environment, continueString, errorString ilos.Instance, objs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	arguments, err := List(e, objs...)
 	if err != nil {
 		return nil, err
@@ -52,7 +51,7 @@ func Error(e env.Environment, continueString, errorString ilos.Instance, objs ..
 	return SignalCondition(e, condition, Nil)
 }
 
-func IgnoreErrors(e env.Environment, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func IgnoreErrors(e ilos.Environment, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	ret, err := Progn(e, forms...)
 	if err != nil && ilos.InstanceOf(instance.ErrorClass, err) {
 		return Nil, nil
@@ -60,18 +59,18 @@ func IgnoreErrors(e env.Environment, forms ...ilos.Instance) (ilos.Instance, ilo
 	return ret, err
 }
 
-func ReportCondition(e env.Environment, condition, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
+func ReportCondition(e ilos.Environment, condition, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
 	return Format(e, e.StandardOutput, instance.NewString([]rune("~A")), condition)
 }
 
-func ConditionContinuable(e env.Environment, condition ilos.Instance) (ilos.Instance, ilos.Instance) {
+func ConditionContinuable(e ilos.Environment, condition ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if continuable, ok := condition.(instance.BasicInstance).GetSlotValue(instance.NewSymbol("IRIS.CONTINUABLE"), instance.SeriousConditionClass); ok {
 		return continuable, nil
 	}
 	return Nil, nil
 }
 
-func ContinueCondition(e env.Environment, condition ilos.Instance, value ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func ContinueCondition(e ilos.Environment, condition ilos.Instance, value ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if b, ok := condition.(instance.BasicInstance).GetSlotValue(instance.NewSymbol("IRIS.CONTINUABLE"), instance.SeriousConditionClass); !ok || b == Nil {
 		return nil, instance.Create(e, instance.ProgramErrorClass)
 	}
@@ -84,7 +83,7 @@ func ContinueCondition(e env.Environment, condition ilos.Instance, value ...ilos
 	return nil, instance.Create(e, instance.ProgramErrorClass)
 }
 
-func WithHandler(e env.Environment, handler ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func WithHandler(e ilos.Environment, handler ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	fun, err := Eval(e, handler)
 	if err != nil {
 		return nil, err

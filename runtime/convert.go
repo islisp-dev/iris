@@ -5,12 +5,11 @@
 package runtime
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
-func Convert(e env.Environment, object, class1 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Convert(e ilos.Environment, object, class1 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	object, err := Eval(e, object)
 	if err != nil {
 		return nil, err

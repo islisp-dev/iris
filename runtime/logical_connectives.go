@@ -5,13 +5,12 @@
 package runtime
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
 // Not is the logical “not” (or “¬”). It returns t if obj is nil and nil
 // otherwise. obj may be any ISLISP object.
-func Not(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Not(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if obj == Nil {
 		return T, nil
 	}
@@ -22,7 +21,7 @@ func Not(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 // to right until either one of them evaluates to nil or else none are left. If
 // one of them evaluates to nil, then nil is returned from the and; otherwise,
 // the value of the last evaluated form is returned.
-func And(e env.Environment, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func And(e ilos.Environment, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var ret ilos.Instance
 	for _, form := range forms {
 		//fmt.Printf("%v\n%#v\n", form, e.Variable)
@@ -45,7 +44,7 @@ func And(e env.Environment, forms ...ilos.Instance) (ilos.Instance, ilos.Instanc
 // right until either one of them evaluates to a non-nil value or else none are
 // left. If one of them evaluates to a non-nil value, then this non-nil value is
 // returned, otherwise nil is returned.
-func Or(e env.Environment, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Or(e ilos.Environment, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var ret ilos.Instance
 	for _, form := range forms {
 		var err ilos.Instance

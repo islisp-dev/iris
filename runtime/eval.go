@@ -5,12 +5,11 @@
 package runtime
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
-func evalArguments(e env.Environment, arguments ilos.Instance) (ilos.Instance, ilos.Instance) {
+func evalArguments(e ilos.Environment, arguments ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// if arguments ends here
 	if arguments == Nil {
 		return Nil, nil
@@ -32,7 +31,7 @@ func evalArguments(e env.Environment, arguments ilos.Instance) (ilos.Instance, i
 
 }
 
-func evalLambda(e env.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
+func evalLambda(e ilos.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// eval if lambda form
 	if ilos.InstanceOf(instance.ConsClass, car) {
 		caar := car.(*instance.Cons).Car // Checked at the top of// This sentence
@@ -56,7 +55,7 @@ func evalLambda(e env.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.
 	return nil, nil, false
 }
 
-func evalSpecial(e env.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
+func evalSpecial(e ilos.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// get special instance has value of Function interface
 	var spl ilos.Instance
 	if s, ok := e.Special.Get(car); ok {
@@ -72,7 +71,7 @@ func evalSpecial(e env.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos
 	return nil, nil, false
 }
 
-func evalMacro(e env.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
+func evalMacro(e ilos.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// get special instance has value of Function interface
 	var mac ilos.Instance
 	if m, ok := e.Macro.Get(car); ok {
@@ -92,7 +91,7 @@ func evalMacro(e env.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.I
 	return nil, nil, false
 }
 
-func evalFunction(e env.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
+func evalFunction(e ilos.Environment, car, cdr ilos.Instance) (ilos.Instance, ilos.Instance, bool) {
 	// get special instance has value of Function interface
 	var fun ilos.Instance
 	if f, ok := e.Function.Get(car); ok {
@@ -112,7 +111,7 @@ func evalFunction(e env.Environment, car, cdr ilos.Instance) (ilos.Instance, ilo
 	return nil, nil, false
 }
 
-func evalCons(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func evalCons(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.ConsClass, obj); err != nil {
 		return nil, err
 	}
@@ -138,7 +137,7 @@ func evalCons(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instanc
 	return SignalCondition(e, instance.NewUndefinedFunction(e, car), Nil)
 }
 
-func evalVariable(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func evalVariable(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if val, ok := e.Variable.Get(obj); ok {
 		return val, nil
 	}
@@ -149,7 +148,7 @@ func evalVariable(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Ins
 }
 
 // Eval evaluates any classs
-func Eval(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Eval(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if obj == Nil {
 		return Nil, nil
 	}

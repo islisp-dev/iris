@@ -12,7 +12,6 @@ import (
 
 	"github.com/islisp-dev/iris/reader/parser"
 	"github.com/islisp-dev/iris/reader/tokenizer"
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
@@ -27,7 +26,7 @@ func isProperList(i ilos.Instance) bool {
 	return false
 }
 
-func convFloat64(e env.Environment, x ilos.Instance) (float64, bool, ilos.Instance) {
+func convFloat64(e ilos.Environment, x ilos.Instance) (float64, bool, ilos.Instance) {
 	switch {
 	case ilos.InstanceOf(instance.IntegerClass, x):
 		return float64(x.(instance.Integer)), false, nil
@@ -43,7 +42,7 @@ func readFromString(s string) (ilos.Instance, ilos.Instance) {
 	return parser.Parse(tokenizer.NewReader(strings.NewReader(s)))
 }
 
-func ensure(e env.Environment, c ilos.Class, i ...ilos.Instance) ilos.Instance {
+func ensure(e ilos.Environment, c ilos.Class, i ...ilos.Instance) ilos.Instance {
 	for _, o := range i {
 		if !ilos.InstanceOf(c, o) {
 			_, err := SignalCondition(e, instance.NewDomainError(e, o, c), Nil)

@@ -8,13 +8,12 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
 // instance
 
-func Create(e env.Environment, c ilos.Instance, i ...ilos.Instance) ilos.Instance {
+func Create(e ilos.Environment, c ilos.Instance, i ...ilos.Instance) ilos.Instance {
 	p := []ilos.Instance{}
 	for _, q := range c.(ilos.Class).Supers() {
 		p = append(p, Create(e, q, i...))
@@ -22,7 +21,7 @@ func Create(e env.Environment, c ilos.Instance, i ...ilos.Instance) ilos.Instanc
 	return InitializeObject(e, BasicInstance{c.(ilos.Class), p, map[ilos.Instance]ilos.Instance{}}, i...)
 }
 
-func InitializeObject(e env.Environment, object ilos.Instance, inits ...ilos.Instance) ilos.Instance {
+func InitializeObject(e ilos.Environment, object ilos.Instance, inits ...ilos.Instance) ilos.Instance {
 	for _, super := range object.(BasicInstance).supers {
 		InitializeObject(e, super, inits...)
 	}

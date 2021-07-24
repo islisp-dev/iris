@@ -5,14 +5,13 @@
 package runtime
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // Listp returns t if obj is a list (instance of class list); otherwise, returns
 // nil. obj may be any ISLISP object.
-func Listp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Listp(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(instance.ListClass, obj) {
 		return T, nil
 	}
@@ -25,7 +24,7 @@ func Listp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) 
 // requested list cannot be allocated (error-id. cannot-create-list). An error
 // shall be signaled if i is not a non-negative integer (error-id.
 // domain-error).initial-element may be any ISLISP object.
-func CreateList(e env.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func CreateList(e ilos.Environment, i ilos.Instance, initialElement ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := Integerp(e, i); ok == Nil {
 		return nil, instance.NewDomainError(e, i, instance.IntegerClass)
 	}
@@ -47,7 +46,7 @@ func CreateList(e env.Environment, i ilos.Instance, initialElement ...ilos.Insta
 // elements are the arguments in the same order as in the list-form. An error
 // shall be signaled if the requested list cannot be allocated (error-id.
 // cannot-create-list). Each obj may be any ISLISP object.
-func List(e env.Environment, objs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func List(e ilos.Environment, objs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	cons := Nil
 	for i := len(objs) - 1; i >= 0; i-- {
 		cons = instance.NewCons(objs[i], cons)
@@ -60,7 +59,7 @@ func List(e env.Environment, objs ...ilos.Instance) (ilos.Instance, ilos.Instanc
 // domain-error). For reverse, no side-effect to the given list occurs. The
 // resulting list is permitted but not required to share structure with the
 // input list.
-func Reverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Reverse(e ilos.Environment, list ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := Listp(e, list); ok == Nil {
 		return nil, instance.NewDomainError(e, list, instance.ListClass)
 	}
@@ -76,7 +75,7 @@ func Reverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instanc
 // domain-error). For nreverse, the conses which make up the top level of the
 // given list are permitted, but not required, to be side-effected in order to
 // produce this new list. nreverse should never be called on a literal object.
-func Nreverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Nreverse(e ilos.Environment, list ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// TODO: tests literal object
 	if ok, _ := Listp(e, list); ok == Nil {
 		return nil, instance.NewDomainError(e, list, instance.ListClass)
@@ -94,7 +93,7 @@ func Nreverse(e env.Environment, list ilos.Instance) (ilos.Instance, ilos.Instan
 // implementation defined whether and when the result shares structure with its
 // list arguments. An error shall be signaled if the list cannot be allocated
 // (error-id. cannot-create-list).
-func Append(e env.Environment, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Append(e ilos.Environment, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// Ref: https://github.com/sbcl/sbcl/blob/fe4faef65315c6ad52b3b89b62b6c6497cb78d09/src/code/list.lisp#L364
 
 	result, err := List(e, Nil)
@@ -124,7 +123,7 @@ func Append(e env.Environment, lists ...ilos.Instance) (ilos.Instance, ilos.Inst
 // at least one occurrence of obj (as determined by eql).  Otherwise, nil is
 // returned. An error shall be signaled if list is not a list (error-id.
 // domain-error).
-func Member(e env.Environment, obj, list ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Member(e ilos.Environment, obj, list ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := Listp(e, list); ok == Nil {
 		return nil, instance.NewDomainError(e, list, instance.ListClass)
 	}
@@ -142,7 +141,7 @@ func Member(e env.Environment, obj, list ilos.Instance) (ilos.Instance, ilos.Ins
 // so on. The iteration terminates when the shortest list runs out, and excess
 // elements in other lists are ignored. The value returned by mapcar is a list
 // of the results of successive calls to function.
-func Mapcar(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Mapcar(e ilos.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
 	if ok, _ := Functionp(e, function); ok == Nil {
 		return nil, instance.NewDomainError(e, function, instance.FunctionClass)
@@ -182,7 +181,7 @@ func Mapcar(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 
 // Mapc is like mapcar except that the results of applying function are not
 // accumulated; list1 is returned.
-func Mapc(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Mapc(e ilos.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	_, err := Mapcar(e, function, list1, lists...)
 	if err != nil {
 		return nil, err
@@ -193,7 +192,7 @@ func Mapc(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instan
 // Mapcan is like mapcar respectively, except that the results of applying
 // function are combined into a list by the use of an operation that performs a
 // destructive form of append rather than list.
-func Mapcan(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Mapcan(e ilos.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	list, err := Mapcar(e, function, list1, lists...)
 	if err != nil {
 		return nil, err
@@ -205,7 +204,7 @@ func Mapcan(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 // Maplist is like mapcar except that function is applied to successive sublists
 // of the lists. function is first applied to the lists themselves, and then to
 // the cdr of each list, and then to the cdr of the cdr of each list, and so on.
-func Maplist(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Maplist(e ilos.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	lists = append([]ilos.Instance{list1}, lists...)
 	if ok, _ := Functionp(e, function); ok == Nil {
 		return nil, instance.NewDomainError(e, function, instance.FunctionClass)
@@ -245,7 +244,7 @@ func Maplist(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Ins
 
 // Mapl is like maplist except that the results of applying function are not
 // accumulated; list1 is returned.
-func Mapl(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Mapl(e ilos.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	_, err := Maplist(e, function, list1, lists...)
 	if err != nil {
 		return nil, err
@@ -256,7 +255,7 @@ func Mapl(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instan
 // Mapcon is like maplist respectively, except that the results of applying
 // function are combined into a list by the use of an operation that performs a
 // destructive form of append rather than list.
-func Mapcon(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Mapcon(e ilos.Environment, function, list1 ilos.Instance, lists ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	list, err := Maplist(e, function, list1, lists...)
 	if err != nil {
 		return nil, err
@@ -269,7 +268,7 @@ func Mapcon(e env.Environment, function, list1 ilos.Instance, lists ...ilos.Inst
 // whose car is obj (as determined by eql). Otherwise, nil is returned. An error
 // shall be signaled if association-list is not a list of conses (error-id.
 // domain-error).
-func Assoc(e env.Environment, obj, associationList ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Assoc(e ilos.Environment, obj, associationList ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := Listp(e, associationList); ok == Nil {
 		return nil, instance.NewDomainError(e, associationList, instance.ListClass)
 	}
@@ -289,7 +288,7 @@ func Assoc(e env.Environment, obj, associationList ilos.Instance) (ilos.Instance
 
 // Null returns t if obj is nil; otherwise, returns nil obj may be any ISLISP
 // object.
-func Null(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Null(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if obj == Nil {
 		return T, nil
 	}

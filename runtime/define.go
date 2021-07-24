@@ -5,7 +5,6 @@
 package runtime
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
@@ -17,7 +16,7 @@ import (
 // evaluation of form is bound to the variable named by name. The binding and
 // the object created as the result of evaluating the second argument are
 // immutable. The symbol named name is returned.
-func Defconstant(e env.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Defconstant(e ilos.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.SymbolClass, name); err != nil {
 		return nil, err
 	}
@@ -40,7 +39,7 @@ func Defconstant(e env.Environment, name, form ilos.Instance) (ilos.Instance, il
 // returned. A lexical variable binding for name can still be ely established by
 // a binding form; in that case, the e binding lexically shadows the outer
 // binding of name defined by defe.
-func Defglobal(e env.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Defglobal(e ilos.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.SymbolClass, name); err != nil {
 		return nil, err
 	}
@@ -58,7 +57,7 @@ func Defglobal(e env.Environment, name, form ilos.Instance) (ilos.Instance, ilos
 // Defdynamic is used to define a dynamic variable identifier in the dynamic
 // variable namespace. The scope of name is the entire current toplevel scope
 // except the body form.The symbol named name is returned.
-func Defdynamic(e env.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Defdynamic(e ilos.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.SymbolClass, name); err != nil {
 		return nil, err
 	}
@@ -82,7 +81,7 @@ func Defdynamic(e env.Environment, name, form ilos.Instance) (ilos.Instance, ilo
 // returns the function name which is the symbol named function-name. The free
 // identifiers in the body form* (i.e., those which are not contained in the
 // lambda list) follow the rules of lexical scoping.
-func Defun(e env.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Defun(e ilos.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.SymbolClass, functionName); err != nil {
 		return nil, err
 	}

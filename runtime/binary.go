@@ -1,12 +1,11 @@
 package runtime
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
-func ReadByte(e env.Environment, args ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func ReadByte(e ilos.Environment, args ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	str := e.StandardInput
 	if len(args) > 0 {
 		str = args[0]
@@ -41,7 +40,7 @@ func ReadByte(e env.Environment, args ...ilos.Instance) (ilos.Instance, ilos.Ins
 	return instance.NewInteger(int(buf[0])), nil
 }
 
-func WriteByte(e env.Environment, obj, str ilos.Instance) (ilos.Instance, ilos.Instance) {
+func WriteByte(e ilos.Environment, obj, str ilos.Instance) (ilos.Instance, ilos.Instance) {
 	s, ok := str.(instance.Stream)
 	if !ok {
 		return SignalCondition(e, instance.NewDomainError(e, s, instance.StreamClass), Nil)

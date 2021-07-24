@@ -6,12 +6,11 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
-func FormatObject(e env.Environment, stream, object, escapep ilos.Instance) (ilos.Instance, ilos.Instance) {
+func FormatObject(e ilos.Environment, stream, object, escapep ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := OpenStreamP(e, stream); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, stream, instance.StreamClass), Nil)
 	}
@@ -31,7 +30,7 @@ func FormatObject(e env.Environment, stream, object, escapep ilos.Instance) (ilo
 	return Nil, nil
 }
 
-func FormatChar(e env.Environment, stream, object ilos.Instance) (ilos.Instance, ilos.Instance) {
+func FormatChar(e ilos.Environment, stream, object ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := OpenStreamP(e, stream); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, stream, instance.StreamClass), Nil)
 	}
@@ -42,7 +41,7 @@ func FormatChar(e env.Environment, stream, object ilos.Instance) (ilos.Instance,
 	return Nil, nil
 }
 
-func FormatFloat(e env.Environment, stream, object ilos.Instance) (ilos.Instance, ilos.Instance) {
+func FormatFloat(e ilos.Environment, stream, object ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := OpenStreamP(e, stream); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, stream, instance.StreamClass), Nil)
 	}
@@ -53,7 +52,7 @@ func FormatFloat(e env.Environment, stream, object ilos.Instance) (ilos.Instance
 	return Nil, nil
 }
 
-func FormatInteger(e env.Environment, stream, object, radix ilos.Instance) (ilos.Instance, ilos.Instance) {
+func FormatInteger(e ilos.Environment, stream, object, radix ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := OpenStreamP(e, stream); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, stream, instance.StreamClass), Nil)
 	}
@@ -69,7 +68,7 @@ func FormatInteger(e env.Environment, stream, object, radix ilos.Instance) (ilos
 	return Nil, nil
 }
 
-func FormatTab(e env.Environment, stream, num ilos.Instance) (ilos.Instance, ilos.Instance) {
+func FormatTab(e ilos.Environment, stream, num ilos.Instance) (ilos.Instance, ilos.Instance) {
 	n := int(num.(instance.Integer))
 	if *stream.(instance.Stream).Column < n {
 		for i := *stream.(instance.Stream).Column; i < n; i++ {
@@ -82,14 +81,14 @@ func FormatTab(e env.Environment, stream, num ilos.Instance) (ilos.Instance, ilo
 	return FormatChar(e, stream, instance.NewCharacter(' '))
 }
 
-func FormatFreshLine(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
+func FormatFreshLine(e ilos.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if *stream.(instance.Stream).Column != 0 {
 		return FormatChar(e, stream, instance.NewCharacter('\n'))
 	}
 	return Nil, nil
 }
 
-func Format(e env.Environment, stream, formatString ilos.Instance, formatArguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Format(e ilos.Environment, stream, formatString ilos.Instance, formatArguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := Stringp(e, formatString); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, formatString, instance.StringClass), Nil)
 	}

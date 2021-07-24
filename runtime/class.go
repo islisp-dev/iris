@@ -8,30 +8,29 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
-func ClassOf(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func ClassOf(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	return obj.Class(), nil
 }
 
-func Instancep(e env.Environment, obj ilos.Instance, class ilos.Class) (ilos.Instance, ilos.Instance) {
+func Instancep(e ilos.Environment, obj ilos.Instance, class ilos.Class) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(class, obj) {
 		return T, nil
 	}
 	return Nil, nil
 }
 
-func Subclassp(e env.Environment, class1, class2 ilos.Class) (ilos.Instance, ilos.Instance) {
+func Subclassp(e ilos.Environment, class1, class2 ilos.Class) (ilos.Instance, ilos.Instance) {
 	if ilos.SubclassOf(class1, class2) {
 		return T, nil
 	}
 	return Nil, nil
 }
 
-func Class(e env.Environment, className ilos.Instance) (ilos.Class, ilos.Instance) {
+func Class(e ilos.Environment, className ilos.Instance) (ilos.Class, ilos.Instance) {
 	if v, ok := e.Class[:1].Get(className); ok {
 		return v.(ilos.Class), nil
 	}
@@ -59,7 +58,7 @@ func checkSuperClass(a, b ilos.Class) bool {
 	return false
 }
 
-func Defclass(e env.Environment, className, scNames, slotSpecs ilos.Instance, classOpts ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Defclass(e ilos.Environment, className, scNames, slotSpecs ilos.Instance, classOpts ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.SymbolClass, className); err != nil {
 		return nil, err
 	}
@@ -150,7 +149,7 @@ func Defclass(e env.Environment, className, scNames, slotSpecs ilos.Instance, cl
 				Defgeneric(e, readerFunctionName, lambdaList)
 			}
 			fun, _ := e.Function.Get(readerFunctionName)
-			fun.(*instance.GenericFunction).AddMethod(nil, lambdaList, []ilos.Class{classObject}, instance.NewFunction(readerFunctionName, func(e env.Environment, object ilos.Instance) (ilos.Instance, ilos.Instance) {
+			fun.(*instance.GenericFunction).AddMethod(nil, lambdaList, []ilos.Class{classObject}, instance.NewFunction(readerFunctionName, func(e ilos.Environment, object ilos.Instance) (ilos.Instance, ilos.Instance) {
 				slot, ok := object.(instance.BasicInstance).GetSlotValue(slotName, classObject)
 				if ok {
 					return slot, nil
@@ -167,7 +166,7 @@ func Defclass(e env.Environment, className, scNames, slotSpecs ilos.Instance, cl
 				Defgeneric(e, writerFunctionName, lambdaList)
 			}
 			fun, _ := e.Function.Get(writerFunctionName)
-			fun.(*instance.GenericFunction).AddMethod(nil, lambdaList, []ilos.Class{instance.ObjectClass, classObject}, instance.NewFunction(writerFunctionName, func(e env.Environment, obj, object ilos.Instance) (ilos.Instance, ilos.Instance) {
+			fun.(*instance.GenericFunction).AddMethod(nil, lambdaList, []ilos.Class{instance.ObjectClass, classObject}, instance.NewFunction(writerFunctionName, func(e ilos.Environment, obj, object ilos.Instance) (ilos.Instance, ilos.Instance) {
 				ok := object.(instance.BasicInstance).SetSlotValue(obj, slotName, classObject)
 				if ok {
 					return obj, nil
@@ -184,7 +183,7 @@ func Defclass(e env.Environment, className, scNames, slotSpecs ilos.Instance, cl
 				Defgeneric(e, boundpFunctionName, lambdaList)
 			}
 			fun, _ := e.Function.Get(boundpFunctionName)
-			fun.(*instance.GenericFunction).AddMethod(nil, lambdaList, []ilos.Class{classObject}, instance.NewFunction(boundpFunctionName, func(e env.Environment, object ilos.Instance) (ilos.Instance, ilos.Instance) {
+			fun.(*instance.GenericFunction).AddMethod(nil, lambdaList, []ilos.Class{classObject}, instance.NewFunction(boundpFunctionName, func(e ilos.Environment, object ilos.Instance) (ilos.Instance, ilos.Instance) {
 				_, ok := object.(instance.BasicInstance).GetSlotValue(slotName, classObject)
 				if ok {
 					return T, nil
@@ -196,21 +195,21 @@ func Defclass(e env.Environment, className, scNames, slotSpecs ilos.Instance, cl
 	return className, nil
 }
 
-func Create(e env.Environment, c ilos.Instance, i ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Create(e ilos.Environment, c ilos.Instance, i ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.StandardClassClass, c); err != nil {
 		return nil, err
 	}
 	return instance.Create(e, c, i...), nil
 }
 
-func InitializeObject(e env.Environment, object ilos.Instance, inits ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func InitializeObject(e ilos.Environment, object ilos.Instance, inits ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.StandardObjectClass, object); err != nil {
 		return nil, err
 	}
 	return instance.InitializeObject(e, object, inits...), nil
 }
 
-func Defmethod(e env.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Defmethod(e ilos.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if len(arguments) < 2 {
 		return SignalCondition(e, instance.NewArityError(e), Nil)
 	}
@@ -263,7 +262,7 @@ func Defmethod(e env.Environment, arguments ...ilos.Instance) (ilos.Instance, il
 	return name, nil
 }
 
-func Defgeneric(e env.Environment, funcSpec, lambdaList ilos.Instance, optionsOrMethodDescs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Defgeneric(e ilos.Environment, funcSpec, lambdaList ilos.Instance, optionsOrMethodDescs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var methodCombination ilos.Instance
 	genericFunctionClass := instance.StandardGenericFunctionClass
 	forms := []ilos.Instance{}
@@ -296,7 +295,7 @@ func Defgeneric(e env.Environment, funcSpec, lambdaList ilos.Instance, optionsOr
 	return funcSpec, nil
 }
 
-func GenericFunctionP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func GenericFunctionP(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(instance.GenericFunctionClass, obj) {
 		return T, nil
 	}

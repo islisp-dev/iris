@@ -9,18 +9,17 @@ import (
 	"os"
 	"time"
 
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 var Time time.Time
 
-func TopLevelHander(e env.Environment, c ilos.Instance) (ilos.Instance, ilos.Instance) {
+func TopLevelHander(e ilos.Environment, c ilos.Instance) (ilos.Instance, ilos.Instance) {
 	return nil, c
 }
 
-var TopLevel = env.NewEnvironment(
+var TopLevel = ilos.NewEnvironment(
 	instance.NewStream(os.Stdin, nil, instance.CharacterClass),
 	instance.NewStream(nil, os.Stdout, instance.CharacterClass),
 	instance.NewStream(nil, os.Stderr, instance.CharacterClass),

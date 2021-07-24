@@ -5,7 +5,6 @@
 package runtime
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
@@ -18,7 +17,7 @@ import (
 // uppermost level of the list. For example, (length ' (a b . c)) ⇒ 2, since '(a
 // b . c) ≡ (cons 'a (cons 'b 'c)). An error shall be signaled if sequence is
 // not a basic-vector or a list (error-id. domain-error).
-func Length(e env.Environment, sequence ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Length(e ilos.Environment, sequence ilos.Instance) (ilos.Instance, ilos.Instance) {
 	switch {
 	case ilos.InstanceOf(instance.StringClass, sequence):
 		return instance.NewInteger(len(sequence.(instance.String))), nil
@@ -37,7 +36,7 @@ func Length(e env.Environment, sequence ilos.Instance) (ilos.Instance, ilos.Inst
 // integer outside of the mentioned range (error-id. index-out-of-range). An
 // error shall be signaled if sequence is not a basic-vector or a list or if z
 // is not an integer (error-id. domain-error).
-func Elt(e env.Environment, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Elt(e ilos.Environment, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.IntegerClass, z); err != nil {
 		return nil, err
 	}
@@ -73,7 +72,7 @@ func Elt(e env.Environment, sequence, z ilos.Instance) (ilos.Instance, ilos.Inst
 // of the valid range of indices (error-id. index-out-of-range). An error shall
 // be signaled if sequence is not a basic-vector or a list or if z is not an
 // integer (error-id. domain-error). obj may be any ISLISP object.
-func SetElt(e env.Environment, obj, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
+func SetElt(e ilos.Environment, obj, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.IntegerClass, z); err != nil {
 		return nil, err
 	}
@@ -122,7 +121,7 @@ func SetElt(e env.Environment, obj, sequence, z ilos.Instance) (ilos.Instance, i
 // of the bounds mentioned (error-id. index-out-of-range). An error shall be
 // signaled if sequence is not a basic-vector or a list, or if z1 is not an
 // integer, or if z2 is not an integer (error-id. domain-error).
-func Subseq(e env.Environment, sequence, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Subseq(e ilos.Environment, sequence, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.IntegerClass, z1, z2); err != nil {
 		return nil, err
 	}
@@ -161,7 +160,7 @@ func Subseq(e env.Environment, sequence, z1, z2 ilos.Instance) (ilos.Instance, i
 // numbered 1, and so on. An error shall be signaled if destination is not a
 // basic-vector or a list (error-id. domain-error). An error shall be signaled
 // if any sequence is not a basic-vector or a list (error-id. domain-error).
-func MapInto(e env.Environment, destination, function ilos.Instance, sequences ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func MapInto(e ilos.Environment, destination, function ilos.Instance, sequences ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.ListClass, append(sequences, destination)...); err != nil {
 		if err := ensure(e, instance.BasicVectorClass, append(sequences, destination)...); err != nil {
 			return nil, err

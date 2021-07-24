@@ -5,14 +5,13 @@
 package runtime
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // Consp returns t if obj is a cons (instance of class cons); otherwise, returns
 // nil. obj may be any ISLISP object.
-func Consp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Consp(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(instance.ConsClass, obj) {
 		return T, nil
 	}
@@ -23,13 +22,13 @@ func Consp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) 
 // and with obj2 as its cdr (or `right') part. An error shall be signaled if the
 // requested cons cannot be allocated (error-id. cannot-create-cons). Both obj1
 // and obj2 may be any ISLISP object.
-func Cons(e env.Environment, obj1, obj2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Cons(e ilos.Environment, obj1, obj2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	return instance.NewCons(obj1, obj2), nil
 }
 
 // Car returns the left component of the cons. An error shall be signaled if
 // cons is not a cons (error-id. domain-error).
-func Car(e env.Environment, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Car(e ilos.Environment, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.ConsClass, cons); err != nil {
 		return nil, err
 	}
@@ -38,7 +37,7 @@ func Car(e env.Environment, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
 
 // Cdr returns the right component of the cons. An error shall be signaled if
 // cons is not a cons (error-id. domain-error).
-func Cdr(e env.Environment, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Cdr(e ilos.Environment, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.ConsClass, cons); err != nil {
 		return nil, err
 	}
@@ -48,7 +47,7 @@ func Cdr(e env.Environment, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
 // SetCar updates the left component of cons with obj. The returned value is obj
 // . An error shall be signaled if cons is not a cons (error-id. domain-error).
 // obj may be any ISLISP object.
-func SetCar(e env.Environment, obj, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
+func SetCar(e ilos.Environment, obj, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.ConsClass, cons); err != nil {
 		return nil, err
 	}
@@ -59,7 +58,7 @@ func SetCar(e env.Environment, obj, cons ilos.Instance) (ilos.Instance, ilos.Ins
 // SetCdr updates the right component of cons with obj. The returned value is
 // obj . An error shall be signaled if cons is not a cons (error-id.
 // domain-error). obj may be any ISLISP object.
-func SetCdr(e env.Environment, obj, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
+func SetCdr(e ilos.Environment, obj, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.ConsClass, cons); err != nil {
 		return nil, err
 	}

@@ -10,49 +10,48 @@ import (
 	"strings"
 
 	"github.com/islisp-dev/iris/reader/parser"
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
-func Streamp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Streamp(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(instance.StreamClass, obj) {
 		return T, nil
 	}
 	return Nil, nil
 }
 
-func OpenStreamP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func OpenStreamP(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	return T, nil
 }
 
-func InputStreamP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func InputStreamP(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if s, ok := obj.(instance.Stream); ok && s.Reader.Raw != nil {
 		return T, nil
 	}
 	return Nil, nil
 }
 
-func OutputStreamP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func OutputStreamP(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if s, ok := obj.(instance.Stream); ok && s.BufferedWriter.Raw != nil {
 		return T, nil
 	}
 	return Nil, nil
 }
 
-func StandardInput(e env.Environment) (ilos.Instance, ilos.Instance) {
+func StandardInput(e ilos.Environment) (ilos.Instance, ilos.Instance) {
 	return e.StandardInput, nil
 }
 
-func StandardOutput(e env.Environment) (ilos.Instance, ilos.Instance) {
+func StandardOutput(e ilos.Environment) (ilos.Instance, ilos.Instance) {
 	return e.StandardOutput, nil
 }
 
-func ErrorOutput(e env.Environment) (ilos.Instance, ilos.Instance) {
+func ErrorOutput(e ilos.Environment) (ilos.Instance, ilos.Instance) {
 	return e.ErrorOutput, nil
 }
 
-func WithStandardInput(e env.Environment, streamForm ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func WithStandardInput(e ilos.Environment, streamForm ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	e.StandardInput, err = Eval(e, streamForm)
 	if err != nil {
@@ -64,7 +63,7 @@ func WithStandardInput(e env.Environment, streamForm ilos.Instance, forms ...ilo
 	return Progn(e, forms...)
 }
 
-func WithStandardOutput(e env.Environment, streamForm ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func WithStandardOutput(e ilos.Environment, streamForm ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	e.StandardOutput, err = Eval(e, streamForm)
 	if err != nil {
@@ -76,7 +75,7 @@ func WithStandardOutput(e env.Environment, streamForm ilos.Instance, forms ...il
 	return Progn(e, forms...)
 }
 
-func WithErrorOutput(e env.Environment, streamForm ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func WithErrorOutput(e ilos.Environment, streamForm ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	e.ErrorOutput, err = Eval(e, streamForm)
 	if err != nil {
@@ -88,7 +87,7 @@ func WithErrorOutput(e env.Environment, streamForm ilos.Instance, forms ...ilos.
 	return Progn(e, forms...)
 }
 
-func OpenInputFile(e env.Environment, filename ilos.Instance, elementClass ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func OpenInputFile(e ilos.Environment, filename ilos.Instance, elementClass ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := Stringp(e, filename); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, filename, instance.StringClass), Nil)
 	}
@@ -106,7 +105,7 @@ func OpenInputFile(e env.Environment, filename ilos.Instance, elementClass ...il
 	return instance.NewStream(file, nil, ec), nil
 }
 
-func OpenOutputFile(e env.Environment, filename ilos.Instance, elementClass ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func OpenOutputFile(e ilos.Environment, filename ilos.Instance, elementClass ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := Stringp(e, filename); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, filename, instance.StringClass), Nil)
 	}
@@ -125,7 +124,7 @@ func OpenOutputFile(e env.Environment, filename ilos.Instance, elementClass ...i
 	return instance.NewStream(nil, file, ec), nil
 }
 
-func OpenIoFile(e env.Environment, filename ilos.Instance, elementClass ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func OpenIoFile(e ilos.Environment, filename ilos.Instance, elementClass ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := Stringp(e, filename); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, filename, instance.StringClass), Nil)
 	}
@@ -143,7 +142,7 @@ func OpenIoFile(e env.Environment, filename ilos.Instance, elementClass ...ilos.
 	return instance.NewStream(file, file, ec), nil
 }
 
-func WithOpenInputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func WithOpenInputFile(e ilos.Environment, fileSpec ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if !ilos.InstanceOf(instance.ListClass, fileSpec) {
 		return SignalCondition(e, instance.NewDomainError(e, fileSpec, instance.ListClass), Nil)
 	}
@@ -176,7 +175,7 @@ func WithOpenInputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.
 	return r, err
 }
 
-func WithOpenOutputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func WithOpenOutputFile(e ilos.Environment, fileSpec ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if !ilos.InstanceOf(instance.ListClass, fileSpec) {
 		return SignalCondition(e, instance.NewDomainError(e, fileSpec, instance.ListClass), Nil)
 	}
@@ -209,7 +208,7 @@ func WithOpenOutputFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos
 	return r, err
 }
 
-func WithOpenIoFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func WithOpenIoFile(e ilos.Environment, fileSpec ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if !ilos.InstanceOf(instance.ListClass, fileSpec) {
 		return SignalCondition(e, instance.NewDomainError(e, fileSpec, instance.ListClass), Nil)
 	}
@@ -242,7 +241,7 @@ func WithOpenIoFile(e env.Environment, fileSpec ilos.Instance, forms ...ilos.Ins
 	return r, err
 }
 
-func Close(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Close(e ilos.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// It works on file or std stream.
 	if ok, _ := Streamp(e, stream); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, stream, instance.StreamClass), Nil)
@@ -269,7 +268,7 @@ func Close(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instanc
 	return Nil, nil
 }
 
-func FinishOutput(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
+func FinishOutput(e ilos.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// It works on file or std stream.
 	if ok, _ := Streamp(e, stream); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, stream, instance.StreamClass), Nil)
@@ -280,15 +279,15 @@ func FinishOutput(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.
 	return Nil, nil
 }
 
-func CreateStringInputStream(e env.Environment, str ilos.Instance) (ilos.Instance, ilos.Instance) {
+func CreateStringInputStream(e ilos.Environment, str ilos.Instance) (ilos.Instance, ilos.Instance) {
 	return instance.NewStream(strings.NewReader(string(str.(instance.String))), nil, instance.CharacterClass), nil
 }
 
-func CreateStringOutputStream(e env.Environment) (ilos.Instance, ilos.Instance) {
+func CreateStringOutputStream(e ilos.Environment) (ilos.Instance, ilos.Instance) {
 	return instance.NewStream(nil, new(bytes.Buffer), instance.CharacterClass), nil
 }
 
-func GetOutputStreamString(e env.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
+func GetOutputStreamString(e ilos.Environment, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ok, _ := OutputStreamP(e, stream); ok == Nil {
 		return SignalCondition(e, instance.NewDomainError(e, stream, instance.StreamClass), Nil)
 	}
@@ -298,7 +297,7 @@ func GetOutputStreamString(e env.Environment, stream ilos.Instance) (ilos.Instan
 	return out, nil
 }
 
-func Read(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Read(e ilos.Environment, options ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	s := e.StandardInput
 	if len(options) > 0 {
 		s = options[0]
@@ -328,7 +327,7 @@ func Read(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.Inst
 	return v, nil
 }
 
-func ReadChar(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func ReadChar(e ilos.Environment, options ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	s := e.StandardInput
 	if len(options) > 0 {
 		s = options[0]
@@ -359,7 +358,7 @@ func ReadChar(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.
 	return instance.NewCharacter(v), nil
 }
 
-func ProbeFile(e env.Environment, fs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func ProbeFile(e ilos.Environment, fs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if len(fs) != 1 {
 		return SignalCondition(e, instance.NewArityError(e), Nil)
 	}
@@ -373,7 +372,7 @@ func ProbeFile(e env.Environment, fs ...ilos.Instance) (ilos.Instance, ilos.Inst
 	}
 }
 
-func PreviewChar(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func PreviewChar(e ilos.Environment, options ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	s := e.StandardInput
 	if len(options) > 0 {
 		s = options[0]
@@ -404,7 +403,7 @@ func PreviewChar(e env.Environment, options ...ilos.Instance) (ilos.Instance, il
 	return instance.NewCharacter(rune(bytes[0])), nil
 }
 
-func ReadLine(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func ReadLine(e ilos.Environment, options ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	s := e.StandardInput
 	if len(options) > 0 {
 		s = options[0]
@@ -434,7 +433,7 @@ func ReadLine(e env.Environment, options ...ilos.Instance) (ilos.Instance, ilos.
 	return instance.NewString([]rune(string(v))), nil
 }
 
-func StreamReadyP(e env.Environment, inputStream ilos.Instance) (ilos.Instance, ilos.Instance) {
+func StreamReadyP(e ilos.Environment, inputStream ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// TODO: stream-ready-p
 	return T, nil
 }

@@ -5,7 +5,6 @@
 package runtime
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
@@ -15,7 +14,7 @@ import (
 // immediately returns nil. 3. Otherwise, if Vt is non-nil, the forms body-form*
 // are evaluated sequentially (from left to right). 4. Upon successful
 // completion of the body-forms*, the while form begins again with step 1.
-func While(e env.Environment, testForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func While(e ilos.Environment, testForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	test, err := Eval(e, testForm)
 	if err != nil {
 		return nil, err
@@ -52,7 +51,7 @@ func While(e env.Environment, testForm ilos.Instance, bodyForm ...ilos.Instance)
 // then the result * are evaluated sequentially and the value of the last one is
 // returned as value of the whole for macro. If no result is present, then the
 // value of the for macro is nil.
-func For(e env.Environment, iterationSpecs, endTestAndResults ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func For(e ilos.Environment, iterationSpecs, endTestAndResults ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.ListClass, iterationSpecs); err != nil {
 		return nil, err
 	}

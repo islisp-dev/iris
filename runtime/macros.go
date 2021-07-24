@@ -5,7 +5,6 @@
 package runtime
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
@@ -15,7 +14,7 @@ import (
 // must be an identifier whose scope is the current toplevel scope in which the
 // defmacro form appears. lambda-list is as defined in page 23. The definition
 // point of macro-name is the closing parenthesis of the lambda-list.
-func Defmacro(e env.Environment, macroName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Defmacro(e ilos.Environment, macroName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err := ensure(e, instance.SymbolClass, macroName); err != nil {
 		return nil, err
 	}
@@ -40,11 +39,11 @@ func Defmacro(e env.Environment, macroName, lambdaList ilos.Instance, forms ...i
 // for unquoted expressions appearing at the same nesting level, which increases
 // by one inside each successive quasiquotation and decreases by one inside each
 // unquotation.
-func Quasiquote(e env.Environment, form ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Quasiquote(e ilos.Environment, form ilos.Instance) (ilos.Instance, ilos.Instance) {
 	return expand(e, form, 0)
 }
 
-func expand(e env.Environment, form ilos.Instance, level int) (ilos.Instance, ilos.Instance) {
+func expand(e ilos.Environment, form ilos.Instance, level int) (ilos.Instance, ilos.Instance) {
 	if !ilos.InstanceOf(instance.ConsClass, form) {
 		return form, nil
 	} // If form is a instance of <cons> then,

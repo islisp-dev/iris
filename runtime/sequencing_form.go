@@ -5,7 +5,6 @@
 package runtime
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
@@ -14,7 +13,7 @@ import (
 // the forms are evaluated from left to right. The values of all the forms but
 // the last are discarded, so they are executed only for their side-effects.
 // progn without forms returns nil.
-func Progn(e env.Environment, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Progn(e ilos.Environment, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	ret := Nil
 	for _, form := range forms {

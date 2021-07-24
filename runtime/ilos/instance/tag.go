@@ -5,26 +5,25 @@
 package instance
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
 func NewBlockTag(tag, uid, object ilos.Instance) ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil, nil),
+	return Create(ilos.NewEnvironment(nil, nil, nil, nil),
 		BlockTagClass,
 		NewSymbol("IRIS.TAG"), tag,
 		NewSymbol("IRIS.UID"), uid,
 		NewSymbol("IRIS.OBJECT"), object)
 }
 func NewCatchTag(tag, uid, object ilos.Instance) ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil, nil),
+	return Create(ilos.NewEnvironment(nil, nil, nil, nil),
 		CatchTagClass,
 		NewSymbol("IRIS.TAG"), tag,
 		NewSymbol("IRIS.UID"), uid,
 		NewSymbol("IRIS.OBJECT"), object)
 }
 func NewTagbodyTag(tag, uid ilos.Instance) ilos.Instance {
-	return Create(env.NewEnvironment(nil, nil, nil, nil),
+	return Create(ilos.NewEnvironment(nil, nil, nil, nil),
 		TagbodyTagClass,
 		NewSymbol("IRIS.TAG"), tag,
 		NewSymbol("IRIS.UID"), uid)

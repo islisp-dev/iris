@@ -7,12 +7,11 @@ package runtime
 import (
 	"math"
 
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
-func convInt(e env.Environment, z ilos.Instance) (int, ilos.Instance) {
+func convInt(e ilos.Environment, z ilos.Instance) (int, ilos.Instance) {
 	if err := ensure(e, instance.IntegerClass, z); err != nil {
 		return 0, err
 	}
@@ -21,7 +20,7 @@ func convInt(e env.Environment, z ilos.Instance) (int, ilos.Instance) {
 
 // Integerp returns t if obj is an integer (instance of class integer);
 // otherwise, returns nil. obj may be any ISLISP object.
-func Integerp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Integerp(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(instance.IntegerClass, obj) {
 		return T, nil
 	}
@@ -30,7 +29,7 @@ func Integerp(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instanc
 
 // Div returns the greatest integer less than or equal to the quotient of z1 and
 // z2. An error shall be signaled if z2 is zero (error-id. division-by-zero).
-func Div(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Div(e ilos.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, err := convInt(e, z1)
 	if err != nil {
 		return nil, err
@@ -58,7 +57,7 @@ func Div(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance)
 // (exclusive), and the difference of z1 and this result is divisible by z2
 // without remainder. An error shall be signaled if either z1 or z2 is not an
 // integer (error-id. domain-error).
-func Mod(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Mod(e ilos.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	f, err := Div(e, z1, z2)
 	if err != nil {
 		return nil, err
@@ -75,7 +74,7 @@ func Mod(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance)
 // is the largest integer z such that z1 and z2 are integral multiples of z. An
 // error shall be signaled if either z1 or z2 is not an integer (error-id.
 // domain-error).
-func Gcd(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Gcd(e ilos.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	gcd := func(x, y int) int {
 		for y != 0 {
 			x, y = y, x%y
@@ -96,7 +95,7 @@ func Gcd(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance)
 // Lcm returns the least common multiple of its integer arguments. An error
 // shall be signaled if either z1 or z2 is not an integer (error-id.
 // domain-error).
-func Lcm(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Lcm(e ilos.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
 	gcd := func(x, y int) int {
 		for y != 0 {
 			x, y = y, x%y
@@ -117,7 +116,7 @@ func Lcm(e env.Environment, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance)
 // Isqrt Returns the greatest integer less than or equal to the exact positive
 // square root of z . An error shall be signaled if z is not a non-negative
 // integer (error-id. domain-error).
-func Isqrt(e env.Environment, z ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Isqrt(e ilos.Environment, z ilos.Instance) (ilos.Instance, ilos.Instance) {
 	a, err := convInt(e, z)
 	if err != nil {
 		return nil, err

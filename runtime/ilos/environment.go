@@ -2,11 +2,7 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can
 // obtain one at http://mozilla.org/MPL/2.0/.
 
-package env
-
-import (
-	"github.com/islisp-dev/iris/runtime/ilos"
-)
+package ilos
 
 // Environment struct is the struct for keeping functions and variables
 type Environment struct {
@@ -26,14 +22,14 @@ type Environment struct {
 	// Dynamic
 	CatchTag        stack
 	DynamicVariable stack // deep biding
-	StandardInput   ilos.Instance
-	StandardOutput  ilos.Instance
-	ErrorOutput     ilos.Instance
-	Handler         ilos.Instance
+	StandardInput   Instance
+	StandardOutput  Instance
+	ErrorOutput     Instance
+	Handler         Instance
 }
 
 // New creates new eironment
-func NewEnvironment(stdin, stdout, stderr, handler ilos.Instance) Environment {
+func NewEnvironment(stdin, stdout, stderr, handler Instance) Environment {
 	e := new(Environment)
 
 	// Lexical

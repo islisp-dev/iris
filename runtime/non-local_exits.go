@@ -5,7 +5,6 @@
 package runtime
 
 import (
-	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
@@ -37,7 +36,7 @@ more recently than the destination to which control is being transferred
 is immediately considered invalid.
 */
 
-func Block(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Block(e ilos.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	uid := instance.NewInteger(uniqueInt())
 	if ilos.InstanceOf(instance.NumberClass, tag) || ilos.InstanceOf(instance.CharacterClass, tag) {
 		return SignalCondition(e, instance.NewDomainError(e, tag, instance.ObjectClass), Nil)
@@ -67,7 +66,7 @@ func Block(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.In
 	return sucess, nil
 }
 
-func ReturnFrom(e env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
+func ReturnFrom(e ilos.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if ilos.InstanceOf(instance.NumberClass, tag) || ilos.InstanceOf(instance.CharacterClass, tag) {
 		return SignalCondition(e, instance.NewDomainError(e, tag, instance.ObjectClass), Nil)
 	}
@@ -82,7 +81,7 @@ func ReturnFrom(e env.Environment, tag, object ilos.Instance) (ilos.Instance, il
 	return nil, instance.NewBlockTag(tag, uid, object)
 }
 
-func Catch(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Catch(e ilos.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	tag, err = Eval(e, tag)
 	uid := instance.NewInteger(uniqueInt())
@@ -117,7 +116,7 @@ func Catch(e env.Environment, tag ilos.Instance, body ...ilos.Instance) (ilos.In
 	return sucess, nil
 }
 
-func Throw(e env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Throw(e ilos.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var err ilos.Instance
 	tag, err = Eval(e, tag)
 	if err != nil {
@@ -138,7 +137,7 @@ func Throw(e env.Environment, tag, object ilos.Instance) (ilos.Instance, ilos.In
 	return nil, instance.NewCatchTag(tag, uid, object)
 }
 
-func Tagbody(e env.Environment, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Tagbody(e ilos.Environment, body ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	uid := instance.NewInteger(uniqueInt())
 	for _, cadr := range body {
 		if !ilos.InstanceOf(instance.ConsClass, cadr) {
@@ -182,7 +181,7 @@ func Tagbody(e env.Environment, body ...ilos.Instance) (ilos.Instance, ilos.Inst
 	return Nil, nil
 }
 
-func Go(e env.Environment, tag ilos.Instance) (ilos.Instance, ilos.Instance) {
+func Go(e ilos.Environment, tag ilos.Instance) (ilos.Instance, ilos.Instance) {
 	uid, ok := e.TagbodyTag.Get(tag)
 	if !ok {
 		return SignalCondition(e, instance.NewControlError(e), Nil)
@@ -209,7 +208,7 @@ func Go(e env.Environment, tag ilos.Instance) (ilos.Instance, ilos.Instance) {
 // intent is that if the ISLISP processor does not terminate abnormally, normal
 // mechanisms for non-e exit (return-from, throw, or go) would be used as
 // necessary and would respect these cleanup-forms.
-func UnwindProtect(e env.Environment, form ilos.Instance, cleanupForms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func UnwindProtect(e ilos.Environment, form ilos.Instance, cleanupForms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	ret1, err1 := Eval(e, form)
 	ret2, err2 := Progn(e, cleanupForms...)
 	if err2 != nil {

@@ -2,19 +2,15 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can
 // obtain one at http://mozilla.org/MPL/2.0/.
 
-package env
+package ilos
 
-import (
-	"github.com/islisp-dev/iris/runtime/ilos"
-)
-
-type stack []map[ilos.Instance]ilos.Instance
+type stack []map[Instance]Instance
 
 func NewStack() stack {
-	return []map[ilos.Instance]ilos.Instance{map[ilos.Instance]ilos.Instance{}}
+	return []map[Instance]Instance{map[Instance]Instance{}}
 }
 
-func (s stack) Get(key ilos.Instance) (ilos.Instance, bool) {
+func (s stack) Get(key Instance) (Instance, bool) {
 	for i := len(s) - 1; i >= 0; i-- {
 		if v, ok := s[i][key]; ok {
 			return v, true
@@ -23,7 +19,7 @@ func (s stack) Get(key ilos.Instance) (ilos.Instance, bool) {
 	return nil, false
 }
 
-func (s stack) Set(key, value ilos.Instance) bool {
+func (s stack) Set(key, value Instance) bool {
 	for i := len(s) - 1; i >= 0; i-- {
 		if _, ok := s[i][key]; ok {
 			s[i][key] = value
@@ -33,7 +29,7 @@ func (s stack) Set(key, value ilos.Instance) bool {
 	return false
 }
 
-func (s stack) Define(key, value ilos.Instance) bool {
+func (s stack) Define(key, value Instance) bool {
 	if _, ok := s[len(s)-1][key]; !ok {
 		s[len(s)-1][key] = value
 		return true
@@ -42,7 +38,7 @@ func (s stack) Define(key, value ilos.Instance) bool {
 	return false
 }
 
-func (s stack) Delete(key ilos.Instance) {
+func (s stack) Delete(key Instance) {
 	delete(s[len(s)-1], key)
 }
 
