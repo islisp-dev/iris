@@ -6,7 +6,6 @@ package runtime
 
 import (
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // Defconstant is used to define a named constant in the variable namespace of
@@ -17,11 +16,11 @@ import (
 // the object created as the result of evaluating the second argument are
 // immutable. The symbol named name is returned.
 func Defconstant(e ilos.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.SymbolClass, name); err != nil {
+	if err := ensure(e, ilos.SymbolClass, name); err != nil {
 		return nil, err
 	}
 	if _, ok := e.Constant[:1].Get(name); ok {
-		return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
+		return SignalCondition(e, ilos.NewImmutableBinding(e), Nil)
 	}
 	ret, err := Eval(e, form)
 	if err != nil {
@@ -40,11 +39,11 @@ func Defconstant(e ilos.Environment, name, form ilos.Instance) (ilos.Instance, i
 // a binding form; in that case, the e binding lexically shadows the outer
 // binding of name defined by defe.
 func Defglobal(e ilos.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.SymbolClass, name); err != nil {
+	if err := ensure(e, ilos.SymbolClass, name); err != nil {
 		return nil, err
 	}
 	if _, ok := e.Constant[:1].Get(name); ok {
-		return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
+		return SignalCondition(e, ilos.NewImmutableBinding(e), Nil)
 	}
 	ret, err := Eval(e, form)
 	if err != nil {
@@ -58,11 +57,11 @@ func Defglobal(e ilos.Environment, name, form ilos.Instance) (ilos.Instance, ilo
 // variable namespace. The scope of name is the entire current toplevel scope
 // except the body form.The symbol named name is returned.
 func Defdynamic(e ilos.Environment, name, form ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.SymbolClass, name); err != nil {
+	if err := ensure(e, ilos.SymbolClass, name); err != nil {
 		return nil, err
 	}
 	if _, ok := e.Constant[:1].Get(name); ok {
-		return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
+		return SignalCondition(e, ilos.NewImmutableBinding(e), Nil)
 	}
 	ret, err := Eval(e, form)
 	if err != nil {
@@ -82,7 +81,7 @@ func Defdynamic(e ilos.Environment, name, form ilos.Instance) (ilos.Instance, il
 // identifiers in the body form* (i.e., those which are not contained in the
 // lambda list) follow the rules of lexical scoping.
 func Defun(e ilos.Environment, functionName, lambdaList ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.SymbolClass, functionName); err != nil {
+	if err := ensure(e, ilos.SymbolClass, functionName); err != nil {
 		return nil, err
 	}
 	ret, err := newNamedFunction(e, functionName, lambdaList, forms...)

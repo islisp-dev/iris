@@ -6,13 +6,12 @@ package runtime
 
 import (
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // Characterp returns t if obj is a character (instance of class character);
 // otherwise, returns nil. obj may be any ISLISP object.
 func Characterp(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(instance.CharacterClass, obj) {
+	if ilos.InstanceOf(ilos.CharacterClass, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -20,7 +19,7 @@ func Characterp(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Inst
 
 // CharEqual tests whether char1 is the same character as char2.
 func CharEqual(e ilos.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.CharacterClass, char1, char2); err != nil {
+	if err := ensure(e, ilos.CharacterClass, char1, char2); err != nil {
 		return nil, err
 	}
 	if char1 == char2 {
@@ -41,10 +40,10 @@ func CharNotEqual(e ilos.Environment, char1, char2 ilos.Instance) (ilos.Instance
 // CharGreaterThan tests whether char1 is greater than char2. An error shall be
 // signaled if either char1 or char2 is not a character (error-id. domain-error).
 func CharGreaterThan(e ilos.Environment, char1, char2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.CharacterClass, char1, char2); err != nil {
+	if err := ensure(e, ilos.CharacterClass, char1, char2); err != nil {
 		return nil, err
 	}
-	if char1.(instance.Character) > char2.(instance.Character) {
+	if char1.(ilos.Character) > char2.(ilos.Character) {
 		return T, nil
 	}
 	return Nil, nil

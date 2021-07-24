@@ -4,9 +4,7 @@
 
 package runtime
 
-import (
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
-)
+import "github.com/islisp-dev/iris/runtime/ilos"
 
 // The values t and nil are called booleans. t denotes true, and nil is the only
 // value denoting false. Predicates, also called boolean functions, are
@@ -21,6 +19,6 @@ import (
 // whose value is the symbol t itself. nil is a named constant whose value is
 // the symbol nil itself.
 var (
-	Nil = instance.Nil
-	T   = instance.NewSymbol("T")
+	Nil = ilos.Nil
+	T   = ilos.NewSymbol("T")
 )

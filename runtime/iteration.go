@@ -6,7 +6,6 @@ package runtime
 
 import (
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // While the test-form returns a true value. Specifically: 1. test-form is
@@ -52,15 +51,15 @@ func While(e ilos.Environment, testForm ilos.Instance, bodyForm ...ilos.Instance
 // returned as value of the whole for macro. If no result is present, then the
 // value of the for macro is nil.
 func For(e ilos.Environment, iterationSpecs, endTestAndResults ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.ListClass, iterationSpecs); err != nil {
+	if err := ensure(e, ilos.ListClass, iterationSpecs); err != nil {
 		return nil, err
 	}
 	a := e.NewLexical()
-	for _, is := range iterationSpecs.(instance.List).Slice() {
-		if err := ensure(e, instance.ListClass, is); err != nil {
+	for _, is := range iterationSpecs.(ilos.List).Slice() {
+		if err := ensure(e, ilos.ListClass, is); err != nil {
 			return nil, err
 		}
-		i := is.(instance.List).Slice()
+		i := is.(ilos.List).Slice()
 		switch len(i) {
 		case 2, 3:
 			var1 := i[0]
@@ -69,18 +68,18 @@ func For(e ilos.Environment, iterationSpecs, endTestAndResults ilos.Instance, fo
 				return nil, err
 			}
 			if !a.Variable.Define(var1, init) {
-				return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
+				return SignalCondition(e, ilos.NewImmutableBinding(e), Nil)
 			}
 		default:
-			return SignalCondition(e, instance.NewArityError(e), Nil)
+			return SignalCondition(e, ilos.NewArityError(e), Nil)
 		}
 	}
-	if err := ensure(e, instance.ListClass, endTestAndResults); err != nil {
+	if err := ensure(e, ilos.ListClass, endTestAndResults); err != nil {
 		return nil, err
 	}
-	ends := endTestAndResults.(instance.List).Slice()
+	ends := endTestAndResults.(ilos.List).Slice()
 	if len(ends) == 0 {
-		return SignalCondition(e, instance.NewArityError(e), Nil)
+		return SignalCondition(e, ilos.NewArityError(e), Nil)
 	}
 	endTest := ends[0]
 	results := ends[1:]
@@ -94,23 +93,23 @@ func For(e ilos.Environment, iterationSpecs, endTestAndResults ilos.Instance, fo
 			return nil, err
 		}
 		b := a.NewLexical()
-		for _, is := range iterationSpecs.(instance.List).Slice() {
-			if err := ensure(e, instance.ListClass, is); err != nil {
+		for _, is := range iterationSpecs.(ilos.List).Slice() {
+			if err := ensure(e, ilos.ListClass, is); err != nil {
 				return nil, err
 			}
-			switch is.(instance.List).Length() {
+			switch is.(ilos.List).Length() {
 			case 2:
 			case 3:
-				var1 := is.(instance.List).Nth(0)
-				step, err := Eval(a, is.(instance.List).Nth(2))
+				var1 := is.(ilos.List).Nth(0)
+				step, err := Eval(a, is.(ilos.List).Nth(2))
 				if err != nil {
 					return nil, err
 				}
 				if !b.Variable.Define(var1, step) {
-					return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
+					return SignalCondition(e, ilos.NewImmutableBinding(e), Nil)
 				}
 			default:
-				return SignalCondition(e, instance.NewArityError(e), Nil)
+				return SignalCondition(e, ilos.NewArityError(e), Nil)
 			}
 		}
 		test, err = Eval(b, endTest)

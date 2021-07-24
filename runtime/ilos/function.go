@@ -2,30 +2,28 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can
 // obtain one at http://mozilla.org/MPL/2.0/.
 
-package instance
+package ilos
 
 import (
 	"fmt"
 	"reflect"
 	"sort"
-
-	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
 type Applicable interface {
-	Apply(ilos.Environment, ...ilos.Instance) (ilos.Instance, ilos.Instance)
+	Apply(Environment, ...Instance) (Instance, Instance)
 }
 
 type Function struct {
-	name     ilos.Instance
+	name     Instance
 	function interface{}
 }
 
-func NewFunction(name ilos.Instance, function interface{}) ilos.Instance {
+func NewFunction(name Instance, function interface{}) Instance {
 	return Function{name, function}
 }
 
-func (Function) Class() ilos.Class {
+func (Function) Class() Class {
 	return FunctionClass
 }
 
@@ -33,7 +31,7 @@ func (f Function) String() string {
 	return fmt.Sprintf("#%v", f.Class())
 }
 
-func (f Function) Apply(e ilos.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func (f Function) Apply(e Environment, arguments ...Instance) (Instance, Instance) {
 	fv := reflect.ValueOf(f.function)
 	ft := reflect.TypeOf(f.function)
 	argv := []reflect.Value{reflect.ValueOf(e)}
@@ -44,31 +42,31 @@ func (f Function) Apply(e ilos.Environment, arguments ...ilos.Instance) (ilos.In
 		return nil, NewArityError(e)
 	}
 	rets := fv.Call(argv)
-	a, _ := rets[0].Interface().(ilos.Instance)
-	b, _ := rets[1].Interface().(ilos.Instance)
+	a, _ := rets[0].Interface().(Instance)
+	b, _ := rets[1].Interface().(Instance)
 	return a, b
 
 }
 
 type method struct {
-	qualifier ilos.Instance
-	classList []ilos.Class
+	qualifier Instance
+	classList []Class
 	function  Function
 }
 
 type GenericFunction struct {
-	funcSpec             ilos.Instance
-	lambdaList           ilos.Instance
-	methodCombination    ilos.Instance
-	genericFunctionClass ilos.Class
+	funcSpec             Instance
+	lambdaList           Instance
+	methodCombination    Instance
+	genericFunctionClass Class
 	methods              []method
 }
 
-func NewGenericFunction(funcSpec, lambdaList, methodCombination ilos.Instance, genericFunctionClass ilos.Class) ilos.Instance {
+func NewGenericFunction(funcSpec, lambdaList, methodCombination Instance, genericFunctionClass Class) Instance {
 	return &GenericFunction{funcSpec, lambdaList, methodCombination, genericFunctionClass, []method{}}
 }
 
-func (f *GenericFunction) AddMethod(qualifier, lambdaList ilos.Instance, classList []ilos.Class, function ilos.Instance) bool {
+func (f *GenericFunction) AddMethod(qualifier, lambdaList Instance, classList []Class, function Instance) bool {
 	if f.lambdaList.(List).Length() != lambdaList.(List).Length() {
 		return false
 	}
@@ -89,7 +87,7 @@ func (f *GenericFunction) AddMethod(qualifier, lambdaList ilos.Instance, classLi
 	return true
 }
 
-func (f *GenericFunction) Class() ilos.Class {
+func (f *GenericFunction) Class() Class {
 	return f.genericFunctionClass
 }
 
@@ -97,7 +95,7 @@ func (f *GenericFunction) String() string {
 	return fmt.Sprintf("#%v", f.Class())
 }
 
-func (f *GenericFunction) Apply(e ilos.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
+func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance, Instance) {
 	parameters := f.lambdaList.(List).Slice()
 	variadic := false
 	{
@@ -113,7 +111,7 @@ func (f *GenericFunction) Apply(e ilos.Environment, arguments ...ilos.Instance) 
 	for _, method := range f.methods {
 		matched := true
 		for i, c := range method.classList {
-			if !ilos.InstanceOf(c, arguments[i]) {
+			if !InstanceOf(c, arguments[i]) {
 				matched = false
 				break
 			}
@@ -127,26 +125,26 @@ func (f *GenericFunction) Apply(e ilos.Environment, arguments ...ilos.Instance) 
 	after := NewSymbol(":AFTER")
 	sort.Slice(methods, func(a, b int) bool {
 		for i := range methods[a].classList {
-			if ilos.SubclassOf(methods[a].classList[i], methods[b].classList[i]) {
+			if SubclassOf(methods[a].classList[i], methods[b].classList[i]) {
 				return false
 			}
-			if ilos.SubclassOf(methods[b].classList[i], methods[a].classList[i]) {
+			if SubclassOf(methods[b].classList[i], methods[a].classList[i]) {
 				return true
 			}
 		}
-		t := map[ilos.Instance]int{around: 4, before: 3, nil: 2, after: 1}
+		t := map[Instance]int{around: 4, before: 3, nil: 2, after: 1}
 		return t[methods[a].qualifier] > t[methods[b].qualifier]
 	})
 
-	nextMethodPisNil := NewFunction(NewSymbol("NEXT-METHOD-P"), func(e ilos.Environment) (ilos.Instance, ilos.Instance) {
+	nextMethodPisNil := NewFunction(NewSymbol("NEXT-METHOD-P"), func(e Environment) (Instance, Instance) {
 		return Nil, nil
 	})
-	nextMethodPisT := NewFunction(NewSymbol("NEXT-METHOD-P"), func(e ilos.Environment) (ilos.Instance, ilos.Instance) {
+	nextMethodPisT := NewFunction(NewSymbol("NEXT-METHOD-P"), func(e Environment) (Instance, Instance) {
 		return T, nil
 	})
 	if f.methodCombination == NewSymbol("NIL") {
-		var callNextMethod func(e ilos.Environment) (ilos.Instance, ilos.Instance) // To Recursive
-		callNextMethod = func(e ilos.Environment) (ilos.Instance, ilos.Instance) { // CALL-NEXT-METHOD
+		var callNextMethod func(e Environment) (Instance, Instance) // To Recursive
+		callNextMethod = func(e Environment) (Instance, Instance) { // CALL-NEXT-METHOD
 			depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS/DEPTH"))           // Get previous depth
 			index := int(depth.(Integer)) + 1                                    // Get index of next method
 			e.DynamicVariable.Define(NewSymbol("IRIS/DEPTH"), NewInteger(index)) // Set current depth
@@ -173,8 +171,8 @@ func (f *GenericFunction) Apply(e ilos.Environment, arguments ...ilos.Instance) 
 		width := len(methods)
 		if index := sort.Search(width, test); index < width { // if has :around methods
 			// This callNextMethod is called in :around methods
-			var callNextMethod func(e ilos.Environment) (ilos.Instance, ilos.Instance)
-			callNextMethod = func(e ilos.Environment) (ilos.Instance, ilos.Instance) {
+			var callNextMethod func(e Environment) (Instance, Instance)
+			callNextMethod = func(e Environment) (Instance, Instance) {
 				depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS/DEPTH")) // Get previous depth
 				for index, method := range methods[:int(depth.(Integer))+1] {
 					if method.qualifier == around { // If have :around method
@@ -203,8 +201,8 @@ func (f *GenericFunction) Apply(e ilos.Environment, arguments ...ilos.Instance) 
 				}
 				// Do the first of primary methods
 				// this callNextMethod is called in primary methods
-				var callNextMethod func(e ilos.Environment) (ilos.Instance, ilos.Instance)
-				callNextMethod = func(e ilos.Environment) (ilos.Instance, ilos.Instance) {
+				var callNextMethod func(e Environment) (Instance, Instance)
+				callNextMethod = func(e Environment) (Instance, Instance) {
 					depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS/DEPTH")) // Get previous depth
 					index := int(depth.(Integer))                              // Convert depth to integer
 					{
@@ -273,8 +271,8 @@ func (f *GenericFunction) Apply(e ilos.Environment, arguments ...ilos.Instance) 
 	}
 	{ // Function has no :around methods
 		// This callNextMethod is called in primary methods
-		var callNextMethod func(e ilos.Environment) (ilos.Instance, ilos.Instance)
-		callNextMethod = func(e ilos.Environment) (ilos.Instance, ilos.Instance) {
+		var callNextMethod func(e Environment) (Instance, Instance)
+		callNextMethod = func(e Environment) (Instance, Instance) {
 			depth, _ := e.DynamicVariable.Get(NewSymbol("IRIS/DEPTH")) // Get previous depth
 			index := int(depth.(Integer))                              // Convert depth to integer
 			{

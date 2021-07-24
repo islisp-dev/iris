@@ -8,7 +8,6 @@ import (
 	"fmt"
 
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // Setq represents an assignment to the variable denoted by the identifier. In
@@ -26,23 +25,23 @@ func Setq(e ilos.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Ins
 	if e.Variable.Set(var1, ret) {
 		return ret, nil
 	}
-	return SignalCondition(e, instance.NewUndefinedVariable(e, var1), Nil)
+	return SignalCondition(e, ilos.NewUndefinedVariable(e, var1), Nil)
 }
 
 func Setf(e ilos.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(instance.SymbolClass, var1) {
+	if ilos.InstanceOf(ilos.SymbolClass, var1) {
 		return Setq(e, var1, form)
 	}
-	funcSpec := instance.NewSymbol(fmt.Sprintf("(SETF %v)", var1.(instance.List).Nth(0)))
+	funcSpec := ilos.NewSymbol(fmt.Sprintf("(SETF %v)", var1.(ilos.List).Nth(0)))
 	fun, ok := e.Function.Get(funcSpec)
 	if !ok {
-		return SignalCondition(e, instance.NewUndefinedFunction(e, funcSpec), Nil)
+		return SignalCondition(e, ilos.NewUndefinedFunction(e, funcSpec), Nil)
 	}
-	arguments, err := evalArguments(e, instance.NewCons(form, var1.(*instance.Cons).Cdr))
+	arguments, err := evalArguments(e, ilos.NewCons(form, var1.(*ilos.Cons).Cdr))
 	if err != nil {
 		return nil, err
 	}
-	return fun.(instance.Applicable).Apply(e, arguments.(instance.List).Slice()...)
+	return fun.(ilos.Applicable).Apply(e, arguments.(ilos.List).Slice()...)
 }
 
 // Let is used to define a scope for a group of identifiers for a sequence of
@@ -57,25 +56,25 @@ func Setf(e ilos.Environment, var1, form ilos.Instance) (ilos.Instance, ilos.Ins
 // variable list.
 func Let(e ilos.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	vfs := map[ilos.Instance]ilos.Instance{}
-	if err := ensure(e, instance.ListClass, varForm); err != nil {
+	if err := ensure(e, ilos.ListClass, varForm); err != nil {
 		return nil, err
 	}
-	for _, cadr := range varForm.(instance.List).Slice() {
-		if err := ensure(e, instance.ListClass, cadr); err != nil {
+	for _, cadr := range varForm.(ilos.List).Slice() {
+		if err := ensure(e, ilos.ListClass, cadr); err != nil {
 			return nil, err
 		}
-		if cadr.(instance.List).Length() != 2 {
-			return SignalCondition(e, instance.NewArityError(e), Nil)
+		if cadr.(ilos.List).Length() != 2 {
+			return SignalCondition(e, ilos.NewArityError(e), Nil)
 		}
-		f, err := Eval(e, cadr.(instance.List).Nth(1))
+		f, err := Eval(e, cadr.(ilos.List).Nth(1))
 		if err != nil {
 			return nil, err
 		}
-		vfs[cadr.(instance.List).Nth(0)] = f
+		vfs[cadr.(ilos.List).Nth(0)] = f
 	}
 	for v, f := range vfs {
 		if !e.Variable.Define(v, f) {
-			return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
+			return SignalCondition(e, ilos.NewImmutableBinding(e), Nil)
 		}
 	}
 	return Progn(e, bodyForm...)
@@ -95,22 +94,22 @@ func Let(e ilos.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (
 // value of let* is the result of the evaluation of the last form of its body
 // (or nil if there is none).
 func LetStar(e ilos.Environment, varForm ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.ListClass, varForm); err != nil {
+	if err := ensure(e, ilos.ListClass, varForm); err != nil {
 		return nil, err
 	}
-	for _, cadr := range varForm.(instance.List).Slice() {
-		if err := ensure(e, instance.ListClass, cadr); err != nil {
+	for _, cadr := range varForm.(ilos.List).Slice() {
+		if err := ensure(e, ilos.ListClass, cadr); err != nil {
 			return nil, err
 		}
-		if cadr.(instance.List).Length() != 2 {
-			return SignalCondition(e, instance.NewArityError(e), Nil)
+		if cadr.(ilos.List).Length() != 2 {
+			return SignalCondition(e, ilos.NewArityError(e), Nil)
 		}
-		f, err := Eval(e, cadr.(instance.List).Nth(1))
+		f, err := Eval(e, cadr.(ilos.List).Nth(1))
 		if err != nil {
 			return nil, err
 		}
-		if !e.Variable.Define(cadr.(instance.List).Nth(0), f) {
-			return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
+		if !e.Variable.Define(cadr.(ilos.List).Nth(0), f) {
+			return SignalCondition(e, ilos.NewImmutableBinding(e), Nil)
 		}
 	}
 	return Progn(e, bodyForm...)

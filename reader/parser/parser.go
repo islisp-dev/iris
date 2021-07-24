@@ -12,11 +12,10 @@ import (
 
 	"github.com/islisp-dev/iris/reader/tokenizer"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
-var eop = instance.NewSymbol("End Of Parentheses")
-var bod = instance.NewSymbol("Begin Of Dot")
+var eop = ilos.NewSymbol("End Of Parentheses")
+var bod = ilos.NewSymbol("Begin Of Dot")
 
 func ParseAtom(tok *tokenizer.Token) (ilos.Instance, ilos.Instance) {
 	str := tok.Str
@@ -25,56 +24,56 @@ func ParseAtom(tok *tokenizer.Token) (ilos.Instance, ilos.Instance) {
 	//
 	if m, _ := regexp.MatchString("^[-+]?[[:digit:]]+$", str); m {
 		n, _ := strconv.ParseInt(str, 10, 64)
-		return instance.NewInteger(int(n)), nil
+		return ilos.NewInteger(int(n)), nil
 	}
 	if r := regexp.MustCompile("^#[bB]([-+]?[01]+)$").FindStringSubmatch(str); len(r) >= 2 {
 		n, _ := strconv.ParseInt(r[1], 2, 64)
-		return instance.NewInteger(int(n)), nil
+		return ilos.NewInteger(int(n)), nil
 	}
 	if r := regexp.MustCompile("^#[oO]([-+]?[0-7]+)$").FindStringSubmatch(str); len(r) >= 2 {
 		n, _ := strconv.ParseInt(r[1], 8, 64)
-		return instance.NewInteger(int(n)), nil
+		return ilos.NewInteger(int(n)), nil
 	}
 	if r := regexp.MustCompile("^#[xX]([-+]?[[:xdigit:]]+)$").FindStringSubmatch(str); len(r) >= 2 {
 		n, _ := strconv.ParseInt(r[1], 16, 64)
-		return instance.NewInteger(int(n)), nil
+		return ilos.NewInteger(int(n)), nil
 	}
 	//
 	// float
 	//
 	if m, _ := regexp.MatchString(`^[-+]?[[:digit:]]+\.[[:digit:]]+$`, str); m {
 		n, _ := strconv.ParseFloat(str, 64)
-		return instance.NewFloat(n), nil
+		return ilos.NewFloat(n), nil
 	}
 	if r := regexp.MustCompile(`^([-+]?[[:digit:]]+(?:\.[[:digit:]]+)?)[eE]([-+]?[[:digit:]]+)$`).FindStringSubmatch(str); len(r) >= 3 {
 		n, _ := strconv.ParseFloat(r[1], 64)
 		e, _ := strconv.ParseInt(r[2], 10, 64)
-		return instance.NewFloat(n * math.Pow10(int(e))), nil
+		return ilos.NewFloat(n * math.Pow10(int(e))), nil
 	}
 	//
 	// character
 	//
 	if m, _ := regexp.MatchString(`^#\\newline$`, strings.ToLower(str)); m {
-		return instance.NewCharacter('\n'), nil
+		return ilos.NewCharacter('\n'), nil
 	}
 	if m, _ := regexp.MatchString(`^#\\space$`, strings.ToLower(str)); m {
-		return instance.NewCharacter(' '), nil
+		return ilos.NewCharacter(' '), nil
 	}
 	if r := regexp.MustCompile(`^#\\([[:graph:]])$`).FindStringSubmatch(str); len(r) >= 2 {
-		return instance.NewCharacter(rune(r[1][0])), nil
+		return ilos.NewCharacter(rune(r[1][0])), nil
 	}
 	//
 	// string
 	//
 	if r := regexp.MustCompile(`^"(.*)"$`).FindStringSubmatch(str); len(r) >= 2 {
 		s := strings.Replace(r[1], "\\\\", "\\", -1)
-		return instance.NewString([]rune(s)), nil
+		return ilos.NewString([]rune(s)), nil
 	}
 	//
 	// symbol
 	//
 	if str == "nil" {
-		return instance.Nil, nil
+		return ilos.Nil, nil
 	}
 	re := `^(`
 	re += `[:&][a-zA-Z]+|`
@@ -83,12 +82,12 @@ func ParseAtom(tok *tokenizer.Token) (ilos.Instance, ilos.Instance) {
 	re += `[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*|`
 	re += `)$`
 	if m, _ := regexp.MatchString(re, str); m {
-		return instance.NewSymbol(strings.ToUpper(str)), nil
+		return ilos.NewSymbol(strings.ToUpper(str)), nil
 	}
-	return nil, instance.Create(ilos.NewEnvironment(nil, nil, nil, nil),
-		instance.ParseErrorClass,
-		instance.NewSymbol("STRING"), instance.NewString([]rune(str)),
-		instance.NewSymbol("EXPECTED-CLASS"), instance.ObjectClass)
+	return nil, ilos.Create(ilos.NewEnvironment(nil, nil, nil, nil),
+		ilos.ParseErrorClass,
+		ilos.NewSymbol("STRING"), ilos.NewString([]rune(str)),
+		ilos.NewSymbol("EXPECTED-CLASS"), ilos.ObjectClass)
 }
 
 func parseMacro(tok *tokenizer.Token, t *tokenizer.Reader) (ilos.Instance, ilos.Instance) {
@@ -105,10 +104,10 @@ func parseMacro(tok *tokenizer.Token, t *tokenizer.Reader) (ilos.Instance, ilos.
 			var err error
 			v, err = strconv.ParseInt(str[1:i], 10, 64)
 			if err != nil {
-				return nil, instance.Create(ilos.NewEnvironment(nil, nil, nil, nil),
-					instance.ParseErrorClass,
-					instance.NewSymbol("STRING"), instance.NewString([]rune(str)),
-					instance.NewSymbol("EXPECTED-CLASS"), instance.IntegerClass)
+				return nil, ilos.Create(ilos.NewEnvironment(nil, nil, nil, nil),
+					ilos.ParseErrorClass,
+					ilos.NewSymbol("STRING"), ilos.NewString([]rune(str)),
+					ilos.NewSymbol("EXPECTED-CLASS"), ilos.IntegerClass)
 			}
 		}
 		if int(v) == 1 {
@@ -131,13 +130,13 @@ func parseMacro(tok *tokenizer.Token, t *tokenizer.Reader) (ilos.Instance, ilos.
 	case "`":
 		n = "QUASIQUOTE"
 	}
-	m := instance.NewSymbol(n)
-	return instance.NewCons(m, instance.NewCons(cdr, instance.Nil)), nil
+	m := ilos.NewSymbol(n)
+	return ilos.NewCons(m, ilos.NewCons(cdr, ilos.Nil)), nil
 }
 func parseCons(t *tokenizer.Reader) (ilos.Instance, ilos.Instance) {
 	car, err := Parse(t)
 	if err == eop {
-		return instance.Nil, nil
+		return ilos.Nil, nil
 	}
 	if err == bod {
 		cdr, err := Parse(t)
@@ -156,20 +155,20 @@ func parseCons(t *tokenizer.Reader) (ilos.Instance, ilos.Instance) {
 	if err != nil {
 		return nil, err
 	}
-	return instance.NewCons(car, cdr), nil
+	return ilos.NewCons(car, cdr), nil
 }
 
 // Parse builds a internal expression from tokens
 func Parse(t *tokenizer.Reader) (ilos.Instance, ilos.Instance) {
 	tok, err := t.Next()
 	if err != nil {
-		return nil, instance.Create(ilos.NewEnvironment(nil, nil, nil, nil), instance.EndOfStreamClass)
+		return nil, ilos.Create(ilos.NewEnvironment(nil, nil, nil, nil), ilos.EndOfStreamClass)
 	}
 	str := tok.Str
 	for (len(str) > 2 && str[:2] == "#|") || str[:1] == ";" {
 		tok, err = t.Next()
 		if err != nil {
-			return nil, instance.Create(ilos.NewEnvironment(nil, nil, nil, nil), instance.EndOfStreamClass)
+			return nil, ilos.Create(ilos.NewEnvironment(nil, nil, nil, nil), ilos.EndOfStreamClass)
 		}
 		str = tok.Str
 	}

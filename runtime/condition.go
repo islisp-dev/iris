@@ -6,17 +6,16 @@ package runtime
 
 import (
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 func SignalCondition(e ilos.Environment, condition, continuable ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.SeriousConditionClass, condition); err != nil {
+	if err := ensure(e, ilos.SeriousConditionClass, condition); err != nil {
 		return nil, err
 	}
-	condition.(instance.BasicInstance).SetSlotValue(instance.NewSymbol("IRIS.CONTINUABLE"), continuable, instance.SeriousConditionClass)
-	_, c := e.Handler.(instance.Applicable).Apply(e, condition)
-	if ilos.InstanceOf(instance.ContinueClass, c) {
-		o, _ := c.(instance.BasicInstance).GetSlotValue(instance.NewSymbol("IRIS.OBJECT"), instance.ContinueClass)
+	condition.(ilos.BasicInstance).SetSlotValue(ilos.NewSymbol("IRIS.CONTINUABLE"), continuable, ilos.SeriousConditionClass)
+	_, c := e.Handler.(ilos.Applicable).Apply(e, condition)
+	if ilos.InstanceOf(ilos.ContinueClass, c) {
+		o, _ := c.(ilos.BasicInstance).GetSlotValue(ilos.NewSymbol("IRIS.OBJECT"), ilos.ContinueClass)
 		return o, nil
 	}
 	return nil, c
@@ -27,7 +26,7 @@ func Cerror(e ilos.Environment, continueString, errorString ilos.Instance, objs 
 	if err != nil {
 		return nil, err
 	}
-	condition := instance.Create(e, instance.SimpleErrorClass, instance.NewSymbol("FORMAT-STRING"), errorString, instance.NewSymbol("FORAMT-OBJECTS"), arguments)
+	condition := ilos.Create(e, ilos.SimpleErrorClass, ilos.NewSymbol("FORMAT-STRING"), errorString, ilos.NewSymbol("FORAMT-OBJECTS"), arguments)
 	ss, err := CreateStringOutputStream(e)
 	if err != nil {
 		return nil, err
@@ -47,40 +46,40 @@ func Error(e ilos.Environment, continueString, errorString ilos.Instance, objs .
 	if err != nil {
 		return nil, err
 	}
-	condition := instance.Create(e, instance.SimpleErrorClass, instance.NewSymbol("FORMAT-STRING"), errorString, instance.NewSymbol("FORAMT-OBJECTS"), arguments)
+	condition := ilos.Create(e, ilos.SimpleErrorClass, ilos.NewSymbol("FORMAT-STRING"), errorString, ilos.NewSymbol("FORAMT-OBJECTS"), arguments)
 	return SignalCondition(e, condition, Nil)
 }
 
 func IgnoreErrors(e ilos.Environment, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	ret, err := Progn(e, forms...)
-	if err != nil && ilos.InstanceOf(instance.ErrorClass, err) {
+	if err != nil && ilos.InstanceOf(ilos.ErrorClass, err) {
 		return Nil, nil
 	}
 	return ret, err
 }
 
 func ReportCondition(e ilos.Environment, condition, stream ilos.Instance) (ilos.Instance, ilos.Instance) {
-	return Format(e, e.StandardOutput, instance.NewString([]rune("~A")), condition)
+	return Format(e, e.StandardOutput, ilos.NewString([]rune("~A")), condition)
 }
 
 func ConditionContinuable(e ilos.Environment, condition ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if continuable, ok := condition.(instance.BasicInstance).GetSlotValue(instance.NewSymbol("IRIS.CONTINUABLE"), instance.SeriousConditionClass); ok {
+	if continuable, ok := condition.(ilos.BasicInstance).GetSlotValue(ilos.NewSymbol("IRIS.CONTINUABLE"), ilos.SeriousConditionClass); ok {
 		return continuable, nil
 	}
 	return Nil, nil
 }
 
 func ContinueCondition(e ilos.Environment, condition ilos.Instance, value ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if b, ok := condition.(instance.BasicInstance).GetSlotValue(instance.NewSymbol("IRIS.CONTINUABLE"), instance.SeriousConditionClass); !ok || b == Nil {
-		return nil, instance.Create(e, instance.ProgramErrorClass)
+	if b, ok := condition.(ilos.BasicInstance).GetSlotValue(ilos.NewSymbol("IRIS.CONTINUABLE"), ilos.SeriousConditionClass); !ok || b == Nil {
+		return nil, ilos.Create(e, ilos.ProgramErrorClass)
 	}
 	if len(value) == 1 {
-		return nil, instance.Create(e, instance.ContinueClass, instance.NewSymbol("IRIS.OBJECT"), value[0])
+		return nil, ilos.Create(e, ilos.ContinueClass, ilos.NewSymbol("IRIS.OBJECT"), value[0])
 	}
 	if len(value) == 0 {
-		return nil, instance.Create(e, instance.ContinueClass, instance.NewSymbol("IRIS.OBJECT"), Nil)
+		return nil, ilos.Create(e, ilos.ContinueClass, ilos.NewSymbol("IRIS.OBJECT"), Nil)
 	}
-	return nil, instance.Create(e, instance.ProgramErrorClass)
+	return nil, ilos.Create(e, ilos.ProgramErrorClass)
 }
 
 func WithHandler(e ilos.Environment, handler ilos.Instance, forms ...ilos.Instance) (ilos.Instance, ilos.Instance) {

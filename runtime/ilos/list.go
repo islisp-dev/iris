@@ -2,45 +2,43 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can
 // obtain one at http://mozilla.org/MPL/2.0/.
 
-package instance
+package ilos
 
 import (
 	"fmt"
-
-	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
 type List interface {
-	Slice() []ilos.Instance
-	Nth(i int) ilos.Instance
-	SetNth(obj ilos.Instance, i int)
-	NthCdr(i int) ilos.Instance
+	Slice() []Instance
+	Nth(i int) Instance
+	SetNth(obj Instance, i int)
+	NthCdr(i int) Instance
 	Length() int
 }
 
 // Cons
 
 type Cons struct {
-	Car ilos.Instance
-	Cdr ilos.Instance
+	Car Instance
+	Cdr Instance
 }
 
-func NewCons(car, cdr ilos.Instance) ilos.Instance {
+func NewCons(car, cdr Instance) Instance {
 	return &Cons{car, cdr}
 }
 
-func (*Cons) Class() ilos.Class {
+func (*Cons) Class() Class {
 	return ConsClass
 }
 
 func (i *Cons) String() string {
 	str := "(" + fmt.Sprint(i.Car)
 	cdr := i.Cdr
-	for ilos.InstanceOf(ConsClass, cdr) {
+	for InstanceOf(ConsClass, cdr) {
 		str += fmt.Sprintf(" %v", cdr.(*Cons).Car) // Checked at the top of this loop
 		cdr = cdr.(*Cons).Cdr                      // Checked at the top of this loop
 	}
-	if ilos.InstanceOf(NullClass, cdr) {
+	if InstanceOf(NullClass, cdr) {
 		str += ")"
 	} else {
 		str += fmt.Sprintf(" . %v)", cdr)
@@ -48,10 +46,10 @@ func (i *Cons) String() string {
 	return str
 }
 
-func (i *Cons) Slice() []ilos.Instance {
-	s := []ilos.Instance{}
-	var cdr ilos.Instance = i
-	for ilos.InstanceOf(ConsClass, cdr) {
+func (i *Cons) Slice() []Instance {
+	s := []Instance{}
+	var cdr Instance = i
+	for InstanceOf(ConsClass, cdr) {
 		s = append(s, cdr.(*Cons).Car)
 		cdr = cdr.(*Cons).Cdr
 	}
@@ -62,21 +60,21 @@ func (i *Cons) Length() int {
 	return 1 + i.Cdr.(List).Length()
 }
 
-func (i *Cons) Nth(n int) ilos.Instance {
+func (i *Cons) Nth(n int) Instance {
 	if n == 0 {
 		return i.Car
 	}
 	return i.Cdr.(List).Nth(n - 1)
 }
 
-func (i *Cons) SetNth(obj ilos.Instance, n int) {
+func (i *Cons) SetNth(obj Instance, n int) {
 	if n == 0 {
 		i.Car = obj
 	}
 	i.Cdr.(List).SetNth(obj, n-1)
 }
 
-func (i *Cons) NthCdr(n int) ilos.Instance {
+func (i *Cons) NthCdr(n int) Instance {
 	if n == 0 {
 		return i.Cdr
 	}
@@ -89,11 +87,11 @@ type Null struct{}
 
 var Nil = NewNull()
 
-func NewNull() ilos.Instance {
+func NewNull() Instance {
 	return &Null{}
 }
 
-func (*Null) Class() ilos.Class {
+func (*Null) Class() Class {
 	return NullClass
 }
 
@@ -101,19 +99,19 @@ func (*Null) String() string {
 	return "NIL"
 }
 
-func (*Null) Slice() []ilos.Instance {
-	return []ilos.Instance{}
+func (*Null) Slice() []Instance {
+	return []Instance{}
 }
 
-func (i *Null) Nth(n int) ilos.Instance {
+func (i *Null) Nth(n int) Instance {
 	return Nil
 }
 
-func (i *Null) SetNth(obj ilos.Instance, n int) {
+func (i *Null) SetNth(obj Instance, n int) {
 	panic("NOT a cons")
 }
 
-func (i *Null) NthCdr(n int) ilos.Instance {
+func (i *Null) NthCdr(n int) Instance {
 	return Nil
 }
 

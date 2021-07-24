@@ -2,21 +2,17 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can
 // obtain one at http://mozilla.org/MPL/2.0/.
 
-package instance
-
-import (
-	"github.com/islisp-dev/iris/runtime/ilos"
-)
+package ilos
 
 // Symbol
 
 type Symbol string
 
-func NewSymbol(s string) ilos.Instance {
+func NewSymbol(s string) Instance {
 	return Symbol(s)
 }
 
-func (Symbol) Class() ilos.Class {
+func (Symbol) Class() Class {
 	return SymbolClass
 }
 

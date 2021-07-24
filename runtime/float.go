@@ -8,21 +8,20 @@ import (
 	"math"
 
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // The value of MostPositiveFloat is the implementation-dependent ﬂoating-point
 // number closest to positive infinity. The value of MostNegativeFloat is the
 // implementation-dependent ﬂoating-point number closest to negative infinity.
 var (
-	MostPositiveFloat = instance.NewFloat(math.MaxFloat64)
-	MostNegativeFloat = instance.NewFloat(-math.MaxFloat64)
+	MostPositiveFloat = ilos.NewFloat(math.MaxFloat64)
+	MostNegativeFloat = ilos.NewFloat(-math.MaxFloat64)
 )
 
 // Floatp returns t if obj is a ﬂoat (instance of class float); otherwise,
 // returns nil. The obj may be any ISLISP object.
 func Floatp(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(instance.FloatClass, obj) {
+	if ilos.InstanceOf(ilos.FloatClass, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -36,7 +35,7 @@ func Float(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err != nil {
 		return nil, err
 	}
-	return instance.NewFloat(f), nil
+	return ilos.NewFloat(f), nil
 }
 
 // Floor returns the greatest integer less than or equal to x . That is, x is
@@ -47,7 +46,7 @@ func Floor(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err != nil {
 		return nil, err
 	}
-	return instance.NewInteger(int(math.Floor(f))), nil
+	return ilos.NewInteger(int(math.Floor(f))), nil
 }
 
 // Ceiling Returns the smallest integer that is not smaller than x. That is, x
@@ -58,7 +57,7 @@ func Ceiling(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance)
 	if err != nil {
 		return nil, err
 	}
-	return instance.NewInteger(int(math.Ceil(f))), nil
+	return ilos.NewInteger(int(math.Ceil(f))), nil
 }
 
 // Truncate returns the integer between 0 and x (inclusive) that is nearest to
@@ -69,7 +68,7 @@ func Truncate(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance
 	if err != nil {
 		return nil, err
 	}
-	return instance.NewInteger(int(math.Trunc(f))), nil
+	return ilos.NewInteger(int(math.Trunc(f))), nil
 }
 
 // Round returns the integer nearest to x. If x is exactly halfway between two
@@ -80,5 +79,5 @@ func Round(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err != nil {
 		return nil, err
 	}
-	return instance.NewInteger(int(math.Floor(f + .5))), nil
+	return ilos.NewInteger(int(math.Floor(f + .5))), nil
 }

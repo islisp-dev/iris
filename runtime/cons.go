@@ -6,13 +6,12 @@ package runtime
 
 import (
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // Consp returns t if obj is a cons (instance of class cons); otherwise, returns
 // nil. obj may be any ISLISP object.
 func Consp(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(instance.ConsClass, obj) {
+	if ilos.InstanceOf(ilos.ConsClass, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -23,35 +22,35 @@ func Consp(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance)
 // requested cons cannot be allocated (error-id. cannot-create-cons). Both obj1
 // and obj2 may be any ISLISP object.
 func Cons(e ilos.Environment, obj1, obj2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	return instance.NewCons(obj1, obj2), nil
+	return ilos.NewCons(obj1, obj2), nil
 }
 
 // Car returns the left component of the cons. An error shall be signaled if
 // cons is not a cons (error-id. domain-error).
 func Car(e ilos.Environment, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.ConsClass, cons); err != nil {
+	if err := ensure(e, ilos.ConsClass, cons); err != nil {
 		return nil, err
 	}
-	return cons.(*instance.Cons).Car, nil // Checked at the top of this function
+	return cons.(*ilos.Cons).Car, nil // Checked at the top of this function
 }
 
 // Cdr returns the right component of the cons. An error shall be signaled if
 // cons is not a cons (error-id. domain-error).
 func Cdr(e ilos.Environment, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.ConsClass, cons); err != nil {
+	if err := ensure(e, ilos.ConsClass, cons); err != nil {
 		return nil, err
 	}
-	return cons.(*instance.Cons).Cdr, nil // Checked at the top of this function
+	return cons.(*ilos.Cons).Cdr, nil // Checked at the top of this function
 }
 
 // SetCar updates the left component of cons with obj. The returned value is obj
 // . An error shall be signaled if cons is not a cons (error-id. domain-error).
 // obj may be any ISLISP object.
 func SetCar(e ilos.Environment, obj, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.ConsClass, cons); err != nil {
+	if err := ensure(e, ilos.ConsClass, cons); err != nil {
 		return nil, err
 	}
-	cons.(*instance.Cons).Car = obj
+	cons.(*ilos.Cons).Car = obj
 	return obj, nil
 }
 
@@ -59,9 +58,9 @@ func SetCar(e ilos.Environment, obj, cons ilos.Instance) (ilos.Instance, ilos.In
 // obj . An error shall be signaled if cons is not a cons (error-id.
 // domain-error). obj may be any ISLISP object.
 func SetCdr(e ilos.Environment, obj, cons ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.ConsClass, cons); err != nil {
+	if err := ensure(e, ilos.ConsClass, cons); err != nil {
 		return nil, err
 	}
-	cons.(*instance.Cons).Cdr = obj
+	cons.(*ilos.Cons).Cdr = obj
 	return obj, nil
 }

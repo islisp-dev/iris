@@ -2,28 +2,24 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can
 // obtain one at http://mozilla.org/MPL/2.0/.
 
-package instance
+package ilos
 
-import (
-	"github.com/islisp-dev/iris/runtime/ilos"
-)
-
-func NewBlockTag(tag, uid, object ilos.Instance) ilos.Instance {
-	return Create(ilos.NewEnvironment(nil, nil, nil, nil),
+func NewBlockTag(tag, uid, object Instance) Instance {
+	return Create(NewEnvironment(nil, nil, nil, nil),
 		BlockTagClass,
 		NewSymbol("IRIS.TAG"), tag,
 		NewSymbol("IRIS.UID"), uid,
 		NewSymbol("IRIS.OBJECT"), object)
 }
-func NewCatchTag(tag, uid, object ilos.Instance) ilos.Instance {
-	return Create(ilos.NewEnvironment(nil, nil, nil, nil),
+func NewCatchTag(tag, uid, object Instance) Instance {
+	return Create(NewEnvironment(nil, nil, nil, nil),
 		CatchTagClass,
 		NewSymbol("IRIS.TAG"), tag,
 		NewSymbol("IRIS.UID"), uid,
 		NewSymbol("IRIS.OBJECT"), object)
 }
-func NewTagbodyTag(tag, uid ilos.Instance) ilos.Instance {
-	return Create(ilos.NewEnvironment(nil, nil, nil, nil),
+func NewTagbodyTag(tag, uid Instance) Instance {
+	return Create(NewEnvironment(nil, nil, nil, nil),
 		TagbodyTagClass,
 		NewSymbol("IRIS.TAG"), tag,
 		NewSymbol("IRIS.UID"), uid)

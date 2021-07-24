@@ -13,12 +13,11 @@ import (
 	"github.com/islisp-dev/iris/reader/parser"
 	"github.com/islisp-dev/iris/reader/tokenizer"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 func isProperList(i ilos.Instance) bool {
-	if ilos.InstanceOf(instance.ConsClass, i) {
-		return isProperList(i.(*instance.Cons).Cdr) // Checked at the top of this statements
+	if ilos.InstanceOf(ilos.ConsClass, i) {
+		return isProperList(i.(*ilos.Cons).Cdr) // Checked at the top of this statements
 	}
 	if i == Nil {
 		return true
@@ -28,12 +27,12 @@ func isProperList(i ilos.Instance) bool {
 
 func convFloat64(e ilos.Environment, x ilos.Instance) (float64, bool, ilos.Instance) {
 	switch {
-	case ilos.InstanceOf(instance.IntegerClass, x):
-		return float64(x.(instance.Integer)), false, nil
-	case ilos.InstanceOf(instance.FloatClass, x):
-		return float64(x.(instance.Float)), true, nil
+	case ilos.InstanceOf(ilos.IntegerClass, x):
+		return float64(x.(ilos.Integer)), false, nil
+	case ilos.InstanceOf(ilos.FloatClass, x):
+		return float64(x.(ilos.Float)), true, nil
 	default:
-		_, err := SignalCondition(e, instance.NewDomainError(e, x, instance.NumberClass), Nil)
+		_, err := SignalCondition(e, ilos.NewDomainError(e, x, ilos.NumberClass), Nil)
 		return 0.0, false, err
 	}
 }
@@ -45,7 +44,7 @@ func readFromString(s string) (ilos.Instance, ilos.Instance) {
 func ensure(e ilos.Environment, c ilos.Class, i ...ilos.Instance) ilos.Instance {
 	for _, o := range i {
 		if !ilos.InstanceOf(c, o) {
-			_, err := SignalCondition(e, instance.NewDomainError(e, o, c), Nil)
+			_, err := SignalCondition(e, ilos.NewDomainError(e, o, c), Nil)
 			return err
 		}
 	}
@@ -65,5 +64,5 @@ func func2symbol(function interface{}) ilos.Instance {
 	name = regexp.MustCompile(`.*\.`).ReplaceAllString(name, "")
 	name = regexp.MustCompile(`(.)([A-Z])`).ReplaceAllString(name, "$1-$2")
 	name = strings.ToUpper(name)
-	return instance.NewSymbol(name)
+	return ilos.NewSymbol(name)
 }

@@ -6,7 +6,6 @@ package runtime
 
 import (
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // Length returns the length of sequence as an integer greater than or equal to
@@ -19,15 +18,15 @@ import (
 // not a basic-vector or a list (error-id. domain-error).
 func Length(e ilos.Environment, sequence ilos.Instance) (ilos.Instance, ilos.Instance) {
 	switch {
-	case ilos.InstanceOf(instance.StringClass, sequence):
-		return instance.NewInteger(len(sequence.(instance.String))), nil
-	case ilos.InstanceOf(instance.GeneralVectorClass, sequence):
-		return instance.NewInteger(len(sequence.(instance.GeneralVector))), nil
-	case ilos.InstanceOf(instance.ListClass, sequence):
-		return instance.NewInteger(sequence.(instance.List).Length()), nil
+	case ilos.InstanceOf(ilos.StringClass, sequence):
+		return ilos.NewInteger(len(sequence.(ilos.String))), nil
+	case ilos.InstanceOf(ilos.GeneralVectorClass, sequence):
+		return ilos.NewInteger(len(sequence.(ilos.GeneralVector))), nil
+	case ilos.InstanceOf(ilos.ListClass, sequence):
+		return ilos.NewInteger(sequence.(ilos.List).Length()), nil
 	}
-	// TODO: instance.SeqClass
-	return SignalCondition(e, instance.NewDomainError(e, sequence, instance.ObjectClass), Nil)
+	// TODO: ilos.SeqClass
+	return SignalCondition(e, ilos.NewDomainError(e, sequence, ilos.ObjectClass), Nil)
 }
 
 // Elt returns the element of sequence that has index z. Indexing is 0-based;
@@ -37,33 +36,33 @@ func Length(e ilos.Environment, sequence ilos.Instance) (ilos.Instance, ilos.Ins
 // error shall be signaled if sequence is not a basic-vector or a list or if z
 // is not an integer (error-id. domain-error).
 func Elt(e ilos.Environment, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.IntegerClass, z); err != nil {
+	if err := ensure(e, ilos.IntegerClass, z); err != nil {
 		return nil, err
 	}
 	switch {
-	case ilos.InstanceOf(instance.StringClass, sequence):
-		seq := sequence.(instance.String)
-		idx := int(z.(instance.Integer))
+	case ilos.InstanceOf(ilos.StringClass, sequence):
+		seq := sequence.(ilos.String)
+		idx := int(z.(ilos.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
+			return SignalCondition(e, ilos.NewIndexOutOfRange(e), Nil)
 		}
-		return instance.NewCharacter(seq[idx]), nil
-	case ilos.InstanceOf(instance.GeneralVectorClass, sequence):
-		seq := sequence.(instance.GeneralVector)
-		idx := int(z.(instance.Integer))
+		return ilos.NewCharacter(seq[idx]), nil
+	case ilos.InstanceOf(ilos.GeneralVectorClass, sequence):
+		seq := sequence.(ilos.GeneralVector)
+		idx := int(z.(ilos.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
+			return SignalCondition(e, ilos.NewIndexOutOfRange(e), Nil)
 		}
 		return seq[idx], nil
-	case ilos.InstanceOf(instance.ListClass, sequence):
-		seq := sequence.(instance.List).Slice()
-		idx := int(z.(instance.Integer))
+	case ilos.InstanceOf(ilos.ListClass, sequence):
+		seq := sequence.(ilos.List).Slice()
+		idx := int(z.(ilos.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
+			return SignalCondition(e, ilos.NewIndexOutOfRange(e), Nil)
 		}
 		return seq[idx], nil
 	}
-	return SignalCondition(e, instance.NewDomainError(e, sequence, instance.ObjectClass), Nil)
+	return SignalCondition(e, ilos.NewDomainError(e, sequence, ilos.ObjectClass), Nil)
 
 }
 
@@ -73,43 +72,43 @@ func Elt(e ilos.Environment, sequence, z ilos.Instance) (ilos.Instance, ilos.Ins
 // be signaled if sequence is not a basic-vector or a list or if z is not an
 // integer (error-id. domain-error). obj may be any ISLISP object.
 func SetElt(e ilos.Environment, obj, sequence, z ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.IntegerClass, z); err != nil {
+	if err := ensure(e, ilos.IntegerClass, z); err != nil {
 		return nil, err
 	}
 	switch {
-	case ilos.InstanceOf(instance.StringClass, sequence):
-		seq := sequence.(instance.String)
-		idx := int(z.(instance.Integer))
+	case ilos.InstanceOf(ilos.StringClass, sequence):
+		seq := sequence.(ilos.String)
+		idx := int(z.(ilos.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
+			return SignalCondition(e, ilos.NewIndexOutOfRange(e), Nil)
 		}
-		if err := ensure(e, instance.CharacterClass, obj); err != nil {
+		if err := ensure(e, ilos.CharacterClass, obj); err != nil {
 			return nil, err
 		}
-		seq[idx] = rune(obj.(instance.Character))
+		seq[idx] = rune(obj.(ilos.Character))
 		return obj, nil
-	case ilos.InstanceOf(instance.GeneralVectorClass, sequence):
-		seq := sequence.(instance.GeneralVector)
-		idx := int(z.(instance.Integer))
+	case ilos.InstanceOf(ilos.GeneralVectorClass, sequence):
+		seq := sequence.(ilos.GeneralVector)
+		idx := int(z.(ilos.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
+			return SignalCondition(e, ilos.NewIndexOutOfRange(e), Nil)
 		}
 		seq[idx] = obj
 		return obj, nil
-	case ilos.InstanceOf(instance.ListClass, sequence):
-		seq := sequence.(instance.List).Slice()
-		idx := int(z.(instance.Integer))
+	case ilos.InstanceOf(ilos.ListClass, sequence):
+		seq := sequence.(ilos.List).Slice()
+		idx := int(z.(ilos.Integer))
 		if idx > 0 && len(seq) <= idx {
-			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
+			return SignalCondition(e, ilos.NewIndexOutOfRange(e), Nil)
 		}
-		for idx != 0 && ilos.InstanceOf(instance.ConsClass, sequence) {
+		for idx != 0 && ilos.InstanceOf(ilos.ConsClass, sequence) {
 			idx--
-			sequence = sequence.(*instance.Cons).Cdr
+			sequence = sequence.(*ilos.Cons).Cdr
 		}
-		sequence.(*instance.Cons).Car = obj
+		sequence.(*ilos.Cons).Car = obj
 		return obj, nil
 	}
-	return SignalCondition(e, instance.NewDomainError(e, sequence, instance.ObjectClass), Nil)
+	return SignalCondition(e, ilos.NewDomainError(e, sequence, ilos.ObjectClass), Nil)
 }
 
 // Subseq returns the subsequence of length z2 − z1, containing the elements
@@ -122,32 +121,32 @@ func SetElt(e ilos.Environment, obj, sequence, z ilos.Instance) (ilos.Instance, 
 // signaled if sequence is not a basic-vector or a list, or if z1 is not an
 // integer, or if z2 is not an integer (error-id. domain-error).
 func Subseq(e ilos.Environment, sequence, z1, z2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.IntegerClass, z1, z2); err != nil {
+	if err := ensure(e, ilos.IntegerClass, z1, z2); err != nil {
 		return nil, err
 	}
-	start := int(z1.(instance.Integer))
-	end := int(z2.(instance.Integer))
+	start := int(z1.(ilos.Integer))
+	end := int(z2.(ilos.Integer))
 	switch {
-	case ilos.InstanceOf(instance.StringClass, sequence):
-		seq := sequence.(instance.String)
+	case ilos.InstanceOf(ilos.StringClass, sequence):
+		seq := sequence.(ilos.String)
 		if !(0 <= start && start < len(seq) && 0 <= end && end < len(seq) && start <= end) {
-			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
+			return SignalCondition(e, ilos.NewIndexOutOfRange(e), Nil)
 		}
 		return seq[start:end], nil
-	case ilos.InstanceOf(instance.GeneralVectorClass, sequence):
-		seq := sequence.(instance.GeneralVector)
+	case ilos.InstanceOf(ilos.GeneralVectorClass, sequence):
+		seq := sequence.(ilos.GeneralVector)
 		if !(0 <= start && start < len(seq) && 0 <= end && end < len(seq) && start <= end) {
-			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
+			return SignalCondition(e, ilos.NewIndexOutOfRange(e), Nil)
 		}
 		return seq[start:end], nil
-	case ilos.InstanceOf(instance.ListClass, sequence):
-		seq := sequence.(instance.List).Slice()
+	case ilos.InstanceOf(ilos.ListClass, sequence):
+		seq := sequence.(ilos.List).Slice()
 		if !(0 < start && start < len(seq) && 0 < end && end < len(seq) && start <= end) {
-			return SignalCondition(e, instance.NewIndexOutOfRange(e), Nil)
+			return SignalCondition(e, ilos.NewIndexOutOfRange(e), Nil)
 		}
 		return List(e, seq[start:end]...)
 	}
-	return SignalCondition(e, instance.NewDomainError(e, sequence, instance.ObjectClass), Nil)
+	return SignalCondition(e, ilos.NewDomainError(e, sequence, ilos.ObjectClass), Nil)
 }
 
 // Destructively modifies destination to contain the results of applying
@@ -161,12 +160,12 @@ func Subseq(e ilos.Environment, sequence, z1, z2 ilos.Instance) (ilos.Instance, 
 // basic-vector or a list (error-id. domain-error). An error shall be signaled
 // if any sequence is not a basic-vector or a list (error-id. domain-error).
 func MapInto(e ilos.Environment, destination, function ilos.Instance, sequences ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.ListClass, append(sequences, destination)...); err != nil {
-		if err := ensure(e, instance.BasicVectorClass, append(sequences, destination)...); err != nil {
+	if err := ensure(e, ilos.ListClass, append(sequences, destination)...); err != nil {
+		if err := ensure(e, ilos.BasicVectorClass, append(sequences, destination)...); err != nil {
 			return nil, err
 		}
 	}
-	if err := ensure(e, instance.FunctionClass, function); err != nil {
+	if err := ensure(e, ilos.FunctionClass, function); err != nil {
 		return nil, err
 	}
 	min, err := Length(e, destination)
@@ -183,20 +182,20 @@ func MapInto(e ilos.Environment, destination, function ilos.Instance, sequences 
 			return nil, err
 		}
 	}
-	for i := 0; i < int(min.(instance.Integer)); i++ {
+	for i := 0; i < int(min.(ilos.Integer)); i++ {
 		arguments := make([]ilos.Instance, len(sequences))
 		for j, seq := range sequences {
 			var err ilos.Instance
-			arguments[j], err = Elt(e, seq, instance.NewInteger(i))
+			arguments[j], err = Elt(e, seq, ilos.NewInteger(i))
 			if err != nil {
 				return nil, err
 			}
 		}
-		ret, err := function.(instance.Applicable).Apply(e.NewDynamic(), arguments...)
+		ret, err := function.(ilos.Applicable).Apply(e.NewDynamic(), arguments...)
 		if err != nil {
 			return nil, err
 		}
-		_, err = SetElt(e, ret, destination, instance.NewInteger(i))
+		_, err = SetElt(e, ret, destination, ilos.NewInteger(i))
 		if err != nil {
 			return nil, err
 		}

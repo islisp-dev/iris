@@ -2,13 +2,9 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can
 // obtain one at http://mozilla.org/MPL/2.0/.
 
-package instance
+package ilos
 
-import (
-	"github.com/islisp-dev/iris/runtime/ilos"
-)
-
-var ObjectClass = BuiltInClass{NewSymbol("<OBJECT>"), []ilos.Class{}, []ilos.Instance{}}
+var ObjectClass = BuiltInClass{NewSymbol("<OBJECT>"), []Class{}, []Instance{}}
 var BuiltInClassClass = NewBuiltInClass("<BUILT-IN-CLASS>", ObjectClass)
 var StandardClassClass = NewBuiltInClass("<STANDARD-CLASS>", ObjectClass)
 var BasicArrayClass = NewBuiltInClass("<BASIC-ARRAY>", ObjectClass)
@@ -23,7 +19,7 @@ var GenericFunctionClass = NewBuiltInClass("<GENERIC-FUNCTION>", FunctionClass)
 var StandardGenericFunctionClass = NewBuiltInClass("<STANDARD-GENERIC-FUNCTION>", GenericFunctionClass)
 var ListClass = NewBuiltInClass("<LIST>", ObjectClass)
 var ConsClass = NewBuiltInClass("<CONS>", ListClass)
-var NullClass = BuiltInClass{NewSymbol("<NULL>"), []ilos.Class{ListClass, SymbolClass}, []ilos.Instance{}}
+var NullClass = BuiltInClass{NewSymbol("<NULL>"), []Class{ListClass, SymbolClass}, []Instance{}}
 var SymbolClass = NewBuiltInClass("<SYMBOL>", ObjectClass)
 var NumberClass = NewBuiltInClass("<NUMBER>", ObjectClass)
 var IntegerClass = NewBuiltInClass("<INTEGER>", NumberClass)

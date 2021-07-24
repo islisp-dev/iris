@@ -11,7 +11,7 @@ import (
 	golang "runtime"
 
 	"github.com/islisp-dev/iris/runtime"
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
+	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
 var commit string
@@ -25,9 +25,9 @@ func repl(quiet bool) {
 		fmt.Printf("Copyright 2017 islisp-dev All Rights Reserved.\n")
 		fmt.Print(">>> ")
 	}
-	runtime.TopLevel.StandardInput = instance.NewStream(os.Stdin, nil, instance.CharacterClass)
-	runtime.TopLevel.StandardOutput = instance.NewStream(nil, os.Stdout, instance.CharacterClass)
-	runtime.TopLevel.ErrorOutput = instance.NewStream(nil, os.Stderr, instance.CharacterClass)
+	runtime.TopLevel.StandardInput = ilos.NewStream(os.Stdin, nil, ilos.CharacterClass)
+	runtime.TopLevel.StandardOutput = ilos.NewStream(nil, os.Stdout, ilos.CharacterClass)
+	runtime.TopLevel.ErrorOutput = ilos.NewStream(nil, os.Stderr, ilos.CharacterClass)
 	for exp, err := runtime.Read(runtime.TopLevel); err == nil; exp, err = runtime.Read(runtime.TopLevel) {
 		ret, err := runtime.Eval(runtime.TopLevel, exp)
 		if err != nil {
@@ -47,9 +47,9 @@ func script(path string) {
 		return
 	}
 	defer file.Close()
-	runtime.TopLevel.StandardInput = instance.NewStream(file, nil, instance.CharacterClass)
-	runtime.TopLevel.StandardOutput = instance.NewStream(nil, os.Stdout, instance.CharacterClass)
-	runtime.TopLevel.ErrorOutput = instance.NewStream(nil, os.Stderr, instance.CharacterClass)
+	runtime.TopLevel.StandardInput = ilos.NewStream(file, nil, ilos.CharacterClass)
+	runtime.TopLevel.StandardOutput = ilos.NewStream(nil, os.Stdout, ilos.CharacterClass)
+	runtime.TopLevel.ErrorOutput = ilos.NewStream(nil, os.Stderr, ilos.CharacterClass)
 	for {
 		exp, err := runtime.Read(runtime.TopLevel)
 		if err != nil {

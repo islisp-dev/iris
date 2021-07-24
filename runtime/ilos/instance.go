@@ -2,26 +2,24 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can
 // obtain one at http://mozilla.org/MPL/2.0/.
 
-package instance
+package ilos
 
 import (
 	"fmt"
 	"reflect"
-
-	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
 // instance
 
-func Create(e ilos.Environment, c ilos.Instance, i ...ilos.Instance) ilos.Instance {
-	p := []ilos.Instance{}
-	for _, q := range c.(ilos.Class).Supers() {
+func Create(e Environment, c Instance, i ...Instance) Instance {
+	p := []Instance{}
+	for _, q := range c.(Class).Supers() {
 		p = append(p, Create(e, q, i...))
 	}
-	return InitializeObject(e, BasicInstance{c.(ilos.Class), p, map[ilos.Instance]ilos.Instance{}}, i...)
+	return InitializeObject(e, BasicInstance{c.(Class), p, map[Instance]Instance{}}, i...)
 }
 
-func InitializeObject(e ilos.Environment, object ilos.Instance, inits ...ilos.Instance) ilos.Instance {
+func InitializeObject(e Environment, object Instance, inits ...Instance) Instance {
 	for _, super := range object.(BasicInstance).supers {
 		InitializeObject(e, super, inits...)
 	}
@@ -48,7 +46,7 @@ func InitializeObject(e ilos.Environment, object ilos.Instance, inits ...ilos.In
 	return object
 }
 
-type slots map[ilos.Instance]ilos.Instance
+type slots map[Instance]Instance
 
 func (s slots) String() string {
 	str := "{"
@@ -62,16 +60,16 @@ func (s slots) String() string {
 }
 
 type BasicInstance struct {
-	class  ilos.Class
-	supers []ilos.Instance
+	class  Class
+	supers []Instance
 	slots  slots
 }
 
-func (i BasicInstance) Class() ilos.Class {
+func (i BasicInstance) Class() Class {
 	return i.class
 }
 
-func (i BasicInstance) GetSlotValue(key ilos.Instance, class ilos.Class) (ilos.Instance, bool) {
+func (i BasicInstance) GetSlotValue(key Instance, class Class) (Instance, bool) {
 	if v, ok := i.slots[key]; ok && reflect.DeepEqual(i.class, class) {
 		return v, ok
 	}
@@ -83,7 +81,7 @@ func (i BasicInstance) GetSlotValue(key ilos.Instance, class ilos.Class) (ilos.I
 	return nil, false
 }
 
-func (i BasicInstance) SetSlotValue(key ilos.Instance, value ilos.Instance, class ilos.Class) bool {
+func (i BasicInstance) SetSlotValue(key Instance, value Instance, class Class) bool {
 	if reflect.DeepEqual(i.class, class) {
 		i.slots[key] = value
 		return true

@@ -6,7 +6,6 @@ package runtime
 
 import (
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // Functionp returns t if obj is a (normal or generic) function; otherwise,
@@ -17,7 +16,7 @@ import (
 // function-name—if in operator position—or by (function function-name)
 // elsewhere.
 func Functionp(e ilos.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(instance.FunctionClass, fun) {
+	if ilos.InstanceOf(ilos.FunctionClass, fun) {
 		return T, nil
 	}
 	return Nil, nil
@@ -30,7 +29,7 @@ func Functionp(e ilos.Environment, fun ilos.Instance) (ilos.Instance, ilos.Insta
 // names a macro or special form
 func Function(e ilos.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instance) {
 	// car must be a symbol
-	if err := ensure(e, instance.SymbolClass, fun); err != nil {
+	if err := ensure(e, ilos.SymbolClass, fun); err != nil {
 		return nil, err
 	}
 	if f, ok := e.Function.Get(fun); ok {
@@ -39,7 +38,7 @@ func Function(e ilos.Environment, fun ilos.Instance) (ilos.Instance, ilos.Instan
 	if f, ok := e.Function.Get(fun); ok {
 		return f, nil
 	}
-	return SignalCondition(e, instance.NewUndefinedFunction(e, fun), Nil)
+	return SignalCondition(e, ilos.NewUndefinedFunction(e, fun), Nil)
 }
 
 // Lambda special form creates a function object. The scope of the identifiers
@@ -65,7 +64,7 @@ func Lambda(e ilos.Environment, lambdaList ilos.Instance, form ...ilos.Instance)
 	if err := checkLambdaList(e, lambdaList); err != nil {
 		return nil, err
 	}
-	return newNamedFunction(e, instance.NewSymbol("ANONYMOUS-FUNCTION"), lambdaList, form...)
+	return newNamedFunction(e, ilos.NewSymbol("ANONYMOUS-FUNCTION"), lambdaList, form...)
 }
 
 // Labels special form allow the definition of new identifiers in the function
@@ -87,16 +86,16 @@ func Lambda(e ilos.Environment, lambdaList ilos.Instance, form ...ilos.Instance)
 // there is none) is the value returned by the special form activation. No
 // function-name may appear more than once in the function bindings.
 func Labels(e ilos.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.ListClass, functions); err != nil {
+	if err := ensure(e, ilos.ListClass, functions); err != nil {
 		return nil, err
 	}
-	for _, function := range functions.(instance.List).Slice() {
-		if err := ensure(e, instance.ListClass, function); err != nil {
+	for _, function := range functions.(ilos.List).Slice() {
+		if err := ensure(e, ilos.ListClass, function); err != nil {
 			return nil, err
 		}
-		definition := function.(instance.List).Slice()
+		definition := function.(ilos.List).Slice()
 		if len(definition) < 2 {
-			return SignalCondition(e, instance.NewArityError(e), Nil)
+			return SignalCondition(e, ilos.NewArityError(e), Nil)
 		}
 		functionName := definition[0]
 		lambdaList := definition[1]
@@ -106,7 +105,7 @@ func Labels(e ilos.Environment, functions ilos.Instance, bodyForm ...ilos.Instan
 			return nil, err
 		}
 		if !e.Function.Define(functionName, fun) {
-			return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
+			return SignalCondition(e, ilos.NewImmutableBinding(e), Nil)
 		}
 	}
 	return Progn(e, bodyForm...)
@@ -115,17 +114,17 @@ func Labels(e ilos.Environment, functions ilos.Instance, bodyForm ...ilos.Instan
 // Flet special form allow the definition of new identifiers in the function
 // namespace for function objects (see Labels).
 func Flet(e ilos.Environment, functions ilos.Instance, bodyForm ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.ListClass, functions); err != nil {
+	if err := ensure(e, ilos.ListClass, functions); err != nil {
 		return nil, err
 	}
 	newEnv := e.NewLexical()
-	for _, function := range functions.(instance.List).Slice() {
-		if err := ensure(e, instance.ListClass, function); err != nil {
+	for _, function := range functions.(ilos.List).Slice() {
+		if err := ensure(e, ilos.ListClass, function); err != nil {
 			return nil, err
 		}
-		definition := function.(instance.List).Slice()
+		definition := function.(ilos.List).Slice()
 		if len(definition) < 2 {
-			return SignalCondition(e, instance.NewArityError(e), Nil)
+			return SignalCondition(e, ilos.NewArityError(e), Nil)
 		}
 		functionName := definition[0]
 		lambdaList := definition[1]
@@ -135,7 +134,7 @@ func Flet(e ilos.Environment, functions ilos.Instance, bodyForm ...ilos.Instance
 			return nil, err
 		}
 		if !newEnv.Function.Define(functionName, fun) {
-			return SignalCondition(e, instance.NewImmutableBinding(e), Nil)
+			return SignalCondition(e, ilos.NewImmutableBinding(e), Nil)
 		}
 	}
 	return Progn(newEnv, bodyForm...)
@@ -147,14 +146,14 @@ func Flet(e ilos.Environment, functions ilos.Instance, bodyForm ...ilos.Instance
 // be any ISLISP object. An error shall be signaled if list is not a proper list
 // (error-id. improper-argument-list).
 func Apply(e ilos.Environment, function ilos.Instance, obj ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.FunctionClass, function); err != nil {
+	if err := ensure(e, ilos.FunctionClass, function); err != nil {
 		return nil, err
 	}
-	if err := ensure(e, instance.ListClass, obj[len(obj)-1]); err != nil {
+	if err := ensure(e, ilos.ListClass, obj[len(obj)-1]); err != nil {
 		return nil, err
 	}
-	obj = append(obj[:len(obj)-1], obj[len(obj)-1].(instance.List).Slice()...)
-	return function.(instance.Applicable).Apply(e, obj...)
+	obj = append(obj[:len(obj)-1], obj[len(obj)-1].(ilos.List).Slice()...)
+	return function.(ilos.Applicable).Apply(e, obj...)
 }
 
 // Funcall activates the specified function function and returns the value that

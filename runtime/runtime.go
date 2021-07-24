@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 var Time time.Time
@@ -20,42 +19,42 @@ func TopLevelHander(e ilos.Environment, c ilos.Instance) (ilos.Instance, ilos.In
 }
 
 var TopLevel = ilos.NewEnvironment(
-	instance.NewStream(os.Stdin, nil, instance.CharacterClass),
-	instance.NewStream(nil, os.Stdout, instance.CharacterClass),
-	instance.NewStream(nil, os.Stderr, instance.CharacterClass),
-	instance.NewFunction(instance.NewSymbol("TOP-LEVEL-HANDLER"), TopLevelHander),
+	ilos.NewStream(os.Stdin, nil, ilos.CharacterClass),
+	ilos.NewStream(nil, os.Stdout, ilos.CharacterClass),
+	ilos.NewStream(nil, os.Stderr, ilos.CharacterClass),
+	ilos.NewFunction(ilos.NewSymbol("TOP-LEVEL-HANDLER"), TopLevelHander),
 )
 
 func defclass(name string, class ilos.Class) {
-	symbol := instance.NewSymbol(name)
+	symbol := ilos.NewSymbol(name)
 	TopLevel.Class.Define(symbol, class)
 }
 
 func defspecial(name string, function interface{}) {
-	symbol := instance.NewSymbol(name)
-	TopLevel.Special.Define(symbol, instance.NewFunction(func2symbol(function), function))
+	symbol := ilos.NewSymbol(name)
+	TopLevel.Special.Define(symbol, ilos.NewFunction(func2symbol(function), function))
 }
 
 func defun(name string, function interface{}) {
-	symbol := instance.NewSymbol(name)
-	TopLevel.Function.Define(symbol, instance.NewFunction(symbol, function))
+	symbol := ilos.NewSymbol(name)
+	TopLevel.Function.Define(symbol, ilos.NewFunction(symbol, function))
 }
 
 func defgeneric(name string, function interface{}) {
-	symbol := instance.NewSymbol(name)
-	lambdaList, _ := List(TopLevel, instance.NewSymbol("FIRST"), instance.NewSymbol("&REST"), instance.NewSymbol("REST"))
-	generic := instance.NewGenericFunction(symbol, lambdaList, T, instance.GenericFunctionClass)
-	generic.(*instance.GenericFunction).AddMethod(nil, lambdaList, []ilos.Class{instance.StandardClassClass}, instance.NewFunction(symbol, function))
+	symbol := ilos.NewSymbol(name)
+	lambdaList, _ := List(TopLevel, ilos.NewSymbol("FIRST"), ilos.NewSymbol("&REST"), ilos.NewSymbol("REST"))
+	generic := ilos.NewGenericFunction(symbol, lambdaList, T, ilos.GenericFunctionClass)
+	generic.(*ilos.GenericFunction).AddMethod(nil, lambdaList, []ilos.Class{ilos.StandardClassClass}, ilos.NewFunction(symbol, function))
 	TopLevel.Function.Define(symbol, generic)
 }
 
 func defglobal(name string, value ilos.Instance) {
-	symbol := instance.NewSymbol(name)
+	symbol := ilos.NewSymbol(name)
 	TopLevel.Variable.Define(symbol, value)
 }
 
 func init() {
-	defglobal("*PI*", instance.Float(math.Pi))
+	defglobal("*PI*", ilos.Float(math.Pi))
 	defglobal("*MOST-POSITIVE-FLOAT*", MostPositiveFloat)
 	defglobal("*MOST-NEGATIVE-FLOAT*", MostNegativeFloat)
 	defun("-", Substruct)
@@ -280,44 +279,44 @@ func init() {
 	defspecial("WITH-STANDARD-INPUT", WithStandardInput)
 	defspecial("WITH-STANDARD-OUTPUT", WithStandardOutput)
 	defun("WRITE-BYTE", WriteByte)
-	defclass("<OBJECT>", instance.ObjectClass)
-	defclass("<BUILT-IN-CLASS>", instance.BuiltInClassClass)
-	defclass("<STANDARD-CLASS>", instance.StandardClassClass)
-	defclass("<BASIC-ARRAY>", instance.BasicArrayClass)
-	defclass("<BASIC-ARRAY-STAR>", instance.BasicArrayStarClass)
-	defclass("<GENERAL-ARRAY-STAR>", instance.GeneralArrayStarClass)
-	defclass("<BASIC-VECTOR>", instance.BasicVectorClass)
-	defclass("<GENERAL-VECTOR>", instance.GeneralVectorClass)
-	defclass("<STRING>", instance.StringClass)
-	defclass("<CHARACTER>", instance.CharacterClass)
-	defclass("<FUNCTION>", instance.FunctionClass)
-	defclass("<GENERIC-FUNCTION>", instance.GenericFunctionClass)
-	defclass("<STANDARD-GENERIC-FUNCTION>", instance.StandardGenericFunctionClass)
-	defclass("<LIST>", instance.ListClass)
-	defclass("<CONS>", instance.ConsClass)
-	defclass("<NULL>", instance.NullClass)
-	defclass("<SYMBOL>", instance.SymbolClass)
-	defclass("<NUMBER>", instance.NumberClass)
-	defclass("<INTEGER>", instance.IntegerClass)
-	defclass("<FLOAT>", instance.FloatClass)
-	defclass("<SERIOUS-CONDITION>", instance.SeriousConditionClass)
-	defclass("<ERROR>", instance.ErrorClass)
-	defclass("<ARITHMETIC-ERROR>", instance.ArithmeticErrorClass)
-	defclass("<DIVISION-BY-ZERO>", instance.DivisionByZeroClass)
-	defclass("<FLOATING-POINT-ONDERFLOW>", instance.FloatingPointOnderflowClass)
-	defclass("<FLOATING-POINT-UNDERFLOW>", instance.FloatingPointUnderflowClass)
-	defclass("<CONTROL-ERROR>", instance.ControlErrorClass)
-	defclass("<PARSE-ERROR>", instance.ParseErrorClass)
-	defclass("<PROGRAM-ERROR>", instance.ProgramErrorClass)
-	defclass("<DOMAIN-ERROR>", instance.DomainErrorClass)
-	defclass("<UNDEFINED-ENTITY>", instance.UndefinedEntityClass)
-	defclass("<UNDEFINED-VARIABLE>", instance.UndefinedVariableClass)
-	defclass("<UNDEFINED-FUNCTION>", instance.UndefinedFunctionClass)
-	defclass("<SIMPLE-ERROR>", instance.SimpleErrorClass)
-	defclass("<STREAM-ERROR>", instance.StreamErrorClass)
-	defclass("<END-OF-STREAM>", instance.EndOfStreamClass)
-	defclass("<STORAGE-EXHAUSTED>", instance.StorageExhaustedClass)
-	defclass("<STANDARD-OBJECT>", instance.StandardObjectClass)
-	defclass("<STREAM>", instance.StreamClass)
+	defclass("<OBJECT>", ilos.ObjectClass)
+	defclass("<BUILT-IN-CLASS>", ilos.BuiltInClassClass)
+	defclass("<STANDARD-CLASS>", ilos.StandardClassClass)
+	defclass("<BASIC-ARRAY>", ilos.BasicArrayClass)
+	defclass("<BASIC-ARRAY-STAR>", ilos.BasicArrayStarClass)
+	defclass("<GENERAL-ARRAY-STAR>", ilos.GeneralArrayStarClass)
+	defclass("<BASIC-VECTOR>", ilos.BasicVectorClass)
+	defclass("<GENERAL-VECTOR>", ilos.GeneralVectorClass)
+	defclass("<STRING>", ilos.StringClass)
+	defclass("<CHARACTER>", ilos.CharacterClass)
+	defclass("<FUNCTION>", ilos.FunctionClass)
+	defclass("<GENERIC-FUNCTION>", ilos.GenericFunctionClass)
+	defclass("<STANDARD-GENERIC-FUNCTION>", ilos.StandardGenericFunctionClass)
+	defclass("<LIST>", ilos.ListClass)
+	defclass("<CONS>", ilos.ConsClass)
+	defclass("<NULL>", ilos.NullClass)
+	defclass("<SYMBOL>", ilos.SymbolClass)
+	defclass("<NUMBER>", ilos.NumberClass)
+	defclass("<INTEGER>", ilos.IntegerClass)
+	defclass("<FLOAT>", ilos.FloatClass)
+	defclass("<SERIOUS-CONDITION>", ilos.SeriousConditionClass)
+	defclass("<ERROR>", ilos.ErrorClass)
+	defclass("<ARITHMETIC-ERROR>", ilos.ArithmeticErrorClass)
+	defclass("<DIVISION-BY-ZERO>", ilos.DivisionByZeroClass)
+	defclass("<FLOATING-POINT-ONDERFLOW>", ilos.FloatingPointOnderflowClass)
+	defclass("<FLOATING-POINT-UNDERFLOW>", ilos.FloatingPointUnderflowClass)
+	defclass("<CONTROL-ERROR>", ilos.ControlErrorClass)
+	defclass("<PARSE-ERROR>", ilos.ParseErrorClass)
+	defclass("<PROGRAM-ERROR>", ilos.ProgramErrorClass)
+	defclass("<DOMAIN-ERROR>", ilos.DomainErrorClass)
+	defclass("<UNDEFINED-ENTITY>", ilos.UndefinedEntityClass)
+	defclass("<UNDEFINED-VARIABLE>", ilos.UndefinedVariableClass)
+	defclass("<UNDEFINED-FUNCTION>", ilos.UndefinedFunctionClass)
+	defclass("<SIMPLE-ERROR>", ilos.SimpleErrorClass)
+	defclass("<STREAM-ERROR>", ilos.StreamErrorClass)
+	defclass("<END-OF-STREAM>", ilos.EndOfStreamClass)
+	defclass("<STORAGE-EXHAUSTED>", ilos.StorageExhaustedClass)
+	defclass("<STANDARD-OBJECT>", ilos.StandardObjectClass)
+	defclass("<STREAM>", ilos.StreamClass)
 	Time = time.Now()
 }

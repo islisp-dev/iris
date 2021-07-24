@@ -2,21 +2,17 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can
 // obtain one at http://mozilla.org/MPL/2.0/.
 
-package instance
-
-import (
-	"github.com/islisp-dev/iris/runtime/ilos"
-)
+package ilos
 
 // Character
 
 type Character rune
 
-func NewCharacter(r rune) ilos.Instance {
+func NewCharacter(r rune) Instance {
 	return Character(r)
 }
 
-func (Character) Class() ilos.Class {
+func (Character) Class() Class {
 	return CharacterClass
 }
 

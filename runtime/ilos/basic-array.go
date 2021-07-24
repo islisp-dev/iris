@@ -2,26 +2,24 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can
 // obtain one at http://mozilla.org/MPL/2.0/.
 
-package instance
+package ilos
 
 import (
 	"fmt"
-
-	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
 // General Array *
 
 type GeneralArrayStar struct {
 	Vector []*GeneralArrayStar
-	Scalar ilos.Instance
+	Scalar Instance
 }
 
-func NewGeneralArrayStar(vector []*GeneralArrayStar, scalar ilos.Instance) ilos.Instance {
+func NewGeneralArrayStar(vector []*GeneralArrayStar, scalar Instance) Instance {
 	return &GeneralArrayStar{vector, scalar}
 }
 
-func (*GeneralArrayStar) Class() ilos.Class {
+func (*GeneralArrayStar) Class() Class {
 	return GeneralArrayStarClass
 }
 
@@ -53,18 +51,18 @@ func (i *GeneralArrayStar) String() string {
 
 // General Vector
 
-type GeneralVector []ilos.Instance
+type GeneralVector []Instance
 
-func NewGeneralVector(v []ilos.Instance) ilos.Instance {
+func NewGeneralVector(v []Instance) Instance {
 	return GeneralVector(v)
 }
 
-func (GeneralVector) Class() ilos.Class {
+func (GeneralVector) Class() Class {
 	return GeneralVectorClass
 }
 
 func (i GeneralVector) String() string {
-	str := fmt.Sprint([]ilos.Instance(i))
+	str := fmt.Sprint([]Instance(i))
 	return fmt.Sprintf("#(%v)", str[1:len(str)-1])
 }
 
@@ -72,11 +70,11 @@ func (i GeneralVector) String() string {
 
 type String []rune
 
-func NewString(s []rune) ilos.Instance {
+func NewString(s []rune) Instance {
 	return String(s)
 }
 
-func (String) Class() ilos.Class {
+func (String) Class() Class {
 	return StringClass
 }
 

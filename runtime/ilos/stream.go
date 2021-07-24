@@ -2,7 +2,7 @@
 // v. 2.0. If a copy of the MPL was not distributed with this file, You can
 // obtain one at http://mozilla.org/MPL/2.0/.
 
-package instance
+package ilos
 
 import (
 	"bufio"
@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"github.com/islisp-dev/iris/reader/tokenizer"
-	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
 type BufferedWriter struct {
@@ -24,16 +23,16 @@ func NewBufferedWriter(w io.Writer) *BufferedWriter {
 
 type Stream struct {
 	Column       *int
-	ElementClass ilos.Instance
+	ElementClass Instance
 	*tokenizer.Reader
 	*BufferedWriter
 }
 
-func NewStream(r io.Reader, w io.Writer, e ilos.Instance) ilos.Instance {
+func NewStream(r io.Reader, w io.Writer, e Instance) Instance {
 	return Stream{new(int), e, tokenizer.NewReader(r), NewBufferedWriter(w)}
 }
 
-func (Stream) Class() ilos.Class {
+func (Stream) Class() Class {
 	return StreamClass
 }
 

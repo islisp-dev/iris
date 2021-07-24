@@ -10,13 +10,12 @@ import (
 	"github.com/islisp-dev/iris/reader/parser"
 	"github.com/islisp-dev/iris/reader/tokenizer"
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // Numberp returns t if obj is a number (instance of class number); otherwise,
 // returns nil. The obj may be any ISLISP object.
 func Numberp(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(instance.NumberClass, obj) {
+	if ilos.InstanceOf(ilos.NumberClass, obj) {
 		return T, nil
 	}
 	return Nil, nil
@@ -28,12 +27,12 @@ func Numberp(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instanc
 // error shall be signaled if string is not the textual representation of a
 // number (error-id. cannot-parse-number).
 func ParseNumber(e ilos.Environment, str ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.StringClass, str); err != nil {
+	if err := ensure(e, ilos.StringClass, str); err != nil {
 		return nil, err
 	}
-	ret, err := parser.ParseAtom(tokenizer.NewToken(string(str.(instance.String)), -1, -1))
-	if err != nil || !ilos.InstanceOf(instance.NumberClass, ret) {
-		return SignalCondition(e, instance.NewParseError(e, str, instance.NumberClass), Nil)
+	ret, err := parser.ParseAtom(tokenizer.NewToken(string(str.(ilos.String)), -1, -1))
+	if err != nil || !ilos.InstanceOf(ilos.NumberClass, ret) {
+		return SignalCondition(e, ilos.NewParseError(e, str, ilos.NumberClass), Nil)
 	}
 	return ret, err
 }
@@ -44,18 +43,18 @@ func ParseNumber(e ilos.Environment, str ilos.Instance) (ilos.Instance, ilos.Ins
 // compares only the mathematical values of its arguments, whereas eql also
 // compares the representations
 func NumberEqual(e ilos.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.NumberClass, x1, x2); err != nil {
+	if err := ensure(e, ilos.NumberClass, x1, x2); err != nil {
 		return nil, err
 	}
 	ret := false
 	switch {
-	case ilos.InstanceOf(instance.IntegerClass, x1) && ilos.InstanceOf(instance.IntegerClass, x2):
+	case ilos.InstanceOf(ilos.IntegerClass, x1) && ilos.InstanceOf(ilos.IntegerClass, x2):
 		ret = x1 == x2
-	case ilos.InstanceOf(instance.IntegerClass, x1) && ilos.InstanceOf(instance.FloatClass, x2):
-		ret = float64(x1.(instance.Integer)) == float64(x2.(instance.Float))
-	case ilos.InstanceOf(instance.FloatClass, x1) && ilos.InstanceOf(instance.IntegerClass, x2):
-		ret = float64(x1.(instance.Float)) == float64(x2.(instance.Integer))
-	case ilos.InstanceOf(instance.FloatClass, x1) && ilos.InstanceOf(instance.FloatClass, x2):
+	case ilos.InstanceOf(ilos.IntegerClass, x1) && ilos.InstanceOf(ilos.FloatClass, x2):
+		ret = float64(x1.(ilos.Integer)) == float64(x2.(ilos.Float))
+	case ilos.InstanceOf(ilos.FloatClass, x1) && ilos.InstanceOf(ilos.IntegerClass, x2):
+		ret = float64(x1.(ilos.Float)) == float64(x2.(ilos.Integer))
+	case ilos.InstanceOf(ilos.FloatClass, x1) && ilos.InstanceOf(ilos.FloatClass, x2):
 		ret = x1 == x2
 	}
 	if ret {
@@ -77,19 +76,19 @@ func NumberNotEqual(e ilos.Environment, x1, x2 ilos.Instance) (ilos.Instance, il
 
 // NumberGreaterThan returns t if x1 is greater than x2
 func NumberGreaterThan(e ilos.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.NumberClass, x1, x2); err != nil {
+	if err := ensure(e, ilos.NumberClass, x1, x2); err != nil {
 		return nil, err
 	}
 	ret := false
 	switch {
-	case ilos.InstanceOf(instance.IntegerClass, x1) && ilos.InstanceOf(instance.IntegerClass, x2):
-		ret = float64(x1.(instance.Integer)) > float64(x2.(instance.Integer))
-	case ilos.InstanceOf(instance.IntegerClass, x1) && ilos.InstanceOf(instance.FloatClass, x2):
-		ret = float64(x1.(instance.Integer)) > float64(x2.(instance.Float))
-	case ilos.InstanceOf(instance.FloatClass, x1) && ilos.InstanceOf(instance.IntegerClass, x2):
-		ret = float64(x1.(instance.Float)) > float64(x2.(instance.Integer))
-	case ilos.InstanceOf(instance.FloatClass, x1) && ilos.InstanceOf(instance.FloatClass, x2):
-		ret = float64(x1.(instance.Float)) > float64(x2.(instance.Float))
+	case ilos.InstanceOf(ilos.IntegerClass, x1) && ilos.InstanceOf(ilos.IntegerClass, x2):
+		ret = float64(x1.(ilos.Integer)) > float64(x2.(ilos.Integer))
+	case ilos.InstanceOf(ilos.IntegerClass, x1) && ilos.InstanceOf(ilos.FloatClass, x2):
+		ret = float64(x1.(ilos.Integer)) > float64(x2.(ilos.Float))
+	case ilos.InstanceOf(ilos.FloatClass, x1) && ilos.InstanceOf(ilos.IntegerClass, x2):
+		ret = float64(x1.(ilos.Float)) > float64(x2.(ilos.Integer))
+	case ilos.InstanceOf(ilos.FloatClass, x1) && ilos.InstanceOf(ilos.FloatClass, x2):
+		ret = float64(x1.(ilos.Float)) > float64(x2.(ilos.Float))
 	}
 	if ret {
 		return T, nil
@@ -147,9 +146,9 @@ func Add(e ilos.Environment, x ...ilos.Instance) (ilos.Instance, ilos.Instance) 
 		sum += f
 	}
 	if flt {
-		return instance.NewFloat(sum), nil
+		return ilos.NewFloat(sum), nil
 	}
-	return instance.NewInteger(int(sum)), nil
+	return ilos.NewInteger(int(sum)), nil
 }
 
 // Multiply returns the product, respectively, of their arguments. If all
@@ -168,9 +167,9 @@ func Multiply(e ilos.Environment, x ...ilos.Instance) (ilos.Instance, ilos.Insta
 		flt = flt || b
 	}
 	if flt {
-		return instance.NewFloat(pdt), nil
+		return ilos.NewFloat(pdt), nil
 	}
-	return instance.NewInteger(int(pdt)), nil
+	return ilos.NewInteger(int(pdt)), nil
 }
 
 // Substruct returns its additive inverse. An error shall be signaled if x is
@@ -181,7 +180,7 @@ func Multiply(e ilos.Environment, x ...ilos.Instance) (ilos.Instance, ilos.Insta
 // An error shall be signaled if any x is not a number (error-id. domain-error).
 func Substruct(e ilos.Environment, x ilos.Instance, xs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if len(xs) == 0 {
-		ret, err := Substruct(e, instance.NewInteger(0), x)
+		ret, err := Substruct(e, ilos.NewInteger(0), x)
 		return ret, err
 	}
 	sub, flt, err := convFloat64(e, x)
@@ -197,9 +196,9 @@ func Substruct(e ilos.Environment, x ilos.Instance, xs ...ilos.Instance) (ilos.I
 		flt = flt || b
 	}
 	if flt {
-		return instance.NewFloat(sub), nil
+		return ilos.NewFloat(sub), nil
 	}
-	return instance.NewInteger(int(sub)), nil
+	return ilos.NewInteger(int(sub)), nil
 }
 
 // Quotient returns the quotient of those numbers. The result is an integer if
@@ -225,9 +224,9 @@ func Quotient(e ilos.Environment, dividend, divisor1 ilos.Instance, divisor ...i
 		if f == 0.0 {
 			arguments := Nil
 			for i := len(divisor) - 1; i >= 0; i-- {
-				arguments = instance.NewCons(divisor[i], arguments)
+				arguments = ilos.NewCons(divisor[i], arguments)
 			}
-			return SignalCondition(e, instance.NewArithmeticError(e, instance.NewSymbol("QUOTIENT"), arguments), Nil)
+			return SignalCondition(e, ilos.NewArithmeticError(e, ilos.NewSymbol("QUOTIENT"), arguments), Nil)
 		}
 		if !flt && !b && int(quotient)%int(f) != 0 {
 			flt = true
@@ -235,15 +234,15 @@ func Quotient(e ilos.Environment, dividend, divisor1 ilos.Instance, divisor ...i
 		quotient /= f
 	}
 	if flt {
-		return instance.NewFloat(quotient), nil
+		return ilos.NewFloat(quotient), nil
 	}
-	return instance.NewInteger(int(quotient)), nil
+	return ilos.NewInteger(int(quotient)), nil
 }
 
 // Reciprocal returns the reciprocal of its argument x ; that is, 1/x . An error
 // shall be signaled if x is zero (error-id. division-by-zero).
 func Reciprocal(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
-	return Quotient(e, instance.NewInteger(1), x)
+	return Quotient(e, ilos.NewInteger(1), x)
 }
 
 // Max returns the greatest (closest to positive infinity) of its arguments. The
@@ -283,7 +282,7 @@ func Min(e ilos.Environment, x ilos.Instance, xs ...ilos.Instance) (ilos.Instanc
 // Abs returns the absolute value of its argument. An error shall be signaled if
 // x is not a number (error-id. domain-error).
 func Abs(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
-	ret, err := NumberLessThan(e, x, instance.NewInteger(0))
+	ret, err := NumberLessThan(e, x, ilos.NewInteger(0))
 	if err != nil {
 		return nil, err
 	}
@@ -301,7 +300,7 @@ func Exp(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err != nil {
 		return nil, err
 	}
-	return instance.NewFloat(math.Exp(f)), nil
+	return ilos.NewFloat(math.Exp(f)), nil
 }
 
 // Log returns the natural logarithm of x. An error shall be signaled if x is
@@ -312,9 +311,9 @@ func Log(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 		return nil, err
 	}
 	if f <= 0.0 {
-		return SignalCondition(e, instance.NewDomainError(e, x, instance.NumberClass), Nil)
+		return SignalCondition(e, ilos.NewDomainError(e, x, ilos.NumberClass), Nil)
 	}
-	return instance.NewFloat(math.Log(f)), nil
+	return ilos.NewFloat(math.Log(f)), nil
 }
 
 // Expt returns x1 raised to the power x2. The result will be an integer if x1
@@ -331,17 +330,17 @@ func Expt(e ilos.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instanc
 		return nil, err
 	}
 	if !af && !bf && b >= 0 {
-		return instance.NewInteger(int(math.Pow(a, b))), nil
+		return ilos.NewInteger(int(math.Pow(a, b))), nil
 	}
 	if (a == 0 && b < 0) || (a == 0 && bf && b == 0) || (a < 0 && bf) {
-		operation := instance.NewSymbol("EXPT")
+		operation := ilos.NewSymbol("EXPT")
 		operands, err := List(e, x1, x2)
 		if err != nil {
 			return nil, err
 		}
-		return SignalCondition(e, instance.NewArithmeticError(e, operation, operands), Nil)
+		return SignalCondition(e, ilos.NewArithmeticError(e, operation, operands), Nil)
 	}
-	return instance.NewFloat(math.Pow(a, b)), nil
+	return ilos.NewFloat(math.Pow(a, b)), nil
 }
 
 // Sqrt returns the non-negative square root of x. An error shall be signaled if
@@ -352,16 +351,16 @@ func Sqrt(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 		return nil, err
 	}
 	if a < 0.0 {
-		return SignalCondition(e, instance.NewDomainError(e, x, instance.NumberClass), Nil)
+		return SignalCondition(e, ilos.NewDomainError(e, x, ilos.NumberClass), Nil)
 	}
 	if math.Ceil(math.Sqrt(a)) == math.Sqrt(a) {
-		return instance.NewInteger(int(math.Sqrt(a))), nil
+		return ilos.NewInteger(int(math.Sqrt(a))), nil
 	}
-	return instance.NewFloat(math.Sqrt(a)), nil
+	return ilos.NewFloat(math.Sqrt(a)), nil
 }
 
 // Pi is an approximation of π.
-var Pi = instance.NewFloat(3.141592653589793)
+var Pi = ilos.NewFloat(3.141592653589793)
 
 // Sin returns the sine of x . x must be given in radians. An error shall be
 // signaled if x is not a number (error-id. domain-error).
@@ -370,7 +369,7 @@ func Sin(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err != nil {
 		return nil, err
 	}
-	return instance.NewFloat(math.Sin(a)), nil
+	return ilos.NewFloat(math.Sin(a)), nil
 }
 
 // Cos returns the cosine of x . x must be given in radians. An error shall be
@@ -380,7 +379,7 @@ func Cos(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err != nil {
 		return nil, err
 	}
-	return instance.NewFloat(math.Cos(a)), nil
+	return ilos.NewFloat(math.Cos(a)), nil
 }
 
 // Tan returns the tangent of x . x must be given in radians. An error shall be
@@ -390,7 +389,7 @@ func Tan(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err != nil {
 		return nil, err
 	}
-	return instance.NewFloat(math.Tan(a)), nil
+	return ilos.NewFloat(math.Tan(a)), nil
 }
 
 // Atan returns the arc tangent of x. The result is a (real) number that lies
@@ -401,7 +400,7 @@ func Atan(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err != nil {
 		return nil, err
 	}
-	return instance.NewFloat(math.Atan(a)), nil
+	return ilos.NewFloat(math.Atan(a)), nil
 }
 
 // Atan2 returns the phase of its representation in polar coordinates. If x1 is
@@ -421,14 +420,14 @@ func Atan2(e ilos.Environment, x1, x2 ilos.Instance) (ilos.Instance, ilos.Instan
 		return nil, err
 	}
 	if a == 0 && b == 0 {
-		operation := instance.NewSymbol("ATAN2")
+		operation := ilos.NewSymbol("ATAN2")
 		operands, err := List(e, x1, x2)
 		if err != nil {
 			return nil, err
 		}
-		return SignalCondition(e, instance.NewArithmeticError(e, operation, operands), Nil)
+		return SignalCondition(e, ilos.NewArithmeticError(e, operation, operands), Nil)
 	}
-	return instance.NewFloat(math.Atan2(a, b)), nil
+	return ilos.NewFloat(math.Atan2(a, b)), nil
 }
 
 // Sinh returns the hyperbolic sine of x . x must be given in radians. An error
@@ -438,7 +437,7 @@ func Sinh(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err != nil {
 		return nil, err
 	}
-	return instance.NewFloat(math.Sinh(a)), nil
+	return ilos.NewFloat(math.Sinh(a)), nil
 }
 
 // Cosh returns the hyperbolic cosine of x . x must be given in radians. An
@@ -448,7 +447,7 @@ func Cosh(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err != nil {
 		return nil, err
 	}
-	return instance.NewFloat(math.Cosh(a)), nil
+	return ilos.NewFloat(math.Cosh(a)), nil
 }
 
 // Tanh returns the hyperbolic tangent of x . x must be given in radians. An
@@ -458,7 +457,7 @@ func Tanh(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if err != nil {
 		return nil, err
 	}
-	return instance.NewFloat(math.Tanh(a)), nil
+	return ilos.NewFloat(math.Tanh(a)), nil
 }
 
 // Atanh returns the hyperbolic arc tangent of x. An error shall be signaled if
@@ -469,7 +468,7 @@ func Atanh(e ilos.Environment, x ilos.Instance) (ilos.Instance, ilos.Instance) {
 		return nil, err
 	}
 	if math.Abs(a) >= 1 {
-		return SignalCondition(e, instance.NewDomainError(e, x, instance.NumberClass), Nil)
+		return SignalCondition(e, ilos.NewDomainError(e, x, ilos.NumberClass), Nil)
 	}
-	return instance.NewFloat(math.Atanh(a)), nil
+	return ilos.NewFloat(math.Atanh(a)), nil
 }

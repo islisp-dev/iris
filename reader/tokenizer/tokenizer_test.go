@@ -7,8 +7,6 @@ package tokenizer
 import (
 	"strings"
 	"testing"
-
-	"github.com/islisp-dev/iris/runtime/ilos"
 )
 
 func TestTokenizer_Next(t *testing.T) {
@@ -16,9 +14,8 @@ func TestTokenizer_Next(t *testing.T) {
 	;foo
 	("\\""\"foo\"" | foo \| bar | #b101)`))
 	tests := []struct {
-		name  string
-		want  string
-		want1 ilos.Instance
+		name string
+		want string
 	}{
 		{
 			name: "comment",

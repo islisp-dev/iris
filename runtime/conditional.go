@@ -6,7 +6,6 @@ package runtime
 
 import (
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 // If is conditional expression. The test-form is evaluated. If its result is
@@ -22,7 +21,7 @@ func If(e ilos.Environment, testForm, thenForm ilos.Instance, elseForm ...ilos.I
 		return Eval(e, thenForm)
 	}
 	if len(elseForm) > 1 {
-		return SignalCondition(e, instance.NewArityError(e), Nil)
+		return SignalCondition(e, ilos.NewArityError(e), Nil)
 	}
 	if len(elseForm) == 0 {
 		return Nil, nil
@@ -38,12 +37,12 @@ func If(e ilos.Environment, testForm, thenForm ilos.Instance, elseForm ...ilos.I
 // this test is returned.
 func Cond(e ilos.Environment, testFrom ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	for _, tf := range testFrom {
-		if err := ensure(e, instance.ListClass, tf); err != nil {
+		if err := ensure(e, ilos.ListClass, tf); err != nil {
 			return nil, err
 		}
-		s := tf.(instance.List).Slice()
+		s := tf.(ilos.List).Slice()
 		if len(s) == 0 {
-			return SignalCondition(e, instance.NewArityError(e), Nil)
+			return SignalCondition(e, ilos.NewArityError(e), Nil)
 		}
 		ret, err := Eval(e, s[0])
 		if err != nil {
@@ -76,20 +75,20 @@ func Case(e ilos.Environment, key ilos.Instance, pattern ...ilos.Instance) (ilos
 		return nil, err
 	}
 	for idx, pat := range pattern {
-		if err := ensure(e, instance.ListClass, pat); err != nil {
+		if err := ensure(e, ilos.ListClass, pat); err != nil {
 			return nil, err
 		}
-		form := pat.(instance.List).Slice()
+		form := pat.(ilos.List).Slice()
 		if len(form) < 1 {
-			return SignalCondition(e, instance.NewArityError(e), Nil)
+			return SignalCondition(e, ilos.NewArityError(e), Nil)
 		}
 		if idx == len(pattern)-1 && form[0] == T {
 			return Progn(e, form[1:]...)
 		}
-		if err := ensure(e, instance.ListClass, form[0]); err != nil {
+		if err := ensure(e, ilos.ListClass, form[0]); err != nil {
 			return nil, err
 		}
-		for _, k := range form[0].(instance.List).Slice() {
+		for _, k := range form[0].(ilos.List).Slice() {
 			if k == key {
 				return Progn(e, form[1:]...)
 			}
@@ -122,25 +121,25 @@ func CaseUsing(e ilos.Environment, pred, key ilos.Instance, pattern ...ilos.Inst
 	if err != nil {
 		return nil, err
 	}
-	if err := ensure(e, instance.FunctionClass, pred); err != nil {
+	if err := ensure(e, ilos.FunctionClass, pred); err != nil {
 		return nil, err
 	}
 	for idx, pat := range pattern {
-		if err := ensure(e, instance.ListClass, pat); err != nil {
+		if err := ensure(e, ilos.ListClass, pat); err != nil {
 			return nil, err
 		}
-		form := pat.(instance.List).Slice()
+		form := pat.(ilos.List).Slice()
 		if len(form) < 1 {
-			return SignalCondition(e, instance.NewArityError(e), Nil)
+			return SignalCondition(e, ilos.NewArityError(e), Nil)
 		}
 		if idx == len(pattern)-1 && form[0] == T {
 			return Progn(e, form[1:]...)
 		}
-		if err := ensure(e, instance.ListClass, form[0]); err != nil {
+		if err := ensure(e, ilos.ListClass, form[0]); err != nil {
 			return nil, err
 		}
-		for _, k := range form[0].(instance.List).Slice() {
-			ret, err := pred.(instance.Applicable).Apply(e.NewDynamic(), k, key)
+		for _, k := range form[0].(ilos.List).Slice() {
+			ret, err := pred.(ilos.Applicable).Apply(e.NewDynamic(), k, key)
 			if err != nil {
 				return nil, err
 			}

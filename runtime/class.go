@@ -9,7 +9,6 @@ import (
 	"reflect"
 
 	"github.com/islisp-dev/iris/runtime/ilos"
-	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
 func ClassOf(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
@@ -34,12 +33,12 @@ func Class(e ilos.Environment, className ilos.Instance) (ilos.Class, ilos.Instan
 	if v, ok := e.Class[:1].Get(className); ok {
 		return v.(ilos.Class), nil
 	}
-	_, err := SignalCondition(e, instance.NewUndefinedClass(e, className), Nil)
+	_, err := SignalCondition(e, ilos.NewUndefinedClass(e, className), Nil)
 	return nil, err
 }
 
 func checkSuperClass(a, b ilos.Class) bool {
-	if reflect.DeepEqual(a, instance.StandardObjectClass) || reflect.DeepEqual(b, instance.StandardObjectClass) {
+	if reflect.DeepEqual(a, ilos.StandardObjectClass) || reflect.DeepEqual(b, ilos.StandardObjectClass) {
 		return false
 	}
 	if ilos.SubclassOf(a, b) || ilos.SubclassOf(b, a) {
@@ -59,21 +58,21 @@ func checkSuperClass(a, b ilos.Class) bool {
 }
 
 func Defclass(e ilos.Environment, className, scNames, slotSpecs ilos.Instance, classOpts ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.SymbolClass, className); err != nil {
+	if err := ensure(e, ilos.SymbolClass, className); err != nil {
 		return nil, err
 	}
-	if err := ensure(e, instance.ListClass, scNames, slotSpecs); err != nil {
+	if err := ensure(e, ilos.ListClass, scNames, slotSpecs); err != nil {
 		return nil, err
 	}
-	supers := []ilos.Class{instance.StandardObjectClass}
-	for _, scName := range scNames.(instance.List).Slice() {
+	supers := []ilos.Class{ilos.StandardObjectClass}
+	for _, scName := range scNames.(ilos.List).Slice() {
 		super, err := Class(e, scName)
 		if err != nil {
 			return nil, err
 		}
 		for _, before := range supers {
 			if checkSuperClass(before, super) {
-				return SignalCondition(e, instance.NewArityError(e), Nil)
+				return SignalCondition(e, ilos.NewArityError(e), Nil)
 			}
 		}
 		supers = append(supers, super)
@@ -81,76 +80,76 @@ func Defclass(e ilos.Environment, className, scNames, slotSpecs ilos.Instance, c
 	slots := []ilos.Instance{}
 	initforms := map[ilos.Instance]ilos.Instance{}
 	initargs := map[ilos.Instance]ilos.Instance{}
-	for _, slotSpec := range slotSpecs.(instance.List).Slice() {
-		if ilos.InstanceOf(instance.SymbolClass, slotSpec) {
+	for _, slotSpec := range slotSpecs.(ilos.List).Slice() {
+		if ilos.InstanceOf(ilos.SymbolClass, slotSpec) {
 			slotName := slotSpec
 			slots = append(slots, slotName)
 			continue
 		}
-		slotName := slotSpec.(*instance.Cons).Car
+		slotName := slotSpec.(*ilos.Cons).Car
 		slots = append(slots, slotName)
-		slotOpts := slotSpec.(*instance.Cons).Cdr.(instance.List).Slice()
+		slotOpts := slotSpec.(*ilos.Cons).Cdr.(ilos.List).Slice()
 		for i := 0; i < len(slotOpts); i += 2 {
 			switch slotOpts[i] {
-			case instance.NewSymbol(":INITFORM"):
-				closure, err := newNamedFunction(e, instance.NewSymbol("CLOSURE"), Nil, slotOpts[i+1])
+			case ilos.NewSymbol(":INITFORM"):
+				closure, err := newNamedFunction(e, ilos.NewSymbol("CLOSURE"), Nil, slotOpts[i+1])
 				if err != nil {
 					return nil, err
 				}
 				initforms[slotName] = closure
-			case instance.NewSymbol(":INITARG"):
+			case ilos.NewSymbol(":INITARG"):
 				initargs[slotOpts[i+1]] = slotName
 			}
 		}
 	}
-	metaclass := instance.StandardClassClass
+	metaclass := ilos.StandardClassClass
 	abstractp := Nil
 	for _, classOpt := range classOpts {
 		var err ilos.Instance
-		switch classOpt.(*instance.Cons).Car {
-		case instance.NewSymbol(":METACLASS"):
-			if metaclass, err = Class(e, classOpt.(instance.List).Nth(1)); err != nil {
+		switch classOpt.(*ilos.Cons).Car {
+		case ilos.NewSymbol(":METACLASS"):
+			if metaclass, err = Class(e, classOpt.(ilos.List).Nth(1)); err != nil {
 				return nil, err
 			}
-		case instance.NewSymbol(":ABSTRACTP"):
-			if abstractp, err = Eval(e, classOpt.(instance.List).Nth(1)); err != nil {
+		case ilos.NewSymbol(":ABSTRACTP"):
+			if abstractp, err = Eval(e, classOpt.(ilos.List).Nth(1)); err != nil {
 				return nil, err
 			}
 		}
 	}
-	classObject := instance.NewStandardClass(className, supers, slots, initforms, initargs, metaclass, abstractp)
+	classObject := ilos.NewStandardClass(className, supers, slots, initforms, initargs, metaclass, abstractp)
 	e.Class[:1].Define(className, classObject)
-	for _, slotSpec := range slotSpecs.(instance.List).Slice() {
-		if ilos.InstanceOf(instance.SymbolClass, slotSpec) {
+	for _, slotSpec := range slotSpecs.(ilos.List).Slice() {
+		if ilos.InstanceOf(ilos.SymbolClass, slotSpec) {
 			continue
 		}
-		slotName := slotSpec.(*instance.Cons).Car
-		slotOpts := slotSpec.(*instance.Cons).Cdr.(instance.List).Slice()
+		slotName := slotSpec.(*ilos.Cons).Car
+		slotOpts := slotSpec.(*ilos.Cons).Cdr.(ilos.List).Slice()
 		var readerFunctionName, writerFunctionName, boundpFunctionName ilos.Instance
 		for i := 0; i < len(slotOpts); i += 2 {
 			switch slotOpts[i] {
-			case instance.NewSymbol(":READER"):
+			case ilos.NewSymbol(":READER"):
 				readerFunctionName = slotOpts[i+1]
-			case instance.NewSymbol(":WRITER"):
+			case ilos.NewSymbol(":WRITER"):
 				writerFunctionName = slotOpts[i+1]
-			case instance.NewSymbol(":ACCESSOR"):
+			case ilos.NewSymbol(":ACCESSOR"):
 				readerFunctionName = slotOpts[i+1]
-				writerFunctionName = instance.NewSymbol(fmt.Sprintf("(SETF %v)", slotOpts[i+1]))
-			case instance.NewSymbol(":BOUNDP"):
+				writerFunctionName = ilos.NewSymbol(fmt.Sprintf("(SETF %v)", slotOpts[i+1]))
+			case ilos.NewSymbol(":BOUNDP"):
 				boundpFunctionName = slotOpts[i+1]
 			}
 		}
 		if readerFunctionName != nil {
-			lambdaList, err := List(e, instance.NewSymbol("INSTANCE"))
+			lambdaList, err := List(e, ilos.NewSymbol("INSTANCE"))
 			if err != nil {
 				return nil, err
 			}
-			if g, ok := e.Function.Get(readerFunctionName); !ok || !ilos.InstanceOf(instance.GenericFunctionClass, g) {
+			if g, ok := e.Function.Get(readerFunctionName); !ok || !ilos.InstanceOf(ilos.GenericFunctionClass, g) {
 				Defgeneric(e, readerFunctionName, lambdaList)
 			}
 			fun, _ := e.Function.Get(readerFunctionName)
-			fun.(*instance.GenericFunction).AddMethod(nil, lambdaList, []ilos.Class{classObject}, instance.NewFunction(readerFunctionName, func(e ilos.Environment, object ilos.Instance) (ilos.Instance, ilos.Instance) {
-				slot, ok := object.(instance.BasicInstance).GetSlotValue(slotName, classObject)
+			fun.(*ilos.GenericFunction).AddMethod(nil, lambdaList, []ilos.Class{classObject}, ilos.NewFunction(readerFunctionName, func(e ilos.Environment, object ilos.Instance) (ilos.Instance, ilos.Instance) {
+				slot, ok := object.(ilos.BasicInstance).GetSlotValue(slotName, classObject)
 				if ok {
 					return slot, nil
 				}
@@ -158,16 +157,16 @@ func Defclass(e ilos.Environment, className, scNames, slotSpecs ilos.Instance, c
 			}))
 		}
 		if writerFunctionName != nil {
-			lambdaList, err := List(e, instance.NewSymbol("Y"), instance.NewSymbol("X"))
+			lambdaList, err := List(e, ilos.NewSymbol("Y"), ilos.NewSymbol("X"))
 			if err != nil {
 				return nil, err
 			}
-			if g, ok := e.Function.Get(writerFunctionName); !ok || !ilos.InstanceOf(instance.GenericFunctionClass, g) {
+			if g, ok := e.Function.Get(writerFunctionName); !ok || !ilos.InstanceOf(ilos.GenericFunctionClass, g) {
 				Defgeneric(e, writerFunctionName, lambdaList)
 			}
 			fun, _ := e.Function.Get(writerFunctionName)
-			fun.(*instance.GenericFunction).AddMethod(nil, lambdaList, []ilos.Class{instance.ObjectClass, classObject}, instance.NewFunction(writerFunctionName, func(e ilos.Environment, obj, object ilos.Instance) (ilos.Instance, ilos.Instance) {
-				ok := object.(instance.BasicInstance).SetSlotValue(obj, slotName, classObject)
+			fun.(*ilos.GenericFunction).AddMethod(nil, lambdaList, []ilos.Class{ilos.ObjectClass, classObject}, ilos.NewFunction(writerFunctionName, func(e ilos.Environment, obj, object ilos.Instance) (ilos.Instance, ilos.Instance) {
+				ok := object.(ilos.BasicInstance).SetSlotValue(obj, slotName, classObject)
 				if ok {
 					return obj, nil
 				}
@@ -175,16 +174,16 @@ func Defclass(e ilos.Environment, className, scNames, slotSpecs ilos.Instance, c
 			}))
 		}
 		if boundpFunctionName != nil {
-			lambdaList, err := List(e, instance.NewSymbol("INSTANCE"))
+			lambdaList, err := List(e, ilos.NewSymbol("INSTANCE"))
 			if err != nil {
 				return nil, err
 			}
-			if g, ok := e.Function.Get(boundpFunctionName); !ok || !ilos.InstanceOf(instance.GenericFunctionClass, g) {
+			if g, ok := e.Function.Get(boundpFunctionName); !ok || !ilos.InstanceOf(ilos.GenericFunctionClass, g) {
 				Defgeneric(e, boundpFunctionName, lambdaList)
 			}
 			fun, _ := e.Function.Get(boundpFunctionName)
-			fun.(*instance.GenericFunction).AddMethod(nil, lambdaList, []ilos.Class{classObject}, instance.NewFunction(boundpFunctionName, func(e ilos.Environment, object ilos.Instance) (ilos.Instance, ilos.Instance) {
-				_, ok := object.(instance.BasicInstance).GetSlotValue(slotName, classObject)
+			fun.(*ilos.GenericFunction).AddMethod(nil, lambdaList, []ilos.Class{classObject}, ilos.NewFunction(boundpFunctionName, func(e ilos.Environment, object ilos.Instance) (ilos.Instance, ilos.Instance) {
+				_, ok := object.(ilos.BasicInstance).GetSlotValue(slotName, classObject)
 				if ok {
 					return T, nil
 				}
@@ -196,36 +195,36 @@ func Defclass(e ilos.Environment, className, scNames, slotSpecs ilos.Instance, c
 }
 
 func Create(e ilos.Environment, c ilos.Instance, i ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.StandardClassClass, c); err != nil {
+	if err := ensure(e, ilos.StandardClassClass, c); err != nil {
 		return nil, err
 	}
-	return instance.Create(e, c, i...), nil
+	return ilos.Create(e, c, i...), nil
 }
 
 func InitializeObject(e ilos.Environment, object ilos.Instance, inits ...ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if err := ensure(e, instance.StandardObjectClass, object); err != nil {
+	if err := ensure(e, ilos.StandardObjectClass, object); err != nil {
 		return nil, err
 	}
-	return instance.InitializeObject(e, object, inits...), nil
+	return ilos.InitializeObject(e, object, inits...), nil
 }
 
 func Defmethod(e ilos.Environment, arguments ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	if len(arguments) < 2 {
-		return SignalCondition(e, instance.NewArityError(e), Nil)
+		return SignalCondition(e, ilos.NewArityError(e), Nil)
 	}
 	name := arguments[0]
 	var qualifier ilos.Instance
 	i := 0
-	if arguments[1] == instance.NewSymbol(":AROUND") || arguments[1] == instance.NewSymbol(":BEFORE") || arguments[1] == instance.NewSymbol(":AFTER") {
+	if arguments[1] == ilos.NewSymbol(":AROUND") || arguments[1] == ilos.NewSymbol(":BEFORE") || arguments[1] == ilos.NewSymbol(":AFTER") {
 		qualifier = arguments[1]
 		i++
 	}
 	parameterList := []ilos.Instance{}
-	for _, pp := range arguments[i+1].(instance.List).Slice() {
-		if ilos.InstanceOf(instance.SymbolClass, pp) {
+	for _, pp := range arguments[i+1].(ilos.List).Slice() {
+		if ilos.InstanceOf(ilos.SymbolClass, pp) {
 			parameterList = append(parameterList, pp)
 		} else {
-			parameterList = append(parameterList, pp.(instance.List).Nth(0))
+			parameterList = append(parameterList, pp.(ilos.List).Nth(0))
 		}
 	}
 	lambdaList, err := List(e, parameterList...)
@@ -233,16 +232,16 @@ func Defmethod(e ilos.Environment, arguments ...ilos.Instance) (ilos.Instance, i
 		return nil, err
 	}
 	classList := []ilos.Class{}
-	for _, pp := range arguments[i+1].(instance.List).Slice() {
-		if pp == instance.NewSymbol(":REST") && pp == instance.NewSymbol("&REST") {
+	for _, pp := range arguments[i+1].(ilos.List).Slice() {
+		if pp == ilos.NewSymbol(":REST") && pp == ilos.NewSymbol("&REST") {
 			break
 		}
-		if ilos.InstanceOf(instance.SymbolClass, pp) {
-			classList = append(classList, instance.ObjectClass)
+		if ilos.InstanceOf(ilos.SymbolClass, pp) {
+			classList = append(classList, ilos.ObjectClass)
 		} else {
-			class, ok := e.Class[:1].Get(pp.(instance.List).Nth(1))
+			class, ok := e.Class[:1].Get(pp.(ilos.List).Nth(1))
 			if !ok {
-				return SignalCondition(e, instance.NewUndefinedClass(e, pp.(instance.List).Nth(1)), Nil)
+				return SignalCondition(e, ilos.NewUndefinedClass(e, pp.(ilos.List).Nth(1)), Nil)
 
 			}
 			classList = append(classList, class.(ilos.Class))
@@ -254,37 +253,37 @@ func Defmethod(e ilos.Environment, arguments ...ilos.Instance) (ilos.Instance, i
 	}
 	gen, ok := e.Function[:1].Get(name)
 	if !ok {
-		return SignalCondition(e, instance.NewUndefinedFunction(e, name), Nil)
+		return SignalCondition(e, ilos.NewUndefinedFunction(e, name), Nil)
 	}
-	if !gen.(*instance.GenericFunction).AddMethod(qualifier, lambdaList, classList, fun) {
-		return SignalCondition(e, instance.NewUndefinedFunction(e, name), Nil)
+	if !gen.(*ilos.GenericFunction).AddMethod(qualifier, lambdaList, classList, fun) {
+		return SignalCondition(e, ilos.NewUndefinedFunction(e, name), Nil)
 	}
 	return name, nil
 }
 
 func Defgeneric(e ilos.Environment, funcSpec, lambdaList ilos.Instance, optionsOrMethodDescs ...ilos.Instance) (ilos.Instance, ilos.Instance) {
 	var methodCombination ilos.Instance
-	genericFunctionClass := instance.StandardGenericFunctionClass
+	genericFunctionClass := ilos.StandardGenericFunctionClass
 	forms := []ilos.Instance{}
 	for _, optionOrMethodDesc := range optionsOrMethodDescs {
-		switch optionOrMethodDesc.(instance.List).Nth(0) {
-		case instance.NewSymbol(":METHOD-COMBINATION"):
-			methodCombination = optionOrMethodDesc.(instance.List).Nth(1)
-		case instance.NewSymbol(":GENERIC-FUNCTION-CLASS"):
-			class, ok := e.Class[:1].Get(optionOrMethodDesc.(instance.List).Nth(1))
+		switch optionOrMethodDesc.(ilos.List).Nth(0) {
+		case ilos.NewSymbol(":METHOD-COMBINATION"):
+			methodCombination = optionOrMethodDesc.(ilos.List).Nth(1)
+		case ilos.NewSymbol(":GENERIC-FUNCTION-CLASS"):
+			class, ok := e.Class[:1].Get(optionOrMethodDesc.(ilos.List).Nth(1))
 			if !ok {
-				return SignalCondition(e, instance.NewUndefinedClass(e, optionOrMethodDesc.(instance.List).Nth(1)), Nil)
+				return SignalCondition(e, ilos.NewUndefinedClass(e, optionOrMethodDesc.(ilos.List).Nth(1)), Nil)
 			}
 			genericFunctionClass = class.(ilos.Class)
-		case instance.NewSymbol(":METHOD"):
-			forms = append(forms, instance.NewCons(instance.NewSymbol("DEFMETHOD"), optionOrMethodDesc.(instance.List).NthCdr(1)))
+		case ilos.NewSymbol(":METHOD"):
+			forms = append(forms, ilos.NewCons(ilos.NewSymbol("DEFMETHOD"), optionOrMethodDesc.(ilos.List).NthCdr(1)))
 		}
 	}
 	e.Function[:1].Define(
-		instance.NewSymbol(
+		ilos.NewSymbol(
 			fmt.Sprint(funcSpec),
 		),
-		instance.NewGenericFunction(
+		ilos.NewGenericFunction(
 			funcSpec,
 			lambdaList,
 			methodCombination,
@@ -296,7 +295,7 @@ func Defgeneric(e ilos.Environment, funcSpec, lambdaList ilos.Instance, optionsO
 }
 
 func GenericFunctionP(e ilos.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(instance.GenericFunctionClass, obj) {
+	if ilos.InstanceOf(ilos.GenericFunctionClass, obj) {
 		return T, nil
 	}
 	return Nil, nil
