@@ -63,6 +63,7 @@ func init() {
 	defun("<", NumberLessThan)
 	defun("<=", NumberLessThanOrEqual)
 	defun("=", NumberEqual)
+	defun("/=", NumberNotEqual)
 	defun(">", NumberGreaterThan)
 	defun(">=", NumberGreaterThanOrEqual)
 	defspecial("QUASIQUOTE", Quasiquote)
