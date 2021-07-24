@@ -84,10 +84,11 @@ func ParseAtom(tok *tokenizer.Token) (core.Instance, core.Instance) {
 	if m, _ := regexp.MatchString(re, str); m {
 		return core.NewSymbol(strings.ToUpper(str), tok.Line, tok.Column), nil
 	}
-	return nil, core.Create(core.NewEnvironment(nil, nil, nil, nil),
-		core.ParseErrorClass,
-		core.NewSymbol("STRING"), core.NewString([]rune(str)),
-		core.NewSymbol("EXPECTED-CLASS"), core.ObjectClass)
+	return nil, core.NewParseError(
+		core.NewEnvironment(nil, nil, nil, nil),
+		core.NewString([]rune(str)),
+		core.ObjectClass,
+	)
 }
 
 func parseMacro(tok *tokenizer.Token, t *tokenizer.Reader) (core.Instance, core.Instance) {
@@ -104,10 +105,11 @@ func parseMacro(tok *tokenizer.Token, t *tokenizer.Reader) (core.Instance, core.
 			var err error
 			v, err = strconv.ParseInt(str[1:i], 10, 64)
 			if err != nil {
-				return nil, core.Create(core.NewEnvironment(nil, nil, nil, nil),
-					core.ParseErrorClass,
-					core.NewSymbol("STRING"), core.NewString([]rune(str)),
-					core.NewSymbol("EXPECTED-CLASS"), core.IntegerClass)
+				return nil, core.NewParseError(
+					core.NewEnvironment(nil, nil, nil, nil),
+					core.NewString([]rune(str)),
+					core.IntegerClass,
+				)
 			}
 		}
 		if int(v) == 1 {
