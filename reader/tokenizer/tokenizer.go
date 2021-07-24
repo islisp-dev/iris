@@ -12,46 +12,13 @@ import (
 // Reader is like bufio.Reader but has PeekRune
 // which returns a rune without advancing pointer
 type Reader struct {
-	err error
-	ru  rune
-	sz  int
-	rr  *bufio.Reader
+	Raw io.Reader
+	*bufio.Reader
 }
 
 // NewReader creates interal reader from io.RuneReader
 func NewReader(r io.Reader) *Reader {
-	b := new(Reader)
-	b.rr = bufio.NewReader(r)
-	return b
-}
-
-// PeekRune returns a rune without advancing pointer
-func (r *Reader) PeekRune() (rune, int, error) {
-	if r.ru == 0 {
-		r.ru, r.sz, r.err = r.rr.ReadRune()
-	}
-	return r.ru, r.sz, r.err
-}
-
-// ReadRune returns a rune with advancing pointer
-func (r *Reader) ReadRune() (rune, int, error) {
-	if r.ru == 0 {
-		r.ru, r.sz, r.err = r.rr.ReadRune()
-	}
-	ru := r.ru
-	sz := r.sz
-	err := r.err
-	r.ru, r.sz, r.err = r.rr.ReadRune()
-	return ru, sz, err
-}
-
-func (r *Reader) Read(b []byte) (int, error) {
-	ru := r.ru
-	sz := r.sz
-	err := r.err
-	r.ru, r.sz, r.err = r.rr.ReadRune()
-	copy(b, []byte(string([]rune{ru})))
-	return sz, err
+	return &Reader{r, bufio.NewReader(r)}
 }
 
 var str = `^1\+$|^1-$|` +
@@ -63,10 +30,10 @@ var str = `^1\+$|^1-$|` +
 	`^#[xX][-+]?[[:xdigit:]]+$|` +
 	`^#\\[[:alpha:]]+$|` +
 	`^#\\[[:graph:]]$|` +
-	`^"(?:\\\\|\\"|[^\\"])*"$|` +
+	`^"(?:\\\\|\\.|[^\\"])*"$|` +
 	`^[:&][a-zA-Z]+$|` +
 	`^\+$|^-$|^[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*$|` +
-	`^\|(?:\\\\|\\\||[^\\|])*\|$|` +
+	`^\|(?:\\\\|\\.|[^\\|])*\|$|` +
 	`^[.()]$|` +
 	"^;.*\n$|" +
 	`^#\|.*?\|#$|` +
@@ -76,8 +43,12 @@ var re = regexp.MustCompile(str)
 // ReadToken returns error or string as token
 func (r *Reader) Next() (string, error) {
 	for {
-		ru, _, err := r.PeekRune()
-		if ru == 0 || err != nil {
+		bytes, err := r.Peek(1)
+		if err != nil {
+			return "", io.EOF
+		}
+		ru := rune(bytes[0])
+		if ru == 0 {
 			return "", io.EOF
 		}
 		if !strings.ContainsRune(" \t\n\r", ru) {
@@ -90,8 +61,15 @@ func (r *Reader) Next() (string, error) {
 	num := false
 	shp := false
 	for {
-		ru, _, err := r.PeekRune()
-		if ru == 0 || err != nil {
+		bytes, err := r.Peek(1)
+		if err != nil {
+			if mat {
+				return buf, nil
+			}
+			return "", io.EOF
+		}
+		ru := rune(bytes[0])
+		if ru == 0 {
 			if mat {
 				return buf, nil
 			}
@@ -100,7 +78,7 @@ func (r *Reader) Next() (string, error) {
 		if buf == "" && strings.ContainsRune("1234567890", ru) {
 			num = true
 		}
-		if buf == "" && '#' == ru {
+		if buf == "" && ru == '#' {
 			shp = true
 		}
 		if mat && !re.MatchString(buf+string(ru)) {
@@ -111,6 +89,11 @@ func (r *Reader) Next() (string, error) {
 			}
 			if shp {
 				if len(buf) == 1 && ru == '\\' {
+					buf += string(ru)
+					r.ReadRune()
+					continue
+				}
+				if len(buf) == 1 && (ru == 'b' || ru == 'B' || ru == 'o' || ru == 'O' || ru == 'x' || ru == 'X') {
 					buf += string(ru)
 					r.ReadRune()
 					continue

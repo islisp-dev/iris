@@ -296,3 +296,10 @@ func Defgeneric(e env.Environment, funcSpec, lambdaList ilos.Instance, optionsOr
 	Progn(e, forms...)
 	return funcSpec, nil
 }
+
+func GenericFunctionP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
+	if ilos.InstanceOf(class.GenericFunction, obj) {
+		return T, nil
+	}
+	return Nil, nil
+}

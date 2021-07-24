@@ -14,7 +14,7 @@ import (
 func TestTokenizer_Next(t *testing.T) {
 	tokenizer := NewReader(strings.NewReader(`
 	;foo
-	("\\""\"foo\"" | foo \| bar |)`))
+	("\\""\"foo\"" | foo \| bar | #b101)`))
 	tests := []struct {
 		name  string
 		want  string
@@ -39,6 +39,10 @@ func TestTokenizer_Next(t *testing.T) {
 		{
 			name: `| foo \| bar |`,
 			want: `| foo \| bar |`,
+		},
+		{
+			name: `Binary`,
+			want: `#b101`,
 		},
 		{
 			name: "end",

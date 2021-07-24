@@ -14,19 +14,19 @@ import (
 // BasicArrayP returns t if obj is a basic-array (instance of class
 // basic-array); otherwise, returns nil. obj may be any ISLISP object.
 func BasicArrayP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(class.BasicArray, obj) {
-		return T, nil
+	if err := ensure(e, class.BasicArray, obj); err != nil {
+		return Nil, nil
 	}
-	return Nil, nil
+	return T, nil
 }
 
 // BasicArrayStarP returns t if obj is a basic-array* (instance of class
 // <basic-array*>); otherwise, returns nil. obj may be any ISLISP object.
 func BasicArrayStarP(e env.Environment, obj ilos.Instance) (ilos.Instance, ilos.Instance) {
-	if ilos.InstanceOf(class.BasicArrayStar, obj) {
-		return T, nil
+	if err := ensure(e, class.BasicArrayStar, obj); err != nil {
+		return Nil, nil
 	}
-	return Nil, nil
+	return T, nil
 }
 
 // GeneralArrayStarP returns t if obj is a general-array* (instance of class

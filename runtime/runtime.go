@@ -7,6 +7,7 @@ package runtime
 import (
 	"math"
 	"os"
+	"time"
 
 	"github.com/islisp-dev/iris/runtime/env"
 	"github.com/islisp-dev/iris/runtime/ilos"
@@ -14,14 +15,16 @@ import (
 	"github.com/islisp-dev/iris/runtime/ilos/instance"
 )
 
+var Time time.Time
+
 func TopLevelHander(e env.Environment, c ilos.Instance) (ilos.Instance, ilos.Instance) {
 	return nil, c
 }
 
 var TopLevel = env.NewEnvironment(
-	instance.NewStream(os.Stdin, nil),
-	instance.NewStream(nil, os.Stdout),
-	instance.NewStream(nil, os.Stderr),
+	instance.NewStream(os.Stdin, nil, class.Character),
+	instance.NewStream(nil, os.Stdout, class.Character),
+	instance.NewStream(nil, os.Stderr, class.Character),
 	instance.NewFunction(instance.NewSymbol("TOP-LEVEL-HANDLER"), TopLevelHander),
 )
 
@@ -99,7 +102,7 @@ func init() {
 	defspecial("CLASS", Class)
 	defun("CLASS-OF", ClassOf)
 	defun("CLOSE", Close)
-	// TODO defun2("COERCION", Coercion)
+	// SKIP defun2("COERCION", Coercion)
 	defspecial("COND", Cond)
 	defun("CONDITION-CONTINUABLE", ConditionContinuable)
 	defun("CONS", Cons)
@@ -136,7 +139,7 @@ func init() {
 	defun("EXPT", Expt)
 	// TODO defun2("FILE-LENGTH", FileLength)
 	// TODO defun2("FILE-POSITION", FilePosition)
-	// TODO defun2("FINISH-OUTPUT", FinishOutput)
+	defun("FINISH-OUTPUT", FinishOutput)
 	defspecial("FLET", Flet)
 	defun("FLOAT", Float)
 	defun("FLOATP", Floatp)
@@ -156,22 +159,21 @@ func init() {
 	defun("GCD", Gcd)
 	defun("GENERAL-ARRAY*-P", GeneralArrayStarP)
 	defun("GENERAL-VECTOR-P", GeneralVectorP)
-	// TODO defun2("GENERIC-FUNCTION-P", GenericFunctionP)
+	defun("GENERIC-FUNCTION-P", GenericFunctionP)
 	defun("GENSYM", Gensym)
-	// TODO defun2("GET-INTERNAL-REAL-TIME", GetInternalRealTime)
-	// TODO defun2("GET-INTERNAL-RUN-TIME", GetInternalRunTime)
+	defun("GET-INTERNAL-REAL-TIME", GetInternalRealTime)
+	defun("GET-INTERNAL-RUN-TIME", GetInternalRunTime)
 	defun("GET-OUTPUT-STREAM-STRING", GetOutputStreamString)
-	// TODO defun2("GET-UNIVERSAL-TIME", GetUniversalTime)
+	defun("GET-UNIVERSAL-TIME", GetUniversalTime)
 	defspecial("GO", Go)
-	// TODO defun2("IDENTITY", Identity)
+	defun("IDENTITY", Identity)
 	defspecial("IF", If)
 	// TODO defspecial2("IGNORE-ERRORS", IgnoreErrors)
 	defgeneric("INITIALIZE-OBJECT", InitializeObject) // TODO change generic function
 	defun("INPUT-STREAM-P", InputStreamP)
 	defun("INSTANCEP", Instancep)
-	// TODO defun2("INTEGER", Integer)
 	defun("INTEGERP", Integerp)
-	// TODO defun2("INTERNAL-TIME-UNITS-PER-SECOND", InternalTimeUnitsPerSecond)
+	defun("INTERNAL-TIME-UNITS-PER-SECOND", InternalTimeUnitsPerSecond)
 	defun("ISQRT", Isqrt)
 	defspecial("LABELS", Labels)
 	defspecial("LAMBDA", Lambda)
@@ -203,17 +205,18 @@ func init() {
 	defun("OPEN-OUTPUT-FILE", OpenOutputFile)
 	defun("OPEN-STREAM-P", OpenStreamP)
 	defspecial("OR", Or)
+	// defun("FLUSH-OUTPUT", FlushOutput)
 	defun("OUTPUT-STREAM-P", OutputStreamP)
 	defun("PARSE-NUMBER", ParseNumber)
-	// TODO defun2("PREVIEW-CHAR", PreviewChar)
-	// TODO defun2("PROVE-FILE", ProveFile)
+	defun("PREVIEW-CHAR", PreviewChar)
+	defun("PROBE-FILE", ProbeFile)
 	defspecial("PROGN", Progn)
 	defun("PROPERTY", Property)
 	defspecial("QUASIQUOTE", Quasiquote)
 	defspecial("QUOTE", Quote)
 	defun("QUOTIENT", Quotient)
 	defun("READ", Read)
-	// TODO defun2("READ-BYTE", ReadByte)
+	defun("READ-BYTE", ReadByte)
 	defun("READ-CHAR", ReadChar)
 	defun("READ-LINE", ReadLine)
 	defun("REMOVE-PROPERTY", RemoveProperty)
@@ -278,8 +281,7 @@ func init() {
 	defspecial("WITH-OPEN-OUTPUT-FILE", WithOpenOutputFile)
 	defspecial("WITH-STANDARD-INPUT", WithStandardInput)
 	defspecial("WITH-STANDARD-OUTPUT", WithStandardOutput)
-	// TODO defun2("WRITE-BYTE", WriteByte)
-
+	defun("WRITE-BYTE", WriteByte)
 	defclass("<OBJECT>", class.Object)
 	defclass("<BUILT-IN-CLASS>", class.BuiltInClass)
 	defclass("<STANDARD-CLASS>", class.StandardClass)
@@ -319,4 +321,5 @@ func init() {
 	defclass("<STORAGE-EXHAUSTED>", class.StorageExhausted)
 	defclass("<STANDARD-OBJECT>", class.StandardObject)
 	defclass("<STREAM>", class.Stream)
+	Time = time.Now()
 }
