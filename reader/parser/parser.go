@@ -95,7 +95,7 @@ func ParseAtom(e core.Environment, tok *tokenizer.Token) (core.Instance, core.In
 	)
 }
 
-func parseMacro(e core.Environment, tok *tokenizer.Token, t *tokenizer.Reader) (core.Instance, core.Instance) {
+func parseMacro(e core.Environment, tok *tokenizer.Token, t *tokenizer.BufferedTokenReader) (core.Instance, core.Instance) {
 	str := tok.Str
 	cdr, err := Parse(e, t)
 	if err != nil {
@@ -143,7 +143,7 @@ func parseMacro(e core.Environment, tok *tokenizer.Token, t *tokenizer.Reader) (
 	m := core.NewSymbol(n, tok.Line, tok.Line)
 	return core.NewCons(m, core.NewCons(cdr, core.Nil)), nil
 }
-func parseCons(e core.Environment, t *tokenizer.Reader) (core.Instance, core.Instance) {
+func parseCons(e core.Environment, t *tokenizer.BufferedTokenReader) (core.Instance, core.Instance) {
 	car, err := Parse(e, t)
 	if err == eop {
 		return core.Nil, nil
@@ -169,14 +169,14 @@ func parseCons(e core.Environment, t *tokenizer.Reader) (core.Instance, core.Ins
 }
 
 // Parse builds a internal expression from tokens
-func Parse(e core.Environment, t *tokenizer.Reader) (core.Instance, core.Instance) {
-	tok, err := t.Next()
+func Parse(e core.Environment, t *tokenizer.BufferedTokenReader) (core.Instance, core.Instance) {
+	tok, err := t.ReadToken()
 	if err != nil {
 		return core.SignalCondition(e, core.NewEndOfStream(e), core.Nil)
 	}
 	str := tok.Str
 	for (len(str) > 2 && str[:2] == "#|") || str[:1] == ";" {
-		tok, err = t.Next()
+		tok, err = t.ReadToken()
 		if err != nil {
 			return core.SignalCondition(e, core.NewEndOfStream(e), core.Nil)
 		}

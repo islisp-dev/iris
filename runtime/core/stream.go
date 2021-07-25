@@ -24,12 +24,12 @@ func NewBufferedWriter(w io.Writer) *BufferedWriter {
 type Stream struct {
 	Column       *int
 	ElementClass Instance
-	*tokenizer.Reader
+	*tokenizer.BufferedTokenReader
 	*BufferedWriter
 }
 
 func NewStream(r io.Reader, w io.Writer, e Instance) Instance {
-	return Stream{new(int), e, tokenizer.NewReader(r), NewBufferedWriter(w)}
+	return Stream{new(int), e, tokenizer.NewBufferedTokenReader(r), NewBufferedWriter(w)}
 }
 
 func (Stream) Class() Class {

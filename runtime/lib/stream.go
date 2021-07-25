@@ -25,7 +25,7 @@ func OpenStreamP(e core.Environment, obj core.Instance) (core.Instance, core.Ins
 }
 
 func InputStreamP(e core.Environment, obj core.Instance) (core.Instance, core.Instance) {
-	if s, ok := obj.(core.Stream); ok && s.Reader.Raw != nil {
+	if s, ok := obj.(core.Stream); ok && s.BufferedTokenReader.Raw != nil {
 		return T, nil
 	}
 	return Nil, nil
@@ -245,8 +245,8 @@ func Close(e core.Environment, stream core.Instance) (core.Instance, core.Instan
 	if ok, _ := Streamp(e, stream); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, stream, core.StreamClass), Nil)
 	}
-	if stream.(core.Stream).Reader.Raw != nil {
-		file, ok := stream.(core.Stream).Reader.Raw.(*os.File)
+	if stream.(core.Stream).BufferedTokenReader.Raw != nil {
+		file, ok := stream.(core.Stream).BufferedTokenReader.Raw.(*os.File)
 		if ok {
 			file.Close()
 		} else {
@@ -316,7 +316,7 @@ func Read(e core.Environment, options ...core.Instance) (core.Instance, core.Ins
 			eosValue = options[2]
 		}
 	}
-	v, err := parser.Parse(e, s.(core.Stream).Reader)
+	v, err := parser.Parse(e, s.(core.Stream).BufferedTokenReader)
 	if err != nil && core.InstanceOf(core.EndOfStreamClass, err) {
 		if eosErrorP {
 			return nil, err

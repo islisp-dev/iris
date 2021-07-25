@@ -7,22 +7,22 @@ import (
 	"strings"
 )
 
-// Reader interface type is the interface
+// BufferedTokenReader interface type is the interface
 // for reading string with every token
-// Reader is like bufio.Reader but has PeekRune
+// BufferedTokenReader is like bufio.BufferedTokenReader but has PeekRune
 // which returns a rune without advancing pointer
-type Reader struct {
+type BufferedTokenReader struct {
 	line, column int
 	Raw          io.Reader
 	*bufio.Reader
 }
 
-// NewReader creates interal reader from io.RuneReader
-func NewReader(r io.Reader) *Reader {
-	return &Reader{1, 0, r, bufio.NewReader(r)}
+// NewBufferedTokenReader creates interal reader from io.RuneReader
+func NewBufferedTokenReader(r io.Reader) *BufferedTokenReader {
+	return &BufferedTokenReader{1, 0, r, bufio.NewReader(r)}
 }
 
-func (t *Reader) ReadRune() (r rune, size int, err error) {
+func (t *BufferedTokenReader) ReadRune() (r rune, size int, err error) {
 	r, size, err = t.Reader.ReadRune()
 	if r == '\n' {
 		t.line++
@@ -62,7 +62,7 @@ func NewToken(Str string, Line, Column int) *Token {
 }
 
 // ReadToken returns error or string as token
-func (r *Reader) Next() (*Token, error) {
+func (r *BufferedTokenReader) ReadToken() (*Token, error) {
 	for {
 		bytes, err := r.Peek(1)
 		if err != nil {

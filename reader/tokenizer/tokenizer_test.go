@@ -10,7 +10,7 @@ import (
 )
 
 func TestTokenizer_Next(t *testing.T) {
-	tokenizer := NewReader(strings.NewReader(`
+	tokenizer := NewBufferedTokenReader(strings.NewReader(`
 	;foo
 	("\\""\"foo\"" | foo \| bar | #b101)`))
 	tests := []struct {
@@ -48,7 +48,7 @@ func TestTokenizer_Next(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, _ := tokenizer.Next()
+			got, _ := tokenizer.ReadToken()
 			if got.Str != tt.want {
 				t.Errorf("Tokenizer.Next() got = %v, want %v", got, tt.want)
 			}
