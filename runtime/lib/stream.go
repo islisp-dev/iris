@@ -304,19 +304,19 @@ func Read(e core.Environment, options ...core.Instance) (core.Instance, core.Ins
 	if b, _ := InputStreamP(e, s); core.DeepEqual(b, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, s, core.StreamClass), Nil)
 	}
+	env := e
 	eosErrorP := true
 	if len(options) > 1 {
 		if core.DeepEqual(options[1], Nil) {
+			env = env.NewHandler(core.DefaultHandler)
 			eosErrorP = false
 		}
 	}
 	eosValue := Nil
 	if len(options) > 2 {
-		if core.DeepEqual(options[2], Nil) {
-			eosValue = options[2]
-		}
+		eosValue = options[2]
 	}
-	v, err := parser.Parse(e, s.(core.Stream).BufferedTokenReader)
+	v, err := parser.Parse(env, s.(core.Stream).BufferedTokenReader)
 	if err != nil && core.InstanceOf(core.EndOfStreamClass, err) {
 		if eosErrorP {
 			return nil, err
@@ -342,15 +342,13 @@ func ReadChar(e core.Environment, options ...core.Instance) (core.Instance, core
 	}
 	eosValue := Nil
 	if len(options) > 2 {
-		if core.DeepEqual(options[2], Nil) {
-			eosValue = options[2]
-		}
+		eosValue = options[2]
 	}
 	//v, _, err := bufio.NewReader(s.(core.Stream).Reader).ReadRune()
 	v, _, err := s.(core.Stream).ReadRune()
 	if err != nil {
 		if eosErrorP {
-			return nil, core.Create(e, core.EndOfStreamClass)
+			return SignalCondition(e, core.NewEndOfStream(e), Nil)
 		}
 		return eosValue, nil
 	}
@@ -387,15 +385,13 @@ func PreviewChar(e core.Environment, options ...core.Instance) (core.Instance, c
 	}
 	eosValue := Nil
 	if len(options) > 2 {
-		if core.DeepEqual(options[2], Nil) {
-			eosValue = options[2]
-		}
+		eosValue = options[2]
 	}
 	//v, _, err := bufio.NewReader(s.(core.Stream).Reader).ReadRune()
 	bytes, err := s.(core.Stream).Peek(1)
 	if err != nil {
 		if eosErrorP {
-			return nil, core.Create(e, core.EndOfStreamClass)
+			return SignalCondition(e, core.NewEndOfStream(e), Nil)
 		}
 		return eosValue, nil
 	}
@@ -418,14 +414,12 @@ func ReadLine(e core.Environment, options ...core.Instance) (core.Instance, core
 	}
 	eosValue := Nil
 	if len(options) > 2 {
-		if core.DeepEqual(options[2], Nil) {
-			eosValue = options[2]
-		}
+		eosValue = options[2]
 	}
 	v, _, err := s.(core.Stream).ReadLine()
 	if err != nil {
 		if eosErrorP {
-			return nil, core.Create(e, core.EndOfStreamClass)
+			return SignalCondition(e, core.NewEndOfStream(e), Nil)
 		}
 		return eosValue, nil
 	}

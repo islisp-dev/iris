@@ -55,6 +55,25 @@ func NewEnvironment(stdin, stdout, stderr, handler Instance) Environment {
 	return *e
 }
 
+func (before *Environment) NewHandler(handler Instance) Environment {
+	e := NewEnvironment(before.StandardInput, before.StandardOutput, before.ErrorOutput, handler)
+
+	e.BlockTag = before.BlockTag
+	e.TagbodyTag = before.TagbodyTag
+	e.Variable = before.Variable
+	e.Function = before.Function
+
+	e.Macro = before.Macro
+	e.Class = before.Class
+	e.Special = before.Special
+	e.Constant = before.Constant
+	e.Property = before.Property
+
+	e.CatchTag = before.CatchTag
+
+	return e
+}
+
 func (e *Environment) MergeLexical(before Environment) {
 	e.BlockTag = before.BlockTag.Append(e.BlockTag[1:])
 	e.TagbodyTag = before.TagbodyTag.Append(e.TagbodyTag[1:])
@@ -91,10 +110,6 @@ func (before *Environment) NewLexical() Environment {
 
 	e.CatchTag = before.CatchTag.Append(e.CatchTag)
 	e.DynamicVariable = before.DynamicVariable.Append(e.DynamicVariable)
-	e.StandardInput = before.StandardInput
-	e.StandardOutput = before.StandardOutput
-	e.ErrorOutput = before.ErrorOutput
-	e.Handler = before.Handler
 
 	return e
 }
@@ -115,10 +130,6 @@ func (before *Environment) NewDynamic() Environment {
 
 	e.CatchTag = before.CatchTag.Append(e.CatchTag)
 	e.DynamicVariable = before.DynamicVariable.Append(e.DynamicVariable)
-	e.StandardInput = before.StandardInput
-	e.StandardOutput = before.StandardOutput
-	e.ErrorOutput = before.ErrorOutput
-	e.Handler = before.Handler
 
 	return e
 }

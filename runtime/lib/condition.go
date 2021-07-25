@@ -76,8 +76,8 @@ func WithHandler(e core.Environment, handler core.Instance, forms ...core.Instan
 	if err != nil {
 		return nil, err
 	}
-	e.Handler = fun
-	ret, err := Progn(e, forms...)
+	f := e.NewHandler(fun)
+	ret, err := Progn(f, forms...)
 	if err != nil {
 		return nil, err
 	}
