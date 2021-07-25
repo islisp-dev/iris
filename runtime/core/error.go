@@ -4,6 +4,27 @@
 
 package core
 
+var DefaultHandler = NewFunction(NewSymbol("DEFAULT-HANDLER"), func(e Environment, c Instance) (Instance, Instance) {
+	return nil, c
+})
+
+func SignalCondition(e Environment, condition, continuable Instance) (Instance, Instance) {
+	if !InstanceOf(SeriousConditionClass, condition) {
+		return SignalCondition(e, NewDomainError(e, condition, SeriousConditionClass), Nil)
+	}
+	condition.(BasicInstance).SetSlotValue(NewSymbol("IRIS.CONTINUABLE"), continuable, SeriousConditionClass)
+	_, c := e.Handler.(Applicable).Apply(e, condition)
+	if InstanceOf(ContinueClass, c) {
+		o, _ := c.(BasicInstance).GetSlotValue(NewSymbol("IRIS.OBJECT"), ContinueClass)
+		return o, nil
+	}
+	return nil, c
+}
+
+func NewEndOfStream(e Environment) Instance {
+	return Create(e, EndOfStreamClass)
+}
+
 func NewArithmeticError(e Environment, operation, operands Instance) Instance {
 	return Create(e, ArithmeticErrorClass,
 		NewSymbol("OPERATION"), operation,
@@ -29,7 +50,10 @@ func NewDomainError(e Environment, object Instance, expectedClass Class) Instanc
 }
 
 func NewUndefinedFunction(e Environment, name Instance) Instance {
-	l, c := name.(Symbol).Location()
+	l, c := -1, -1
+	if s, ok := name.(Symbol); ok {
+		l, c = s.Location()
+	}
 	loc := NewCons(NewInteger(l), NewInteger(c))
 	return Create(e, UndefinedFunctionClass,
 		NewSymbol("NAME"), name,
@@ -38,7 +62,10 @@ func NewUndefinedFunction(e Environment, name Instance) Instance {
 }
 
 func NewUnboundVariable(e Environment, name Instance) Instance {
-	l, c := name.(Symbol).Location()
+	l, c := -1, -1
+	if s, ok := name.(Symbol); ok {
+		l, c = s.Location()
+	}
 	loc := NewCons(NewInteger(l), NewInteger(c))
 	return Create(e, UnboundVariableClass,
 		NewSymbol("NAME"), name,
@@ -47,7 +74,10 @@ func NewUnboundVariable(e Environment, name Instance) Instance {
 }
 
 func NewUndefinedClass(e Environment, name Instance) Instance {
-	l, c := name.(Symbol).Location()
+	l, c := -1, -1
+	if s, ok := name.(Symbol); ok {
+		l, c = s.Location()
+	}
 	loc := NewCons(NewInteger(l), NewInteger(c))
 	return Create(e, UndefinedEntityClass,
 		NewSymbol("NAME"), name,

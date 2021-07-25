@@ -5,21 +5,21 @@
 package core
 
 func NewBlockTag(tag, uid, object Instance) Instance {
-	return Create(NewEnvironment(nil, nil, nil, nil),
+	return Create(NewEnvironment(nil, nil, nil, DefaultHandler),
 		BlockTagClass,
 		NewSymbol("IRIS.TAG"), tag,
 		NewSymbol("IRIS.UID"), uid,
 		NewSymbol("IRIS.OBJECT"), object)
 }
 func NewCatchTag(tag, uid, object Instance) Instance {
-	return Create(NewEnvironment(nil, nil, nil, nil),
+	return Create(NewEnvironment(nil, nil, nil, DefaultHandler),
 		CatchTagClass,
 		NewSymbol("IRIS.TAG"), tag,
 		NewSymbol("IRIS.UID"), uid,
 		NewSymbol("IRIS.OBJECT"), object)
 }
 func NewTagbodyTag(tag, uid Instance) Instance {
-	return Create(NewEnvironment(nil, nil, nil, nil),
+	return Create(NewEnvironment(nil, nil, nil, DefaultHandler),
 		TagbodyTagClass,
 		NewSymbol("IRIS.TAG"), tag,
 		NewSymbol("IRIS.UID"), uid)

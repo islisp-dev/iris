@@ -91,30 +91,30 @@ func NewNull() Instance {
 	return &Null{}
 }
 
-func (*Null) Class() Class {
+func (Null) Class() Class {
 	return NullClass
 }
 
-func (*Null) String() string {
+func (Null) String() string {
 	return "NIL"
 }
 
-func (*Null) Slice() []Instance {
+func (Null) Slice() []Instance {
 	return []Instance{}
 }
 
-func (i *Null) Nth(n int) Instance {
+func (Null) Nth(n int) Instance {
 	return Nil
 }
 
-func (i *Null) SetNth(obj Instance, n int) {
+func (Null) SetNth(obj Instance, n int) {
 	panic("NOT a cons")
 }
 
-func (i *Null) NthCdr(n int) Instance {
+func (Null) NthCdr(n int) Instance {
 	return Nil
 }
 
-func (i *Null) Length() int {
+func (Null) Length() int {
 	return 0
 }

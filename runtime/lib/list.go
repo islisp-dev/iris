@@ -23,7 +23,7 @@ func Listp(e core.Environment, obj core.Instance) (core.Instance, core.Instance)
 // domain-error).initial-element may be any ISLISP object.
 func CreateList(e core.Environment, i core.Instance, initialElement ...core.Instance) (core.Instance, core.Instance) {
 	if ok, _ := Integerp(e, i); core.DeepEqual(ok, Nil) {
-		return nil, core.NewDomainError(e, i, core.IntegerClass)
+		return SignalCondition(e, core.NewDomainError(e, i, core.IntegerClass), Nil)
 	}
 	if len(initialElement) > 1 {
 		return SignalCondition(e, core.NewArityError(e), Nil)
@@ -58,7 +58,7 @@ func List(e core.Environment, objs ...core.Instance) (core.Instance, core.Instan
 // input list.
 func Reverse(e core.Environment, list core.Instance) (core.Instance, core.Instance) {
 	if ok, _ := Listp(e, list); core.DeepEqual(ok, Nil) {
-		return nil, core.NewDomainError(e, list, core.ListClass)
+		return SignalCondition(e, core.NewDomainError(e, list, core.ListClass), Nil)
 	}
 	cons := Nil
 	for _, car := range list.(core.List).Slice() {
@@ -75,7 +75,7 @@ func Reverse(e core.Environment, list core.Instance) (core.Instance, core.Instan
 func Nreverse(e core.Environment, list core.Instance) (core.Instance, core.Instance) {
 	// TODO: tests literal object
 	if ok, _ := Listp(e, list); core.DeepEqual(ok, Nil) {
-		return nil, core.NewDomainError(e, list, core.ListClass)
+		return SignalCondition(e, core.NewDomainError(e, list, core.ListClass), Nil)
 	}
 	cons := Nil
 	for _, car := range list.(core.List).Slice() {
@@ -100,7 +100,7 @@ func Append(e core.Environment, lists ...core.Instance) (core.Instance, core.Ins
 	cdr := result
 	for _, list := range lists {
 		if ok, _ := Listp(e, list); core.DeepEqual(ok, Nil) {
-			return nil, core.NewDomainError(e, list, core.ListClass)
+			return SignalCondition(e, core.NewDomainError(e, list, core.ListClass), Nil)
 		}
 	}
 	for _, list := range lists {
@@ -122,7 +122,7 @@ func Append(e core.Environment, lists ...core.Instance) (core.Instance, core.Ins
 // domain-error).
 func Member(e core.Environment, obj, list core.Instance) (core.Instance, core.Instance) {
 	if ok, _ := Listp(e, list); core.DeepEqual(ok, Nil) {
-		return nil, core.NewDomainError(e, list, core.ListClass)
+		return SignalCondition(e, core.NewDomainError(e, list, core.ListClass), Nil)
 	}
 	if !core.InstanceOf(core.ConsClass, list) || core.DeepEqual(list.(*core.Cons).Car, obj) {
 		return list, nil
@@ -141,11 +141,11 @@ func Member(e core.Environment, obj, list core.Instance) (core.Instance, core.In
 func Mapcar(e core.Environment, function, list1 core.Instance, lists ...core.Instance) (core.Instance, core.Instance) {
 	lists = append([]core.Instance{list1}, lists...)
 	if ok, _ := Functionp(e, function); core.DeepEqual(ok, Nil) {
-		return nil, core.NewDomainError(e, function, core.FunctionClass)
+		return SignalCondition(e, core.NewDomainError(e, function, core.FunctionClass), Nil)
 	}
 	for _, list := range lists {
 		if ok, _ := Listp(e, list); core.DeepEqual(ok, Nil) {
-			return nil, core.NewDomainError(e, list, core.ListClass)
+			return SignalCondition(e, core.NewDomainError(e, list, core.ListClass), Nil)
 		}
 	}
 	arguments := []core.Instance{}
@@ -204,11 +204,11 @@ func Mapcan(e core.Environment, function, list1 core.Instance, lists ...core.Ins
 func Maplist(e core.Environment, function, list1 core.Instance, lists ...core.Instance) (core.Instance, core.Instance) {
 	lists = append([]core.Instance{list1}, lists...)
 	if ok, _ := Functionp(e, function); core.DeepEqual(ok, Nil) {
-		return nil, core.NewDomainError(e, function, core.FunctionClass)
+		return SignalCondition(e, core.NewDomainError(e, function, core.FunctionClass), Nil)
 	}
 	for _, list := range lists {
 		if ok, _ := Listp(e, list); core.DeepEqual(ok, Nil) {
-			return nil, core.NewDomainError(e, list, core.ListClass)
+			return SignalCondition(e, core.NewDomainError(e, list, core.ListClass), Nil)
 		}
 	}
 	arguments := []core.Instance{}
@@ -267,7 +267,7 @@ func Mapcon(e core.Environment, function, list1 core.Instance, lists ...core.Ins
 // domain-error).
 func Assoc(e core.Environment, obj, associationList core.Instance) (core.Instance, core.Instance) {
 	if ok, _ := Listp(e, associationList); core.DeepEqual(ok, Nil) {
-		return nil, core.NewDomainError(e, associationList, core.ListClass)
+		return SignalCondition(e, core.NewDomainError(e, associationList, core.ListClass), Nil)
 	}
 	if !core.InstanceOf(core.ConsClass, associationList) {
 		return Nil, nil
@@ -275,7 +275,7 @@ func Assoc(e core.Environment, obj, associationList core.Instance) (core.Instanc
 	car := associationList.(*core.Cons).Car
 	cdr := associationList.(*core.Cons).Cdr
 	if ok, _ := Consp(e, car); core.DeepEqual(ok, Nil) {
-		return nil, core.NewDomainError(e, car, core.ConsClass)
+		return SignalCondition(e, core.NewDomainError(e, car, core.ConsClass), Nil)
 	}
 	if core.DeepEqual(car.(*core.Cons).Car, obj) { // eql
 		return car, nil

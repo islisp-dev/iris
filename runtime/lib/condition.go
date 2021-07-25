@@ -7,16 +7,7 @@ package lib
 import "github.com/islisp-dev/iris/runtime/core"
 
 func SignalCondition(e core.Environment, condition, continuable core.Instance) (core.Instance, core.Instance) {
-	if err := ensure(e, core.SeriousConditionClass, condition); err != nil {
-		return nil, err
-	}
-	condition.(core.BasicInstance).SetSlotValue(core.NewSymbol("IRIS.CONTINUABLE"), continuable, core.SeriousConditionClass)
-	_, c := e.Handler.(core.Applicable).Apply(e, condition)
-	if core.InstanceOf(core.ContinueClass, c) {
-		o, _ := c.(core.BasicInstance).GetSlotValue(core.NewSymbol("IRIS.OBJECT"), core.ContinueClass)
-		return o, nil
-	}
-	return nil, c
+	return core.SignalCondition(e, condition, continuable)
 }
 
 func Cerror(e core.Environment, continueString, errorString core.Instance, objs ...core.Instance) (core.Instance, core.Instance) {

@@ -84,10 +84,14 @@ func ParseAtom(tok *tokenizer.Token) (core.Instance, core.Instance) {
 	if m, _ := regexp.MatchString(re, str); m {
 		return core.NewSymbol(strings.ToUpper(str), tok.Line, tok.Column), nil
 	}
-	return nil, core.NewParseError(
-		core.NewEnvironment(nil, nil, nil, nil),
-		core.NewString([]rune(str)),
-		core.ObjectClass,
+	return core.SignalCondition(
+		core.NewEnvironment(nil, nil, nil, core.DefaultHandler),
+		core.NewParseError(
+			core.NewEnvironment(nil, nil, nil, core.DefaultHandler),
+			core.NewString([]rune(str)),
+			core.ObjectClass,
+		),
+		core.Nil,
 	)
 }
 
@@ -105,10 +109,14 @@ func parseMacro(tok *tokenizer.Token, t *tokenizer.Reader) (core.Instance, core.
 			var err error
 			v, err = strconv.ParseInt(str[1:i], 10, 64)
 			if err != nil {
-				return nil, core.NewParseError(
-					core.NewEnvironment(nil, nil, nil, nil),
-					core.NewString([]rune(str)),
-					core.IntegerClass,
+				return core.SignalCondition(
+					core.NewEnvironment(nil, nil, nil, core.DefaultHandler),
+					core.NewParseError(
+						core.NewEnvironment(nil, nil, nil, core.DefaultHandler),
+						core.NewString([]rune(str)),
+						core.IntegerClass,
+					),
+					core.Nil,
 				)
 			}
 		}
@@ -164,13 +172,25 @@ func parseCons(t *tokenizer.Reader) (core.Instance, core.Instance) {
 func Parse(t *tokenizer.Reader) (core.Instance, core.Instance) {
 	tok, err := t.Next()
 	if err != nil {
-		return nil, core.Create(core.NewEnvironment(nil, nil, nil, nil), core.EndOfStreamClass)
+		return core.SignalCondition(
+			core.NewEnvironment(nil, nil, nil, core.DefaultHandler),
+			core.NewEndOfStream(
+				core.NewEnvironment(nil, nil, nil, core.DefaultHandler),
+			),
+			core.Nil,
+		)
 	}
 	str := tok.Str
 	for (len(str) > 2 && str[:2] == "#|") || str[:1] == ";" {
 		tok, err = t.Next()
 		if err != nil {
-			return nil, core.Create(core.NewEnvironment(nil, nil, nil, nil), core.EndOfStreamClass)
+			return core.SignalCondition(
+				core.NewEnvironment(nil, nil, nil, core.DefaultHandler),
+				core.NewEndOfStream(
+					core.NewEnvironment(nil, nil, nil, core.DefaultHandler),
+				),
+				core.Nil,
+			)
 		}
 		str = tok.Str
 	}

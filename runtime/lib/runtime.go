@@ -14,15 +14,11 @@ import (
 
 var Time time.Time
 
-func TopLevelHander(e core.Environment, c core.Instance) (core.Instance, core.Instance) {
-	return nil, c
-}
-
 var TopLevel = core.NewEnvironment(
 	core.NewStream(os.Stdin, nil, core.CharacterClass),
 	core.NewStream(nil, os.Stdout, core.CharacterClass),
 	core.NewStream(nil, os.Stderr, core.CharacterClass),
-	core.NewFunction(core.NewSymbol("TOP-LEVEL-HANDLER"), TopLevelHander),
+	core.DefaultHandler,
 )
 
 func defclass(name string, class core.Class) {

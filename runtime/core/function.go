@@ -32,6 +32,11 @@ func (f Function) String() string {
 }
 
 func (f Function) Apply(e Environment, arguments ...Instance) (Instance, Instance) {
+	for _, arg := range arguments {
+		if arg == nil {
+			return SignalCondition(e, NewDomainError(e, arg, ObjectClass), Nil)
+		}
+	}
 	fv := reflect.ValueOf(f.function)
 	ft := reflect.TypeOf(f.function)
 	argv := []reflect.Value{reflect.ValueOf(e)}
@@ -39,7 +44,7 @@ func (f Function) Apply(e Environment, arguments ...Instance) (Instance, Instanc
 		argv = append(argv, reflect.ValueOf(cadr))
 	}
 	if ft.NumIn() != len(argv) && (!ft.IsVariadic() || ft.NumIn()-2 >= len(argv)) {
-		return nil, NewArityError(e)
+		return SignalCondition(e, NewArityError(e), Nil)
 	}
 	rets := fv.Call(argv)
 	a, _ := rets[0].Interface().(Instance)
@@ -107,7 +112,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 		}
 	}
 	if (variadic && len(parameters)-2 > len(arguments)) || (!variadic && len(parameters) != len(arguments)) {
-		return nil, NewArityError(e)
+		return SignalCondition(e, NewArityError(e), Nil)
 	}
 	methods := []method{}
 	for _, method := range f.methods {
@@ -312,7 +317,7 @@ func (f *GenericFunction) Apply(e Environment, arguments ...Instance) (Instance,
 			index := sort.Search(width, test)
 			e.DynamicVariable.Define(NewSymbol("IRIS.DEPTH"), NewInteger(index))
 			if index == len(methods) {
-				return nil, NewUndefinedFunction(e, f.funcSpec)
+				return SignalCondition(e, NewUndefinedFunction(e, f.funcSpec), Nil)
 			}
 		}
 		e.Function.Define(NewSymbol("NEXT-METHOD-P"), nextMethodPisNil)
