@@ -38,7 +38,8 @@ func convFloat64(e core.Environment, x core.Instance) (float64, bool, core.Insta
 }
 
 func readFromString(s string) (core.Instance, core.Instance) {
-	return parser.Parse(tokenizer.NewReader(strings.NewReader(s)))
+	e := core.NewEnvironment(nil, nil, nil, core.DefaultHandler)
+	return parser.Parse(e, tokenizer.NewReader(strings.NewReader(s)))
 }
 
 func ensure(e core.Environment, c core.Class, i ...core.Instance) core.Instance {
