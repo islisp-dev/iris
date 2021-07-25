@@ -30,7 +30,7 @@ func ParseNumber(e core.Environment, str core.Instance) (core.Instance, core.Ins
 	if err := ensure(e, core.StringClass, str); err != nil {
 		return nil, err
 	}
-	ret, err := parser.ParseAtom(tokenizer.NewToken(string(str.(core.String)), -1, -1))
+	ret, err := parser.ParseAtom(e, tokenizer.NewToken(string(str.(core.String)), -1, -1))
 	if err != nil || !core.InstanceOf(core.NumberClass, ret) {
 		return SignalCondition(e, core.NewParseError(e, str, core.NumberClass), Nil)
 	}

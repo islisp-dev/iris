@@ -17,7 +17,7 @@ import (
 var eop = core.NewSymbol("End Of Parentheses")
 var bod = core.NewSymbol("Begin Of Dot")
 
-func ParseAtom(tok *tokenizer.Token) (core.Instance, core.Instance) {
+func ParseAtom(e core.Environment, tok *tokenizer.Token) (core.Instance, core.Instance) {
 	str := tok.Str
 	//
 	// integer
@@ -85,9 +85,9 @@ func ParseAtom(tok *tokenizer.Token) (core.Instance, core.Instance) {
 		return core.NewSymbol(strings.ToUpper(str), tok.Line, tok.Column), nil
 	}
 	return core.SignalCondition(
-		core.NewEnvironment(nil, nil, nil, core.DefaultHandler),
+		e,
 		core.NewParseError(
-			core.NewEnvironment(nil, nil, nil, core.DefaultHandler),
+			e,
 			core.NewString([]rune(str)),
 			core.ObjectClass,
 		),
@@ -95,9 +95,9 @@ func ParseAtom(tok *tokenizer.Token) (core.Instance, core.Instance) {
 	)
 }
 
-func parseMacro(tok *tokenizer.Token, t *tokenizer.Reader) (core.Instance, core.Instance) {
+func parseMacro(e core.Environment, tok *tokenizer.Token, t *tokenizer.Reader) (core.Instance, core.Instance) {
 	str := tok.Str
-	cdr, err := Parse(t)
+	cdr, err := Parse(e, t)
 	if err != nil {
 		return nil, err
 	}
@@ -110,9 +110,9 @@ func parseMacro(tok *tokenizer.Token, t *tokenizer.Reader) (core.Instance, core.
 			v, err = strconv.ParseInt(str[1:i], 10, 64)
 			if err != nil {
 				return core.SignalCondition(
-					core.NewEnvironment(nil, nil, nil, core.DefaultHandler),
+					e,
 					core.NewParseError(
-						core.NewEnvironment(nil, nil, nil, core.DefaultHandler),
+						e,
 						core.NewString([]rune(str)),
 						core.IntegerClass,
 					),
@@ -143,17 +143,17 @@ func parseMacro(tok *tokenizer.Token, t *tokenizer.Reader) (core.Instance, core.
 	m := core.NewSymbol(n, tok.Line, tok.Line)
 	return core.NewCons(m, core.NewCons(cdr, core.Nil)), nil
 }
-func parseCons(t *tokenizer.Reader) (core.Instance, core.Instance) {
-	car, err := Parse(t)
+func parseCons(e core.Environment, t *tokenizer.Reader) (core.Instance, core.Instance) {
+	car, err := Parse(e, t)
 	if err == eop {
 		return core.Nil, nil
 	}
 	if err == bod {
-		cdr, err := Parse(t)
+		cdr, err := Parse(e, t)
 		if err != nil {
 			return nil, err
 		}
-		if _, err := Parse(t); err != eop {
+		if _, err := Parse(e, t); err != eop {
 			return nil, err
 		}
 		return cdr, nil
@@ -161,7 +161,7 @@ func parseCons(t *tokenizer.Reader) (core.Instance, core.Instance) {
 	if err != nil {
 		return nil, err
 	}
-	cdr, err := parseCons(t)
+	cdr, err := parseCons(e, t)
 	if err != nil {
 		return nil, err
 	}
@@ -169,33 +169,21 @@ func parseCons(t *tokenizer.Reader) (core.Instance, core.Instance) {
 }
 
 // Parse builds a internal expression from tokens
-func Parse(t *tokenizer.Reader) (core.Instance, core.Instance) {
+func Parse(e core.Environment, t *tokenizer.Reader) (core.Instance, core.Instance) {
 	tok, err := t.Next()
 	if err != nil {
-		return core.SignalCondition(
-			core.NewEnvironment(nil, nil, nil, core.DefaultHandler),
-			core.NewEndOfStream(
-				core.NewEnvironment(nil, nil, nil, core.DefaultHandler),
-			),
-			core.Nil,
-		)
+		return core.SignalCondition(e, core.NewEndOfStream(e), core.Nil)
 	}
 	str := tok.Str
 	for (len(str) > 2 && str[:2] == "#|") || str[:1] == ";" {
 		tok, err = t.Next()
 		if err != nil {
-			return core.SignalCondition(
-				core.NewEnvironment(nil, nil, nil, core.DefaultHandler),
-				core.NewEndOfStream(
-					core.NewEnvironment(nil, nil, nil, core.DefaultHandler),
-				),
-				core.Nil,
-			)
+			return core.SignalCondition(e, core.NewEndOfStream(e), core.Nil)
 		}
 		str = tok.Str
 	}
 	if str == "(" {
-		cons, err := parseCons(t)
+		cons, err := parseCons(e, t)
 		if err != nil {
 			return nil, err
 		}
@@ -208,13 +196,13 @@ func Parse(t *tokenizer.Reader) (core.Instance, core.Instance) {
 		return nil, bod
 	}
 	if mat, _ := regexp.MatchString("^(?:#'|,@?|'|`|#[[:digit:]]*[aA]|#)$", str); mat {
-		m, err := parseMacro(tok, t)
+		m, err := parseMacro(e, tok, t)
 		if err != nil {
 			return nil, err
 		}
 		return m, nil
 	}
-	atom, err1 := ParseAtom(tok)
+	atom, err1 := ParseAtom(e, tok)
 	if err1 != nil {
 		return nil, err1
 	}

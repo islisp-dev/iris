@@ -316,7 +316,7 @@ func Read(e core.Environment, options ...core.Instance) (core.Instance, core.Ins
 			eosValue = options[2]
 		}
 	}
-	v, err := parser.Parse(s.(core.Stream).Reader)
+	v, err := parser.Parse(e, s.(core.Stream).Reader)
 	if err != nil && core.InstanceOf(core.EndOfStreamClass, err) {
 		if eosErrorP {
 			return nil, err
