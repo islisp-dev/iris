@@ -5,6 +5,8 @@ import (
 	"io"
 	"regexp"
 	"strings"
+
+	"github.com/dlclark/regexp2"
 )
 
 // BufferedTokenReader interface type is the interface
@@ -37,20 +39,20 @@ var str = `^1\+$|^1-$|` +
 	`^[-+]?[[:digit:]]+\.[[:digit:]]+$|` +
 	`^[-+]?[[:digit:]]+(?:\.[[:digit:]]+)?[eE][-+]?[[:digit:]]+$|` +
 	`^[-+]?[[:digit:]]+$|` +
-	`^#[bB][-+]?[01]+$|` +
-	`^#[oO][-+]?[0-7]+$|` +
-	`^#[xX][-+]?[[:xdigit:]]+$|` +
-	`^#\\[[:alpha:]]+$|` +
-	`^#\\[[:graph:]]$|` +
+	`^#[bB][-+]?[01]*$|` +
+	`^#[oO][-+]?[0-7]*$|` +
+	`^#[xX][-+]?[[:xdigit:]]*$|` +
+	`^#\\[[:alpha:]]*$|` +
+	`^#\\[[:graph:]]?$|` +
 	`^"(?:\\\\|\\.|[^\\"])*"$|` +
 	`^[:&][a-zA-Z]+$|` +
 	`^\+$|^-$|^[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*$|` +
 	`^\|(?:\\\\|\\.|[^\\|])*\|$|` +
 	`^[.()]$|` +
-	"^;.*\n$|" +
-	`^#\|.*?\|#$|` +
+	"^;[^\n]*$|" +
+	`^#\|((?<!\|#)[\s\S])*$|` +
 	"^#'$|^,@?$|^'$|^`$|^#[[:digit:]]*[aA]$|^#$" // TODO: hangs at #ab or #3
-var re = regexp.MustCompile(str)
+var re = regexp2.MustCompile(str, regexp2.RE2)
 
 type Token struct {
 	Str          string
@@ -102,23 +104,13 @@ func (r *BufferedTokenReader) ReadToken() (*Token, error) {
 		if buf == "" && ru == '#' {
 			shp = true
 		}
-		if mat && !re.MatchString(buf+string(ru)) {
+		if m, _ := re.MatchString(buf + string(ru)); !m && mat {
 			if num && strings.ContainsRune(".Ee", ru) {
 				buf += string(ru)
 				r.ReadRune()
 				continue
 			}
 			if shp {
-				if len(buf) == 1 && ru == '\\' {
-					buf += string(ru)
-					r.ReadRune()
-					continue
-				}
-				if len(buf) == 1 && (ru == 'b' || ru == 'B' || ru == 'o' || ru == 'O' || ru == 'x' || ru == 'X') {
-					buf += string(ru)
-					r.ReadRune()
-					continue
-				}
 				if matched, _ := regexp.MatchString(`^#[0123456789]*$`, buf+string(ru)); matched {
 					buf += string(ru)
 					r.ReadRune()
@@ -128,7 +120,7 @@ func (r *BufferedTokenReader) ReadToken() (*Token, error) {
 			break
 		}
 		buf += string(ru)
-		if re.MatchString(buf) {
+		if m, _ := re.MatchString(buf); m {
 			mat = true
 		}
 		r.ReadRune()

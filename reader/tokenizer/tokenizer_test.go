@@ -11,6 +11,8 @@ import (
 
 func TestTokenizer_Next(t *testing.T) {
 	tokenizer := NewBufferedTokenReader(strings.NewReader(`
+	#|bar
+|#
 	;foo
 	("\\""\"foo\"" | foo \| bar | #b101)`))
 	tests := []struct {
@@ -19,7 +21,12 @@ func TestTokenizer_Next(t *testing.T) {
 	}{
 		{
 			name: "comment",
-			want: ";foo\n",
+			want: `#|bar
+|#`,
+		},
+		{
+			name: "comment",
+			want: ";foo",
 		},
 		{
 			name: "start",
