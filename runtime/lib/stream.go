@@ -92,7 +92,7 @@ func OpenInputFile(e core.Environment, filename core.Instance, elementClass ...c
 	}
 	file, err := os.Open(string(filename.(core.String)))
 	if err != nil {
-		return SignalCondition(e, core.NewStreamError(e), Nil)
+		return SignalCondition(e, core.NewStreamError(e, Nil), Nil)
 	}
 	var ec core.Instance
 	if len(elementClass) == 0 {
@@ -111,7 +111,7 @@ func OpenOutputFile(e core.Environment, filename core.Instance, elementClass ...
 	rawFilename := string(filename.(core.String))
 	file, err := os.Create(rawFilename)
 	if err != nil {
-		return SignalCondition(e, core.NewStreamError(e), Nil)
+		return SignalCondition(e, core.NewStreamError(e, Nil), Nil)
 	}
 	var ec core.Instance
 	if len(elementClass) == 0 {
@@ -129,7 +129,7 @@ func OpenIoFile(e core.Environment, filename core.Instance, elementClass ...core
 	}
 	file, err := os.Open(string(filename.(core.String)))
 	if err != nil {
-		return SignalCondition(e, core.NewStreamError(e), Nil)
+		return SignalCondition(e, core.NewStreamError(e, Nil), Nil)
 	}
 	var ec core.Instance
 	if len(elementClass) == 0 {
@@ -251,7 +251,7 @@ func Close(e core.Environment, stream core.Instance) (core.Instance, core.Instan
 			file.Close()
 		} else {
 			// Close is only for file pointer
-			return SignalCondition(e, core.NewStreamError(e), Nil)
+			return SignalCondition(e, core.NewStreamError(e, stream), Nil)
 		}
 	}
 	if stream.(core.Stream).BufferedWriter.Raw != nil {
@@ -261,7 +261,7 @@ func Close(e core.Environment, stream core.Instance) (core.Instance, core.Instan
 			file.Close()
 		} else {
 			// Close is only for file pointer
-			return SignalCondition(e, core.NewStreamError(e), Nil)
+			return SignalCondition(e, core.NewStreamError(e, stream), Nil)
 		}
 	}
 	return Nil, nil

@@ -62,10 +62,10 @@ func SetDynamic(e core.Environment, form, var1 core.Instance) (core.Instance, co
 // body-form of the body (or nil if there is none). The bindings are undone when
 // control leaves the prepared dynamic-let special form.
 func DynamicLet(e core.Environment, varForm core.Instance, bodyForm ...core.Instance) (core.Instance, core.Instance) {
-	vfs := map[core.Instance]core.Instance{}
-	if err := ensure(e, core.ListClass, varForm); err != nil {
-		return nil, err
+	if !Rep(Tpl(Sym(), Any))(varForm) {
+		return SignalCondition(e, core.NewDomainError(e, varForm, core.ListClass), Nil)
 	}
+	vfs := map[core.Instance]core.Instance{}
 	for _, cadr := range varForm.(core.List).Slice() {
 		if err := ensure(e, core.ListClass, cadr); err != nil {
 			return nil, err

@@ -83,3 +83,15 @@ func WithHandler(e core.Environment, handler core.Instance, forms ...core.Instan
 	}
 	return ret, err
 }
+
+func CreateReader(class core.Class, key string) func(e core.Environment, c core.Instance) (core.Instance, core.Instance) {
+	return func(e core.Environment, c core.Instance) (core.Instance, core.Instance) {
+		if core.InstanceOf(class, c) {
+			if v, ok := c.(core.BasicInstance).GetSlotValue(core.NewSymbol(key), core.ArithmeticErrorClass); ok {
+				return v, nil
+			}
+			return Nil, nil
+		}
+		return SignalCondition(e, core.NewDomainError(e, c, class), Nil)
+	}
+}

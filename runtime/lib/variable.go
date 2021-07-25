@@ -32,6 +32,9 @@ func Setf(e core.Environment, var1, form core.Instance) (core.Instance, core.Ins
 	if core.InstanceOf(core.SymbolClass, var1) {
 		return Setq(e, var1, form)
 	}
+	if !core.InstanceOf(core.ListClass, var1) {
+		return SignalCondition(e, core.NewParseError(e, var1, core.ListClass), Nil)
+	}
 	funcSpec := core.NewSymbol(fmt.Sprintf("(SETF %v)", var1.(core.List).Nth(0)))
 	fun, ok := e.Function.Get(funcSpec)
 	if !ok {
@@ -54,11 +57,12 @@ func Setf(e core.Environment, var1, form core.Instance) (core.Instance, core.Ins
 // value of let is the result of the evaluation of the last body-form of its
 // body (or nil if there is none). No var may appear more than once in let
 // variable list.
+
 func Let(e core.Environment, varForm core.Instance, bodyForm ...core.Instance) (core.Instance, core.Instance) {
-	vfs := map[core.Instance]core.Instance{}
-	if err := ensure(e, core.ListClass, varForm); err != nil {
-		return nil, err
+	if !Rep(Tpl(Sym(), Any))(varForm) {
+		return SignalCondition(e, core.NewDomainError(e, varForm, core.ListClass), Nil)
 	}
+	vfs := map[core.Instance]core.Instance{}
 	for _, cadr := range varForm.(core.List).Slice() {
 		if err := ensure(e, core.ListClass, cadr); err != nil {
 			return nil, err
@@ -94,8 +98,8 @@ func Let(e core.Environment, varForm core.Instance, bodyForm ...core.Instance) (
 // value of let* is the result of the evaluation of the last form of its body
 // (or nil if there is none).
 func LetStar(e core.Environment, varForm core.Instance, bodyForm ...core.Instance) (core.Instance, core.Instance) {
-	if err := ensure(e, core.ListClass, varForm); err != nil {
-		return nil, err
+	if !Rep(Tpl(Sym(), Any))(varForm) {
+		return SignalCondition(e, core.NewDomainError(e, varForm, core.ListClass), Nil)
 	}
 	for _, cadr := range varForm.(core.List).Slice() {
 		if err := ensure(e, core.ListClass, cadr); err != nil {

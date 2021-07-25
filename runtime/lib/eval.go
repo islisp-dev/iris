@@ -168,6 +168,9 @@ func evalCons(e core.Environment, obj core.Instance) (core.Instance, core.Instan
 	if err := ensure(e, core.ConsClass, obj); err != nil {
 		return nil, err
 	}
+	if !isProperList(obj) {
+		return SignalCondition(e, core.NewParseError(e, obj, core.ListClass), Nil)
+	}
 	car := obj.(*core.Cons).Car // Checked at the top of// This function
 	cdr := obj.(*core.Cons).Cdr // Checked at the top of// This function
 

@@ -45,7 +45,7 @@ func NewParseError(e Environment, str, expectedClass Instance) Instance {
 
 func NewDomainError(e Environment, object Instance, expectedClass Class) Instance {
 	return Create(e, DomainErrorClass,
-		NewSymbol("IRIS.OBJECT"), object,
+		NewSymbol("OBJECT"), object,
 		NewSymbol("EXPECTED-CLASS"), expectedClass)
 }
 
@@ -107,6 +107,6 @@ func NewControlError(e Environment) Instance {
 	return Create(e, ControlErrorClass)
 }
 
-func NewStreamError(e Environment) Instance {
-	return Create(e, StreamErrorClass)
+func NewStreamError(e Environment, stream Instance) Instance {
+	return Create(e, StreamErrorClass, NewSymbol("STREAM"), stream)
 }

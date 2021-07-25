@@ -37,7 +37,7 @@ func newNamedFunction(e core.Environment, functionName, lambdaList core.Instance
 		}
 		parameters = append(parameters, cadr)
 	}
-	return core.NewFunction(functionName.(core.Symbol), func(e core.Environment, arguments ...core.Instance) (core.Instance, core.Instance) {
+	return core.NewFunction(functionName, func(e core.Environment, arguments ...core.Instance) (core.Instance, core.Instance) {
 		e.MergeLexical(lexical)
 		if (variadic && len(parameters)-2 > len(arguments)) || (!variadic && len(parameters) != len(arguments)) {
 			return SignalCondition(e, core.NewArityError(e), Nil)

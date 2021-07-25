@@ -50,7 +50,7 @@ func WriteByte(e core.Environment, obj, str core.Instance) (core.Instance, core.
 
 	b := byte(n)
 	if err := s.WriteByte(b); err != nil {
-		return SignalCondition(e, core.NewStreamError(e), Nil)
+		return SignalCondition(e, core.NewStreamError(e, str), Nil)
 	}
 	return core.NewInteger(int(b)), nil
 }
