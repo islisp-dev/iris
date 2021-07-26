@@ -324,5 +324,7 @@ func init() {
 	defun("STREAM-ERROR-STREAM", CreateReader(core.StreamErrorClass, "STREAM"))
 	defun("UNDEFINED-ENTITY-NAME", CreateReader(core.SimpleErrorClass, "NAME"))
 	defun("UNDEFINED-ENTITY-NAMESPACE", CreateReader(core.StreamErrorClass, "NAMESPACE"))
+
+	defspecial("IMPORT", Import)
 	Time = time.Now()
 }
