@@ -40,6 +40,34 @@ Iris is tested on TravisCI with this command.
 $ go test ./...
 ```
 
+## Calling Go function from Iris
+
+```go
+// greet.go
+package main
+
+import (
+    "fmt"
+    islisp "github.com/islisp-dev/iris/runtime/core"
+)
+
+func SayHello(env islisp.Environment) (islisp.Instance, islisp.Instance) {
+    fmt.Fprintf(env.StandardOutput, "Hello there!\n")
+    return islisp.Nil, nil
+}
+```
+
+```
+$ go build -buildmode=plugin greet.go
+$ iris
+>>> (import say-hello :from "greet.so")
+Nil
+>>> (say-hello)
+Hello there!
+Nil
+```
+
+
 ## License
 This software is licensed under the Mozilla Public License v2.0
 
