@@ -29,7 +29,7 @@ func createList(es ...core.Instance) core.Instance {
 	if len(es) == 0 {
 		return Nil
 	}
-	return NewCons(es[0], createList(es[1:]...))
+	return core.NewCons(es[0], createList(es[1:]...))
 }
 
 func convFloat64(e core.Environment, x core.Instance) (float64, bool, core.Instance) {
@@ -154,10 +154,7 @@ func Apd(test Pattern, tests ...Pattern) Pattern {
 				}
 			}
 		}
-		if len(tests) == 0 {
-			return true
-		}
-		return false
+		return len(tests) == 0
 	}
 }
 
