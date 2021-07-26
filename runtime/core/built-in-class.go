@@ -14,6 +14,11 @@ type BuiltInClass struct {
 	slots  []Instance
 }
 
+func (c BuiltInClass) Equal(i Instance) bool {
+	ic, ok := i.(BuiltInClass)
+	return ok && c.name == ic.name
+}
+
 func NewBuiltInClass(name string, super Class, slots ...string) Class {
 	slotNames := []Instance{}
 	for _, slot := range slots {

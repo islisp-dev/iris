@@ -86,6 +86,11 @@ type StandardClass struct {
 	abstractp Instance
 }
 
+func (c StandardClass) Equal(i Instance) bool {
+	ic, ok := i.(StandardClass)
+	return ok && c.name == ic.name
+}
+
 func NewStandardClass(name Instance, supers []Class, slots []Instance, initforms, initargs *AssociateList, metaclass Class, abstractp Instance) Class {
 	return StandardClass{name, supers, slots, initforms, initargs, metaclass, abstractp}
 }
