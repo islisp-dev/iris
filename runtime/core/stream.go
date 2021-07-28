@@ -13,11 +13,11 @@ import (
 )
 
 type BufferedWriter struct {
-	Raw io.Writer
+	Raw io.WriteCloser
 	*bufio.Writer
 }
 
-func NewBufferedWriter(w io.Writer) *BufferedWriter {
+func NewBufferedWriter(w io.WriteCloser) *BufferedWriter {
 	return &BufferedWriter{w, bufio.NewWriter(w)}
 }
 
@@ -28,7 +28,7 @@ type Stream struct {
 	*BufferedWriter
 }
 
-func NewStream(r io.Reader, w io.Writer, e Instance) Instance {
+func NewStream(r io.ReadCloser, w io.WriteCloser, e Instance) Instance {
 	return Stream{new(int), e, tokenizer.NewBufferedTokenReader(r), NewBufferedWriter(w)}
 }
 

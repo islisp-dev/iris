@@ -10,11 +10,31 @@ import (
 	"os"
 	golang "runtime"
 
+	"github.com/chzyer/readline"
 	"github.com/islisp-dev/iris/runtime/core"
 	"github.com/islisp-dev/iris/runtime/lib"
 )
 
 var commit string
+
+type ReadLine struct {
+	chunk []byte
+	*readline.Instance
+}
+
+func (r *ReadLine) Read(p []byte) (n int, err error) {
+	if len(r.chunk) < len(p) {
+		s, err := r.Readline()
+		if err != nil {
+			return len(s), err
+		}
+		r.chunk = append(r.chunk, []byte(s)...)
+	}
+	n = copy(p, r.chunk)
+	r.chunk = r.chunk[n:]
+	err = nil
+	return
+}
 
 func repl(quiet bool) {
 	if !quiet {
@@ -25,8 +45,11 @@ func repl(quiet bool) {
 		fmt.Printf("Copyright 2017 islisp-dev All Rights Reserved.\n")
 		fmt.Print(">>> ")
 	}
-	lib.TopLevel.StandardInput = core.NewStream(os.Stdin, nil, core.CharacterClass)
-	lib.TopLevel.StandardOutput = core.NewStream(nil, os.Stdout, core.CharacterClass)
+	i, _ := readline.New(">>> ")
+	defer i.Close()
+	rl := &ReadLine{[]byte(""), i}
+	lib.TopLevel.StandardInput = core.NewStream(rl, nil, core.CharacterClass)
+	lib.TopLevel.StandardOutput = core.NewStream(nil, rl, core.CharacterClass)
 	lib.TopLevel.ErrorOutput = core.NewStream(nil, os.Stderr, core.CharacterClass)
 	for exp, err := lib.Read(lib.TopLevel); err == nil; exp, err = lib.Read(lib.TopLevel) {
 		ret, err := lib.Eval(lib.TopLevel, exp)

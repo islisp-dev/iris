@@ -7,14 +7,16 @@ package tokenizer
 import (
 	"strings"
 	"testing"
+
+	"github.com/islisp-dev/iris/util"
 )
 
 func TestTokenizer_Next(t *testing.T) {
-	tokenizer := NewBufferedTokenReader(strings.NewReader(`
+	tokenizer := NewBufferedTokenReader(util.StringReadCloser{strings.NewReader(`
 	#|bar
 |#
 	;foo
-	("\\""\"foo\"" | foo \| bar | #b101)`))
+	("\\""\"foo\"" | foo \| bar | #b101)`)})
 	tests := []struct {
 		name string
 		want string

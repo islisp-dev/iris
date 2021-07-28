@@ -15,12 +15,12 @@ import (
 // which returns a rune without advancing pointer
 type BufferedTokenReader struct {
 	line, column int
-	Raw          io.Reader
+	Raw          io.ReadCloser
 	*bufio.Reader
 }
 
 // NewBufferedTokenReader creates interal reader from io.RuneReader
-func NewBufferedTokenReader(r io.Reader) *BufferedTokenReader {
+func NewBufferedTokenReader(r io.ReadCloser) *BufferedTokenReader {
 	return &BufferedTokenReader{1, 0, r, bufio.NewReader(r)}
 }
 

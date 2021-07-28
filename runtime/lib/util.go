@@ -13,6 +13,7 @@ import (
 	"github.com/islisp-dev/iris/reader/parser"
 	"github.com/islisp-dev/iris/reader/tokenizer"
 	"github.com/islisp-dev/iris/runtime/core"
+	"github.com/islisp-dev/iris/util"
 )
 
 func isProperList(i core.Instance) bool {
@@ -46,7 +47,7 @@ func convFloat64(e core.Environment, x core.Instance) (float64, bool, core.Insta
 
 func readFromString(s string) (core.Instance, core.Instance) {
 	e := core.NewEnvironment(nil, nil, nil, core.DefaultHandler)
-	return parser.Parse(e, tokenizer.NewBufferedTokenReader(strings.NewReader(s)))
+	return parser.Parse(e, tokenizer.NewBufferedTokenReader(util.StringReadCloser{strings.NewReader(s)}))
 }
 
 func ensure(e core.Environment, c core.Class, i ...core.Instance) core.Instance {

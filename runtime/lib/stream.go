@@ -11,6 +11,7 @@ import (
 
 	"github.com/islisp-dev/iris/reader/parser"
 	"github.com/islisp-dev/iris/runtime/core"
+	"github.com/islisp-dev/iris/util"
 )
 
 func Streamp(e core.Environment, obj core.Instance) (core.Instance, core.Instance) {
@@ -245,24 +246,12 @@ func Close(e core.Environment, stream core.Instance) (core.Instance, core.Instan
 	if ok, _ := Streamp(e, stream); core.DeepEqual(ok, Nil) {
 		return SignalCondition(e, core.NewDomainError(e, stream, core.StreamClass), Nil)
 	}
+	stream.(core.Stream).Flush()
 	if stream.(core.Stream).BufferedTokenReader.Raw != nil {
-		file, ok := stream.(core.Stream).BufferedTokenReader.Raw.(*os.File)
-		if ok {
-			file.Close()
-		} else {
-			// Close is only for file pointer
-			return SignalCondition(e, core.NewStreamError(e, stream), Nil)
-		}
+		stream.(core.Stream).BufferedTokenReader.Raw.Close()
 	}
 	if stream.(core.Stream).BufferedWriter.Raw != nil {
-		file, ok := stream.(core.Stream).BufferedWriter.Raw.(*os.File)
-		if ok {
-			stream.(core.Stream).Flush()
-			file.Close()
-		} else {
-			// Close is only for file pointer
-			return SignalCondition(e, core.NewStreamError(e, stream), Nil)
-		}
+		stream.(core.Stream).BufferedWriter.Raw.Close()
 	}
 	return Nil, nil
 }
@@ -279,11 +268,19 @@ func FinishOutput(e core.Environment, stream core.Instance) (core.Instance, core
 }
 
 func CreateStringInputStream(e core.Environment, str core.Instance) (core.Instance, core.Instance) {
-	return core.NewStream(strings.NewReader(string(str.(core.String))), nil, core.CharacterClass), nil
+	return core.NewStream(util.StringReadCloser{strings.NewReader(string(str.(core.String)))}, nil, core.CharacterClass), nil
+}
+
+type BufferCloser struct {
+	*bytes.Buffer
+}
+
+func (BufferCloser) Close() error {
+	return nil
 }
 
 func CreateStringOutputStream(e core.Environment) (core.Instance, core.Instance) {
-	return core.NewStream(nil, new(bytes.Buffer), core.CharacterClass), nil
+	return core.NewStream(nil, BufferCloser{new(bytes.Buffer)}, core.CharacterClass), nil
 }
 
 func GetOutputStreamString(e core.Environment, stream core.Instance) (core.Instance, core.Instance) {
@@ -291,8 +288,8 @@ func GetOutputStreamString(e core.Environment, stream core.Instance) (core.Insta
 		return SignalCondition(e, core.NewDomainError(e, stream, core.StreamClass), Nil)
 	}
 	stream.(core.Stream).Flush()
-	out := core.NewString([]rune(stream.(core.Stream).BufferedWriter.Raw.(*bytes.Buffer).String()))
-	stream.(core.Stream).BufferedWriter.Raw.(*bytes.Buffer).Reset()
+	out := core.NewString([]rune(stream.(core.Stream).BufferedWriter.Raw.(BufferCloser).String()))
+	stream.(core.Stream).BufferedWriter.Raw.(BufferCloser).Reset()
 	return out, nil
 }
 
