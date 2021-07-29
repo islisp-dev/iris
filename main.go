@@ -24,6 +24,8 @@ type ReadLine struct {
 
 func (r *ReadLine) Read(p []byte) (n int, err error) {
 	if len(r.chunk) < len(p) {
+		lib.TopLevel.StandardOutput.(core.Stream).Flush()
+		lib.TopLevel.ErrorOutput.(core.Stream).Flush()
 		s, err := r.Readline()
 		if err != nil {
 			return len(s), err
@@ -37,29 +39,27 @@ func (r *ReadLine) Read(p []byte) (n int, err error) {
 }
 
 func repl(quiet bool) {
+	prompt := ""
 	if !quiet {
+		prompt = ">>> "
 		if commit == "" {
 			commit = "HEAD"
 		}
 		fmt.Printf("Iris ISLisp Interpreter Commit %v on %v\n", commit, golang.Version())
 		fmt.Printf("Copyright 2017 islisp-dev All Rights Reserved.\n")
-		fmt.Print(">>> ")
 	}
-	i, _ := readline.New(">>> ")
+	i, _ := readline.New(prompt)
 	defer i.Close()
-	rl := &ReadLine{[]byte(""), i}
+	rl := &ReadLine{[]byte{}, i}
 	lib.TopLevel.StandardInput = core.NewStream(rl, nil, core.CharacterClass)
-	lib.TopLevel.StandardOutput = core.NewStream(nil, rl, core.CharacterClass)
+	lib.TopLevel.StandardOutput = core.NewStream(nil, os.Stdout, core.CharacterClass)
 	lib.TopLevel.ErrorOutput = core.NewStream(nil, os.Stderr, core.CharacterClass)
 	for exp, err := lib.Read(lib.TopLevel); err == nil; exp, err = lib.Read(lib.TopLevel) {
 		ret, err := lib.Eval(lib.TopLevel, exp)
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintln(lib.TopLevel.ErrorOutput.(core.Stream), err)
 		} else {
-			fmt.Println(ret)
-		}
-		if !quiet {
-			fmt.Print(">>> ")
+			fmt.Fprintln(lib.TopLevel.StandardOutput.(core.Stream), ret)
 		}
 	}
 }
