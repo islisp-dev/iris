@@ -142,3 +142,12 @@ func Repeat(inner Validator) (outer Validator) {
 	}
 	return
 }
+
+func Optional(validator Validator) Validator {
+	return func (args core.Instance) (bool, error) {
+		if args == core.Nil {
+			return true, nil
+		}
+		return validator(args)
+	}
+}
