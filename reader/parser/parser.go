@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/islisp-dev/iris/reader/tokenizer"
-	"github.com/islisp-dev/iris/runtime/core"
+	"github.com/islisp-dev/iris/core"
 )
 
 var eop = core.NewSymbol("End Of Parentheses")

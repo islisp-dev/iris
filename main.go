@@ -10,8 +10,8 @@ import (
 	"os"
 	golang "runtime"
 
-	"github.com/islisp-dev/iris/runtime/core"
-	"github.com/islisp-dev/iris/runtime/lib"
+	"github.com/islisp-dev/iris/core"
+	"github.com/islisp-dev/iris/lib"
 )
 
 var commit string

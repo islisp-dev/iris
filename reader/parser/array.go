@@ -4,7 +4,7 @@
 
 package parser
 
-import "github.com/islisp-dev/iris/runtime/core"
+import "github.com/islisp-dev/iris/core"
 
 func list2array(dim int, list core.Instance) (core.Instance, core.Instance) {
 	if dim == 0 {

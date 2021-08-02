@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/islisp-dev/iris/reader/tokenizer"
-	"github.com/islisp-dev/iris/runtime/core"
+	"github.com/islisp-dev/iris/core"
 )
 
 func Test_parseAtom(t *testing.T) {
