@@ -72,11 +72,11 @@ func ParseAtom(e core.Environment, tok *tokenizer.Token) (core.Instance, core.In
 	//
 	// symbol
 	//
-	if str == "nil" {
+	if str == "nil" || str == "NIL" {
 		return core.Nil, nil
 	}
 	re := `^(`
-	re += `[:&][a-zA-Z]+|`
+	re += `[:&](?:[a-zA-Z]|-)+|`
 	re += `\|.*\||`
 	re += `\+|-|1\+|1-|`
 	re += `[a-zA-Z<>/*=?_!$%[\]^{}~][-a-zA-Z0-9+<>/*=?_!$%[\]^{}~]*|`
