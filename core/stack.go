@@ -4,16 +4,66 @@
 
 package core
 
-type stack []map[string]Instance
+import (
+	"errors"
+
+	hashstructure "github.com/mitchellh/hashstructure/v2"
+)
+
+type HashMap struct {
+	table map[uint64]interface{}
+	keys []interface{}
+}
+
+func NewHashMap() (*HashMap) {
+	return &HashMap{map[uint64]interface{}{}, []interface{}{}}
+}
+
+func (m *HashMap) Set(key, value interface{}) error {
+	hash, err := hashstructure.Hash(key, hashstructure.FormatV2, nil)
+	if err != nil {
+		return err
+	}
+	m.table[hash] = value
+	m.keys = append(m.keys, key)
+	return nil 
+}
+
+func (m *HashMap) Get(key interface{}) (interface{}, error) {
+	hash, err := hashstructure.Hash(key, hashstructure.FormatV2, nil)
+	if err != nil {
+		return nil, err
+	}
+	value, ok := m.table[hash]
+	if !ok {
+		return nil, errors.New("Not found")
+	}
+	return value, nil
+}
+
+func (m *HashMap) Delete(key interface{}) error {
+	hash, err := hashstructure.Hash(key, hashstructure.FormatV2, nil)
+	if err != nil {
+		return err
+	}
+	delete(m.table, hash)
+	return nil
+}
+
+func (m *HashMap) Keys() []interface{} {
+	return m.keys
+}
+
+type stack []*HashMap
 
 func NewStack() stack {
-	return []map[string]Instance{map[string]Instance{}}
+	return []*HashMap{NewHashMap()}
 }
 
 func (s stack) Get(key Instance) (Instance, bool) {
 	for i := len(s) - 1; i >= 0; i-- {
-		if v, ok := s[i][key.String()]; ok {
-			return v, true
+		if v, err := s[i].Get(key); err == nil {
+			return v.(Instance), true
 		}
 	}
 	return nil, false
@@ -21,8 +71,8 @@ func (s stack) Get(key Instance) (Instance, bool) {
 
 func (s stack) Set(key, value Instance) bool {
 	for i := len(s) - 1; i >= 0; i-- {
-		if _, ok := s[i][key.String()]; ok {
-			s[i][key.String()] = value
+		if _, err := s[i].Get(key); err == nil {
+			s[i].Set(key, value)
 			return true
 		}
 	}
@@ -30,16 +80,16 @@ func (s stack) Set(key, value Instance) bool {
 }
 
 func (s stack) Define(key, value Instance) bool {
-	if _, ok := s[len(s)-1][key.String()]; !ok {
-		s[len(s)-1][key.String()] = value
+	if _, err := s[len(s)-1].Get(key); err != nil {
+		s[len(s)-1].Set(key, value)
 		return true
 	}
-	s[len(s)-1][key.String()] = value
+	s[len(s)-1].Set(key, value)
 	return false
 }
 
 func (s stack) Delete(key Instance) {
-	delete(s[len(s)-1], key.String())
+	s[len(s) - 1].Delete(key)
 }
 
 func (s stack) Append(t stack) stack {

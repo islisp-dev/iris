@@ -4,11 +4,17 @@
 
 package core
 
+import hashstructure "github.com/mitchellh/hashstructure/v2"
+
 // Symbol
 
 type Symbol struct {
 	str          string
 	line, column int
+}
+
+func (x Symbol) Hash() (uint64, error) {
+	return hashstructure.Hash(x.str, hashstructure.FormatV2, nil)
 }
 
 func (x Symbol) Location() (line, column int) {

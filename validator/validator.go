@@ -14,143 +14,134 @@ func (err ValidationError) Error() string {
 	return "Validation Error"
 }
 
-type Validator = func (core.Instance) (bool, error)
+type Validator = func (core.Instance) error
 
-func Any(_ core.Instance) (bool, error) {
-	return true, nil
+func Any(_ core.Instance) error {
+	return nil
 }
 
 func InstanceOf(class core.Class) Validator {
-	return func (instance core.Instance) (bool, error) {
+	return func (instance core.Instance) error {
 		ok := core.InstanceOf(class, instance)
 		if !ok {
-			return ok, ValidationError{instance, class}
+			return ValidationError{instance, class}
 		}
-		return ok, nil
+		return nil
 	}
 }
 
 func Symbol(pattern string) Validator {
 	re := regexp2.MustCompile(pattern, 0)
-	return func (instance core.Instance) (bool, error) {
+	return func (instance core.Instance) error {
 		symbol, ok := instance.(core.Symbol)
 		if !ok {
-			return false, ValidationError{instance, core.SymbolClass} 
+			return ValidationError{instance, core.SymbolClass} 
 		}
 		ok, err := re.MatchString(symbol.String())
 		if err != nil || !ok {
-			return false, ValidationError{instance, core.SymbolClass}
+			return ValidationError{instance, core.SymbolClass}
 		}
-		return true, nil
+		return nil
 	}
 }
 
 func Or(validators ...Validator) Validator {
-	return func (instance core.Instance) (bool, error) {
+	return func (instance core.Instance) error {
 		for _, validator := range validators {
-			ok, err := validator(instance)
-			if ok {
-				return ok, err
+			if err := validator(instance); err == nil {
+				return nil
 			}
 		}
-		return false, ValidationError{instance, core.ObjectClass}
+		return ValidationError{instance, core.ObjectClass}
 	}
 }
 
 func And(validators ...Validator) Validator {
-	return func (instance core.Instance) (bool, error) {
+	return func (instance core.Instance) error {
 		for _, validator := range validators {
-			ok, err := validator(instance)
-			if !ok {
-				return ok, err
+			if err := validator(instance); err != nil {
+				return err
 			}
 		}
-		return true, nil
+		return nil
 	}
 }
 
 func Not(validator Validator) Validator {
-	return func (instance core.Instance) (bool, error) {
-		ok, err := validator(instance)
-		if err != nil || !ok {
-			return true, nil
+	return func (instance core.Instance) error {
+		if err := validator(instance); err != nil {
+			return nil
 		}
-		return false, ValidationError{instance, core.ObjectClass}
+		return ValidationError{instance, core.ObjectClass}
 	}
 }
 
 func List(validators ...Validator) Validator {
-	return func (args core.Instance) (bool, error) {
+	return func (args core.Instance) error {
 		if len(validators) == 0 && args == core.Nil {
-			return true, nil
+			return nil
 		}
 		if len(validators) == 0 || args == core.Nil {
-			return false, ValidationError{args, core.ListClass}
+			return ValidationError{args, core.ListClass}
 		}
 		cons, ok := args.(*core.Cons)
 		if !ok {
-			return false, ValidationError{args, core.ConsClass}
+			return ValidationError{args, core.ConsClass}
 		}
-		ok, err := validators[0](cons.Car)
-		if err != nil || !ok {
-			return false, err
+		if err := validators[0](cons.Car); err != nil {
+			return err
 		}
-		ok, err = List(validators...)(cons.Cdr)
-		if err != nil || !ok {
-			return false, err
+		if err := List(validators...)(cons.Cdr); err != nil {
+			return err
 		}
-		return true, nil
+		return nil
 	}
 }
 
 var Nil = List()
 
 func Append(validators ...Validator) Validator {
-	return func (args core.Instance) (bool, error) {
+	return func (args core.Instance) error {
 		if len(validators) == 0 {
-			return false, nil
+			return nil
 		}
 		rest := args
 		for {
 			cons, ok := rest.(*core.Cons)
 			if !ok {
-				return false, ValidationError{rest, core.ConsClass}
+				return ValidationError{rest, core.ConsClass}
 			}
 			rest := cons.Cdr
 			cons.Cdr = core.Nil
-			ok, err := validators[0](args)
-			if !ok || err != nil {
+			if err := validators[0](args); err != nil {
 				cons.Cdr = rest
 				continue
 			}
-			ok, err = Append(validators...)(rest)
-			if !ok || err != nil {
+			if err := Append(validators...)(rest); err != nil {
 				cons.Cdr = rest
 				continue
 			}
-			return true, nil
+			return nil
 		}
 	}
 }
 
 func Repeat(inner Validator) (outer Validator) {
-	outer = func (args core.Instance) (bool, error) {
+	outer = func (args core.Instance) error {
 		if args == core.Nil {
-			return true, nil
+			return nil
 		}
 		cons, ok := args.(*core.Cons)
 		if !ok {
-			return false, ValidationError{args, core.ConsClass} 
+			return ValidationError{args, core.ConsClass} 
 		}
-		ok, err := inner(cons.Car)
-		if err != nil || !ok {
-			return false, err
+		if err := inner(cons.Car); err != nil {
+			return err
 		}
-		ok, err = outer(cons.Cdr)
-		if err != nil || !ok {
-			return false, err
+		if err := outer(cons.Cdr); err != nil {
+			return err
 		}
-		return true, nil
+		return nil
 	}
 	return
 }
