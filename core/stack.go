@@ -8,15 +8,16 @@ import (
 	"errors"
 
 	hashstructure "github.com/mitchellh/hashstructure/v2"
+	mapset "github.com/deckarep/golang-set"
 )
 
 type HashMap struct {
 	table map[uint64]interface{}
-	keys []interface{}
+	keys mapset.Set
 }
 
 func NewHashMap() (*HashMap) {
-	return &HashMap{map[uint64]interface{}{}, []interface{}{}}
+	return &HashMap{map[uint64]interface{}{}, mapset.NewSet()}
 }
 
 func (m *HashMap) Set(key, value interface{}) error {
@@ -25,7 +26,7 @@ func (m *HashMap) Set(key, value interface{}) error {
 		return err
 	}
 	m.table[hash] = value
-	m.keys = append(m.keys, key)
+	m.keys.Add(key)
 	return nil 
 }
 
@@ -47,10 +48,11 @@ func (m *HashMap) Delete(key interface{}) error {
 		return err
 	}
 	delete(m.table, hash)
+	m.keys.Remove(hash)
 	return nil
 }
 
-func (m *HashMap) Keys() []interface{} {
+func (m *HashMap) Keys() mapset.Set {
 	return m.keys
 }
 
