@@ -69,6 +69,16 @@ func And(validators ...Validator) Validator {
 	}
 }
 
+func Not(validator Validator) Validator {
+	return func (instance core.Instance) (bool, error) {
+		ok, err := validator(instance)
+		if err != nil || !ok {
+			return true, nil
+		}
+		return false, ValidationError{instance, core.ObjectClass}
+	}
+}
+
 func List(validators ...Validator) Validator {
 	return func (args core.Instance) (bool, error) {
 		if len(validators) == 0 && args == core.Nil {
@@ -92,6 +102,8 @@ func List(validators ...Validator) Validator {
 		return true, nil
 	}
 }
+
+var Nil = List()
 
 func Append(validators ...Validator) Validator {
 	return func (args core.Instance) (bool, error) {
@@ -141,13 +153,4 @@ func Repeat(inner Validator) (outer Validator) {
 		return true, nil
 	}
 	return
-}
-
-func Optional(validator Validator) Validator {
-	return func (args core.Instance) (bool, error) {
-		if args == core.Nil {
-			return true, nil
-		}
-		return validator(args)
-	}
 }
