@@ -21,7 +21,7 @@ func (x Symbol) Location() (line, column int) {
 	return x.line, x.column
 }
 
-func (x Symbol) Equal(y Instance) bool {
+func (x Symbol) Equal(y interface{}) bool {
 	z, ok := y.(Symbol)
 	if !ok {
 		return false

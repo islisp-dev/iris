@@ -4,62 +4,10 @@
 
 package core
 
-import (
-	"errors"
-
-	hashstructure "github.com/mitchellh/hashstructure/v2"
-	mapset "github.com/deckarep/golang-set"
-)
-
-type HashMap struct {
-	table map[uint64]interface{}
-	keys mapset.Set
-}
-
-func NewHashMap() (*HashMap) {
-	return &HashMap{map[uint64]interface{}{}, mapset.NewSet()}
-}
-
-func (m *HashMap) Set(key, value interface{}) error {
-	hash, err := hashstructure.Hash(key, hashstructure.FormatV2, nil)
-	if err != nil {
-		return err
-	}
-	m.table[hash] = value
-	m.keys.Add(key)
-	return nil 
-}
-
-func (m *HashMap) Get(key interface{}) (interface{}, error) {
-	hash, err := hashstructure.Hash(key, hashstructure.FormatV2, nil)
-	if err != nil {
-		return nil, err
-	}
-	value, ok := m.table[hash]
-	if !ok {
-		return nil, errors.New("Not found")
-	}
-	return value, nil
-}
-
-func (m *HashMap) Delete(key interface{}) error {
-	hash, err := hashstructure.Hash(key, hashstructure.FormatV2, nil)
-	if err != nil {
-		return err
-	}
-	delete(m.table, hash)
-	m.keys.Remove(hash)
-	return nil
-}
-
-func (m *HashMap) Keys() mapset.Set {
-	return m.keys
-}
-
-type stack []*HashMap
+type stack []Map
 
 func NewStack() stack {
-	return []*HashMap{NewHashMap()}
+	return []Map{NewHashMap()}
 }
 
 func (s stack) Get(key Instance) (Instance, bool) {

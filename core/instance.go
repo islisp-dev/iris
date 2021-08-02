@@ -15,7 +15,7 @@ func Create(e Environment, c Instance, i ...Instance) Instance {
 	for _, q := range c.(Class).Supers() {
 		p = append(p, Create(e, q, i...))
 	}
-	return InitializeObject(e, BasicInstance{c.(Class), p, NewAssociateList()}, i...)
+	return InitializeObject(e, BasicInstance{c.(Class), p, NewHashMap()}, i...)
 }
 
 func InitializeObject(e Environment, object Instance, inits ...Instance) Instance {
@@ -48,7 +48,7 @@ func InitializeObject(e Environment, object Instance, inits ...Instance) Instanc
 type BasicInstance struct {
 	class  Class
 	supers []Instance
-	slots  *AssociateList
+	slots  Map
 }
 
 func (i BasicInstance) Class() Class {
@@ -57,8 +57,8 @@ func (i BasicInstance) Class() Class {
 
 func (i BasicInstance) GetSlotValue(key Instance, class Class) (Instance, bool) {
 	if DeepEqual(i.class, class) {
-		if v, ok := i.slots.Find(key); ok {
-			return v, true
+		if v, err := i.slots.Get(key); err == nil {
+			return v.(Instance), true
 		}
 		for _, s := range class.Slots() {
 			if DeepEqual(s, key) {
@@ -86,15 +86,18 @@ func (i BasicInstance) SetSlotValue(key Instance, value Instance, class Class) (
 	return ok
 }
 
-func (i BasicInstance) getAllSlots() *AssociateList {
-	m := NewAssociateList()
-	for _, kv := range i.slots.List {
-		m.Set(kv.Key, kv.Value)
+func (i BasicInstance) getAllSlots() Map {
+	m := NewHashMap()
+	for _, key := range i.slots.Keys() {
+		val, _ := i.slots.Get(key)
+		m.Set(key, val)
 	}
 	for _, c := range i.supers {
 		if _, ok := c.(BasicInstance); ok {
-			for _, kv := range c.(BasicInstance).getAllSlots().List {
-				m.Set(kv.Key, kv.Value)
+			slots := c.(BasicInstance).getAllSlots()
+			for _, key := range slots.Keys() {
+				val, _ := slots.Get(key)
+				m.Set(key, val)
 			}
 		}
 	}

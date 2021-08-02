@@ -77,8 +77,8 @@ func Defclass(e core.Environment, className, scNames, slotSpecs core.Instance, c
 		supers = append(supers, super)
 	}
 	slots := []core.Instance{}
-	initforms := core.NewAssociateList()
-	initargs := core.NewAssociateList()
+	initforms := core.NewHashMap()
+	initargs := core.NewHashMap()
 	for _, slotSpec := range slotSpecs.(core.List).Slice() {
 		if core.InstanceOf(core.SymbolClass, slotSpec) {
 			slotName := slotSpec
